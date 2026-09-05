@@ -170,7 +170,7 @@ export default function Home() {
               <p>{product.tag}</p>
               <h3>{product.title}</h3>
               <p>{product.text}</p>
-              <ArrowLink href={product.href || "/solutions"}>{product.href ? "Explore the ERP" : "Explore the work"}</ArrowLink>
+              <ArrowLink href={product.href || "/solutions"}>{product.href === "/solutions/erp" ? "Explore the ERP" : "Explore the work"}</ArrowLink>
             </article>
           ))}
         </div>
