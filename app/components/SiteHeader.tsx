@@ -7,16 +7,54 @@ import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menuOverlay = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
 
   useEffect(() => {
     document.body.classList.toggle("menu-is-open", open);
-    if (open) closeButton.current?.focus();
+    const page = document.getElementById("main-content");
+    if (open) page?.setAttribute("inert", "");
+    else page?.removeAttribute("inert");
+
+    let focusTimer: number | undefined;
+    if (open) {
+      wasOpen.current = true;
+      focusTimer = window.setTimeout(() => closeButton.current?.focus(), 40);
+    } else if (wasOpen.current) {
+      menuButton.current?.focus();
+      wasOpen.current = false;
+    }
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (!open) return;
+      if (event.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = Array.from(
+        menuOverlay.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((element) => !element.hasAttribute("disabled"));
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
+      if (focusTimer) window.clearTimeout(focusTimer);
+      page?.removeAttribute("inert");
       document.body.classList.remove("menu-is-open");
       window.removeEventListener("keydown", onKeyDown);
     };
@@ -46,11 +84,13 @@ export function SiteHeader() {
         </Link>
         <p className="header-prompt">Engineering imagination into impact.</p>
         <button
+          ref={menuButton}
           className="menu-trigger"
           type="button"
           aria-label="Open navigation menu"
           aria-expanded={open}
           aria-controls="site-menu"
+          tabIndex={open ? -1 : 0}
           onClick={() => setOpen(true)}
         >
           <span>Menu</span>
@@ -59,13 +99,17 @@ export function SiteHeader() {
       </header>
 
       <div
+        ref={menuOverlay}
         id="site-menu"
         className={"menu-overlay" + (open ? " is-open" : "")}
         aria-hidden={!open}
+        aria-modal={open ? "true" : undefined}
+        role="dialog"
+        aria-label="Site navigation"
       >
         <div className="menu-motif" aria-hidden="true"><i /><i /><i /><i /></div>
         <div className="menu-top shell">
-          <Link className="menu-brand" href="/" onClick={() => setOpen(false)}>
+          <Link className="menu-brand" href="/" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
             <img src="/images/brand/logo.png" alt="" width="50" height="50" />
             <span>TechM4India</span>
           </Link>
@@ -75,6 +119,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setOpen(false)}
             aria-label="Close navigation menu"
+            tabIndex={open ? 0 : -1}
           >
             Close <span aria-hidden="true">×</span>
           </button>

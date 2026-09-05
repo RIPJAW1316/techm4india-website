@@ -52,38 +52,88 @@ export const divisions = [
 ];
 
 export const impactStats = [
-  { value: "500+", label: "Partner institutions nationwide" },
-  { value: "10K+", label: "Students actively innovating" },
   { value: "4", label: "Technology innovation verticals" },
-  { value: "15+", label: "Technology domains covered" },
-  { value: "6", label: "Flagship AI products built" },
-  { value: "98%", label: "Partner satisfaction rate" },
+  { value: "7", label: "Engineering disciplines" },
+  { value: "6", label: "Aerospace lab formats" },
+  { value: "5", label: "School innovation labs" },
 ];
 
-export const people = [
+export type Person = {
+  name: string;
+  role: string;
+  image: string;
+  bio: string;
+};
+
+export const people: Person[] = [
   {
     name: "Dr. K. Sudheer Reddy",
-    role: "Academic & Planning Advisor",
-    image: "/images/people/dr-sudheer-reddy.png",
+    role: "Dean — Academics & Planning",
+    image: "/images/people/dr-sudheer-reddy.webp",
     bio: "Provides strategic direction so innovation becomes an integral part of education, connecting academic depth with practical application.",
   },
   {
     name: "Mahesh Mannuru",
     role: "Senior Technical Lead, TechM4Schools",
-    image: "/images/people/mahesh-mannuru.png",
+    image: "/images/people/mahesh-mannuru.webp",
     bio: "Brings expertise in embedded systems, cybersecurity, AUTOSAR integration and software development to hands-on learning experiences.",
   },
   {
     name: "Mettu Raja Reddy",
     role: "Senior Technical Lead, TechM4Schools",
-    image: "/images/people/mettu-raja-reddy.png",
+    image: "/images/people/mettu-raja-reddy.webp",
     bio: "Builds innovation ecosystems informed by business analysis, product management and entrepreneurship.",
   },
   {
     name: "Elavala Bharath Reddy",
     role: "Senior Technical Lead, TechM4Schools",
-    image: "/images/people/elavala-bharath-reddy.png",
+    image: "/images/people/elavala-bharath-reddy.webp",
     bio: "Supports scalable educational platforms through Salesforce technologies and digital transformation expertise.",
+  },
+];
+
+export const founders: Person[] = [
+  {
+    name: "Thanniru Rammurthy",
+    role: "Founder & Chairman",
+    image: "/images/founders/rammurthy.webp",
+    bio: "Provides the founding vision and long-term direction for the TechM4India ecosystem.",
+  },
+  {
+    name: "Thanniru Mahesh",
+    role: "Founder, Managing CEO & Chief Marketing Manager",
+    image: "/images/founders/mahesh.webp",
+    bio: "Leads the organisation, its growth and the partnerships that carry the work forward.",
+  },
+  {
+    name: "Pardhiv Sangyam",
+    role: "HR Manager",
+    image: "/images/founders/pardhiv.webp",
+    bio: "Supports the people and team culture behind TechM4India's programmes and delivery.",
+  },
+  {
+    name: "Thanneeru Pranay",
+    role: "Co-Founder",
+    image: "/images/founders/pranay.webp",
+    bio: "Contributes to the ecosystem's development and institutional innovation work.",
+  },
+  {
+    name: "Karthikeya Patel",
+    role: "Co-Founder",
+    image: "/images/founders/karthikeya.webp",
+    bio: "Contributes to the ecosystem's development and institutional innovation work.",
+  },
+  {
+    name: "Siripuram Varun",
+    role: "Co-Founder",
+    image: "/images/founders/varun.webp",
+    bio: "Contributes to the ecosystem's development and institutional innovation work.",
+  },
+  {
+    name: "Meghana",
+    role: "Co-Founder",
+    image: "/images/founders/meghana.webp",
+    bio: "Contributes to the ecosystem's development and institutional innovation work.",
   },
 ];
 
@@ -102,6 +152,14 @@ export const contact = {
   emailHref: "mailto:info@techm4india.com",
   partnerships: "partnerships@techm4india.com",
   partnershipsHref: "mailto:partnerships@techm4india.com",
+  hello: "hello@techm4india.com",
+  helloHref: "mailto:hello@techm4india.com",
+  ceo: "ceo@techm4india.com",
+  ceoHref: "mailto:ceo@techm4india.com",
+  hr: "hr@techm4india.com",
+  hrHref: "mailto:hr@techm4india.com",
+  support: "techm4india@gmail.com",
+  supportHref: "mailto:techm4india@gmail.com",
   whatsapp: "https://wa.me/916301814246",
   address: "T-Hub, IIIT Hyderabad Campus, Gachibowli, Hyderabad — 500032, Telangana, India",
 };

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const siteUrl = "https://techm4india.com";
+export const siteUrl = "https://www.techm4india.com";
 
 export function pageMetadata({
   title,
@@ -24,11 +24,18 @@ export function pageMetadata({
       siteName: "TechM4India",
       title,
       description,
+      images: [{
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "TechM4India — engineering imagination into impact",
+      }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/og.png"],
     },
   };
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLink, EditorialList, PageHero, PartnershipCTA, PeopleGrid, SectionHeading, StatRow } from "../components/Shared";
 import { StructuredData } from "../components/StructuredData";
-import { divisions } from "@/lib/site-data";
+import { divisions, founders } from "@/lib/site-data";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -12,12 +12,11 @@ export const metadata = pageMetadata({
 });
 
 const timeline = [
-  { date: "2022", title: "A question becomes a company", text: "TechM4India begins with a simple belief: world-class technology education should not be limited by geography or circumstance." },
-  { date: "2022", title: "Solutions take shape", text: "The first product and software experiments turn real institutional and industry problems into practical tools." },
-  { date: "2023", title: "Space joins the ecosystem", text: "Aerospace learning expands the horizon from code and circuits to satellites, rockets and mission thinking." },
-  { date: "2023", title: "Schools start building", text: "Innovation labs and hands-on programs bring future technologies into school learning environments." },
-  { date: "2024", title: "A network with momentum", text: "200+ institutions and 10,000+ students become part of a growing, connected ecosystem." },
-  { date: "2025", title: "A wider ambition", text: "AI, digital infrastructure and global delivery capabilities join the next chapter of the work." },
+  { date: "Origin", title: "A question becomes a company", text: "TechM4India begins with a simple belief: world-class technology education should not be limited by geography or circumstance." },
+  { date: "Build", title: "Solutions take shape", text: "The first product and software experiments turn real institutional and industry problems into practical tools." },
+  { date: "Expand", title: "Space joins the ecosystem", text: "Aerospace learning expands the horizon from code and circuits to satellites, rockets and mission thinking." },
+  { date: "Connect", title: "Schools start building", text: "Innovation labs and hands-on programs bring future technologies into school learning environments." },
+  { date: "Today", title: "A wider ambition", text: "AI, digital infrastructure and four connected divisions now shape the next chapter of the work." },
 ];
 
 const principles = [
@@ -33,7 +32,7 @@ export default function AboutPage() {
   return (
     <main className="inner-page about-page">
       <PageHero
-        eyebrow="Our story · Est. 2023"
+        eyebrow="Our story · Built in India"
         title={<>We&apos;re building India&apos;s largest <em>tech ecosystem for every student.</em></>}
         description="From a single classroom in Telangana to four connected divisions shaping engineers, innovators, space scientists and future-ready school students."
         image="/images/about/hero.jpeg"
@@ -66,11 +65,11 @@ export default function AboutPage() {
             text="The scale is useful only when it creates more chances for people to learn by doing."
           />
           <StatRow items={[
-            { value: "10K+", label: "Students impacted" },
             { value: "4", label: "Connected divisions" },
-            { value: "200+", label: "Institutions in the network" },
-            { value: "50+", label: "Live projects" },
-            { value: "6", label: "Product solutions" },
+            { value: "7", label: "Engineering disciplines" },
+            { value: "6", label: "Aerospace lab formats" },
+            { value: "5", label: "School innovation labs" },
+            { value: "31", label: "Solution concepts in the catalogue" },
           ]} />
         </div>
       </section>
@@ -125,15 +124,15 @@ export default function AboutPage() {
         <SectionHeading
           eyebrow="06 / Leadership"
           title={<>People who keep the work <em>close to the ground.</em></>}
-          text="The team brings academic context, technical fluency and a practical instinct for making ideas useful."
+          text="The founding team carries TechM4India's vision, organisational direction and commitment to building useful pathways for learners."
         />
-        <PeopleGrid />
+        <PeopleGrid members={founders} compact />
       </section>
 
       <section className="about-quote section">
         <div className="shell">
           <p className="section-kicker section-kicker-light"><span>07 / The promise</span></p>
-          <blockquote>“We are not preparing students for a technology future. We are giving them a hand in building it.”</blockquote>
+          <h2>Give every student a hand in <em>building the future.</em></h2>
           <p>TechM4India</p>
         </div>
       </section>

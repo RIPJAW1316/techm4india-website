@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ContactForm } from "../components/ContactForm";
-import { ArrowLink, PageHero, SectionHeading } from "../components/Shared";
+import { PageHero, SectionHeading } from "../components/Shared";
 import { StructuredData } from "../components/StructuredData";
 import { contact, socialLinks } from "@/lib/site-data";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
@@ -18,6 +18,7 @@ const partnershipTypes = [
   { title: "CSR collaboration", text: "Fund a lab or student pathway with clear, measurable outcomes." },
   { title: "Research partnership", text: "Bring a hard problem and build the right student, lab and faculty team around it." },
   { title: "Startup collaboration", text: "Test technology with real learners and grow through a connected institutional network." },
+  { title: "Company management ERP", text: "Discuss the V1 blueprint for CRM, institutions, programs, projects, finance, assets and CMS." },
   { title: "Government / policy", text: "Discuss NEP implementation, digital skilling infrastructure and innovation hubs." },
 ];
 
@@ -30,14 +31,16 @@ export default function ContactPage() {
         description="Whether you are an institution leader, a CSR head, a startup founder, a researcher or a student with a question, we want to hear from you."
         image="/images/home/workshop-display.jpeg"
         imageAlt="Students learning with a mentor in an innovation classroom"
+        ctaHref="#contact-form"
+        ctaLabel="Jump to the form"
       />
 
       <section className="contact-section section shell" id="contact-form">
         <div className="contact-image image-frame" data-reveal>
           <img src="/images/home/mentor-students.jpeg" alt="Mentor and students collaborating in a workshop" loading="lazy" />
           <div>
-            <span>We respond within 24 hours.</span>
-            <span>We do not hide behind forms.</span>
+            <span>Bring the ambition.</span>
+            <span>Bring the context.</span>
           </div>
         </div>
         <div className="contact-form-panel" data-reveal>
@@ -54,12 +57,16 @@ export default function ContactPage() {
           <h2>Good work starts with a <em>conversation.</em></h2>
           <div className="detail-block">
             <span>Headquarters</span>
-            <p>TechM4India Private Limited<br />{contact.address}</p>
+            <p>TechM4India Innovations Private Limited<br />{contact.address}</p>
           </div>
           <div className="detail-block">
             <span>Email</span>
             <a href={contact.emailHref}>{contact.email}</a>
             <a href={contact.partnershipsHref}>{contact.partnerships}</a>
+            <a href={contact.helloHref}>{contact.hello}</a>
+            <a href={contact.ceoHref}>{contact.ceo}</a>
+            <a href={contact.hrHref}>{contact.hr}</a>
+            <a href={contact.supportHref}>{contact.support}</a>
           </div>
           <div className="detail-block">
             <span>Call</span>
@@ -126,7 +133,7 @@ export default function ContactPage() {
             "@context": "https://schema.org",
             "@type": "ContactPage",
             name: "Contact TechM4India",
-            url: "https://techm4india.com/contact",
+            url: "https://www.techm4india.com/contact",
             telephone: contact.generalPhone,
             email: contact.email,
             address: { "@type": "PostalAddress", addressLocality: "Hyderabad", addressRegion: "Telangana", addressCountry: "IN" },

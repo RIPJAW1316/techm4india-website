@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import { people } from "@/lib/site-data";
+import { people, type Person } from "@/lib/site-data";
 
 export function PageHero({
   eyebrow,
@@ -10,6 +10,8 @@ export function PageHero({
   imageAlt,
   className = "",
   credit,
+  ctaHref = "/contact",
+  ctaLabel = "Start a partnership",
 }: {
   eyebrow: string;
   title: ReactNode;
@@ -18,6 +20,8 @@ export function PageHero({
   imageAlt: string;
   className?: string;
   credit?: string;
+  ctaHref?: string;
+  ctaLabel?: string;
 }) {
   return (
     <section className={"page-hero " + className.trim()} aria-labelledby="page-title">
@@ -28,8 +32,8 @@ export function PageHero({
         <h1 id="page-title">{title}</h1>
         <div className="page-hero-bottom">
           <p>{description}</p>
-          <Link className="button button-primary" href="/contact">
-            Start a partnership <span aria-hidden="true">↗</span>
+          <Link className="button button-primary" href={ctaHref}>
+            {ctaLabel} <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </div>
@@ -80,10 +84,10 @@ export function StatRow({ items }: { items: { value: string; label: string }[] }
   );
 }
 
-export function PeopleGrid({ compact = false }: { compact?: boolean }) {
+export function PeopleGrid({ compact = false, members = people }: { compact?: boolean; members?: Person[] }) {
   return (
     <div className={"people-grid" + (compact ? " people-grid-compact" : "")}>
-      {people.map((person, index) => (
+      {members.map((person, index) => (
         <article
           className="person-card"
           key={person.name}

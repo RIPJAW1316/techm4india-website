@@ -1,19 +1,15 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { contact } from "@/lib/site-data";
 
-const supabaseUrl = "https://usmupsydbpzpqepfztdn.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzbXVwc3lkYnB6cHFlcGZ6dGRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NjA3NzUsImV4cCI6MjA5OTMzNjc3NX0.pjrQPCg0uO8Wi85HRtFwlssqNPIrvizi-ZZIUaK3Zwg";
-
-type Status = "idle" | "sending" | "sent" | "error";
+type Status = "idle" | "ready" | "blocked";
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus("sending");
 
     const form = event.currentTarget;
     const data = new FormData(form);
@@ -27,32 +23,20 @@ export function ContactForm() {
     };
 
     const message =
-      "*New Contact Form Submission*\\n\\n" +
-      "*Name:* " + payload.first_name + " " + payload.last_name + "\\n" +
-      "*Email:* " + payload.email + "\\n" +
-      "*Organisation:* " + payload.organisation + "\\n" +
-      "*Role:* " + payload.role + "\\n" +
+      "*New TechM4India enquiry*\n\n" +
+      "*Name:* " + payload.first_name + " " + payload.last_name + "\n" +
+      "*Email:* " + payload.email + "\n" +
+      "*Organisation:* " + payload.organisation + "\n" +
+      "*Role:* " + payload.role + "\n" +
       "*Message:* " + payload.message;
     const whatsappUrl = "https://wa.me/916301814246?text=" + encodeURIComponent(message);
 
-    try {
-      const response = await fetch(supabaseUrl + "/rest/v1/contact_submissions", {
-        method: "POST",
-        headers: {
-          apikey: supabaseAnonKey,
-          Authorization: "Bearer " + supabaseAnonKey,
-          "Content-Type": "application/json",
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error("Submission failed");
-      setStatus("sent");
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    const conversation = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    if (conversation) {
+      setStatus("ready");
       form.reset();
-    } catch {
-      setStatus("error");
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    } else {
+      setStatus("blocked");
     }
   }
 
@@ -61,24 +45,24 @@ export function ContactForm() {
       <div className="form-row">
         <label>
           <span>First name</span>
-          <input name="firstName" type="text" autoComplete="given-name" placeholder="Arjun" required />
+      <input name="firstName" type="text" autoComplete="given-name" placeholder="Arjun" maxLength={80} required />
         </label>
         <label>
           <span>Last name</span>
-          <input name="lastName" type="text" autoComplete="family-name" placeholder="Reddy" required />
+      <input name="lastName" type="text" autoComplete="family-name" placeholder="Reddy" maxLength={80} required />
         </label>
       </div>
       <label>
         <span>Email address</span>
-        <input name="email" type="email" autoComplete="email" placeholder="arjun@institution.ac.in" required />
+        <input name="email" type="email" autoComplete="email" placeholder="arjun@institution.ac.in" maxLength={254} required />
       </label>
       <label>
         <span>Organisation / institution</span>
-        <input name="organisation" type="text" autoComplete="organization" placeholder="Your institution or company" />
+        <input name="organisation" type="text" autoComplete="organization" placeholder="Your institution or company" maxLength={160} />
       </label>
       <label>
         <span>I am reaching out as a</span>
-        <select name="role" defaultValue="">
+        <select name="role" defaultValue="" required>
           <option value="" disabled>Select your role</option>
           <option>University / College Administrator</option>
           <option>School Principal / Director</option>
@@ -94,15 +78,16 @@ export function ContactForm() {
       </label>
       <label>
         <span>What would you like to discuss?</span>
-        <textarea name="message" rows={5} placeholder="Tell us what you are looking to achieve and how we can help." />
+        <textarea name="message" rows={5} minLength={20} maxLength={2000} placeholder="Tell us what you are looking to achieve and how we can help." required />
       </label>
-      <button className="button button-primary form-submit" type="submit" disabled={status === "sending"}>
-        {status === "sending" ? "Sending…" : status === "sent" ? "Message sent" : "Send message"}
-        <span aria-hidden="true">{status === "sent" ? "✓" : "↗"}</span>
+      <p className="form-privacy">Continuing opens a pre-filled WhatsApp message. Review it there before choosing to send. Prefer email? <a href={contact.partnershipsHref}>Write to partnerships</a>.</p>
+      <button className="button button-primary form-submit" type="submit">
+        {status === "ready" ? "WhatsApp ready" : "Continue in WhatsApp"}
+        <span aria-hidden="true">{status === "ready" ? "✓" : "↗"}</span>
       </button>
       <p className="form-status" aria-live="polite">
-        {status === "sent" && "Thank you. Your message has been recorded and WhatsApp has opened for a direct follow-up."}
-        {status === "error" && "WhatsApp has opened so you can send the message directly."}
+        {status === "ready" && "Your draft is ready in WhatsApp. It is not sent until you confirm it there."}
+        {status === "blocked" && "Your browser blocked the new tab. Allow pop-ups for this site, then try again."}
       </p>
     </form>
   );

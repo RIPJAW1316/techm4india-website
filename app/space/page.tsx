@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowLink, EditorialList, PageHero, PartnershipCTA, PeopleGrid, SectionHeading, StatRow } from "../components/Shared";
 import { StructuredData } from "../components/StructuredData";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
@@ -62,11 +61,10 @@ export default function SpacePage() {
           <ArrowLink href="/contact">Build a space pathway</ArrowLink>
         </div>
         <StatRow items={[
-          { value: "5+", label: "Partner institutions" },
-          { value: "8K+", label: "Students reached" },
           { value: "6", label: "Aerospace labs" },
           { value: "5", label: "Innovation layers" },
-          { value: "NEP", label: "2020 aligned" },
+          { value: "5", label: "Hands-on learning kits" },
+          { value: "6", label: "Capability outcomes" },
         ]} />
       </section>
 
@@ -148,14 +146,14 @@ export default function SpacePage() {
       <section className="space-benefits section shell">
         <SectionHeading eyebrow="07 / For institutions" title={<>Aerospace can become a <em>strategic advantage.</em></>} />
         <div className="benefit-grid">
-          {["NAAC & NIRF accreditation support", "A stronger talent pipeline", "Research grants & funding access", "Student admissions differentiation", "Industry & global collaborations", "Startup & innovation ecosystem"].map((benefit, index) => (
+          {["Practice beyond the syllabus", "Cross-disciplinary projects", "Research readiness", "A distinctive student experience", "Industry-facing portfolios", "Startup & innovation culture"].map((benefit, index) => (
             <div key={benefit} data-reveal><span>0{index + 1}</span><h3>{benefit}</h3></div>
           ))}
         </div>
       </section>
 
       <section className="space-team section shell">
-        <SectionHeading eyebrow="08 / The people" title={<>Ambition is a team <em>sport.</em></>} />
+        <SectionHeading eyebrow="08 / The shared team" title={<>Ambition is a team <em>sport.</em></>} />
         <PeopleGrid compact />
       </section>
 

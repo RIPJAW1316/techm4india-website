@@ -12,12 +12,13 @@ export const metadata = pageMetadata({
 });
 
 const products = [
-  { tag: "Industrial intelligence", title: "AirGuard Pro", text: "Turning complex industrial signals into clearer decisions." },
-  { tag: "AI quality", title: "AcoustiCast", text: "Practical intelligence for teams building better products." },
-  { tag: "AgriTech", title: "FoodSpectra", text: "Making essential systems more visible, measurable and resilient." },
-  { tag: "FinTech & SaaS", title: "ITCMax", text: "Digital tools that make everyday enterprise work lighter." },
-  { tag: "Student innovation", title: "IGNITE AI", text: "A bridge from emerging technology to real student capability." },
-  { tag: "School ecosystems", title: "CareerBuddy", text: "Helping students connect curiosity with a future pathway." },
+  { tag: "Company operations", title: "Company Management ERP V1", text: "A modular operating system for people, leads, institutions, programs, projects and content.", href: "/solutions/erp" },
+  { tag: "Industrial intelligence", title: "AirGuard Pro", text: "Turning complex industrial signals into clearer decisions.", href: "/solutions" },
+  { tag: "AI quality", title: "AcoustiCast", text: "Practical intelligence for teams building better products.", href: "/solutions" },
+  { tag: "AgriTech", title: "FoodSpectra", text: "Making essential systems more visible, measurable and resilient.", href: "/solutions" },
+  { tag: "FinTech & SaaS", title: "ITCMax", text: "Digital tools that make everyday enterprise work lighter.", href: "/solutions" },
+  { tag: "Student innovation", title: "IGNITE AI", text: "A bridge from emerging technology to real student capability.", href: "/solutions" },
+  { tag: "School ecosystems", title: "CareerBuddy", text: "Helping students connect curiosity with a future pathway.", href: "/solutions" },
 ];
 
 const news = [
@@ -126,9 +127,9 @@ export default function Home() {
       <section className="impact-section section">
         <div className="shell">
           <SectionHeading
-            eyebrow="03 / Impact at scale"
-            title={<>Progress is a practice, <em>not a promise.</em></>}
-            text="The work is measured in institutions that can do more, students who can build more, and systems that are ready for what comes next."
+            eyebrow="03 / The ecosystem at a glance"
+            title={<>A connected system for <em>serious making.</em></>}
+            text="These are the disciplines, pathways and lab formats that make the TechM4India ecosystem tangible."
           />
           <StatRow items={impactStats} />
         </div>
@@ -158,9 +159,9 @@ export default function Home() {
 
       <section className="products-section section shell">
         <SectionHeading
-          eyebrow="05 / Real products. Real impact."
+          eyebrow="05 / Products, platforms & programmes"
           title={<>Ideas are useful when they <em>leave the room.</em></>}
-          text="A selection from the technology and learning products built across the TechM4India ecosystem."
+          text="A selection of products, learning platforms and programmes moving through the TechM4India ecosystem."
         />
         <div className="product-editorial-grid">
           {products.map((product, index) => (
@@ -169,7 +170,7 @@ export default function Home() {
               <p>{product.tag}</p>
               <h3>{product.title}</h3>
               <p>{product.text}</p>
-              <ArrowLink href="/solutions">Explore the work</ArrowLink>
+              <ArrowLink href={product.href || "/solutions"}>{product.href ? "Explore the ERP" : "Explore the work"}</ArrowLink>
             </article>
           ))}
         </div>
@@ -205,7 +206,7 @@ export default function Home() {
         <SectionHeading
           eyebrow="07 / The people"
           title={<>The work is led by people who <em>stay close to it.</em></>}
-          text="Academic depth, technical fluency and a bias toward building shape the leadership behind TechM4India."
+          text="Academic depth, technical fluency and a bias toward building shape the programme team behind TechM4India."
         />
         <PeopleGrid compact />
         <div className="section-action"><ArrowLink href="/about">Meet the wider team</ArrowLink></div>
@@ -214,13 +215,13 @@ export default function Home() {
       <section className="trust-section section">
         <div className="shell">
           <SectionHeading
-            eyebrow="08 / Trust & alignment"
+            eyebrow="08 / Institution-ready by design"
             title={<>Built to belong in <em>serious institutions.</em></>}
-            text="Our programs are designed with institutional frameworks, industry expectations and India’s innovation priorities in mind."
+            text="Our programs are designed around the practical conditions that help academic innovation keep working after launch day."
             align="center"
           />
           <div className="trust-grid">
-            {["NEP 2020 aligned", "AICTE framework", "ISRO-inspired learning", "DRDO-aligned pathways", "Government initiatives"].map((item, index) => (
+            {["Curriculum integration", "Faculty enablement", "Hands-on infrastructure", "Project development", "Research pathways"].map((item, index) => (
               <div className="trust-item" key={item} data-reveal>
                 <span>0{index + 1}</span><strong>{item}</strong><i aria-hidden="true">↗</i>
               </div>
@@ -256,14 +257,14 @@ export default function Home() {
         data={{
           "@context": "https://schema.org",
           "@type": "ItemList",
-          "@id": "https://techm4india.com/#divisions",
+          "@id": "https://www.techm4india.com/#divisions",
           name: "TechM4India divisions",
           numberOfItems: 4,
           itemListElement: divisions.map((division, index) => ({
             "@type": "ListItem",
             position: index + 1,
             name: division.name,
-            url: "https://techm4india.com" + division.href,
+            url: "https://www.techm4india.com" + division.href,
           })),
         }}
       />

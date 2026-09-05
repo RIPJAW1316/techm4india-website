@@ -54,11 +54,11 @@ export default function SchoolsPage() {
           text="TechM4Schools brings future technologies into the everyday life of a school, with the people, infrastructure and support to make them stick."
         />
         <StatRow items={[
-          { value: "5+", label: "Innovation lab formats" },
+          { value: "5", label: "Innovation lab formats" },
           { value: "6", label: "Core student programs" },
           { value: "3", label: "Scalable platforms" },
-          { value: "NEP", label: "2020 aligned" },
-          { value: "600+", label: "Hands-on activities" },
+          { value: "4", label: "Hands-on learning kits" },
+          { value: "5", label: "Connected ecosystem layers" },
         ]} />
       </section>
 

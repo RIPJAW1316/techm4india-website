@@ -21,18 +21,18 @@ const services = [
 const industries = ["Education", "Healthcare", "Agriculture", "Manufacturing", "Retail & ecommerce", "Finance", "Logistics", "Government", "Aerospace & defence"];
 
 const caseStudies = [
-  { label: "Learning systems", value: "50K+", text: "students managed through a digital learning environment" },
-  { label: "Enterprise resource planning", value: "60%", text: "less manual operations in a mapped workflow" },
-  { label: "AI support", value: "80%", text: "faster response in a focused support experience" },
-  { label: "Workflow automation", value: "70%", text: "less processing time in a repeatable task" },
+  { label: "Learning systems", value: "LMS", text: "connected learning, administration and progress visibility" },
+  { label: "Enterprise resource planning", value: "ERP", text: "clearer operations across people, processes and information" },
+  { label: "AI support", value: "AI", text: "focused assistance shaped around a real service context" },
+  { label: "Workflow automation", value: "Ops", text: "repeatable pathways from a request to a useful result" },
 ];
 
 const products = [
-  { title: "Agriculture intelligence", image: "/images/solutions/product-agri.png", text: "Products that make field decisions more visible and actionable." },
-  { title: "AI support platforms", image: "/images/solutions/product-ai.png", text: "Calmer, faster experiences for people who need answers." },
-  { title: "Enterprise resource planning", image: "/images/solutions/product-erp.png", text: "The connective tissue behind a growing organization." },
-  { title: "Learning management", image: "/images/solutions/product-lms.png", text: "Digital learning systems that keep people moving." },
-  { title: "Workflow systems", image: "/images/solutions/product-workflow.png", text: "Less friction between a request and a result." },
+  { title: "Agriculture intelligence", image: "/images/editorial/workshop-mentor.jpeg", alt: "Mentor guiding a student through a practical technology project", text: "Products that make field decisions more visible and actionable.", href: "/contact" },
+  { title: "AI support platforms", image: "/images/editorial/workshop-crowd.jpeg", alt: "Students collaborating during a TechM4India workshop", text: "Calmer, faster experiences for people who need answers.", href: "/contact" },
+  { title: "Company management ERP V1", image: "/images/editorial/workshop-lab.jpeg", alt: "Students working together in a computer lab", text: "One operating system for people, leads, institutions, projects and content.", href: "/solutions/erp" },
+  { title: "Learning management", image: "/images/editorial/workshop-student.jpeg", alt: "Student presenting work to a workshop group", text: "Digital learning systems that keep people moving.", href: "/contact" },
+  { title: "Workflow systems", image: "/images/editorial/workshop-pair.jpeg", alt: "Mentor and students discussing a prototype", text: "Less friction between a request and a result.", href: "/contact" },
 ];
 
 export default function SolutionsPage() {
@@ -41,7 +41,7 @@ export default function SolutionsPage() {
       <PageHero
         eyebrow="TechM4Solutions · Digital engineering"
         title={<>Engineering the future through <em>AI, software & digital innovation.</em></>}
-        description="We partner with startups, enterprises, educational institutions, industries and public organizations to design, develop and scale intelligent digital solutions."
+        description="We partner with startups, enterprises, educational institutions, industries and public organizations to design, develop and scale intelligent digital solutions—including the operational systems that keep a growing company moving."
         image="/images/solutions/hero.jpeg"
         imageAlt="Two women collaborating around a laptop in a technology workspace"
       />
@@ -53,10 +53,10 @@ export default function SolutionsPage() {
           text="The best digital work is both ambitious and legible. It respects the complexity of an organization, then gives people a simpler way to move through it."
         />
         <StatRow items={[
-          { value: "50+", label: "Solutions delivered" },
-          { value: "10+", label: "Industries served" },
-          { value: "AI-first", label: "Development focus" },
-          { value: "Global", label: "Delivery capability" },
+          { value: "6", label: "Service disciplines" },
+          { value: "9", label: "Industry contexts" },
+          { value: "5", label: "Featured product systems" },
+          { value: "4", label: "Research lab directions" },
         ]} />
       </section>
 
@@ -89,16 +89,16 @@ export default function SolutionsPage() {
           <SectionHeading
             eyebrow="04 / Featured products"
             title={<>Real systems for <em>real conditions.</em></>}
-            text="A glimpse at the product thinking moving through TechM4Solutions."
+            text="A glimpse at the product thinking moving through TechM4Solutions, including the Company Management ERP V1 blueprint."
           />
           <div className="product-showcase-grid">
             {products.map((product, index) => (
               <article className={"showcase-card showcase-card-" + index} key={product.title} data-reveal>
-                <div className="showcase-image"><img src={product.image} alt="" loading="lazy" /></div>
+                <div className="showcase-image"><img src={product.image} alt={product.alt} loading="lazy" /></div>
                 <p>0{index + 1} / Product direction</p>
                 <h3>{product.title}</h3>
                 <p>{product.text}</p>
-                <ArrowLink href="/contact">Discuss a build</ArrowLink>
+                <ArrowLink href={product.href}>{product.href === "/solutions/erp" ? "Explore the ERP" : "Discuss a build"}</ArrowLink>
               </article>
             ))}
           </div>
@@ -107,9 +107,9 @@ export default function SolutionsPage() {
 
       <section className="case-studies-section section shell">
         <SectionHeading
-          eyebrow="05 / Case study signals"
+          eyebrow="05 / Solution patterns"
           title={<>The work should leave a <em>measurable trace.</em></>}
-          text="Examples from the current TechM4Solutions portfolio show the kinds of outcomes we design toward."
+          text="These portfolio patterns show the kinds of operational change TechM4Solutions is designed to support."
         />
         <div className="case-study-grid">
           {caseStudies.map((item, index) => (
@@ -152,7 +152,7 @@ export default function SolutionsPage() {
       </section>
 
       <section className="solutions-team section shell">
-        <SectionHeading eyebrow="08 / The team" title={<>Technical depth with a <em>human edge.</em></>} />
+        <SectionHeading eyebrow="08 / The shared team" title={<>Technical depth with a <em>human edge.</em></>} />
         <PeopleGrid compact />
       </section>
 
