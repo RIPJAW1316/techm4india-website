@@ -22,6 +22,12 @@ for (const [path, heading] of [
   ["/schools", "Transforming education through"],
   ["/space", "Build Real Satellites"],
   ["/contact", "Let&#x27;s build India&#x27;s"],
+  ["/login", "Company Management ERP"],
+  ["/erp", "Restoring your workspace"],
+  ["/erp/engineering/dashboard", "Restoring your workspace"],
+  ["/erp/solutions/dashboard", "Restoring your workspace"],
+  ["/erp/schools/dashboard", "Restoring your workspace"],
+  ["/erp/space/dashboard", "Restoring your workspace"],
 ]) {
   test(`server-renders ${path}`, async () => {
     const response = await render(path);

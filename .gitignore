@@ -30,6 +30,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,9 @@ yarn-error.log*
 /outputs/
 /work/
 *.tsbuildinfo
+/backend/node_modules/
+/backend/dist/
+/backend/coverage/
+/backend/.env
+/backend/.env.*
+!/backend/.env.example
