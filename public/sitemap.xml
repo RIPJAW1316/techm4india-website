@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.techm4india.com/</loc><priority>1.0</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/about</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/engineering</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/solutions</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/solutions/erp</loc><priority>0.85</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/schools</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/space</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.techm4india.com/contact</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+</urlset>
