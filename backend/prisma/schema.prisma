@@ -101,6 +101,8 @@ enum NotificationType {
   LEAVE_CANCELLED
   CRM_LEAD_ASSIGNED
   CRM_OPPORTUNITY_ASSIGNED
+  INSTITUTION_ASSIGNED
+  INSTITUTION_ENGAGEMENT_ASSIGNED
 }
 
 enum CrmAccountType {
@@ -150,6 +152,42 @@ enum CrmActivityType {
   FOLLOW_UP
   NOTE
   OTHER
+}
+
+enum InstitutionType {
+  SCHOOL
+  COLLEGE
+  UNIVERSITY
+  TRAINING_INSTITUTE
+  CORPORATE
+  OTHER
+}
+
+enum InstitutionStatus {
+  PROSPECT
+  ONBOARDING
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum InstitutionEngagementType {
+  WORKSHOP
+  TRAINING
+  BOOTCAMP
+  PROGRAM
+  CONSULTING
+  PARTNERSHIP
+  OTHER
+}
+
+enum InstitutionEngagementStatus {
+  PLANNED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ARCHIVED
 }
 
 enum AttendanceStatus {
@@ -240,6 +278,8 @@ model Organization {
   crmLeads         CrmLead[]
   crmOpportunities CrmOpportunity[]
   crmActivities    CrmActivity[]
+  institutions     Institution[]
+  engagements      InstitutionEngagement[]
 }
 
 model Division {
@@ -377,34 +417,36 @@ model Employee {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user                      User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  division                  Division?               @relation(fields: [divisionId], references: [id], onDelete: SetNull)
-  department                Department?             @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  branch                    Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
-  manager                   Employee?               @relation("EmployeeManager", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
-  directReports             Employee[]              @relation("EmployeeManager")
-  projectMemberships        ProjectMember[]
-  managedProjects           Project[]               @relation("ProjectManager")
-  assignedTasks             ProjectTask[]           @relation("TaskAssignee")
-  createdTasks              ProjectTask[]           @relation("TaskCreatorEmployee")
-  taskComments              TaskComment[]           @relation("TaskCommentEmployeeAuthor")
-  teamMemberships           TeamMember[]
-  ledTeams                  Team[]                  @relation("TeamLead")
-  addresses                 EmployeeAddress[]
-  emergencyContacts         EmergencyContact[]
-  skills                    EmployeeSkill[]
-  certifications            EmployeeCertification[]
-  education                 EmployeeEducation[]
-  employmentHistory         EmploymentHistory[]
-  attendanceRecords         AttendanceRecord[]
-  leaveApplications         LeaveApplication[]      @relation("LeaveApplicant")
-  reviewedLeaveApplications LeaveApplication[]      @relation("LeaveReviewer")
-  leaveBalances             LeaveBalance[]
-  ownedCrmAccounts          CrmAccount[]            @relation("CrmAccountOwner")
-  ownedCrmContacts          CrmContact[]            @relation("CrmContactOwner")
-  ownedCrmLeads             CrmLead[]               @relation("CrmLeadOwner")
-  ownedCrmOpportunities     CrmOpportunity[]        @relation("CrmOpportunityOwner")
-  ownedCrmActivities        CrmActivity[]           @relation("CrmActivityOwner")
+  user                        User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  division                    Division?               @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  department                  Department?             @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  branch                      Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  manager                     Employee?               @relation("EmployeeManager", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
+  directReports               Employee[]              @relation("EmployeeManager")
+  projectMemberships          ProjectMember[]
+  managedProjects             Project[]               @relation("ProjectManager")
+  assignedTasks               ProjectTask[]           @relation("TaskAssignee")
+  createdTasks                ProjectTask[]           @relation("TaskCreatorEmployee")
+  taskComments                TaskComment[]           @relation("TaskCommentEmployeeAuthor")
+  teamMemberships             TeamMember[]
+  ledTeams                    Team[]                  @relation("TeamLead")
+  addresses                   EmployeeAddress[]
+  emergencyContacts           EmergencyContact[]
+  skills                      EmployeeSkill[]
+  certifications              EmployeeCertification[]
+  education                   EmployeeEducation[]
+  employmentHistory           EmploymentHistory[]
+  attendanceRecords           AttendanceRecord[]
+  leaveApplications           LeaveApplication[]      @relation("LeaveApplicant")
+  reviewedLeaveApplications   LeaveApplication[]      @relation("LeaveReviewer")
+  leaveBalances               LeaveBalance[]
+  ownedCrmAccounts            CrmAccount[]            @relation("CrmAccountOwner")
+  ownedCrmContacts            CrmContact[]            @relation("CrmContactOwner")
+  ownedCrmLeads               CrmLead[]               @relation("CrmLeadOwner")
+  ownedCrmOpportunities       CrmOpportunity[]        @relation("CrmOpportunityOwner")
+  ownedCrmActivities          CrmActivity[]           @relation("CrmActivityOwner")
+  ownedInstitutions           Institution[]           @relation("InstitutionOwner")
+  ownedInstitutionEngagements InstitutionEngagement[] @relation("InstitutionEngagementOwner")
 
   @@index([divisionId])
   @@index([departmentId])
@@ -893,6 +935,7 @@ model CrmAccount {
   opportunities      CrmOpportunity[]
   activities         CrmActivity[]
   convertedFromLeads CrmLead[]        @relation("CrmLeadConvertedAccount")
+  institutions       Institution[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, ownerEmployeeId])
@@ -990,13 +1033,14 @@ model CrmOpportunity {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
 
-  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  account           CrmAccount?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
-  primaryContact    CrmContact?   @relation(fields: [primaryContactId], references: [id], onDelete: SetNull)
-  sourceLead        CrmLead?      @relation("CrmOpportunitySourceLead", fields: [sourceLeadId], references: [id], onDelete: SetNull)
-  owner             Employee?     @relation("CrmOpportunityOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
-  convertedFromLead CrmLead?      @relation("CrmLeadConvertedOpportunity")
-  activities        CrmActivity[]
+  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  account                CrmAccount?             @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  primaryContact         CrmContact?             @relation(fields: [primaryContactId], references: [id], onDelete: SetNull)
+  sourceLead             CrmLead?                @relation("CrmOpportunitySourceLead", fields: [sourceLeadId], references: [id], onDelete: SetNull)
+  owner                  Employee?               @relation("CrmOpportunityOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  convertedFromLead      CrmLead?                @relation("CrmLeadConvertedOpportunity")
+  activities             CrmActivity[]
+  institutionEngagements InstitutionEngagement[]
 
   @@index([organizationId, stage, createdAt])
   @@index([organizationId, ownerEmployeeId])
@@ -1038,4 +1082,102 @@ model CrmActivity {
   @@index([accountId])
   @@index([contactId])
   @@index([opportunityId])
+}
+
+model Institution {
+  id                          String            @id @default(uuid()) @db.Uuid
+  organizationId              String            @db.Uuid
+  code                        String
+  name                        String
+  shortName                   String?
+  type                        InstitutionType   @default(OTHER)
+  status                      InstitutionStatus @default(PROSPECT)
+  website                     String?
+  officialEmail               String?
+  officialPhone               String?
+  addressLine1                String?
+  addressLine2                String?
+  city                        String?
+  state                       String?
+  postalCode                  String?
+  country                     String?
+  primaryContactId            String?           @db.Uuid
+  relationshipOwnerEmployeeId String?           @db.Uuid
+  crmAccountId                String?           @db.Uuid
+  establishedYear             Int?
+  studentStrength             Int?
+  notes                       String?
+  archivedAt                  DateTime?
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @updatedAt
+
+  organization      Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  relationshipOwner Employee?               @relation("InstitutionOwner", fields: [relationshipOwnerEmployeeId], references: [id], onDelete: SetNull)
+  crmAccount        CrmAccount?             @relation(fields: [crmAccountId], references: [id], onDelete: SetNull)
+  contacts          InstitutionContact[]    @relation("InstitutionContacts")
+  primaryContact    InstitutionContact?     @relation("InstitutionPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
+  engagements       InstitutionEngagement[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status, createdAt])
+  @@index([organizationId, type])
+  @@index([organizationId, relationshipOwnerEmployeeId])
+  @@index([organizationId, city, state])
+  @@index([organizationId, crmAccountId])
+  @@index([organizationId, archivedAt])
+}
+
+model InstitutionContact {
+  id              String    @id @default(uuid()) @db.Uuid
+  institutionId   String    @db.Uuid
+  firstName       String
+  lastName        String
+  roleTitle       String?
+  department      String?
+  email           String?
+  phone           String?
+  alternatePhone  String?
+  isPrimary       Boolean   @default(false)
+  isDecisionMaker Boolean   @default(false)
+  notes           String?
+  archivedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  institution Institution   @relation("InstitutionContacts", fields: [institutionId], references: [id], onDelete: Cascade)
+  primaryFor  Institution[] @relation("InstitutionPrimaryContact")
+
+  @@index([institutionId, archivedAt])
+  @@index([institutionId, email])
+}
+
+model InstitutionEngagement {
+  id                    String                      @id @default(uuid()) @db.Uuid
+  organizationId        String                      @db.Uuid
+  institutionId         String                      @db.Uuid
+  title                 String
+  description           String?
+  type                  InstitutionEngagementType   @default(OTHER)
+  status                InstitutionEngagementStatus @default(PLANNED)
+  startDate             DateTime?                   @db.Date
+  endDate               DateTime?                   @db.Date
+  ownerEmployeeId       String?                     @db.Uuid
+  crmOpportunityId      String?                     @db.Uuid
+  estimatedParticipants Int?
+  notes                 String?
+  archivedAt            DateTime?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  institution    Institution     @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  owner          Employee?       @relation("InstitutionEngagementOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  crmOpportunity CrmOpportunity? @relation(fields: [crmOpportunityId], references: [id], onDelete: SetNull)
+
+  @@index([institutionId, status, createdAt])
+  @@index([organizationId, type])
+  @@index([organizationId, ownerEmployeeId])
+  @@index([organizationId, startDate, endDate])
+  @@index([organizationId, crmOpportunityId])
+  @@index([organizationId, archivedAt])
 }

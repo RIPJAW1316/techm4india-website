@@ -119,6 +119,22 @@
   color: var(--tm-muted);
   font-size: 12px;
 }
+.institution-detail {
+  scroll-margin-top: 24px;
+  padding-top: 28px;
+}
+.institution-form,
+.institution-sublist {
+  margin-top: 24px;
+}
+.institution-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+}
+.institution-detail .founder-detail-columns > div {
+  min-width: 0;
+}
 @media (max-width: 720px) {
   .crm-tabs {
     overflow-x: auto;
@@ -137,6 +153,14 @@
   }
   .crm-pipeline {
     grid-template-columns: repeat(6, minmax(230px, 1fr));
+  }
+  .institution-detail .founder-identity-strip,
+  .institution-detail .founder-detail-columns {
+    grid-template-columns: 1fr;
+  }
+  .institution-detail .founder-dialog-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 }
 

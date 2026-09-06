@@ -116,6 +116,14 @@ const permissionKeys = [
   "crm.opportunities.manage",
   "crm.activities.read",
   "crm.activities.manage",
+  "institutions.dashboard.read",
+  "institutions.read",
+  "institutions.manage",
+  "institutions.contacts.read",
+  "institutions.contacts.manage",
+  "institutions.engagements.read",
+  "institutions.engagements.manage",
+  "institutions.assign",
 ] as const;
 
 const founderPermissionKeys = [
@@ -177,6 +185,17 @@ const crmManagePermissionKeys = [
   "crm.contacts.manage",
   "crm.opportunities.manage",
   "crm.activities.manage",
+] as const;
+const institutionReadPermissionKeys = [
+  "institutions.read",
+  "institutions.contacts.read",
+  "institutions.engagements.read",
+] as const;
+const institutionManagePermissionKeys = [
+  "institutions.manage",
+  "institutions.contacts.manage",
+  "institutions.engagements.manage",
+  "institutions.assign",
 ] as const;
 
 async function main(): Promise<void> {
@@ -277,6 +296,9 @@ async function main(): Promise<void> {
               "crm.dashboard.read",
               ...crmReadPermissionKeys,
               ...crmManagePermissionKeys,
+              "institutions.dashboard.read",
+              ...institutionReadPermissionKeys,
+              ...institutionManagePermissionKeys,
             ]
           : name === "DIRECTOR"
             ? permissionKeys
@@ -298,10 +320,15 @@ async function main(): Promise<void> {
                       "leave.manage_balances",
                       "holidays.manage",
                       ...crmManagePermissionKeys,
+                      ...institutionManagePermissionKeys,
                     ].includes(key) &&
                     key !== "hr.employees.read_private",
                 )
-                .concat(["crm.dashboard.read"])
+                .concat([
+                  "crm.dashboard.read",
+                  "institutions.dashboard.read",
+                  ...institutionReadPermissionKeys,
+                ])
             : name === "DIVISION_HEAD"
               ? [
                   "employees.read_self",
@@ -368,6 +395,9 @@ async function main(): Promise<void> {
                         "crm.dashboard.read",
                         ...crmReadPermissionKeys,
                         ...crmManagePermissionKeys,
+                        "institutions.dashboard.read",
+                        ...institutionReadPermissionKeys,
+                        ...institutionManagePermissionKeys,
                       ]
                     : name === "SALES_EXECUTIVE"
                       ? [
@@ -380,6 +410,11 @@ async function main(): Promise<void> {
                           "crm.contacts.manage",
                           "crm.opportunities.manage",
                           "crm.activities.manage",
+                          "institutions.dashboard.read",
+                          ...institutionReadPermissionKeys,
+                          "institutions.manage",
+                          "institutions.contacts.manage",
+                          "institutions.engagements.manage",
                         ]
                       : name === "PROJECT_MANAGER"
                         ? [
