@@ -83,6 +83,13 @@ export type Notification = {
   resourceId: string | null;
 };
 
+export type AttendanceRecord = { id: string; employeeId: string; businessDate: string; checkInAt: string | null; checkOutAt: string | null; status: string; source: string; notes: string | null; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string; slug: string } | null } };
+export type AttendanceSummary = { date: string; employeesExpected: number; present: number; absent: number; onLeave: number; remote: number; halfDay: number; missingCheckout: number; holiday: number };
+export type LeaveType = { id: string; code: string; name: string; description: string | null; unit: string; annualAllowance: number | null; balanceTracked?: boolean; isActive: boolean; isPaid: boolean };
+export type LeaveBalance = { id: string; year: number; openingBalance: number; accrued: number; used: number; adjusted: number; carriedForward: number; leaveType: LeaveType; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string } | null } };
+export type LeaveApplication = { id: string; startDate: string; endDate: string; dayCount: number; reason: string; status: string; reviewComment: string | null; createdAt: string; leaveType: LeaveType; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string; slug: string } | null } };
+export type Holiday = { id: string; name: string; date: string; type: string; description: string | null; isOptional: boolean; divisionId: string | null; branchId: string | null };
+
 export type ExecutiveSummary = {
   employeesTotal: number;
   employeesActive: number;
@@ -171,3 +178,44 @@ export type CompanyBranch = { id: string; code: string; name: string; type: stri
 export type CompanyTeam = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; leadEmployee: { id: string; firstName: string; lastName: string; employeeCode: string } | null; memberCount: number; createdAt: string; updatedAt: string };
 export type CompanyTeamMember = { id: string; role: string; joinedAt: string; removedAt: string | null; employee: { id: string; employeeCode: string; firstName: string; lastName: string; designation: string | null; employmentStatus: string; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null } };
 export type CompanyCostCentre = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; createdAt: string; updatedAt: string };
+
+export type HrEmployeeSummary = {
+  id: string;
+  employeeCode: string;
+  firstName: string;
+  lastName: string;
+  officialEmail: string;
+  designation: string | null;
+  gradeText: string | null;
+  phone: string | null;
+  personalEmail: string | null;
+  joiningDate: string | null;
+  confirmationDate?: string | null;
+  probationEndDate?: string | null;
+  employmentType: string;
+  employmentStatus: string;
+  division: { id: string; name: string; slug: string } | null;
+  department: { id: string; name: string; slug: string } | null;
+  branch: { id: string; code: string; name: string; type: string; city: string | null; state: string | null } | null;
+  manager: { id: string; employeeCode: string; name: string; designation: string | null } | null;
+  directReportCount: number;
+  teams: Array<{ id: string; code: string; name: string; role: string; joinedAt: string }>;
+};
+
+export type HrEmployeeDetail = HrEmployeeSummary & {
+  firstName: string;
+  lastName: string;
+  alternatePhone: string | null;
+  gender: string | null;
+  dateOfBirth: string | null;
+  nationality: string | null;
+  bloodGroup: string | null;
+  profilePhotoUrl: string | null;
+  directReports: Array<{ id: string; employeeCode: string; name: string; designation: string | null; employmentStatus: string }>;
+  addresses: Array<{ id: string; type: string; addressLine1: string; addressLine2: string | null; city: string; state: string; postalCode: string; country: string; isPrimary: boolean }>;
+  emergencyContacts: Array<{ id: string; name: string; relationship: string; phone: string; alternatePhone: string | null; email: string | null; isPrimary: boolean }>;
+  skills: Array<{ id: string; name: string; level: string | null; yearsExperience: number | string | null }>;
+  certifications: Array<{ id: string; name: string; issuer: string; issuedAt: string | null; expiresAt: string | null; credentialId: string | null; credentialUrl: string | null }>;
+  education: Array<{ id: string; institution: string; qualification: string; fieldOfStudy: string | null; startDate: string | null; endDate: string | null; gradeOrScore: string | null }>;
+  employmentHistory: Array<{ id: string; eventType: string; effectiveDate: string; summary: string; previousValue: unknown; newValue: unknown; createdAt: string }>;
+};

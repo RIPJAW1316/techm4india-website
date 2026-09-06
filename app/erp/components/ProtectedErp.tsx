@@ -9,19 +9,20 @@ export function ErpLoading({ label = "Restoring your workspace" }: { label?: str
   return <div className="erp-state" role="status"><span className="erp-loader" aria-hidden="true" /><p>{label}</p></div>;
 }
 
-export function ProtectedErp({ children, requiredDivision, requiredExecutive = false }: { children: ReactNode; requiredDivision?: DivisionSlug; requiredExecutive?: boolean }) {
+export function ProtectedErp({ children, requiredDivision, requiredExecutive = false, requiredHr = false }: { children: ReactNode; requiredDivision?: DivisionSlug; requiredExecutive?: boolean; requiredHr?: boolean }) {
   const { status, context } = useErpAuth();
   const router = useRouter();
   const divisionAllowed = !requiredDivision || canAccessDivisionWorkspace(context, requiredDivision);
   const executiveAllowed = !requiredExecutive || canAccessExecutiveWorkspace(context);
+  const hrAllowed = !requiredHr || Boolean(context?.permissions.includes("hr.employees.read"));
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
-    if (status === "authenticated" && (!divisionAllowed || !executiveAllowed)) router.replace(resolveDashboardPath(context));
-  }, [status, context, divisionAllowed, executiveAllowed, router]);
+    if (status === "authenticated" && (!divisionAllowed || !executiveAllowed || !hrAllowed)) router.replace(resolveDashboardPath(context));
+  }, [status, context, divisionAllowed, executiveAllowed, hrAllowed, router]);
 
   if (status === "loading") return <ErpLoading />;
   if (status === "unauthenticated") return <ErpLoading label="Taking you to sign in" />;
-  if (!divisionAllowed || !executiveAllowed) return <ErpLoading label="Opening your permitted workspace" />;
+  if (!divisionAllowed || !executiveAllowed || !hrAllowed) return <ErpLoading label="Opening your permitted workspace" />;
   return <>{children}</>;
 }

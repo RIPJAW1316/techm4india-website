@@ -33,8 +33,36 @@ enum EmploymentStatus {
   ACTIVE
   ON_LEAVE
   SUSPENDED
+  INACTIVE
+  EXITED
   RESIGNED
   TERMINATED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERN
+}
+
+enum AddressType {
+  CURRENT
+  PERMANENT
+  OTHER
+}
+
+enum EmploymentHistoryEventType {
+  JOINED
+  PROMOTED
+  TRANSFERRED
+  DESIGNATION_CHANGED
+  DEPARTMENT_CHANGED
+  DIVISION_CHANGED
+  MANAGER_CHANGED
+  EMPLOYMENT_TYPE_CHANGED
+  STATUS_CHANGED
+  EXITED
 }
 
 enum ProjectStatus {
@@ -67,6 +95,46 @@ enum NotificationType {
   PROJECT_DEADLINE
   PROJECT_MEMBER_ADDED
   SYSTEM
+  LEAVE_APPLICATION_SUBMITTED
+  LEAVE_APPROVED
+  LEAVE_REJECTED
+  LEAVE_CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  ON_LEAVE
+  HOLIDAY
+  WEEK_OFF
+  REMOTE
+  MISSING_CHECKOUT
+}
+
+enum AttendanceSource {
+  WEB
+  HR_MANUAL
+  SYSTEM
+}
+
+enum LeaveUnit {
+  FULL_DAY
+  HALF_DAY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum HolidayType {
+  NATIONAL
+  COMPANY
+  OPTIONAL
+  REGIONAL
 }
 
 enum BranchType {
@@ -114,6 +182,8 @@ model Organization {
   branches    Branch[]
   teams       Team[]
   costCentres CostCentre[]
+  leaveTypes  LeaveType[]
+  holidays    Holiday[]
 }
 
 model Division {
@@ -131,6 +201,7 @@ model Division {
   projects     Project[]
   costCentres  CostCentre[]
   teams        Team[]
+  holidays     Holiday[]
 
   @@unique([organizationId, slug])
   @@index([organizationId, status])
@@ -163,14 +234,18 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  roles           UserRole[]
-  employee        Employee?
-  refreshSessions RefreshSession[]
-  notifications   Notification[]
-  auditLogs       AuditLog[]       @relation("AuditActor")
-  createdProjects Project[]        @relation("ProjectCreatedBy")
-  createdTasks    ProjectTask[]    @relation("TaskCreator")
-  taskComments    TaskComment[]    @relation("TaskCommentAuthor")
+  roles                     UserRole[]
+  employee                  Employee?
+  refreshSessions           RefreshSession[]
+  notifications             Notification[]
+  auditLogs                 AuditLog[]          @relation("AuditActor")
+  createdProjects           Project[]           @relation("ProjectCreatedBy")
+  createdTasks              ProjectTask[]       @relation("TaskCreator")
+  taskComments              TaskComment[]       @relation("TaskCommentAuthor")
+  employmentHistoryActions  EmploymentHistory[] @relation("EmploymentHistoryActor")
+  attendanceCreated         AttendanceRecord[]  @relation("AttendanceCreatedBy")
+  attendanceUpdated         AttendanceRecord[]  @relation("AttendanceUpdatedBy")
+  reviewedLeaveApplications LeaveApplication[]  @relation("LeaveReviewedBy")
 }
 
 model Role {
@@ -224,31 +299,58 @@ model Employee {
   lastName          String
   profilePhotoUrl   String?
   phone             String?
+  personalEmail     String?
+  alternatePhone    String?
+  gender            String?
+  dateOfBirth       DateTime?        @db.Date
+  nationality       String?
+  bloodGroup        String?
   designation       String?
+  gradeText         String?
   joiningDate       DateTime?        @db.Date
+  confirmationDate  DateTime?        @db.Date
+  probationEndDate  DateTime?        @db.Date
+  employmentType    EmploymentType   @default(FULL_TIME)
   employmentStatus  EmploymentStatus @default(ACTIVE)
   divisionId        String?          @db.Uuid
   departmentId      String?          @db.Uuid
+  branchId          String?          @db.Uuid
   managerEmployeeId String?          @db.Uuid
+  biometricId       String?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
-  user               User            @relation(fields: [userId], references: [id], onDelete: Restrict)
-  division           Division?       @relation(fields: [divisionId], references: [id], onDelete: SetNull)
-  department         Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  manager            Employee?       @relation("EmployeeManager", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
-  directReports      Employee[]      @relation("EmployeeManager")
-  projectMemberships ProjectMember[]
-  managedProjects    Project[]       @relation("ProjectManager")
-  assignedTasks      ProjectTask[]   @relation("TaskAssignee")
-  createdTasks       ProjectTask[]   @relation("TaskCreatorEmployee")
-  taskComments       TaskComment[]   @relation("TaskCommentEmployeeAuthor")
-  teamMemberships    TeamMember[]
-  ledTeams           Team[]          @relation("TeamLead")
+  user                      User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  division                  Division?               @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  department                Department?             @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  branch                    Branch?                 @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  manager                   Employee?               @relation("EmployeeManager", fields: [managerEmployeeId], references: [id], onDelete: SetNull)
+  directReports             Employee[]              @relation("EmployeeManager")
+  projectMemberships        ProjectMember[]
+  managedProjects           Project[]               @relation("ProjectManager")
+  assignedTasks             ProjectTask[]           @relation("TaskAssignee")
+  createdTasks              ProjectTask[]           @relation("TaskCreatorEmployee")
+  taskComments              TaskComment[]           @relation("TaskCommentEmployeeAuthor")
+  teamMemberships           TeamMember[]
+  ledTeams                  Team[]                  @relation("TeamLead")
+  addresses                 EmployeeAddress[]
+  emergencyContacts         EmergencyContact[]
+  skills                    EmployeeSkill[]
+  certifications            EmployeeCertification[]
+  education                 EmployeeEducation[]
+  employmentHistory         EmploymentHistory[]
+  attendanceRecords         AttendanceRecord[]
+  leaveApplications         LeaveApplication[]      @relation("LeaveApplicant")
+  reviewedLeaveApplications LeaveApplication[]      @relation("LeaveReviewer")
+  leaveBalances             LeaveBalance[]
 
   @@index([divisionId])
   @@index([departmentId])
+  @@index([branchId])
+  @@index([managerEmployeeId])
   @@index([employmentStatus])
+  @@index([employmentType])
+  @@index([joiningDate])
 }
 
 model Branch {
@@ -270,6 +372,8 @@ model Branch {
   updatedAt      DateTime   @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  employees    Employee[]
+  holidays     Holiday[]
 
   @@unique([organizationId, code])
   @@index([organizationId, type, isActive])
@@ -333,6 +437,108 @@ model TeamMember {
 
   @@index([teamId, employeeId, removedAt])
   @@index([employeeId, removedAt])
+}
+
+model EmployeeAddress {
+  id           String      @id @default(uuid()) @db.Uuid
+  employeeId   String      @db.Uuid
+  type         AddressType @default(CURRENT)
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String      @default("India")
+  isPrimary    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, type, isPrimary])
+}
+
+model EmergencyContact {
+  id             String   @id @default(uuid()) @db.Uuid
+  employeeId     String   @db.Uuid
+  name           String
+  relationship   String
+  phone          String
+  alternatePhone String?
+  email          String?
+  isPrimary      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, isPrimary])
+}
+
+model EmployeeSkill {
+  id              String   @id @default(uuid()) @db.Uuid
+  employeeId      String   @db.Uuid
+  name            String
+  level           String?
+  yearsExperience Decimal? @db.Decimal(4, 1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+}
+
+model EmployeeCertification {
+  id            String    @id @default(uuid()) @db.Uuid
+  employeeId    String    @db.Uuid
+  name          String
+  issuer        String
+  issuedAt      DateTime? @db.Date
+  expiresAt     DateTime? @db.Date
+  credentialId  String?
+  credentialUrl String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, expiresAt])
+}
+
+model EmployeeEducation {
+  id            String    @id @default(uuid()) @db.Uuid
+  employeeId    String    @db.Uuid
+  institution   String
+  qualification String
+  fieldOfStudy  String?
+  startDate     DateTime? @db.Date
+  endDate       DateTime? @db.Date
+  gradeOrScore  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, endDate])
+}
+
+model EmploymentHistory {
+  id            String                     @id @default(uuid()) @db.Uuid
+  employeeId    String                     @db.Uuid
+  eventType     EmploymentHistoryEventType
+  effectiveDate DateTime                   @db.Date
+  summary       String
+  previousValue Json?
+  newValue      Json?
+  actorUserId   String?                    @db.Uuid
+  createdAt     DateTime                   @default(now())
+
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  actorUser User?    @relation("EmploymentHistoryActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId, effectiveDate])
+  @@index([actorUserId, createdAt])
 }
 
 model RefreshSession {
@@ -476,4 +682,122 @@ model AuditLog {
   @@index([actorUserId, createdAt])
   @@index([entityType, entityId, createdAt])
   @@index([action, createdAt])
+}
+
+model AttendanceRecord {
+  id              String           @id @default(uuid()) @db.Uuid
+  employeeId      String           @db.Uuid
+  businessDate    DateTime         @db.Date
+  checkInAt       DateTime?
+  checkOutAt      DateTime?
+  status          AttendanceStatus @default(PRESENT)
+  source          AttendanceSource @default(WEB)
+  notes           String?
+  createdByUserId String?          @db.Uuid
+  updatedByUserId String?          @db.Uuid
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  employee  Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdBy User?    @relation("AttendanceCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  updatedBy User?    @relation("AttendanceUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@unique([employeeId, businessDate])
+  @@index([businessDate, status])
+  @@index([employeeId, businessDate])
+}
+
+model LeaveType {
+  id                  String    @id @default(uuid()) @db.Uuid
+  organizationId      String    @db.Uuid
+  code                String
+  name                String
+  description         String?
+  unit                LeaveUnit @default(FULL_DAY)
+  annualAllowance     Float?
+  balanceTracked      Boolean   @default(false)
+  carryForwardAllowed Boolean   @default(false)
+  maxCarryForward     Float?
+  requiresApproval    Boolean   @default(true)
+  isPaid              Boolean   @default(true)
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  balances     LeaveBalance[]
+  applications LeaveApplication[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, isActive])
+}
+
+model LeaveBalance {
+  id             String   @id @default(uuid()) @db.Uuid
+  employeeId     String   @db.Uuid
+  leaveTypeId    String   @db.Uuid
+  year           Int
+  openingBalance Float    @default(0)
+  accrued        Float    @default(0)
+  used           Float    @default(0)
+  adjusted       Float    @default(0)
+  carriedForward Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  employee  Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([employeeId, leaveTypeId, year])
+  @@index([employeeId, year])
+}
+
+model LeaveApplication {
+  id                 String      @id @default(uuid()) @db.Uuid
+  employeeId         String      @db.Uuid
+  leaveTypeId        String      @db.Uuid
+  startDate          DateTime    @db.Date
+  endDate            DateTime    @db.Date
+  dayCount           Float
+  reason             String
+  status             LeaveStatus @default(PENDING)
+  reviewerEmployeeId String?     @db.Uuid
+  reviewedByUserId   String?     @db.Uuid
+  reviewedAt         DateTime?
+  reviewComment      String?
+  cancelledAt        DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  employee   Employee  @relation("LeaveApplicant", fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType  LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Restrict)
+  reviewer   Employee? @relation("LeaveReviewer", fields: [reviewerEmployeeId], references: [id], onDelete: SetNull)
+  reviewedBy User?     @relation("LeaveReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId, status, startDate])
+  @@index([leaveTypeId, status])
+  @@index([reviewerEmployeeId, status])
+}
+
+model Holiday {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @db.Uuid
+  name           String
+  date           DateTime    @db.Date
+  type           HolidayType @default(COMPANY)
+  description    String?
+  isOptional     Boolean     @default(false)
+  divisionId     String?     @db.Uuid
+  branchId       String?     @db.Uuid
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  division     Division?    @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  branch       Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, date, name])
+  @@index([organizationId, date])
+  @@index([divisionId, date])
+  @@index([branchId, date])
 }

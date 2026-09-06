@@ -184,6 +184,8 @@ function DashboardContent({ divisionSlug }: { divisionSlug: DivisionSlug }) {
             <a className="is-active" href="#workspace-top" onClick={() => closeMobileMenu()}>Dashboard</a>
             <a href="#my-tasks" onClick={() => closeMobileMenu()}>My tasks</a>
             <a href="#my-projects" onClick={() => closeMobileMenu()}>Projects</a>
+            <a href={`/erp/${divisionSlug}/attendance`} onClick={() => closeMobileMenu()}>Attendance</a>
+            <a href={`/erp/${divisionSlug}/leave`} onClick={() => closeMobileMenu()}>Leave</a>
             <a href="#notifications" onClick={() => closeMobileMenu()}>Notifications{unreadCount > 0 && <b>{unreadCount}</b>}</a>
             <a href="#my-profile" onClick={() => closeMobileMenu()}>Profile</a>
           </nav>

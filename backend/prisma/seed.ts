@@ -19,7 +19,7 @@ const divisions = [
 
 const roleNames = [
   "SUPER_ADMIN", "FOUNDER_CEO", "DIRECTOR", "DIVISION_HEAD", "HR_MANAGER", "SALES_MANAGER",
-  "SALES_EXECUTIVE", "FINANCE_MANAGER", "PROJECT_MANAGER", "EMPLOYEE",
+  "HR_EXECUTIVE", "SALES_EXECUTIVE", "FINANCE_MANAGER", "PROJECT_MANAGER", "EMPLOYEE",
   "CONTENT_MANAGER", "VIEWER",
 ] as const;
 
@@ -31,6 +31,10 @@ const permissionKeys = [
   "executive.dashboard.read", "tasks.create_all", "tasks.update_all", "tasks.assign_all", "tasks.cancel_all",
   "company.profile.read", "company.profile.manage", "branches.read", "branches.manage",
   "teams.read", "teams.manage", "cost_centres.read", "cost_centres.manage", "organization.structure.read",
+  "hr.employees.read", "hr.employees.manage", "hr.employees.read_private", "hr.employment_history.read", "hr.employment_history.manage",
+  "attendance.self.read", "attendance.self.checkin", "attendance.read", "attendance.manage",
+  "leave.self.read", "leave.self.apply", "leave.read", "leave.review", "leave.manage_types", "leave.manage_balances",
+  "holidays.read", "holidays.manage",
 ] as const;
 
 const founderPermissionKeys = [
@@ -45,6 +49,11 @@ const companyReadPermissionKeys = [
 const companyManagePermissionKeys = [
   "company.profile.manage", "branches.manage", "teams.manage", "cost_centres.manage",
 ] as const;
+
+const hrReadPermissionKeys = ["hr.employees.read", "hr.employment_history.read"] as const;
+const hrManagePermissionKeys = ["hr.employees.manage", "hr.employees.read_private", "hr.employment_history.manage"] as const;
+const attendanceEmployeeKeys = ["attendance.self.read", "attendance.self.checkin"] as const;
+const leaveEmployeeKeys = ["leave.self.read", "leave.self.apply", "holidays.read"] as const;
 
 async function main(): Promise<void> {
   const organization = await prisma.organization.upsert({
@@ -84,20 +93,25 @@ async function main(): Promise<void> {
     const keys = name === "SUPER_ADMIN"
       ? permissionKeys
       : name === "FOUNDER_CEO"
-        ? [...founderPermissionKeys, ...companyReadPermissionKeys, ...companyManagePermissionKeys, "notifications.read_self", "organization.read_all"]
+      ? [...founderPermissionKeys, ...companyReadPermissionKeys, ...companyManagePermissionKeys, ...hrReadPermissionKeys, ...hrManagePermissionKeys, "notifications.read_self", "organization.read_all", "attendance.self.read", "attendance.self.checkin", "attendance.read", "attendance.manage", "leave.self.read", "leave.self.apply", "leave.read", "leave.review", "leave.manage_types", "leave.manage_balances", "holidays.read", "holidays.manage"]
       : name === "DIRECTOR"
-        ? permissionKeys.filter((key) => !founderPermissionKeys.includes(key as (typeof founderPermissionKeys)[number]) && !companyManagePermissionKeys.includes(key as (typeof companyManagePermissionKeys)[number]))
+        ? permissionKeys.filter((key) => !founderPermissionKeys.includes(key as (typeof founderPermissionKeys)[number]) && !companyManagePermissionKeys.includes(key as (typeof companyManagePermissionKeys)[number]) && !hrManagePermissionKeys.includes(key as (typeof hrManagePermissionKeys)[number]) && !["attendance.manage", "leave.review", "leave.manage_types", "leave.manage_balances", "holidays.manage"].includes(key) && key !== "hr.employees.read_private")
       : name === "DIVISION_HEAD"
         ? [
             "employees.read_self", "employees.read_division", "projects.read_assigned",
             "projects.read_division", "projects.manage", "tasks.read_assigned", "tasks.manage",
             "tasks.read_project", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self", "organization.read_division",
             ...companyReadPermissionKeys,
+            "hr.employees.read", "attendance.self.read", "attendance.self.checkin", "attendance.read", "leave.self.read", "leave.self.apply", "leave.read", "leave.review", "holidays.read",
           ]
+      : name === "HR_MANAGER"
+        ? [...hrReadPermissionKeys, ...hrManagePermissionKeys, "notifications.read_self", "organization.read_all", "attendance.self.read", "attendance.self.checkin", "attendance.read", "attendance.manage", "leave.self.read", "leave.self.apply", "leave.read", "leave.review", "holidays.read", "holidays.manage", "leave.manage_types", "leave.manage_balances"]
+      : name === "HR_EXECUTIVE"
+        ? [...hrReadPermissionKeys, "hr.employees.manage", "notifications.read_self", "organization.read_self", "attendance.self.read", "attendance.self.checkin", "attendance.read", "attendance.manage", "leave.self.read", "leave.read", "holidays.read"]
       : name === "PROJECT_MANAGER"
         ? ["projects.read_assigned", "projects.read_division", "projects.manage", "tasks.read_assigned", "tasks.read_project", "tasks.manage", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self"]
         : name === "EMPLOYEE"
-          ? ["employees.read_self", "projects.read_assigned", "tasks.read_assigned", "tasks.update_assigned", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self"]
+          ? ["employees.read_self", "projects.read_assigned", "tasks.read_assigned", "tasks.update_assigned", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self", ...attendanceEmployeeKeys, ...leaveEmployeeKeys]
           : ["notifications.read_self", "organization.read_self"];
     for (const key of keys) {
       const permission = permissions.get(key);

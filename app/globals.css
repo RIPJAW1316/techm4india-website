@@ -271,6 +271,41 @@ button { font: inherit; }
   .scroll-cue { display: none; }
 }
 
+/* Founder HR employee master */
+.founder-hr-content { max-width: 1500px; }
+.founder-hr-filters { display: grid; grid-template-columns: minmax(220px, 1.6fr) repeat(5, minmax(120px, 1fr)); gap: 12px; margin: 28px 0 22px; padding: 18px; border: 1px solid var(--erp-line, #d9dce1); background: #fff; }
+.founder-hr-filters label, .founder-hr-dialog label { display: grid; gap: 7px; min-width: 0; }
+.founder-hr-filters span, .founder-hr-dialog label > span { color: #68707a; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.founder-hr-filters input, .founder-hr-filters select, .founder-hr-dialog input, .founder-hr-dialog select { width: 100%; min-height: 42px; border: 1px solid #cfd4da; background: #fff; padding: 10px 11px; color: #101827; font: inherit; }
+.founder-hr-directory, .founder-hr-detail { margin-top: 22px; border: 1px solid var(--erp-line, #d9dce1); background: #fff; }
+.founder-hr-table-wrap { overflow-x: auto; }
+.founder-hr-table { width: 100%; min-width: 980px; border-collapse: collapse; }
+.founder-hr-table th { padding: 13px 16px; background: #f6f7f8; color: #68707a; font-size: .68rem; font-weight: 700; letter-spacing: .09em; text-align: left; text-transform: uppercase; }
+.founder-hr-table td { padding: 16px; border-top: 1px solid #e7e9ec; vertical-align: top; }
+.founder-hr-table td strong, .founder-hr-table td span { display: block; }
+.founder-hr-table td small { display: block; margin-top: 5px; color: #707985; font-size: .78rem; line-height: 1.35; }
+.founder-hr-detail { padding: 0 24px 28px; }
+.founder-hr-identity { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 0 0 24px; padding: 16px; background: #f5f7f8; }
+.founder-hr-identity span, .founder-hr-identity strong { display: block; }
+.founder-hr-identity span { color: #6b737d; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; }
+.founder-hr-identity strong { margin-top: 5px; font-size: .92rem; }
+.founder-hr-detail-grid, .founder-hr-detail-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.founder-hr-detail-grid { margin-bottom: 16px; }
+.founder-hr-detail-grid article, .founder-hr-detail-columns article { min-height: 150px; padding: 18px; border: 1px solid #e3e6e9; }
+.founder-hr-detail-grid h3, .founder-hr-detail-columns h3 { margin: 5px 0 10px; font-size: 1.15rem; }
+.founder-hr-detail-grid p, .founder-hr-detail-columns p { margin: 7px 0; color: #5f6873; line-height: 1.5; }
+.founder-hr-chip { display: inline-block; margin: 4px 5px 0 0; padding: 6px 8px; border: 1px solid #d7dce2; color: #2e3742; font-size: .75rem; }
+.founder-hr-line, .founder-hr-history { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eceef0; }
+.founder-hr-line span, .founder-hr-history span, .founder-hr-muted { color: #707985; font-size: .8rem; }
+.founder-hr-inline-form { display: grid; grid-template-columns: 1.5fr 1fr auto; gap: 8px; margin-top: 16px; }
+.founder-hr-inline-form input { min-height: 38px; border: 1px solid #cfd4da; padding: 8px 10px; font: inherit; }
+.founder-hr-dialog { max-width: 780px; }
+.founder-hr-dialog .founder-form-grid { grid-template-columns: repeat(2, 1fr); }
+.founder-hr-dialog .founder-form-note { margin: 15px 0 0; padding: 11px 13px; background: #f5f7f8; color: #65707c; font-size: .85rem; line-height: 1.45; }
+@media (max-width: 1100px) { .founder-hr-filters { grid-template-columns: repeat(3, 1fr); } .founder-hr-identity { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 800px) { .founder-hr-detail-grid, .founder-hr-detail-columns { grid-template-columns: 1fr; } .founder-hr-identity { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .founder-hr-filters { grid-template-columns: 1fr; padding: 14px; } .founder-hr-detail { padding: 0 14px 20px; } .founder-hr-identity { grid-template-columns: 1fr; } .founder-hr-dialog .founder-form-grid { grid-template-columns: 1fr; } .founder-hr-inline-form { grid-template-columns: 1fr; } }
+
 /* Founder / CEO operations control centre */
 .founder-shell { background: #f2f3f0; }
 .founder-sidebar { background: #111a32; }

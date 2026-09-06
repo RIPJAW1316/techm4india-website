@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Prisma, TaskStatus } from "@prisma/client";
+import { EmploymentStatus, Prisma, TaskStatus } from "@prisma/client";
 
 import { AuditService } from "../audit/audit.service";
 import { Principal } from "../auth/auth.types";
@@ -78,7 +78,7 @@ export class TasksService {
     const project = await this.projectScope(projectId);
     if (mode === "standard" && !this.policy.canManageProject(principal, project)) throw new ForbiddenException("Task creation denied");
     if (mode === "executive" && principal.organizationId !== project.organizationId) throw new ForbiddenException("Project organization access denied");
-    let assignee: { id: string; userId: string; firstName: string; lastName: string; divisionId: string | null; employmentStatus: "ACTIVE" | "ON_LEAVE" | "SUSPENDED" | "RESIGNED" | "TERMINATED" } | null = null;
+    let assignee: { id: string; userId: string; firstName: string; lastName: string; divisionId: string | null; employmentStatus: EmploymentStatus } | null = null;
     if (dto.assigneeEmployeeId) {
       assignee = await this.prisma.employee.findUnique({ where: { id: dto.assigneeEmployeeId }, select: { id: true, userId: true, firstName: true, lastName: true, divisionId: true, employmentStatus: true } });
       if (!assignee || assignee.employmentStatus !== "ACTIVE") throw new NotFoundException("Active assignee not found");

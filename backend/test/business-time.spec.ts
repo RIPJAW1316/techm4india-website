@@ -8,6 +8,13 @@ describe("business timezone boundaries", () => {
     expect(boundaries.tomorrow.toISOString()).toBe("2026-09-05T18:30:00.000Z");
   });
 
+  it("keeps the India business date deterministic at 23:30 UTC", () => {
+    const boundaries = businessDayBoundaries(new Date("2026-09-04T23:30:00.000Z"), "Asia/Kolkata");
+    expect(boundaries.start.toISOString()).toBe("2026-09-04T18:30:00.000Z");
+    const sameIndiaDate = businessDayBoundaries(new Date("2026-09-04T20:00:00.000Z"), "Asia/Kolkata");
+    expect(sameIndiaDate.start.toISOString()).toBe(boundaries.start.toISOString());
+  });
+
   it("treats an exact business-day start as today and the previous instant as overdue", () => {
     const start = startOfBusinessDay(new Date("2026-09-05T00:00:00.000Z"), "Asia/Kolkata");
     expect(start.toISOString()).toBe("2026-09-04T18:30:00.000Z");

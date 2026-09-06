@@ -15,6 +15,10 @@ import { ProjectsModule } from "./projects/projects.module";
 import { TasksModule } from "./tasks/tasks.module";
 import { ExecutiveModule } from "./executive/executive.module";
 import { CompanyModule } from "./company/company.module";
+import { HrModule } from "./hr/hr.module";
+import { AttendanceModule } from "./attendance/attendance.module";
+import { LeaveModule } from "./leave/leave.module";
+import { HolidaysModule } from "./holidays/holidays.module";
 
 @Module({
   imports: [
@@ -35,6 +39,10 @@ import { CompanyModule } from "./company/company.module";
     TasksModule,
     ExecutiveModule,
     CompanyModule,
+    HrModule,
+    AttendanceModule,
+    LeaveModule,
+    HolidaysModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
