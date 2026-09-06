@@ -19,6 +19,7 @@ import { HrModule } from "./hr/hr.module";
 import { AttendanceModule } from "./attendance/attendance.module";
 import { LeaveModule } from "./leave/leave.module";
 import { HolidaysModule } from "./holidays/holidays.module";
+import { CrmModule } from "./crm/crm.module";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { HolidaysModule } from "./holidays/holidays.module";
     AttendanceModule,
     LeaveModule,
     HolidaysModule,
+    CrmModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

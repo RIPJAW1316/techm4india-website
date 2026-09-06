@@ -99,6 +99,57 @@ enum NotificationType {
   LEAVE_APPROVED
   LEAVE_REJECTED
   LEAVE_CANCELLED
+  CRM_LEAD_ASSIGNED
+  CRM_OPPORTUNITY_ASSIGNED
+}
+
+enum CrmAccountType {
+  PROSPECT
+  CUSTOMER
+  PARTNER
+  OTHER
+}
+
+enum CrmAccountStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum CrmLeadSource {
+  WEBSITE
+  REFERRAL
+  OUTBOUND
+  EVENT
+  PARTNER
+  OTHER
+}
+
+enum CrmLeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  UNQUALIFIED
+  CONVERTED
+  ARCHIVED
+}
+
+enum CrmOpportunityStage {
+  PROSPECTING
+  QUALIFICATION
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum CrmActivityType {
+  CALL
+  EMAIL
+  MEETING
+  FOLLOW_UP
+  NOTE
+  OTHER
 }
 
 enum AttendanceStatus {
@@ -177,13 +228,18 @@ model Organization {
   createdAt              DateTime           @default(now())
   updatedAt              DateTime           @updatedAt
 
-  divisions   Division[]
-  projects    Project[]
-  branches    Branch[]
-  teams       Team[]
-  costCentres CostCentre[]
-  leaveTypes  LeaveType[]
-  holidays    Holiday[]
+  divisions        Division[]
+  projects         Project[]
+  branches         Branch[]
+  teams            Team[]
+  costCentres      CostCentre[]
+  leaveTypes       LeaveType[]
+  holidays         Holiday[]
+  crmAccounts      CrmAccount[]
+  crmContacts      CrmContact[]
+  crmLeads         CrmLead[]
+  crmOpportunities CrmOpportunity[]
+  crmActivities    CrmActivity[]
 }
 
 model Division {
@@ -246,6 +302,7 @@ model User {
   attendanceCreated         AttendanceRecord[]  @relation("AttendanceCreatedBy")
   attendanceUpdated         AttendanceRecord[]  @relation("AttendanceUpdatedBy")
   reviewedLeaveApplications LeaveApplication[]  @relation("LeaveReviewedBy")
+  createdCrmActivities      CrmActivity[]       @relation("CrmActivityCreator")
 }
 
 model Role {
@@ -343,6 +400,11 @@ model Employee {
   leaveApplications         LeaveApplication[]      @relation("LeaveApplicant")
   reviewedLeaveApplications LeaveApplication[]      @relation("LeaveReviewer")
   leaveBalances             LeaveBalance[]
+  ownedCrmAccounts          CrmAccount[]            @relation("CrmAccountOwner")
+  ownedCrmContacts          CrmContact[]            @relation("CrmContactOwner")
+  ownedCrmLeads             CrmLead[]               @relation("CrmLeadOwner")
+  ownedCrmOpportunities     CrmOpportunity[]        @relation("CrmOpportunityOwner")
+  ownedCrmActivities        CrmActivity[]           @relation("CrmActivityOwner")
 
   @@index([divisionId])
   @@index([departmentId])
@@ -800,4 +862,180 @@ model Holiday {
   @@index([organizationId, date])
   @@index([divisionId, date])
   @@index([branchId, date])
+}
+
+model CrmAccount {
+  id              String           @id @default(uuid()) @db.Uuid
+  organizationId  String           @db.Uuid
+  name            String
+  displayName     String?
+  accountType     CrmAccountType   @default(PROSPECT)
+  industry        String?
+  website         String?
+  email           String?
+  phone           String?
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
+  ownerEmployeeId String?          @db.Uuid
+  status          CrmAccountStatus @default(ACTIVE)
+  notes           String?
+  archivedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  owner              Employee?        @relation("CrmAccountOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  contacts           CrmContact[]
+  opportunities      CrmOpportunity[]
+  activities         CrmActivity[]
+  convertedFromLeads CrmLead[]        @relation("CrmLeadConvertedAccount")
+
+  @@index([organizationId, status, createdAt])
+  @@index([organizationId, ownerEmployeeId])
+  @@index([organizationId, accountType])
+  @@index([organizationId, archivedAt])
+}
+
+model CrmContact {
+  id              String    @id @default(uuid()) @db.Uuid
+  organizationId  String    @db.Uuid
+  accountId       String?   @db.Uuid
+  firstName       String
+  lastName        String
+  jobTitle        String?
+  email           String?
+  phone           String?
+  alternatePhone  String?
+  ownerEmployeeId String?   @db.Uuid
+  isPrimary       Boolean   @default(false)
+  notes           String?
+  archivedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  account            CrmAccount?      @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  owner              Employee?        @relation("CrmContactOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  opportunities      CrmOpportunity[]
+  activities         CrmActivity[]
+  convertedFromLeads CrmLead[]        @relation("CrmLeadConvertedContact")
+
+  @@index([organizationId, accountId])
+  @@index([organizationId, ownerEmployeeId])
+  @@index([organizationId, archivedAt])
+  @@index([organizationId, email])
+}
+
+model CrmLead {
+  id                     String        @id @default(uuid()) @db.Uuid
+  organizationId         String        @db.Uuid
+  firstName              String
+  lastName               String
+  companyName            String?
+  email                  String?
+  phone                  String?
+  designation            String?
+  source                 CrmLeadSource @default(OTHER)
+  status                 CrmLeadStatus @default(NEW)
+  ownerEmployeeId        String?       @db.Uuid
+  estimatedValue         Decimal?      @db.Decimal(14, 2)
+  currency               String?       @db.VarChar(3)
+  nextFollowUpAt         DateTime?
+  lastContactedAt        DateTime?
+  notes                  String?
+  convertedAt            DateTime?
+  convertedAccountId     String?       @db.Uuid
+  convertedContactId     String?       @db.Uuid
+  convertedOpportunityId String?       @unique @db.Uuid
+  archivedAt             DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  organization         Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  owner                Employee?        @relation("CrmLeadOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  convertedAccount     CrmAccount?      @relation("CrmLeadConvertedAccount", fields: [convertedAccountId], references: [id], onDelete: SetNull)
+  convertedContact     CrmContact?      @relation("CrmLeadConvertedContact", fields: [convertedContactId], references: [id], onDelete: SetNull)
+  convertedOpportunity CrmOpportunity?  @relation("CrmLeadConvertedOpportunity", fields: [convertedOpportunityId], references: [id], onDelete: SetNull)
+  sourcedOpportunities CrmOpportunity[] @relation("CrmOpportunitySourceLead")
+  activities           CrmActivity[]
+
+  @@index([organizationId, status, createdAt])
+  @@index([organizationId, ownerEmployeeId])
+  @@index([organizationId, source])
+  @@index([organizationId, nextFollowUpAt])
+  @@index([organizationId, archivedAt])
+  @@index([organizationId, email])
+}
+
+model CrmOpportunity {
+  id                String              @id @default(uuid()) @db.Uuid
+  organizationId    String              @db.Uuid
+  accountId         String?             @db.Uuid
+  primaryContactId  String?             @db.Uuid
+  sourceLeadId      String?             @db.Uuid
+  name              String
+  description       String?
+  stage             CrmOpportunityStage @default(PROSPECTING)
+  estimatedValue    Decimal?            @db.Decimal(14, 2)
+  currency          String?             @db.VarChar(3)
+  expectedCloseDate DateTime?           @db.Date
+  closedAt          DateTime?
+  ownerEmployeeId   String?             @db.Uuid
+  lostReason        String?
+  archivedAt        DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  account           CrmAccount?   @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  primaryContact    CrmContact?   @relation(fields: [primaryContactId], references: [id], onDelete: SetNull)
+  sourceLead        CrmLead?      @relation("CrmOpportunitySourceLead", fields: [sourceLeadId], references: [id], onDelete: SetNull)
+  owner             Employee?     @relation("CrmOpportunityOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  convertedFromLead CrmLead?      @relation("CrmLeadConvertedOpportunity")
+  activities        CrmActivity[]
+
+  @@index([organizationId, stage, createdAt])
+  @@index([organizationId, ownerEmployeeId])
+  @@index([organizationId, accountId])
+  @@index([organizationId, expectedCloseDate])
+  @@index([organizationId, archivedAt])
+}
+
+model CrmActivity {
+  id              String          @id @default(uuid()) @db.Uuid
+  organizationId  String          @db.Uuid
+  type            CrmActivityType @default(NOTE)
+  leadId          String?         @db.Uuid
+  accountId       String?         @db.Uuid
+  contactId       String?         @db.Uuid
+  opportunityId   String?         @db.Uuid
+  ownerEmployeeId String?         @db.Uuid
+  subject         String
+  description     String?
+  occurredAt      DateTime?
+  dueAt           DateTime?
+  completedAt     DateTime?
+  createdByUserId String          @db.Uuid
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  organization  Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  lead          CrmLead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  account       CrmAccount?     @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  contact       CrmContact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity   CrmOpportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  owner         Employee?       @relation("CrmActivityOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  createdByUser User            @relation("CrmActivityCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, ownerEmployeeId, createdAt])
+  @@index([organizationId, dueAt])
+  @@index([organizationId, completedAt])
+  @@index([leadId])
+  @@index([accountId])
+  @@index([contactId])
+  @@index([opportunityId])
 }

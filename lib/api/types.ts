@@ -26,7 +26,12 @@ export type EmployeeProfile = EmployeeContext & {
   joiningDate: string | null;
   profilePhotoUrl: string | null;
   employmentStatus: string;
-  manager: { id: string; employeeCode: string; name: string; designation: string | null } | null;
+  manager: {
+    id: string;
+    employeeCode: string;
+    name: string;
+    designation: string | null;
+  } | null;
   roles: string[];
 };
 
@@ -41,7 +46,11 @@ export type Project = {
   startDate: string | null;
   dueDate: string | null;
   division: { id: string; slug: string; name: string };
-  projectManager: { id: string; name: string; designation: string | null } | null;
+  projectManager: {
+    id: string;
+    name: string;
+    designation: string | null;
+  } | null;
   myMembership?: { role: string } | null;
 };
 
@@ -49,7 +58,8 @@ export type Task = {
   id: string;
   title: string;
   description: string | null;
-  status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "REVIEW" | "COMPLETED" | "CANCELLED";
+  status:
+    "TODO" | "IN_PROGRESS" | "BLOCKED" | "REVIEW" | "COMPLETED" | "CANCELLED";
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   dueDate: string | null;
   completedAt: string | null;
@@ -83,12 +93,196 @@ export type Notification = {
   resourceId: string | null;
 };
 
-export type AttendanceRecord = { id: string; employeeId: string; businessDate: string; checkInAt: string | null; checkOutAt: string | null; status: string; source: string; notes: string | null; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string; slug: string } | null } };
-export type AttendanceSummary = { date: string; employeesExpected: number; present: number; absent: number; onLeave: number; remote: number; halfDay: number; missingCheckout: number; holiday: number };
-export type LeaveType = { id: string; code: string; name: string; description: string | null; unit: string; annualAllowance: number | null; balanceTracked?: boolean; isActive: boolean; isPaid: boolean };
-export type LeaveBalance = { id: string; year: number; openingBalance: number; accrued: number; used: number; adjusted: number; carriedForward: number; leaveType: LeaveType; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string } | null } };
-export type LeaveApplication = { id: string; startDate: string; endDate: string; dayCount: number; reason: string; status: string; reviewComment: string | null; createdAt: string; leaveType: LeaveType; employee?: { id: string; employeeCode: string; firstName: string; lastName: string; division?: { name: string; slug: string } | null } };
-export type Holiday = { id: string; name: string; date: string; type: string; description: string | null; isOptional: boolean; divisionId: string | null; branchId: string | null };
+export type AttendanceRecord = {
+  id: string;
+  employeeId: string;
+  businessDate: string;
+  checkInAt: string | null;
+  checkOutAt: string | null;
+  status: string;
+  source: string;
+  notes: string | null;
+  employee?: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    division?: { name: string; slug: string } | null;
+  };
+};
+export type AttendanceSummary = {
+  date: string;
+  employeesExpected: number;
+  present: number;
+  absent: number;
+  onLeave: number;
+  remote: number;
+  halfDay: number;
+  missingCheckout: number;
+  holiday: number;
+};
+export type LeaveType = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  unit: string;
+  annualAllowance: number | null;
+  balanceTracked?: boolean;
+  isActive: boolean;
+  isPaid: boolean;
+};
+export type LeaveBalance = {
+  id: string;
+  year: number;
+  openingBalance: number;
+  accrued: number;
+  used: number;
+  adjusted: number;
+  carriedForward: number;
+  leaveType: LeaveType;
+  employee?: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    division?: { name: string } | null;
+  };
+};
+export type LeaveApplication = {
+  id: string;
+  startDate: string;
+  endDate: string;
+  dayCount: number;
+  reason: string;
+  status: string;
+  reviewComment: string | null;
+  createdAt: string;
+  leaveType: LeaveType;
+  employee?: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    division?: { name: string; slug: string } | null;
+  };
+};
+export type Holiday = {
+  id: string;
+  name: string;
+  date: string;
+  type: string;
+  description: string | null;
+  isOptional: boolean;
+  divisionId: string | null;
+  branchId: string | null;
+};
+
+export type CrmOwner = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  employeeCode: string;
+};
+export type CrmLead = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  companyName: string | null;
+  email: string | null;
+  phone: string | null;
+  designation: string | null;
+  source: string;
+  status: string;
+  ownerEmployeeId: string | null;
+  owner?: CrmOwner | null;
+  estimatedValue: string | number | null;
+  currency: string | null;
+  nextFollowUpAt: string | null;
+  lastContactedAt: string | null;
+  notes: string | null;
+  convertedAt: string | null;
+  archivedAt: string | null;
+  createdAt: string;
+  convertedAccount?: { id: string; name: string } | null;
+  convertedContact?: { id: string; firstName: string; lastName: string } | null;
+  convertedOpportunity?: { id: string; name: string; stage: string } | null;
+};
+export type CrmAccount = {
+  id: string;
+  name: string;
+  displayName: string | null;
+  accountType: string;
+  status: string;
+  industry: string | null;
+  email: string | null;
+  phone: string | null;
+  ownerEmployeeId: string | null;
+  owner?: CrmOwner | null;
+  archivedAt: string | null;
+  createdAt: string;
+  _count?: { contacts: number; opportunities: number; activities: number };
+};
+export type CrmContact = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: string | null;
+  email: string | null;
+  owner?: CrmOwner | null;
+  account?: { id: string; name: string } | null;
+  createdAt: string;
+};
+export type CrmOpportunity = {
+  id: string;
+  name: string;
+  stage: string;
+  estimatedValue: string | number | null;
+  currency: string | null;
+  expectedCloseDate: string | null;
+  closedAt: string | null;
+  lostReason: string | null;
+  ownerEmployeeId: string | null;
+  owner?: CrmOwner | null;
+  account?: { id: string; name: string } | null;
+  primaryContact?: { id: string; firstName: string; lastName: string } | null;
+  archivedAt: string | null;
+  createdAt: string;
+};
+export type CrmActivity = {
+  id: string;
+  type: string;
+  subject: string;
+  description: string | null;
+  dueAt: string | null;
+  completedAt: string | null;
+  owner?: CrmOwner | null;
+  lead?: { id: string; firstName: string; lastName: string } | null;
+  account?: { id: string; name: string } | null;
+  opportunity?: { id: string; name: string; stage: string } | null;
+  createdAt: string;
+};
+export type CrmDashboard = {
+  leadCounts: Record<string, number>;
+  leadSources: Record<string, number>;
+  openLeads: number;
+  qualifiedLeads: number;
+  convertedLeads: number;
+  opportunityStages: {
+    stage: string;
+    currency: string;
+    count: number;
+    estimatedValue: string;
+  }[];
+  openOpportunityCount: number;
+  wonCount: number;
+  lostCount: number;
+  pipelineByCurrency: Record<string, string>;
+  wonByCurrency: Record<string, string>;
+  upcomingFollowUps: CrmActivity[];
+  overdueFollowUps: CrmActivity[];
+  recentActivities: CrmActivity[];
+};
 
 export type ExecutiveSummary = {
   employeesTotal: number;
@@ -107,7 +301,12 @@ export type ExecutiveEmployee = {
   status: string;
   division: { id: string; name: string; slug: string };
   department: { id: string; name: string } | null;
-  workSummary: { active: number; completed: number; overdue: number; total: number };
+  workSummary: {
+    active: number;
+    completed: number;
+    overdue: number;
+    total: number;
+  };
 };
 
 export type ExecutiveProject = {
@@ -143,7 +342,12 @@ export type ExecutiveWorkDetail = {
     division: { id: string; name: string; slug: string };
     department: { id: string; name: string } | null;
   };
-  taskSummary: { total: number; active: number; completed: number; overdue: number };
+  taskSummary: {
+    total: number;
+    active: number;
+    completed: number;
+    overdue: number;
+  };
   activeTasks: ExecutiveTask[];
   completedTasks: ExecutiveTask[];
   projects: Array<{ id: string; code: string; name: string }>;
@@ -169,15 +373,92 @@ export type CompanyProfile = {
   companyValues: string | null;
   logoUrl: string | null;
   status: string;
-  identifiers: { cin: string | null; dpiitNumber: string | null; gstin: string | null; pan: string | null; tan: string | null };
+  identifiers: {
+    cin: string | null;
+    dpiitNumber: string | null;
+    gstin: string | null;
+    pan: string | null;
+    tan: string | null;
+  };
 };
 
-export type CompanyDivision = { id: string; slug: string; name: string; status: string; _count: { departments: number; employees: number } };
-export type CompanyDepartment = { id: string; divisionId: string; slug: string; name: string; status: string; _count: { employees: number } };
-export type CompanyBranch = { id: string; code: string; name: string; type: string; addressLine1: string | null; addressLine2: string | null; city: string | null; state: string | null; postalCode: string | null; country: string | null; email: string | null; phone: string | null; isActive: boolean; createdAt: string; updatedAt: string };
-export type CompanyTeam = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; leadEmployee: { id: string; firstName: string; lastName: string; employeeCode: string } | null; memberCount: number; createdAt: string; updatedAt: string };
-export type CompanyTeamMember = { id: string; role: string; joinedAt: string; removedAt: string | null; employee: { id: string; employeeCode: string; firstName: string; lastName: string; designation: string | null; employmentStatus: string; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null } };
-export type CompanyCostCentre = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; createdAt: string; updatedAt: string };
+export type CompanyDivision = {
+  id: string;
+  slug: string;
+  name: string;
+  status: string;
+  _count: { departments: number; employees: number };
+};
+export type CompanyDepartment = {
+  id: string;
+  divisionId: string;
+  slug: string;
+  name: string;
+  status: string;
+  _count: { employees: number };
+};
+export type CompanyBranch = {
+  id: string;
+  code: string;
+  name: string;
+  type: string;
+  addressLine1: string | null;
+  addressLine2: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
+  country: string | null;
+  email: string | null;
+  phone: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CompanyTeam = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  division: { id: string; name: string; slug: string } | null;
+  department: { id: string; name: string; slug: string } | null;
+  leadEmployee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    employeeCode: string;
+  } | null;
+  memberCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+export type CompanyTeamMember = {
+  id: string;
+  role: string;
+  joinedAt: string;
+  removedAt: string | null;
+  employee: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    designation: string | null;
+    employmentStatus: string;
+    division: { id: string; name: string; slug: string } | null;
+    department: { id: string; name: string; slug: string } | null;
+  };
+};
+export type CompanyCostCentre = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  division: { id: string; name: string; slug: string } | null;
+  department: { id: string; name: string; slug: string } | null;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type HrEmployeeSummary = {
   id: string;
@@ -196,10 +477,28 @@ export type HrEmployeeSummary = {
   employmentStatus: string;
   division: { id: string; name: string; slug: string } | null;
   department: { id: string; name: string; slug: string } | null;
-  branch: { id: string; code: string; name: string; type: string; city: string | null; state: string | null } | null;
-  manager: { id: string; employeeCode: string; name: string; designation: string | null } | null;
+  branch: {
+    id: string;
+    code: string;
+    name: string;
+    type: string;
+    city: string | null;
+    state: string | null;
+  } | null;
+  manager: {
+    id: string;
+    employeeCode: string;
+    name: string;
+    designation: string | null;
+  } | null;
   directReportCount: number;
-  teams: Array<{ id: string; code: string; name: string; role: string; joinedAt: string }>;
+  teams: Array<{
+    id: string;
+    code: string;
+    name: string;
+    role: string;
+    joinedAt: string;
+  }>;
 };
 
 export type HrEmployeeDetail = HrEmployeeSummary & {
@@ -211,11 +510,64 @@ export type HrEmployeeDetail = HrEmployeeSummary & {
   nationality: string | null;
   bloodGroup: string | null;
   profilePhotoUrl: string | null;
-  directReports: Array<{ id: string; employeeCode: string; name: string; designation: string | null; employmentStatus: string }>;
-  addresses: Array<{ id: string; type: string; addressLine1: string; addressLine2: string | null; city: string; state: string; postalCode: string; country: string; isPrimary: boolean }>;
-  emergencyContacts: Array<{ id: string; name: string; relationship: string; phone: string; alternatePhone: string | null; email: string | null; isPrimary: boolean }>;
-  skills: Array<{ id: string; name: string; level: string | null; yearsExperience: number | string | null }>;
-  certifications: Array<{ id: string; name: string; issuer: string; issuedAt: string | null; expiresAt: string | null; credentialId: string | null; credentialUrl: string | null }>;
-  education: Array<{ id: string; institution: string; qualification: string; fieldOfStudy: string | null; startDate: string | null; endDate: string | null; gradeOrScore: string | null }>;
-  employmentHistory: Array<{ id: string; eventType: string; effectiveDate: string; summary: string; previousValue: unknown; newValue: unknown; createdAt: string }>;
+  directReports: Array<{
+    id: string;
+    employeeCode: string;
+    name: string;
+    designation: string | null;
+    employmentStatus: string;
+  }>;
+  addresses: Array<{
+    id: string;
+    type: string;
+    addressLine1: string;
+    addressLine2: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    isPrimary: boolean;
+  }>;
+  emergencyContacts: Array<{
+    id: string;
+    name: string;
+    relationship: string;
+    phone: string;
+    alternatePhone: string | null;
+    email: string | null;
+    isPrimary: boolean;
+  }>;
+  skills: Array<{
+    id: string;
+    name: string;
+    level: string | null;
+    yearsExperience: number | string | null;
+  }>;
+  certifications: Array<{
+    id: string;
+    name: string;
+    issuer: string;
+    issuedAt: string | null;
+    expiresAt: string | null;
+    credentialId: string | null;
+    credentialUrl: string | null;
+  }>;
+  education: Array<{
+    id: string;
+    institution: string;
+    qualification: string;
+    fieldOfStudy: string | null;
+    startDate: string | null;
+    endDate: string | null;
+    gradeOrScore: string | null;
+  }>;
+  employmentHistory: Array<{
+    id: string;
+    eventType: string;
+    effectiveDate: string;
+    summary: string;
+    previousValue: unknown;
+    newValue: unknown;
+    createdAt: string;
+  }>;
 };
