@@ -69,16 +69,51 @@ enum NotificationType {
   SYSTEM
 }
 
-model Organization {
-  id        String             @id @default(uuid()) @db.Uuid
-  legalName String
-  slug      String             @unique
-  status    OrganizationStatus @default(ACTIVE)
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+enum BranchType {
+  HEADQUARTERS
+  REGIONAL_OFFICE
+  PARTNER_LAB
+  OTHER
+}
 
-  divisions Division[]
-  projects  Project[]
+enum TeamMemberRole {
+  LEAD
+  MEMBER
+}
+
+model Organization {
+  id                     String             @id @default(uuid()) @db.Uuid
+  legalName              String
+  slug                   String             @unique
+  displayName            String?
+  tradeName              String?
+  cin                    String?
+  dpiitNumber            String?
+  gstin                  String?
+  pan                    String?
+  tan                    String?
+  registeredAddressLine1 String?
+  registeredAddressLine2 String?
+  registeredCity         String?
+  registeredState        String?
+  registeredPostalCode   String?
+  registeredCountry      String?
+  website                String?
+  officialEmail          String?
+  officialPhone          String?
+  mission                String?
+  vision                 String?
+  companyValues          String?
+  logoUrl                String?
+  status                 OrganizationStatus @default(ACTIVE)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  divisions   Division[]
+  projects    Project[]
+  branches    Branch[]
+  teams       Team[]
+  costCentres CostCentre[]
 }
 
 model Division {
@@ -94,6 +129,8 @@ model Division {
   departments  Department[]
   employees    Employee[]
   projects     Project[]
+  costCentres  CostCentre[]
+  teams        Team[]
 
   @@unique([organizationId, slug])
   @@index([organizationId, status])
@@ -108,8 +145,10 @@ model Department {
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
 
-  division  Division   @relation(fields: [divisionId], references: [id], onDelete: Restrict)
-  employees Employee[]
+  division    Division     @relation(fields: [divisionId], references: [id], onDelete: Restrict)
+  employees   Employee[]
+  costCentres CostCentre[]
+  teams       Team[]
 
   @@unique([divisionId, slug])
   @@index([divisionId, status])
@@ -204,10 +243,96 @@ model Employee {
   assignedTasks      ProjectTask[]   @relation("TaskAssignee")
   createdTasks       ProjectTask[]   @relation("TaskCreatorEmployee")
   taskComments       TaskComment[]   @relation("TaskCommentEmployeeAuthor")
+  teamMemberships    TeamMember[]
+  ledTeams           Team[]          @relation("TeamLead")
 
   @@index([divisionId])
   @@index([departmentId])
   @@index([employmentStatus])
+}
+
+model Branch {
+  id             String     @id @default(uuid()) @db.Uuid
+  organizationId String     @db.Uuid
+  code           String
+  name           String
+  type           BranchType @default(OTHER)
+  addressLine1   String?
+  addressLine2   String?
+  city           String?
+  state          String?
+  postalCode     String?
+  country        String?
+  email          String?
+  phone          String?
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, code])
+  @@index([organizationId, type, isActive])
+}
+
+model CostCentre {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @db.Uuid
+  divisionId     String?  @db.Uuid
+  departmentId   String?  @db.Uuid
+  code           String
+  name           String
+  description    String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  division     Division?    @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, code])
+  @@index([organizationId, divisionId, departmentId, isActive])
+}
+
+model Team {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @db.Uuid
+  divisionId     String?  @db.Uuid
+  departmentId   String?  @db.Uuid
+  name           String
+  code           String
+  description    String?
+  leadEmployeeId String?  @db.Uuid
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  division     Division?    @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  leadEmployee Employee?    @relation("TeamLead", fields: [leadEmployeeId], references: [id], onDelete: SetNull)
+  members      TeamMember[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, divisionId, departmentId, isActive])
+  @@index([leadEmployeeId])
+}
+
+model TeamMember {
+  id         String         @id @default(uuid()) @db.Uuid
+  teamId     String         @db.Uuid
+  employeeId String         @db.Uuid
+  role       TeamMemberRole @default(MEMBER)
+  joinedAt   DateTime       @default(now())
+  removedAt  DateTime?
+  createdAt  DateTime       @default(now())
+
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+
+  @@index([teamId, employeeId, removedAt])
+  @@index([employeeId, removedAt])
 }
 
 model RefreshSession {

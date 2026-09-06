@@ -4,6 +4,7 @@ const defaultApiBaseUrl = browserHost === "localhost" || browserHost === "127.0.
   ? "http://localhost:3001/api/v1"
   : "https://techm4india-erp-api.vercel.app/api/v1";
 export const API_BASE_URL = (env?.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/$/, "");
+export const API_V2_BASE_URL = API_BASE_URL.replace(/\/v1$/, "/v2");
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<string> | null = null;
@@ -56,16 +57,16 @@ export async function refreshSessionToken() {
   return refreshAccessToken();
 }
 
-export async function apiFetch<T>(path: string, init: RequestInit = {}, canRetry = true): Promise<T> {
+async function apiFetchAtBase<T>(baseUrl: string, path: string, init: RequestInit = {}, canRetry = true): Promise<T> {
   const headers = new Headers(init.headers);
   headers.set("Accept", "application/json");
   if (init.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers, credentials: "include" });
+  const response = await fetch(`${baseUrl}${path}`, { ...init, headers, credentials: "include" });
   if (response.status === 401 && canRetry && !path.endsWith("/auth/refresh") && !path.endsWith("/auth/login")) {
     try {
       await refreshAccessToken();
-      return apiFetch<T>(path, init, false);
+      return apiFetchAtBase<T>(baseUrl, path, init, false);
     } catch {
       clearAccessToken();
       throw new ApiError(401, "Your session has expired. Please sign in again.");
@@ -74,4 +75,12 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}, canRetry
   if (!response.ok) throw await parseError(response);
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
+}
+
+export async function apiFetch<T>(path: string, init: RequestInit = {}, canRetry = true): Promise<T> {
+  return apiFetchAtBase(API_BASE_URL, path, init, canRetry);
+}
+
+export async function apiFetchV2<T>(path: string, init: RequestInit = {}, canRetry = true): Promise<T> {
+  return apiFetchAtBase(API_V2_BASE_URL, path, init, canRetry);
 }

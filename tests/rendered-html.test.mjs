@@ -24,6 +24,8 @@ for (const [path, heading] of [
   ["/contact", "Let&#x27;s build India&#x27;s"],
   ["/login", "Company Management ERP"],
   ["/erp", "Restoring your workspace"],
+  ["/erp/founder/dashboard", "Restoring your workspace"],
+  ["/erp/founder/organization", "Restoring your workspace"],
   ["/erp/engineering/dashboard", "Restoring your workspace"],
   ["/erp/solutions/dashboard", "Restoring your workspace"],
   ["/erp/schools/dashboard", "Restoring your workspace"],

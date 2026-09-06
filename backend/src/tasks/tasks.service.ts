@@ -66,14 +66,31 @@ export class TasksService {
   }
 
   async create(principal: Principal, projectId: string, dto: CreateTaskDto, request: RequestMetadata) {
+    return this.createInternal(principal, projectId, dto, request, "standard");
+  }
+
+  async createForExecutive(principal: Principal, employeeId: string, projectId: string, dto: CreateTaskDto, request: RequestMetadata) {
+    if (!principal.permissions.includes("tasks.create_all")) throw new ForbiddenException("Executive task creation denied");
+    return this.createInternal(principal, projectId, { ...dto, assigneeEmployeeId: employeeId }, request, "executive");
+  }
+
+  private async createInternal(principal: Principal, projectId: string, dto: CreateTaskDto, request: RequestMetadata, mode: "standard" | "executive") {
     const project = await this.projectScope(projectId);
-    if (!this.policy.canManageProject(principal, project)) throw new ForbiddenException("Task creation denied");
+    if (mode === "standard" && !this.policy.canManageProject(principal, project)) throw new ForbiddenException("Task creation denied");
+    if (mode === "executive" && principal.organizationId !== project.organizationId) throw new ForbiddenException("Project organization access denied");
     let assignee: { id: string; userId: string; firstName: string; lastName: string; divisionId: string | null; employmentStatus: "ACTIVE" | "ON_LEAVE" | "SUSPENDED" | "RESIGNED" | "TERMINATED" } | null = null;
     if (dto.assigneeEmployeeId) {
       assignee = await this.prisma.employee.findUnique({ where: { id: dto.assigneeEmployeeId }, select: { id: true, userId: true, firstName: true, lastName: true, divisionId: true, employmentStatus: true } });
       if (!assignee || assignee.employmentStatus !== "ACTIVE") throw new NotFoundException("Active assignee not found");
-      const isMember = await this.prisma.projectMember.findUnique({ where: { projectId_employeeId: { projectId, employeeId: dto.assigneeEmployeeId } }, select: { removedAt: true } });
-      if ((!isMember || isMember.removedAt) && dto.assigneeEmployeeId !== project.projectManagerId) throw new ForbiddenException("Assignee must be an active project member");
+      if (mode === "standard") {
+        const isMember = await this.prisma.projectMember.findUnique({ where: { projectId_employeeId: { projectId, employeeId: dto.assigneeEmployeeId } }, select: { removedAt: true } });
+        if ((!isMember || isMember.removedAt) && dto.assigneeEmployeeId !== project.projectManagerId) throw new ForbiddenException("Assignee must be an active project member");
+      } else if (assignee.divisionId) {
+        const assigneeDivision = await this.prisma.division.findUnique({ where: { id: assignee.divisionId }, select: { organizationId: true } });
+        if (!assigneeDivision || assigneeDivision.organizationId !== project.organizationId) {
+          throw new ForbiddenException("Assignee organization access denied");
+        }
+      }
     }
     this.validateDueDate(dto.dueDate, project.startDate, project.dueDate);
     const status = dto.status ?? TaskStatus.TODO;
@@ -83,39 +100,59 @@ export class TasksService {
       if (assignee) {
         await this.notifications.create({ userId: assignee.userId, type: "TASK_ASSIGNED", title: "New task assigned", body: `You were assigned “${created.title}”.`, resourceType: "ProjectTask", resourceId: created.id, tx });
       }
-      await tx.auditLog.create({ data: { action: "TASK_CREATED", actorUserId: principal.userId, entityType: "ProjectTask", entityId: created.id, metadata: { projectId, assigneeId: dto.assigneeEmployeeId ?? null }, ipAddress: request.ipAddress, userAgent: request.userAgent?.slice(0, 512) } });
-      if (assignee) await tx.auditLog.create({ data: { action: "TASK_ASSIGNED", actorUserId: principal.userId, entityType: "ProjectTask", entityId: created.id, metadata: { assigneeId: assignee.id }, ipAddress: request.ipAddress, userAgent: request.userAgent?.slice(0, 512) } });
+      await tx.auditLog.create({ data: { action: mode === "executive" ? "FOUNDER_TASK_CREATED" : "TASK_CREATED", actorUserId: principal.userId, entityType: "ProjectTask", entityId: created.id, metadata: { projectId, employeeId: dto.assigneeEmployeeId ?? null, assigneeId: dto.assigneeEmployeeId ?? null }, ipAddress: request.ipAddress, userAgent: request.userAgent?.slice(0, 512) } });
+      if (assignee) await tx.auditLog.create({ data: { action: mode === "executive" ? "TASK_REASSIGNED" : "TASK_ASSIGNED", actorUserId: principal.userId, entityType: "ProjectTask", entityId: created.id, metadata: { previousAssigneeId: null, newAssigneeId: assignee.id, employeeId: assignee.id, projectId }, ipAddress: request.ipAddress, userAgent: request.userAgent?.slice(0, 512) } });
       return created;
     });
     return this.toResponse(task);
   }
 
   async update(principal: Principal, id: string, dto: UpdateTaskDto, request: RequestMetadata) {
+    return this.updateInternal(principal, id, dto, request, "standard");
+  }
+
+  async updateForExecutive(principal: Principal, id: string, dto: UpdateTaskDto, request: RequestMetadata) {
+    if (!principal.permissions.includes("tasks.update_all")) throw new ForbiddenException("Executive task update denied");
+    return this.updateInternal(principal, id, dto, request, "executive");
+  }
+
+  private async updateInternal(principal: Principal, id: string, dto: UpdateTaskDto, request: RequestMetadata, mode: "standard" | "executive") {
     const existing = await this.prisma.projectTask.findUnique({ where: { id }, include: taskInclude });
     if (!existing) throw new NotFoundException("Task not found");
     const scope = await this.projectScope(existing.projectId);
     const isAssignee = principal.employeeId === existing.assigneeId;
     const keys = Object.keys(dto).filter((key) => (dto as Record<string, unknown>)[key] !== undefined);
-    if (isAssignee && !this.policy.canManageTask(principal, scope)) {
+    if (mode === "executive" && principal.organizationId !== scope.organizationId) throw new ForbiddenException("Task organization access denied");
+    if (mode === "standard" && isAssignee && !this.policy.canManageTask(principal, scope)) {
       if (!principal.permissions.includes("tasks.update_assigned") || keys.some((key) => key !== "status")) throw new ForbiddenException("Employees may only update their assigned task status");
-    } else if (!this.policy.canManageTask(principal, scope)) {
+    } else if (mode === "standard" && !this.policy.canManageTask(principal, scope)) {
       throw new ForbiddenException("Task update denied");
     }
     if (dto.assigneeEmployeeId) {
       const target = await this.prisma.employee.findUnique({ where: { id: dto.assigneeEmployeeId }, select: { id: true, userId: true, employmentStatus: true } });
-      const member = await this.prisma.projectMember.findUnique({ where: { projectId_employeeId: { projectId: existing.projectId, employeeId: dto.assigneeEmployeeId } }, select: { removedAt: true } });
-      if (!target || target.employmentStatus !== "ACTIVE" || (!member || member.removedAt) && dto.assigneeEmployeeId !== scope.projectManagerId) throw new ForbiddenException("Assignee must be an active project member");
+      if (!target || target.employmentStatus !== "ACTIVE") throw new ForbiddenException("Assignee must be an active employee");
+      if (mode === "standard") {
+        const member = await this.prisma.projectMember.findUnique({ where: { projectId_employeeId: { projectId: existing.projectId, employeeId: dto.assigneeEmployeeId } }, select: { removedAt: true } });
+        if ((!member || member.removedAt) && dto.assigneeEmployeeId !== scope.projectManagerId) throw new ForbiddenException("Assignee must be an active project member");
+      }
     }
     this.validateDueDate(dto.dueDate, scope.startDate, scope.dueDate);
     const status = dto.status;
     const task = await this.prisma.$transaction(async (tx) => {
       const updated = await tx.projectTask.update({ where: { id }, data: { title: dto.title?.trim(), description: dto.description?.trim(), assigneeId: dto.assigneeEmployeeId, priority: dto.priority, status, dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined, completedAt: status === TaskStatus.COMPLETED ? new Date() : status ? null : undefined }, include: taskInclude });
       const auditData = { actorUserId: principal.userId, entityType: "ProjectTask", entityId: id, ipAddress: request.ipAddress, userAgent: request.userAgent?.slice(0, 512) };
-      await tx.auditLog.create({ data: { ...auditData, action: status && status !== existing.status ? "TASK_STATUS_CHANGED" : "TASK_UPDATED", metadata: { fields: keys, previousStatus: existing.status, status: status ?? existing.status } } });
-      if (dto.assigneeEmployeeId && dto.assigneeEmployeeId !== existing.assigneeId) {
+      const reassigned = dto.assigneeEmployeeId !== undefined && dto.assigneeEmployeeId !== existing.assigneeId;
+      const action = mode === "executive"
+        ? status === TaskStatus.CANCELLED && existing.status !== TaskStatus.CANCELLED ? "TASK_CANCELLED" : "FOUNDER_TASK_UPDATED"
+        : status && status !== existing.status ? "TASK_STATUS_CHANGED" : "TASK_UPDATED";
+      await tx.auditLog.create({ data: { ...auditData, action, metadata: { fields: keys, previousStatus: existing.status, status: status ?? existing.status, previousAssigneeId: existing.assigneeId, newAssigneeId: dto.assigneeEmployeeId ?? existing.assigneeId } } });
+      if (reassigned) {
         const assignee = await tx.employee.findUnique({ where: { id: dto.assigneeEmployeeId }, select: { userId: true } });
         if (assignee) await this.notifications.create({ userId: assignee.userId, type: "TASK_ASSIGNED", title: "New task assigned", body: `You were assigned “${updated.title}”.`, resourceType: "ProjectTask", resourceId: id, tx });
-        await tx.auditLog.create({ data: { ...auditData, action: "TASK_ASSIGNED", metadata: { assigneeId: dto.assigneeEmployeeId } } });
+        await tx.auditLog.create({ data: { ...auditData, action: mode === "executive" ? "TASK_REASSIGNED" : "TASK_ASSIGNED", metadata: { taskId: id, previousAssigneeId: existing.assigneeId, newAssigneeId: dto.assigneeEmployeeId, employeeId: dto.assigneeEmployeeId } } });
+      }
+      if (mode === "executive" && status === TaskStatus.CANCELLED && existing.status !== TaskStatus.CANCELLED && updated.assignee?.userId) {
+        await this.notifications.create({ userId: updated.assignee.userId, type: "SYSTEM", title: "Task cancelled", body: `The task “${updated.title}” was cancelled.`, resourceType: "ProjectTask", resourceId: id, tx });
       }
       return updated;
     });

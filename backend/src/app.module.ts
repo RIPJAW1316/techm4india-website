@@ -13,6 +13,8 @@ import { OrganizationModule } from "./organization/organization.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { ProjectsModule } from "./projects/projects.module";
 import { TasksModule } from "./tasks/tasks.module";
+import { ExecutiveModule } from "./executive/executive.module";
+import { CompanyModule } from "./company/company.module";
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { TasksModule } from "./tasks/tasks.module";
     NotificationsModule,
     ProjectsModule,
     TasksModule,
+    ExecutiveModule,
+    CompanyModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

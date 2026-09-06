@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import {
@@ -24,7 +24,8 @@ export async function createConfiguredApp(): Promise<INestApplication> {
     app.getHttpAdapter().getInstance().set("trust proxy", 1);
   }
 
-  app.setGlobalPrefix("api/v1");
+  app.setGlobalPrefix("api");
+  app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
   app.use(helmet());
   app.use(cookieParser());
   app.use(json({ limit: "1mb" }));

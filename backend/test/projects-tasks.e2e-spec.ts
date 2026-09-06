@@ -1,5 +1,5 @@
 import cookieParser from "cookie-parser";
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import argon2 from "argon2";
 import request from "supertest";
@@ -49,7 +49,8 @@ describe("Projects, tasks, comments, and notifications", () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix("api/v1");
+    app.setGlobalPrefix("api");
+    app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
     app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
     app.useGlobalFilters(new HttpExceptionFilter());

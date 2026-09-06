@@ -15,7 +15,7 @@ export interface TaskScope extends ProjectScope {
 @Injectable()
 export class AuthorizationPolicy {
   isOrganizationWide(principal: Principal): boolean {
-    return principal.roles.includes("SUPER_ADMIN") || principal.roles.includes("DIRECTOR");
+    return principal.roles.includes("SUPER_ADMIN") || principal.roles.includes("DIRECTOR") || principal.roles.includes("FOUNDER_CEO");
   }
 
   canAccessDivision(principal: Principal, divisionId: string, permission: string): boolean {

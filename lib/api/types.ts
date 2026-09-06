@@ -82,3 +82,92 @@ export type Notification = {
   resourceType: string | null;
   resourceId: string | null;
 };
+
+export type ExecutiveSummary = {
+  employeesTotal: number;
+  employeesActive: number;
+  activeTasks: number;
+  completedTasks: number;
+  overdueTasks: number;
+  activeProjects: number;
+};
+
+export type ExecutiveEmployee = {
+  id: string;
+  employeeCode: string;
+  name: string;
+  designation: string | null;
+  status: string;
+  division: { id: string; name: string; slug: string };
+  department: { id: string; name: string } | null;
+  workSummary: { active: number; completed: number; overdue: number; total: number };
+};
+
+export type ExecutiveProject = {
+  id: string;
+  code: string;
+  name: string;
+  status: string;
+  division: { id: string; name: string; slug: string };
+};
+
+export type ExecutiveTask = {
+  id: string;
+  title: string;
+  description: string | null;
+  status: Task["status"];
+  priority: Task["priority"];
+  dueDate: string | null;
+  completedAt: string | null;
+  project: { id: string; code: string; name: string };
+  assignee: { id: string; name: string; designation: string | null } | null;
+  createdBy: { id: string; name: string; designation: string | null } | null;
+};
+
+export type ExecutiveWorkDetail = {
+  employee: {
+    id: string;
+    employeeCode: string;
+    firstName: string;
+    lastName: string;
+    name: string;
+    designation: string | null;
+    employmentStatus: string;
+    division: { id: string; name: string; slug: string };
+    department: { id: string; name: string } | null;
+  };
+  taskSummary: { total: number; active: number; completed: number; overdue: number };
+  activeTasks: ExecutiveTask[];
+  completedTasks: ExecutiveTask[];
+  projects: Array<{ id: string; code: string; name: string }>;
+};
+
+export type CompanyProfile = {
+  id: string;
+  legalName: string;
+  slug: string;
+  displayName: string | null;
+  tradeName: string | null;
+  registeredAddressLine1: string | null;
+  registeredAddressLine2: string | null;
+  registeredCity: string | null;
+  registeredState: string | null;
+  registeredPostalCode: string | null;
+  registeredCountry: string | null;
+  website: string | null;
+  officialEmail: string | null;
+  officialPhone: string | null;
+  mission: string | null;
+  vision: string | null;
+  companyValues: string | null;
+  logoUrl: string | null;
+  status: string;
+  identifiers: { cin: string | null; dpiitNumber: string | null; gstin: string | null; pan: string | null; tan: string | null };
+};
+
+export type CompanyDivision = { id: string; slug: string; name: string; status: string; _count: { departments: number; employees: number } };
+export type CompanyDepartment = { id: string; divisionId: string; slug: string; name: string; status: string; _count: { employees: number } };
+export type CompanyBranch = { id: string; code: string; name: string; type: string; addressLine1: string | null; addressLine2: string | null; city: string | null; state: string | null; postalCode: string | null; country: string | null; email: string | null; phone: string | null; isActive: boolean; createdAt: string; updatedAt: string };
+export type CompanyTeam = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; leadEmployee: { id: string; firstName: string; lastName: string; employeeCode: string } | null; memberCount: number; createdAt: string; updatedAt: string };
+export type CompanyTeamMember = { id: string; role: string; joinedAt: string; removedAt: string | null; employee: { id: string; employeeCode: string; firstName: string; lastName: string; designation: string | null; employmentStatus: string; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null } };
+export type CompanyCostCentre = { id: string; code: string; name: string; description: string | null; isActive: boolean; division: { id: string; name: string; slug: string } | null; department: { id: string; name: string; slug: string } | null; createdAt: string; updatedAt: string };

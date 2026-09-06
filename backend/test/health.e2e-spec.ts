@@ -1,4 +1,4 @@
-import { INestApplication } from "@nestjs/common";
+import { INestApplication, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 
@@ -27,7 +27,8 @@ describe("Health endpoint", () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix("api/v1");
+    app.setGlobalPrefix("api");
+    app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     await app.init();
   });
 

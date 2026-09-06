@@ -50,12 +50,18 @@ export function getDivisionConfig(slug: string | null | undefined): DivisionConf
 
 export function isOrganizationWideContext(context: AuthContext | null): boolean {
   if (!context) return false;
-  const hasOrganizationRole = context.user.roles.some((role) => role === "SUPER_ADMIN" || role === "DIRECTOR");
+  const hasOrganizationRole = context.user.roles.some((role) => role === "SUPER_ADMIN" || role === "DIRECTOR" || role === "FOUNDER_CEO");
   return hasOrganizationRole && context.permissions.includes("organization.read_all");
 }
 
+export function canAccessExecutiveWorkspace(context: AuthContext | null): boolean {
+  return Boolean(context?.permissions.includes("executive.dashboard.read"));
+}
+
 export function resolveDashboardPath(context: AuthContext | null): string {
-  if (!context || isOrganizationWideContext(context)) return "/erp";
+  if (!context) return "/erp";
+  if (canAccessExecutiveWorkspace(context)) return "/erp/founder/dashboard";
+  if (isOrganizationWideContext(context)) return "/erp";
   return getDivisionConfig(context.employee?.division?.slug)?.dashboardPath ?? "/erp";
 }
 

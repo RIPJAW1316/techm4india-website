@@ -18,7 +18,7 @@ const divisions = [
 ] as const;
 
 const roleNames = [
-  "SUPER_ADMIN", "DIRECTOR", "DIVISION_HEAD", "HR_MANAGER", "SALES_MANAGER",
+  "SUPER_ADMIN", "FOUNDER_CEO", "DIRECTOR", "DIVISION_HEAD", "HR_MANAGER", "SALES_MANAGER",
   "SALES_EXECUTIVE", "FINANCE_MANAGER", "PROJECT_MANAGER", "EMPLOYEE",
   "CONTENT_MANAGER", "VIEWER",
 ] as const;
@@ -28,6 +28,22 @@ const permissionKeys = [
   "projects.read_all", "projects.manage", "tasks.read_assigned", "tasks.read_project", "tasks.read_all", "tasks.update_assigned", "tasks.manage",
   "employees.read_division", "employees.read_all", "notifications.read_self",
   "organization.read_self", "organization.read_division", "organization.read_all", "task_comments.read", "task_comments.create",
+  "executive.dashboard.read", "tasks.create_all", "tasks.update_all", "tasks.assign_all", "tasks.cancel_all",
+  "company.profile.read", "company.profile.manage", "branches.read", "branches.manage",
+  "teams.read", "teams.manage", "cost_centres.read", "cost_centres.manage", "organization.structure.read",
+] as const;
+
+const founderPermissionKeys = [
+  "executive.dashboard.read", "employees.read_all", "projects.read_all", "tasks.read_all",
+  "tasks.create_all", "tasks.update_all", "tasks.assign_all", "tasks.cancel_all",
+] as const;
+
+const companyReadPermissionKeys = [
+  "company.profile.read", "branches.read", "teams.read", "cost_centres.read", "organization.structure.read",
+] as const;
+
+const companyManagePermissionKeys = [
+  "company.profile.manage", "branches.manage", "teams.manage", "cost_centres.manage",
 ] as const;
 
 async function main(): Promise<void> {
@@ -65,13 +81,18 @@ async function main(): Promise<void> {
   }
 
   for (const [name, role] of roles) {
-    const keys = name === "SUPER_ADMIN" || name === "DIRECTOR"
+    const keys = name === "SUPER_ADMIN"
       ? permissionKeys
+      : name === "FOUNDER_CEO"
+        ? [...founderPermissionKeys, ...companyReadPermissionKeys, ...companyManagePermissionKeys, "notifications.read_self", "organization.read_all"]
+      : name === "DIRECTOR"
+        ? permissionKeys.filter((key) => !founderPermissionKeys.includes(key as (typeof founderPermissionKeys)[number]) && !companyManagePermissionKeys.includes(key as (typeof companyManagePermissionKeys)[number]))
       : name === "DIVISION_HEAD"
         ? [
             "employees.read_self", "employees.read_division", "projects.read_assigned",
             "projects.read_division", "projects.manage", "tasks.read_assigned", "tasks.manage",
             "tasks.read_project", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self", "organization.read_division",
+            ...companyReadPermissionKeys,
           ]
       : name === "PROJECT_MANAGER"
         ? ["projects.read_assigned", "projects.read_division", "projects.manage", "tasks.read_assigned", "tasks.read_project", "tasks.manage", "task_comments.read", "task_comments.create", "notifications.read_self", "organization.read_self"]
@@ -124,6 +145,28 @@ async function main(): Promise<void> {
       });
   const employeeRole = roles.get("EMPLOYEE");
   if (!employeeRole) throw new Error("Employee role seed failed");
+
+  const founderRole = roles.get("FOUNDER_CEO");
+  if (!founderRole) throw new Error("Founder role seed failed");
+  const existingFounderUser = await prisma.user.findUnique({ where: { email: "founder.dev@techm4india.com" } });
+  const founderUser = existingFounderUser
+    ? await prisma.user.update({ where: { id: existingFounderUser.id }, data: { status: UserStatus.ACTIVE } })
+    : await prisma.user.create({
+        data: {
+          email: "founder.dev@techm4india.com",
+          passwordHash: passwordHash as string,
+          status: UserStatus.ACTIVE,
+        },
+      });
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId: founderUser.id, roleId: founderRole.id } },
+    update: {}, create: { userId: founderUser.id, roleId: founderRole.id },
+  });
+  await prisma.employee.upsert({
+    where: { employeeCode: "EMP-DEV-CEO" },
+    update: { userId: founderUser.id, firstName: "Founder", lastName: "Demo", designation: "Founder / CEO", divisionId: engineering.id, departmentId: softwareDepartment.id, employmentStatus: "ACTIVE" },
+    create: { userId: founderUser.id, employeeCode: "EMP-DEV-CEO", firstName: "Founder", lastName: "Demo", designation: "Founder / CEO", joiningDate: new Date("2026-01-01T00:00:00.000Z"), divisionId: engineering.id, departmentId: softwareDepartment.id },
+  });
   await prisma.userRole.upsert({
     where: { userId_roleId: { userId: user.id, roleId: employeeRole.id } },
     update: {}, create: { userId: user.id, roleId: employeeRole.id },

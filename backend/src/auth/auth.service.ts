@@ -233,9 +233,7 @@ export class AuthService {
       email: user.email,
       status: user.status,
       employeeId: context.employee?.id,
-      organizationId: context.employee?.division?.id
-        ? user.employee?.division?.organizationId
-        : undefined,
+      organizationId: user.employee?.division?.organizationId,
       divisionId: context.employee?.division?.id,
       departmentId: context.employee?.department?.id,
       roles: context.user.roles,

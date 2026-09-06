@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { resolveDashboardPath, canAccessDivisionWorkspace } = await import("../lib/erp/divisions.ts");
+const { resolveDashboardPath, canAccessDivisionWorkspace, canAccessExecutiveWorkspace } = await import("../lib/erp/divisions.ts");
 
 function context(slug, roles = ["EMPLOYEE"], permissions = ["organization.read_self"]) {
   return {
@@ -28,8 +28,20 @@ test("organization-wide context resolves to the workspace selector", () => {
   assert.equal(canAccessDivisionWorkspace(director, "space"), true);
 });
 
+test("founder resolves to the executive control centre", () => {
+  const founder = context("engineering", ["FOUNDER_CEO"], ["organization.read_all", "executive.dashboard.read"]);
+  assert.equal(resolveDashboardPath(founder), "/erp/founder/dashboard");
+  assert.equal(canAccessExecutiveWorkspace(founder), true);
+});
+
 test("single-division context cannot access another division workspace", () => {
   const engineering = context("engineering");
   assert.equal(canAccessDivisionWorkspace(engineering, "engineering"), true);
   assert.equal(canAccessDivisionWorkspace(engineering, "space"), false);
+});
+
+test("regular employees cannot access the Founder workspace", () => {
+  const employee = context("engineering");
+  assert.equal(canAccessExecutiveWorkspace(employee), false);
+  assert.equal(resolveDashboardPath(employee), "/erp/engineering/dashboard");
 });
