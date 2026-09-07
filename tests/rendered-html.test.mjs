@@ -7,8 +7,12 @@ async function render(path = "/") {
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
-    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    new Request(`http://localhost${path}`, {
+      headers: { accept: "text/html" },
+    }),
+    {
+      ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
+    },
     { waitUntil() {}, passThroughOnException() {} },
   );
 }
@@ -31,6 +35,7 @@ for (const [path, heading] of [
   ["/erp/founder/leave", "Restoring your workspace"],
   ["/erp/founder/crm", "Restoring your workspace"],
   ["/erp/founder/institutions", "Restoring your workspace"],
+  ["/erp/founder/users", "Restoring your workspace"],
   ["/erp/engineering/dashboard", "Restoring your workspace"],
   ["/erp/solutions/dashboard", "Restoring your workspace"],
   ["/erp/schools/dashboard", "Restoring your workspace"],

@@ -2,27 +2,73 @@
 
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { canAccessDivisionWorkspace, canAccessExecutiveWorkspace, resolveDashboardPath, type DivisionSlug } from "@/lib/erp/divisions";
+import {
+  canAccessDivisionWorkspace,
+  canAccessExecutiveWorkspace,
+  resolveDashboardPath,
+  type DivisionSlug,
+} from "@/lib/erp/divisions";
 import { useErpAuth } from "./AuthProvider";
 
-export function ErpLoading({ label = "Restoring your workspace" }: { label?: string }) {
-  return <div className="erp-state" role="status"><span className="erp-loader" aria-hidden="true" /><p>{label}</p></div>;
+export function ErpLoading({
+  label = "Restoring your workspace",
+}: {
+  label?: string;
+}) {
+  return (
+    <div className="erp-state" role="status">
+      <span className="erp-loader" aria-hidden="true" />
+      <p>{label}</p>
+    </div>
+  );
 }
 
-export function ProtectedErp({ children, requiredDivision, requiredExecutive = false, requiredHr = false }: { children: ReactNode; requiredDivision?: DivisionSlug; requiredExecutive?: boolean; requiredHr?: boolean }) {
+export function ProtectedErp({
+  children,
+  requiredDivision,
+  requiredExecutive = false,
+  requiredHr = false,
+  requiredAdmin = false,
+}: {
+  children: ReactNode;
+  requiredDivision?: DivisionSlug;
+  requiredExecutive?: boolean;
+  requiredHr?: boolean;
+  requiredAdmin?: boolean;
+}) {
   const { status, context } = useErpAuth();
   const router = useRouter();
-  const divisionAllowed = !requiredDivision || canAccessDivisionWorkspace(context, requiredDivision);
-  const executiveAllowed = !requiredExecutive || canAccessExecutiveWorkspace(context);
-  const hrAllowed = !requiredHr || Boolean(context?.permissions.includes("hr.employees.read"));
+  const divisionAllowed =
+    !requiredDivision || canAccessDivisionWorkspace(context, requiredDivision);
+  const executiveAllowed =
+    !requiredExecutive || canAccessExecutiveWorkspace(context);
+  const hrAllowed =
+    !requiredHr || Boolean(context?.permissions.includes("hr.employees.read"));
+  const adminAllowed =
+    !requiredAdmin ||
+    Boolean(context?.permissions.includes("admin.users.read"));
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
-    if (status === "authenticated" && (!divisionAllowed || !executiveAllowed || !hrAllowed)) router.replace(resolveDashboardPath(context));
-  }, [status, context, divisionAllowed, executiveAllowed, hrAllowed, router]);
+    if (
+      status === "authenticated" &&
+      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed)
+    )
+      router.replace(resolveDashboardPath(context));
+  }, [
+    status,
+    context,
+    divisionAllowed,
+    executiveAllowed,
+    hrAllowed,
+    adminAllowed,
+    router,
+  ]);
 
   if (status === "loading") return <ErpLoading />;
-  if (status === "unauthenticated") return <ErpLoading label="Taking you to sign in" />;
-  if (!divisionAllowed || !executiveAllowed || !hrAllowed) return <ErpLoading label="Opening your permitted workspace" />;
+  if (status === "unauthenticated")
+    return <ErpLoading label="Taking you to sign in" />;
+  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed)
+    return <ErpLoading label="Opening your permitted workspace" />;
   return <>{children}</>;
 }

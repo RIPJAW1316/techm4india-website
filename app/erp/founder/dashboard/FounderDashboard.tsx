@@ -235,6 +235,14 @@ function FounderDashboardContent() {
     return () => window.clearTimeout(timer);
   }, [loadAll]);
   useEffect(() => {
+    const employeeId = new URLSearchParams(window.location.search).get(
+      "employee",
+    );
+    if (!employeeId) return;
+    const timer = window.setTimeout(() => setSelectedEmployeeId(employeeId), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
     const interval = window.setInterval(() => {
       void loadAll(true);
     }, 12_000);
@@ -449,6 +457,7 @@ function FounderDashboardContent() {
             <a href="#workforce">Workforce</a>
             <a href="#work-detail">Work detail</a>
             <a href="/erp/founder/employees">Employees ↗</a>
+            <a href="/erp/founder/users">Users &amp; Roles ↗</a>
             <a href="/erp/founder/organization">Organization ↗</a>
             <a href="/erp/founder/attendance">Attendance ↗</a>
             <a href="/erp/founder/leave">Leave ↗</a>

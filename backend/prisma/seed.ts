@@ -7,6 +7,7 @@ import {
   NotificationType,
 } from "@prisma/client";
 import argon2 from "argon2";
+import { OFFICIAL_ROLE_CATALOG } from "../src/admin/role-catalog";
 
 const prisma = new PrismaClient();
 
@@ -37,21 +38,7 @@ const divisions = [
   },
 ] as const;
 
-const roleNames = [
-  "SUPER_ADMIN",
-  "FOUNDER_CEO",
-  "DIRECTOR",
-  "DIVISION_HEAD",
-  "HR_MANAGER",
-  "SALES_MANAGER",
-  "HR_EXECUTIVE",
-  "SALES_EXECUTIVE",
-  "FINANCE_MANAGER",
-  "PROJECT_MANAGER",
-  "EMPLOYEE",
-  "CONTENT_MANAGER",
-  "VIEWER",
-] as const;
+const roleNames = OFFICIAL_ROLE_CATALOG.map((role) => role.name);
 
 const permissionKeys = [
   "employees.read_self",
@@ -124,6 +111,11 @@ const permissionKeys = [
   "institutions.engagements.read",
   "institutions.engagements.manage",
   "institutions.assign",
+  "admin.users.read",
+  "admin.users.manage_roles",
+  "admin.users.manage_status",
+  "admin.roles.read",
+  "admin.permissions.read",
 ] as const;
 
 const founderPermissionKeys = [
@@ -258,12 +250,13 @@ async function main(): Promise<void> {
   }
   const roles = new Map<string, { id: string }>();
   for (const name of roleNames) {
+    const catalogue = OFFICIAL_ROLE_CATALOG.find((role) => role.name === name);
     roles.set(
       name,
       await prisma.role.upsert({
         where: { name },
-        update: {},
-        create: { name },
+        update: { description: catalogue?.description },
+        create: { name, description: catalogue?.description },
       }),
     );
   }
@@ -299,6 +292,11 @@ async function main(): Promise<void> {
               "institutions.dashboard.read",
               ...institutionReadPermissionKeys,
               ...institutionManagePermissionKeys,
+              "admin.users.read",
+              "admin.users.manage_roles",
+              "admin.users.manage_status",
+              "admin.roles.read",
+              "admin.permissions.read",
             ]
           : name === "DIRECTOR"
             ? permissionKeys
@@ -322,7 +320,8 @@ async function main(): Promise<void> {
                       ...crmManagePermissionKeys,
                       ...institutionManagePermissionKeys,
                     ].includes(key) &&
-                    key !== "hr.employees.read_private",
+                    key !== "hr.employees.read_private" &&
+                    !key.startsWith("admin."),
                 )
                 .concat([
                   "crm.dashboard.read",
