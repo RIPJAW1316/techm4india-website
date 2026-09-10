@@ -464,6 +464,7 @@ function FounderDashboardContent() {
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
             <a href="/erp/founder/payroll">Payroll ↗</a>
+            <a href="/erp/founder/finance">Finance &amp; GST ↗</a>
           </nav>
           <button
             className="erp-sidebar-logout"

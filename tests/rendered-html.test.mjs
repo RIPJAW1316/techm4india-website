@@ -37,6 +37,7 @@ for (const [path, heading] of [
   ["/erp/founder/institutions", "Restoring your workspace"],
   ["/erp/founder/users", "Restoring your workspace"],
   ["/erp/founder/payroll", "Restoring your workspace"],
+  ["/erp/founder/finance", "Restoring your workspace"],
   ["/erp/engineering/dashboard", "Restoring your workspace"],
   ["/erp/solutions/dashboard", "Restoring your workspace"],
   ["/erp/schools/dashboard", "Restoring your workspace"],

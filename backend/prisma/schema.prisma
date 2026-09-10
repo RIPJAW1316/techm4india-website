@@ -276,6 +276,77 @@ enum PayrollResultStatus {
   FINALIZED
 }
 
+enum FinancePartyType {
+  CUSTOMER
+  VENDOR
+  BOTH
+}
+
+enum FinanceTaxType {
+  GST
+  CGST
+  SGST
+  IGST
+  CESS
+  OTHER
+}
+
+enum FinanceInvoiceStatus {
+  DRAFT
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum FinancePaymentDirection {
+  RECEIVED
+  PAID
+}
+
+enum FinancePaymentMethod {
+  BANK_TRANSFER
+  UPI
+  CASH
+  CHEQUE
+  CARD
+  OTHER
+}
+
+enum FinancePaymentStatus {
+  RECORDED
+  VOIDED
+}
+
+enum FinanceExpenseStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum FinanceExpensePaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum LedgerAccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  INCOME
+  EXPENSE
+}
+
+enum JournalStatus {
+  DRAFT
+  POSTED
+  VOIDED
+}
+
 model Organization {
   id                     String             @id @default(uuid()) @db.Uuid
   legalName              String
@@ -322,6 +393,13 @@ model Organization {
   salaryStructures  SalaryStructure[]
   payrollPeriods    PayrollPeriod[]
   payrollRuns       PayrollRun[]
+  financeParties    FinanceParty[]
+  financeTaxRates   FinanceTaxRate[]
+  financeInvoices   FinanceInvoice[]
+  financePayments   FinancePayment[]
+  financeExpenses   FinanceExpense[]
+  ledgerAccounts    LedgerAccount[]
+  journalEntries    JournalEntry[]
 }
 
 model Division {
@@ -387,6 +465,11 @@ model User {
   createdCrmActivities      CrmActivity[]       @relation("CrmActivityCreator")
   initiatedPayrollRuns      PayrollRun[]        @relation("PayrollRunInitiator")
   approvedPayrollRuns       PayrollRun[]        @relation("PayrollRunApprover")
+  createdFinanceInvoices    FinanceInvoice[]    @relation("FinanceInvoiceCreator")
+  createdFinancePayments    FinancePayment[]    @relation("FinancePaymentCreator")
+  createdFinanceExpenses    FinanceExpense[]    @relation("FinanceExpenseCreator")
+  approvedFinanceExpenses   FinanceExpense[]    @relation("FinanceExpenseApprover")
+  createdJournalEntries     JournalEntry[]      @relation("JournalEntryCreator")
 }
 
 model Role {
@@ -982,6 +1065,7 @@ model CrmAccount {
   activities         CrmActivity[]
   convertedFromLeads CrmLead[]        @relation("CrmLeadConvertedAccount")
   institutions       Institution[]
+  financeParties     FinanceParty[]
 
   @@index([organizationId, status, createdAt])
   @@index([organizationId, ownerEmployeeId])
@@ -1163,6 +1247,7 @@ model Institution {
   contacts          InstitutionContact[]    @relation("InstitutionContacts")
   primaryContact    InstitutionContact?     @relation("InstitutionPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
   engagements       InstitutionEngagement[]
+  financeParties    FinanceParty[]
 
   @@unique([organizationId, code])
   @@index([organizationId, status, createdAt])
@@ -1410,4 +1495,272 @@ model PayrollLineItem {
 
   @@index([payrollEmployeeResultId])
   @@index([payrollComponentId])
+}
+
+model FinanceParty {
+  id                  String           @id @default(uuid()) @db.Uuid
+  organizationId      String           @db.Uuid
+  type                FinancePartyType
+  name                String
+  displayName         String?
+  email               String?
+  phone               String?
+  billingAddressLine1 String?
+  billingAddressLine2 String?
+  city                String?
+  state               String?
+  postalCode          String?
+  country             String?
+  gstin               String?
+  pan                 String?
+  crmAccountId        String?          @db.Uuid
+  institutionId       String?          @db.Uuid
+  isActive            Boolean          @default(true)
+  archivedAt          DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  crmAccount   CrmAccount?      @relation(fields: [crmAccountId], references: [id], onDelete: SetNull)
+  institution  Institution?     @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  invoices     FinanceInvoice[]
+  payments     FinancePayment[]
+  expenses     FinanceExpense[] @relation("FinanceExpenseVendor")
+
+  @@index([organizationId, type, isActive])
+  @@index([organizationId, archivedAt])
+  @@index([organizationId, crmAccountId])
+  @@index([organizationId, institutionId])
+}
+
+model FinanceTaxRate {
+  id             String         @id @default(uuid()) @db.Uuid
+  organizationId String         @db.Uuid
+  code           String
+  name           String
+  rate           Decimal        @db.Decimal(7, 4)
+  taxType        FinanceTaxType @default(OTHER)
+  description    String?
+  isActive       Boolean        @default(true)
+  effectiveFrom  DateTime?      @db.Date
+  effectiveTo    DateTime?      @db.Date
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  invoiceLines FinanceInvoiceLine[]
+  expenseLines FinanceExpenseLine[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, taxType, isActive])
+  @@index([organizationId, effectiveFrom, effectiveTo])
+}
+
+model FinanceInvoice {
+  id                   String               @id @default(uuid()) @db.Uuid
+  organizationId       String               @db.Uuid
+  invoiceNumber        String
+  partyId              String               @db.Uuid
+  invoiceDate          DateTime             @db.Date
+  dueDate              DateTime?            @db.Date
+  status               FinanceInvoiceStatus @default(DRAFT)
+  currency             String               @default("INR") @db.Char(3)
+  subtotal             Decimal              @default(0) @db.Decimal(14, 2)
+  discountTotal        Decimal              @default(0) @db.Decimal(14, 2)
+  taxTotal             Decimal              @default(0) @db.Decimal(14, 2)
+  roundingAdjustment   Decimal              @default(0) @db.Decimal(14, 2)
+  grandTotal           Decimal              @default(0) @db.Decimal(14, 2)
+  amountPaid           Decimal              @default(0) @db.Decimal(14, 2)
+  balanceDue           Decimal              @default(0) @db.Decimal(14, 2)
+  notes                String?
+  terms                String?
+  placeOfSupply        String?
+  partyNameSnapshot    String?
+  partyAddressSnapshot String?
+  partyGstinSnapshot   String?
+  createdByUserId      String               @db.Uuid
+  finalizedAt          DateTime?
+  cancelledAt          DateTime?
+  cancellationReason   String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  party        FinanceParty         @relation(fields: [partyId], references: [id], onDelete: Restrict)
+  createdBy    User                 @relation("FinanceInvoiceCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  lines        FinanceInvoiceLine[]
+  payments     FinancePayment[]
+
+  @@unique([organizationId, invoiceNumber])
+  @@index([organizationId, status, invoiceDate])
+  @@index([organizationId, dueDate])
+  @@index([organizationId, partyId])
+}
+
+model FinanceInvoiceLine {
+  id              String   @id @default(uuid()) @db.Uuid
+  invoiceId       String   @db.Uuid
+  description     String
+  quantity        Decimal  @db.Decimal(14, 4)
+  unitPrice       Decimal  @db.Decimal(14, 2)
+  discountAmount  Decimal  @default(0) @db.Decimal(14, 2)
+  hsnSacCode      String?
+  taxRateId       String?  @db.Uuid
+  taxableValue    Decimal  @db.Decimal(14, 2)
+  taxAmount       Decimal  @default(0) @db.Decimal(14, 2)
+  lineTotal       Decimal  @db.Decimal(14, 2)
+  taxCodeSnapshot String?
+  taxNameSnapshot String?
+  taxRateSnapshot Decimal? @db.Decimal(7, 4)
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  invoice FinanceInvoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  taxRate FinanceTaxRate? @relation(fields: [taxRateId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([taxRateId])
+}
+
+model FinanceExpense {
+  id                 String                      @id @default(uuid()) @db.Uuid
+  organizationId     String                      @db.Uuid
+  expenseNumber      String
+  vendorPartyId      String?                     @db.Uuid
+  category           String
+  description        String
+  expenseDate        DateTime                    @db.Date
+  currency           String                      @default("INR") @db.Char(3)
+  subtotal           Decimal                     @default(0) @db.Decimal(14, 2)
+  taxAmount          Decimal                     @default(0) @db.Decimal(14, 2)
+  totalAmount        Decimal                     @default(0) @db.Decimal(14, 2)
+  amountPaid         Decimal                     @default(0) @db.Decimal(14, 2)
+  status             FinanceExpenseStatus        @default(DRAFT)
+  paymentStatus      FinanceExpensePaymentStatus @default(UNPAID)
+  reference          String?
+  createdByUserId    String                      @db.Uuid
+  approvedByUserId   String?                     @db.Uuid
+  approvedAt         DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  vendor       FinanceParty?        @relation("FinanceExpenseVendor", fields: [vendorPartyId], references: [id], onDelete: SetNull)
+  createdBy    User                 @relation("FinanceExpenseCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  approvedBy   User?                @relation("FinanceExpenseApprover", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  lines        FinanceExpenseLine[]
+  payments     FinancePayment[]
+
+  @@unique([organizationId, expenseNumber])
+  @@index([organizationId, status, expenseDate])
+  @@index([organizationId, vendorPartyId])
+  @@index([organizationId, paymentStatus])
+}
+
+model FinanceExpenseLine {
+  id          String   @id @default(uuid()) @db.Uuid
+  expenseId   String   @db.Uuid
+  description String
+  amount      Decimal  @db.Decimal(14, 2)
+  taxRateId   String?  @db.Uuid
+  taxAmount   Decimal  @default(0) @db.Decimal(14, 2)
+  hsnSacCode  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  expense FinanceExpense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  taxRate FinanceTaxRate? @relation(fields: [taxRateId], references: [id], onDelete: SetNull)
+
+  @@index([expenseId])
+  @@index([taxRateId])
+}
+
+model FinancePayment {
+  id              String                  @id @default(uuid()) @db.Uuid
+  organizationId  String                  @db.Uuid
+  direction       FinancePaymentDirection
+  partyId         String?                 @db.Uuid
+  invoiceId       String?                 @db.Uuid
+  expenseId       String?                 @db.Uuid
+  amount          Decimal                 @db.Decimal(14, 2)
+  currency        String                  @default("INR") @db.Char(3)
+  method          FinancePaymentMethod    @default(BANK_TRANSFER)
+  reference       String?
+  paymentDate     DateTime                @db.Date
+  notes           String?
+  status          FinancePaymentStatus    @default(RECORDED)
+  voidReason      String?
+  voidedAt        DateTime?
+  createdByUserId String                  @db.Uuid
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  party        FinanceParty?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  invoice      FinanceInvoice? @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  expense      FinanceExpense? @relation(fields: [expenseId], references: [id], onDelete: Restrict)
+  createdBy    User            @relation("FinancePaymentCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, direction, paymentDate])
+  @@index([organizationId, status])
+  @@index([invoiceId])
+  @@index([expenseId])
+  @@index([partyId])
+}
+
+model LedgerAccount {
+  id             String            @id @default(uuid()) @db.Uuid
+  organizationId String            @db.Uuid
+  code           String
+  name           String
+  type           LedgerAccountType
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  journalLines JournalLine[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, type, isActive])
+}
+
+model JournalEntry {
+  id              String        @id @default(uuid()) @db.Uuid
+  organizationId  String        @db.Uuid
+  entryDate       DateTime      @db.Date
+  referenceType   String?
+  referenceId     String?       @db.Uuid
+  description     String
+  status          JournalStatus @default(DRAFT)
+  createdByUserId String        @db.Uuid
+  postedAt        DateTime?
+  voidedAt        DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  createdBy    User          @relation("JournalEntryCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  lines        JournalLine[]
+
+  @@index([organizationId, entryDate, status])
+  @@index([organizationId, referenceType, referenceId])
+}
+
+model JournalLine {
+  id              String   @id @default(uuid()) @db.Uuid
+  journalEntryId  String   @db.Uuid
+  ledgerAccountId String   @db.Uuid
+  debit           Decimal  @default(0) @db.Decimal(14, 2)
+  credit          Decimal  @default(0) @db.Decimal(14, 2)
+  createdAt       DateTime @default(now())
+
+  journalEntry  JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  ledgerAccount LedgerAccount @relation(fields: [ledgerAccountId], references: [id], onDelete: Restrict)
+
+  @@index([journalEntryId])
+  @@index([ledgerAccountId])
 }

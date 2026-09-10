@@ -23,6 +23,7 @@ import { CrmModule } from "./crm/crm.module";
 import { InstitutionsModule } from "./institutions/institutions.module";
 import { AdminModule } from "./admin/admin.module";
 import { PayrollModule } from "./payroll/payroll.module";
+import { FinanceModule } from "./finance/finance.module";
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { PayrollModule } from "./payroll/payroll.module";
     InstitutionsModule,
     AdminModule,
     PayrollModule,
+    FinanceModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

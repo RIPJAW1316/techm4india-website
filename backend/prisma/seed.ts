@@ -127,6 +127,25 @@ const permissionKeys = [
   "payroll.runs.process",
   "payroll.runs.approve",
   "payroll.payslip.read_self",
+  "finance.dashboard.read",
+  "finance.parties.read",
+  "finance.parties.manage",
+  "finance.tax.read",
+  "finance.tax.manage",
+  "finance.invoices.read",
+  "finance.invoices.manage",
+  "finance.invoices.issue",
+  "finance.invoices.cancel",
+  "finance.payments.read",
+  "finance.payments.manage",
+  "finance.payments.void",
+  "finance.expenses.read",
+  "finance.expenses.manage",
+  "finance.expenses.approve",
+  "finance.ledger.read",
+  "finance.ledger.manage",
+  "finance.ledger.post",
+  "finance.gst.read",
 ] as const;
 
 const founderPermissionKeys = [
@@ -319,6 +338,25 @@ async function main(): Promise<void> {
               "payroll.runs.process",
               "payroll.runs.approve",
               "payroll.payslip.read_self",
+              "finance.dashboard.read",
+              "finance.parties.read",
+              "finance.parties.manage",
+              "finance.tax.read",
+              "finance.tax.manage",
+              "finance.invoices.read",
+              "finance.invoices.manage",
+              "finance.invoices.issue",
+              "finance.invoices.cancel",
+              "finance.payments.read",
+              "finance.payments.manage",
+              "finance.payments.void",
+              "finance.expenses.read",
+              "finance.expenses.manage",
+              "finance.expenses.approve",
+              "finance.ledger.read",
+              "finance.ledger.manage",
+              "finance.ledger.post",
+              "finance.gst.read",
             ]
           : name === "DIRECTOR"
             ? permissionKeys
@@ -344,12 +382,17 @@ async function main(): Promise<void> {
                     ].includes(key) &&
                     key !== "hr.employees.read_private" &&
                     !key.startsWith("admin.") &&
-                    !key.startsWith("payroll."),
+                    !key.startsWith("payroll.") &&
+                    !key.startsWith("finance."),
                 )
                 .concat([
                   "crm.dashboard.read",
                   "institutions.dashboard.read",
                   ...institutionReadPermissionKeys,
+                  "finance.dashboard.read",
+                  "finance.invoices.read",
+                  "finance.expenses.read",
+                  "finance.gst.read",
                 ])
             : name === "DIVISION_HEAD"
               ? [
@@ -427,6 +470,25 @@ async function main(): Promise<void> {
                         "payroll.runs.process",
                         "payroll.runs.approve",
                         "payroll.payslip.read_self",
+                        "finance.dashboard.read",
+                        "finance.parties.read",
+                        "finance.parties.manage",
+                        "finance.tax.read",
+                        "finance.tax.manage",
+                        "finance.invoices.read",
+                        "finance.invoices.manage",
+                        "finance.invoices.issue",
+                        "finance.invoices.cancel",
+                        "finance.payments.read",
+                        "finance.payments.manage",
+                        "finance.payments.void",
+                        "finance.expenses.read",
+                        "finance.expenses.manage",
+                        "finance.expenses.approve",
+                        "finance.ledger.read",
+                        "finance.ledger.manage",
+                        "finance.ledger.post",
+                        "finance.gst.read",
                       ]
                     : name === "FINANCE_EXECUTIVE"
                       ? [
@@ -439,6 +501,17 @@ async function main(): Promise<void> {
                           "payroll.runs.read",
                           "payroll.runs.process",
                           "payroll.payslip.read_self",
+                          "finance.dashboard.read",
+                          "finance.parties.read",
+                          "finance.tax.read",
+                          "finance.invoices.read",
+                          "finance.invoices.manage",
+                          "finance.payments.read",
+                          "finance.payments.manage",
+                          "finance.expenses.read",
+                          "finance.expenses.manage",
+                          "finance.ledger.read",
+                          "finance.gst.read",
                         ]
                       : name === "SALES_MANAGER"
                     ? [
