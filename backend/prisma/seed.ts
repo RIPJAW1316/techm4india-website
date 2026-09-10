@@ -116,6 +116,17 @@ const permissionKeys = [
   "admin.users.manage_status",
   "admin.roles.read",
   "admin.permissions.read",
+  "payroll.dashboard.read",
+  "payroll.components.read",
+  "payroll.components.manage",
+  "payroll.structures.read",
+  "payroll.structures.manage",
+  "payroll.compensation.read",
+  "payroll.compensation.manage",
+  "payroll.runs.read",
+  "payroll.runs.process",
+  "payroll.runs.approve",
+  "payroll.payslip.read_self",
 ] as const;
 
 const founderPermissionKeys = [
@@ -297,6 +308,17 @@ async function main(): Promise<void> {
               "admin.users.manage_status",
               "admin.roles.read",
               "admin.permissions.read",
+              "payroll.dashboard.read",
+              "payroll.components.read",
+              "payroll.components.manage",
+              "payroll.structures.read",
+              "payroll.structures.manage",
+              "payroll.compensation.read",
+              "payroll.compensation.manage",
+              "payroll.runs.read",
+              "payroll.runs.process",
+              "payroll.runs.approve",
+              "payroll.payslip.read_self",
             ]
           : name === "DIRECTOR"
             ? permissionKeys
@@ -321,7 +343,8 @@ async function main(): Promise<void> {
                       ...institutionManagePermissionKeys,
                     ].includes(key) &&
                     key !== "hr.employees.read_private" &&
-                    !key.startsWith("admin."),
+                    !key.startsWith("admin.") &&
+                    !key.startsWith("payroll."),
                 )
                 .concat([
                   "crm.dashboard.read",
@@ -372,6 +395,8 @@ async function main(): Promise<void> {
                     "holidays.manage",
                     "leave.manage_types",
                     "leave.manage_balances",
+                    "payroll.compensation.read",
+                    "payroll.compensation.manage",
                   ]
                 : name === "HR_EXECUTIVE"
                   ? [
@@ -387,7 +412,35 @@ async function main(): Promise<void> {
                       "leave.read",
                       "holidays.read",
                     ]
-                  : name === "SALES_MANAGER"
+                  : name === "FINANCE_MANAGER"
+                    ? [
+                        "notifications.read_self",
+                        "organization.read_all",
+                        "payroll.dashboard.read",
+                        "payroll.components.read",
+                        "payroll.components.manage",
+                        "payroll.structures.read",
+                        "payroll.structures.manage",
+                        "payroll.compensation.read",
+                        "payroll.compensation.manage",
+                        "payroll.runs.read",
+                        "payroll.runs.process",
+                        "payroll.runs.approve",
+                        "payroll.payslip.read_self",
+                      ]
+                    : name === "FINANCE_EXECUTIVE"
+                      ? [
+                          "notifications.read_self",
+                          "organization.read_self",
+                          "payroll.dashboard.read",
+                          "payroll.components.read",
+                          "payroll.structures.read",
+                          "payroll.compensation.read",
+                          "payroll.runs.read",
+                          "payroll.runs.process",
+                          "payroll.payslip.read_self",
+                        ]
+                      : name === "SALES_MANAGER"
                     ? [
                         "notifications.read_self",
                         "organization.read_all",
@@ -440,6 +493,7 @@ async function main(): Promise<void> {
                               "organization.read_self",
                               ...attendanceEmployeeKeys,
                               ...leaveEmployeeKeys,
+                              "payroll.payslip.read_self",
                             ]
                           : [
                               "notifications.read_self",

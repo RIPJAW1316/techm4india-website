@@ -42,15 +42,15 @@ export const OFFICIAL_ROLE_CATALOG = [
     name: "FINANCE_MANAGER",
     displayName: "Finance Manager",
     description:
-      "Finance-management role. Finance and GST implementation is an upcoming mandatory phase.",
-    capabilityState: "RESERVED_FUTURE",
+      "Payroll and finance operations management within configured permissions.",
+    capabilityState: "IMPLEMENTED",
   },
   {
     name: "FINANCE_EXECUTIVE",
     displayName: "Finance Executive",
     description:
-      "Finance-operations role. Finance and GST implementation is upcoming.",
-    capabilityState: "RESERVED_FUTURE",
+      "Payroll processing operations with limited approval authority.",
+    capabilityState: "IMPLEMENTED",
   },
   {
     name: "SALES_MANAGER",

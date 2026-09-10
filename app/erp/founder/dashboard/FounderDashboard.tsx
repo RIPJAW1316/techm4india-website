@@ -463,6 +463,7 @@ function FounderDashboardContent() {
             <a href="/erp/founder/leave">Leave ↗</a>
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
+            <a href="/erp/founder/payroll">Payroll ↗</a>
           </nav>
           <button
             className="erp-sidebar-logout"

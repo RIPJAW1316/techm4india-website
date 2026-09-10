@@ -36,6 +36,7 @@ for (const [path, heading] of [
   ["/erp/founder/crm", "Restoring your workspace"],
   ["/erp/founder/institutions", "Restoring your workspace"],
   ["/erp/founder/users", "Restoring your workspace"],
+  ["/erp/founder/payroll", "Restoring your workspace"],
   ["/erp/engineering/dashboard", "Restoring your workspace"],
   ["/erp/solutions/dashboard", "Restoring your workspace"],
   ["/erp/schools/dashboard", "Restoring your workspace"],
@@ -48,6 +49,10 @@ for (const [path, heading] of [
   ["/erp/schools/leave", "Restoring your workspace"],
   ["/erp/space/attendance", "Restoring your workspace"],
   ["/erp/space/leave", "Restoring your workspace"],
+  ["/erp/engineering/payslips", "Restoring your workspace"],
+  ["/erp/solutions/payslips", "Restoring your workspace"],
+  ["/erp/schools/payslips", "Restoring your workspace"],
+  ["/erp/space/payslips", "Restoring your workspace"],
 ]) {
   test(`server-renders ${path}`, async () => {
     const response = await render(path);

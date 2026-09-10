@@ -365,7 +365,7 @@ describe("Client MVP admin users and RBAC", () => {
       roles.body.data.find(
         (role: { name: string }) => role.name === "FINANCE_MANAGER",
       ),
-    ).toEqual(expect.objectContaining({ capabilityState: "RESERVED_FUTURE" }));
+    ).toEqual(expect.objectContaining({ capabilityState: "IMPLEMENTED" }));
     expect(
       roles.body.data
         .find((role: { name: string }) => role.name === "FOUNDER_CEO")

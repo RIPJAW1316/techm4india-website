@@ -29,12 +29,14 @@ export function ProtectedErp({
   requiredExecutive = false,
   requiredHr = false,
   requiredAdmin = false,
+  requiredPayroll = false,
 }: {
   children: ReactNode;
   requiredDivision?: DivisionSlug;
   requiredExecutive?: boolean;
   requiredHr?: boolean;
   requiredAdmin?: boolean;
+  requiredPayroll?: boolean;
 }) {
   const { status, context } = useErpAuth();
   const router = useRouter();
@@ -47,12 +49,15 @@ export function ProtectedErp({
   const adminAllowed =
     !requiredAdmin ||
     Boolean(context?.permissions.includes("admin.users.read"));
+  const payrollAllowed =
+    !requiredPayroll ||
+    Boolean(context?.permissions.includes("payroll.dashboard.read"));
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
     if (
       status === "authenticated" &&
-      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed)
+      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed)
     )
       router.replace(resolveDashboardPath(context));
   }, [
@@ -62,13 +67,14 @@ export function ProtectedErp({
     executiveAllowed,
     hrAllowed,
     adminAllowed,
+    payrollAllowed,
     router,
   ]);
 
   if (status === "loading") return <ErpLoading />;
   if (status === "unauthenticated")
     return <ErpLoading label="Taking you to sign in" />;
-  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed)
+  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed)
     return <ErpLoading label="Opening your permitted workspace" />;
   return <>{children}</>;
 }
