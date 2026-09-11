@@ -346,10 +346,12 @@ export type ExecutiveWorkDetail = {
     total: number;
     active: number;
     completed: number;
+    cancelled: number;
     overdue: number;
   };
   activeTasks: ExecutiveTask[];
   completedTasks: ExecutiveTask[];
+  cancelledTasks: ExecutiveTask[];
   projects: Array<{ id: string; code: string; name: string }>;
 };
 

@@ -42,6 +42,9 @@ In another terminal, run the frontend with `VITE_API_BASE_URL` pointing to
 `http://localhost:3001/api/docs`. Demo employee accounts are seeded only when
 `SEED_DEMO_PASSWORD` is explicitly set in a non-production environment.
 
+See [ERP_HANDOVER.md](ERP_HANDOVER.md) for the current module map, roles,
+verification commands, intentional limitations, and managed deployment notes.
+
 ## Routes
 
 The primary routes are `/`, `/about`, `/engineering`, `/solutions`,

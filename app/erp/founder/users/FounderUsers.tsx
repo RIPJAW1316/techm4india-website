@@ -400,6 +400,7 @@ function FounderUsersContent() {
           </div>
           <nav className="erp-sidebar-nav">
             <a href="/erp/founder/dashboard">Dashboard</a>
+            <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
             <a href="/erp/founder/employees">Employees ↗</a>
             <a className="is-active" href="#users-top">
               Users & Roles
@@ -407,6 +408,8 @@ function FounderUsersContent() {
             <a href="/erp/founder/organization">Organization ↗</a>
             <a href="/erp/founder/attendance">Attendance ↗</a>
             <a href="/erp/founder/leave">Leave ↗</a>
+            <a href="/erp/founder/payroll">Payroll ↗</a>
+            <a href="/erp/founder/finance">Finance ↗</a>
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
           </nav>

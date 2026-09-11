@@ -619,7 +619,7 @@ async function main(): Promise<void> {
   const user = existingUser
     ? await prisma.user.update({
         where: { id: existingUser.id },
-        data: { status: UserStatus.ACTIVE },
+        data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
       })
     : await prisma.user.create({
         data: {
@@ -639,7 +639,7 @@ async function main(): Promise<void> {
   const founderUser = existingFounderUser
     ? await prisma.user.update({
         where: { id: existingFounderUser.id },
-        data: { status: UserStatus.ACTIVE },
+        data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
       })
     : await prisma.user.create({
         data: {
@@ -890,7 +890,7 @@ async function main(): Promise<void> {
     const demoUser = existingDemoUser
       ? await prisma.user.update({
           where: { id: existingDemoUser.id },
-          data: { status: UserStatus.ACTIVE },
+          data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
         })
       : await prisma.user.create({
           data: {

@@ -1,8 +1,10 @@
 # TechM4India ERP API
 
-This is the NestJS + Prisma API for the TechM4India Company Management ERP
-employee vertical slice. The public Vinext/Vite frontend remains at the
-repository root; ERP pages call this API over HTTPS in production.
+This is the NestJS + Prisma API for the TechM4India Company Management ERP.
+The public Vinext/Vite frontend remains at the repository root; ERP pages call
+this API over HTTPS in production. Current modules include RBAC, organization
+and employee records, attendance, leave, projects/tasks, CRM, institutions,
+payroll, and configurable Finance/GST records.
 
 ## Requirements
 
@@ -73,8 +75,8 @@ npm run prisma:seed
 Remove-Item Env:SEED_DEMO_PASSWORD
 ```
 
-Never commit either value. Phase 3 intentionally does not add frontend login, ERP routes,
-dashboards, project/task APIs, or other business modules.
+Never commit either value. Demo personas are development-only, opt-in, and
+must never be represented as real employees or customer data.
 
 Authentication endpoints:
 
@@ -86,6 +88,7 @@ GET  /api/v1/auth/me
 ```
 
 Refresh and logout enforce configured origin checks when a browser sends an
-`Origin` header. Organization, employee, project, task, comment, notification,
-and division-scoped authorization endpoints are available for the current
-vertical slice.
+`Origin` header. Organization, employee, project, task, notification,
+attendance, leave, CRM, institution, payroll, and Finance/GST APIs are all
+organization-scoped at the backend. See `../ERP_HANDOVER.md` for handover,
+testing, and managed deployment notes.

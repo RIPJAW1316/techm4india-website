@@ -131,18 +131,20 @@ export class ExecutiveService {
     if (!employee) throw new NotFoundException("Employee not found");
     const taskScope: Prisma.ProjectTaskWhereInput = { assigneeId: employeeId, project: { organizationId } };
     const { start } = businessDayBoundaries(new Date(), "Asia/Kolkata");
-    const [activeTasks, completedTasks, total, overdue, projects] = await Promise.all([
+    const [activeTasks, completedTasks, cancelledTasks, total, overdue, projects] = await Promise.all([
       this.prisma.projectTask.findMany({ where: { ...taskScope, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } }, select: safeTaskSelect, orderBy: [{ dueDate: "asc" }, { priority: "desc" }], take: 100 }),
       this.prisma.projectTask.findMany({ where: { ...taskScope, status: TaskStatus.COMPLETED }, select: safeTaskSelect, orderBy: { completedAt: "desc" }, take: 100 }),
+      this.prisma.projectTask.findMany({ where: { ...taskScope, status: TaskStatus.CANCELLED }, select: safeTaskSelect, orderBy: { updatedAt: "desc" }, take: 100 }),
       this.prisma.projectTask.count({ where: taskScope }),
       this.prisma.projectTask.count({ where: { ...taskScope, dueDate: { lt: start }, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } } }),
       this.prisma.project.findMany({ where: { organizationId, OR: [{ projectManagerId: employeeId }, { members: { some: { employeeId, removedAt: null } } }, { tasks: { some: { assigneeId: employeeId } } }] }, select: { id: true, code: true, name: true }, orderBy: { updatedAt: "desc" }, take: 100 }),
     ]);
     return {
       employee: { ...employee, name: `${employee.firstName} ${employee.lastName}`.trim() },
-      taskSummary: { total, active: activeTasks.length, completed: completedTasks.length, overdue },
+      taskSummary: { total, active: activeTasks.length, completed: completedTasks.length, cancelled: cancelledTasks.length, overdue },
       activeTasks: activeTasks.map((task) => this.taskResponse(task)),
       completedTasks: completedTasks.map((task) => this.taskResponse(task)),
+      cancelledTasks: cancelledTasks.map((task) => this.taskResponse(task)),
       projects,
     };
   }

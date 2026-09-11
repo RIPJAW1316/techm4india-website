@@ -17,6 +17,39 @@
   margin: 34px 0 12px;
   border-bottom: 1px solid var(--tm-line);
 }
+
+/* Shared Founder workspace navigation */
+.founder-module-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  margin: 0 0 30px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--tm-line);
+  scrollbar-width: thin;
+}
+.founder-module-nav a {
+  flex: 0 0 auto;
+  padding: 9px 11px;
+  color: var(--tm-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.founder-module-nav a:hover,
+.founder-module-nav a.is-active {
+  background: var(--tm-navy);
+  color: #fff;
+}
+.founder-route-navigation {
+  padding-bottom: 0;
+  padding-top: 30px;
+}
+@media (max-width: 620px) {
+  .founder-module-nav { margin-bottom: 24px; }
+  .founder-module-nav a { padding-inline: 10px; }
+}
 .crm-tabs button {
   border: 0;
   border-bottom: 2px solid transparent;

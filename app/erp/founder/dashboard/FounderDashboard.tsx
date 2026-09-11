@@ -452,19 +452,18 @@ function FounderDashboardContent() {
           </div>
           <nav className="erp-sidebar-nav">
             <a className="is-active" href="#founder-top">
-              Control centre
+              Dashboard
             </a>
-            <a href="#workforce">Workforce</a>
-            <a href="#work-detail">Work detail</a>
+            <a href="#workforce">Tasks / Work</a>
             <a href="/erp/founder/employees">Employees ↗</a>
             <a href="/erp/founder/users">Users &amp; Roles ↗</a>
             <a href="/erp/founder/organization">Organization ↗</a>
             <a href="/erp/founder/attendance">Attendance ↗</a>
             <a href="/erp/founder/leave">Leave ↗</a>
+            <a href="/erp/founder/payroll">Payroll ↗</a>
+            <a href="/erp/founder/finance">Finance ↗</a>
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
-            <a href="/erp/founder/payroll">Payroll ↗</a>
-            <a href="/erp/founder/finance">Finance &amp; GST ↗</a>
           </nav>
           <button
             className="erp-sidebar-logout"
@@ -753,6 +752,9 @@ function FounderDashboardContent() {
                       <strong>{detail.taskSummary.completed}</strong> completed
                     </span>
                     <span>
+                      <strong>{detail.taskSummary.cancelled}</strong> cancelled
+                    </span>
+                    <span>
                       <strong>{detail.taskSummary.overdue}</strong> overdue
                     </span>
                     <span>
@@ -787,6 +789,24 @@ function FounderDashboardContent() {
                         </div>
                       ) : (
                         detail.completedTasks.map((task) => (
+                          <TaskRow
+                            key={task.id}
+                            task={task}
+                            onEdit={() => openEdit(task)}
+                            onCancel={() => setModal({ kind: "cancel", task })}
+                          />
+                        ))
+                      )}
+                    </div>
+                    <div>
+                      <h3>Cancelled work</h3>
+                      {detail.cancelledTasks.length === 0 ? (
+                        <div className="erp-empty">
+                          <strong>No cancelled work recorded.</strong>
+                          <span>Cancelled tasks remain visible here for review.</span>
+                        </div>
+                      ) : (
+                        detail.cancelledTasks.map((task) => (
                           <TaskRow
                             key={task.id}
                             task={task}

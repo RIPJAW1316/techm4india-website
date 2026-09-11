@@ -43,5 +43,15 @@ test("admin UI includes safe account, role and employee-work controls", () => {
 test("Founder navigation and task-control handoff remain available", () => {
   assert.match(dashboard, /\/erp\/founder\/users/);
   assert.match(dashboard, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(dashboard, /Cancelled work/);
+  assert.match(dashboard, /cancelledTasks/);
   assert.match(employees, /\/erp\/founder\/users/);
+  for (const path of [
+    "/erp/founder/attendance",
+    "/erp/founder/leave",
+    "/erp/founder/payroll",
+    "/erp/founder/finance",
+    "/erp/founder/crm",
+    "/erp/founder/institutions",
+  ]) assert.match(dashboard, new RegExp(path));
 });

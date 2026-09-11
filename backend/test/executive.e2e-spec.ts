@@ -170,6 +170,9 @@ describe("Founder / CEO executive workspace", () => {
     await request(app.getHttpServer()).post(`/api/v2/executive/tasks/${assignedTaskId}/cancel`).set("Authorization", auth).expect(201);
     const cancelled = await prisma.projectTask.findUniqueOrThrow({ where: { id: assignedTaskId } });
     expect(cancelled.status).toBe("CANCELLED");
+    const workHistory = await request(app.getHttpServer()).get(`/api/v2/executive/employees/${employeeBId}/work`).set("Authorization", auth).expect(200);
+    expect(workHistory.body.data.cancelledTasks.some((task: { id: string }) => task.id === assignedTaskId)).toBe(true);
+    expect(workHistory.body.data.taskSummary.cancelled).toBeGreaterThanOrEqual(1);
     expect(await prisma.auditLog.count({ where: { entityId: assignedTaskId, action: { in: ["FOUNDER_TASK_CREATED", "TASK_REASSIGNED", "FOUNDER_TASK_UPDATED", "TASK_CANCELLED"] } } })).toBeGreaterThanOrEqual(4);
   });
 

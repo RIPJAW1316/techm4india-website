@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { apiFetchV2, ApiError } from "@/lib/api/client";
+import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
 import type {
   ApiResponse,
   CrmAccount,
@@ -283,6 +284,7 @@ function FounderCrmContent() {
   return (
     <main className="erp-main">
       <div className="erp-content founder-content">
+        <FounderModuleNavigation active="crm" />
         <section className="erp-welcome">
           <div>
             <p className="erp-kicker">Client relationships</p>

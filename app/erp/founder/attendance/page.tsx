@@ -1,2 +1,7 @@
 import { AttendancePage } from "../../components/AttendancePage";
-export default function FounderAttendancePage() { return <AttendancePage management />; }
+import { FounderModuleNavigation } from "../../components/FounderModuleNavigation";
+import { ProtectedErp } from "../../components/ProtectedErp";
+
+export default function FounderAttendancePage() {
+  return <ProtectedErp requiredExecutive><div className="erp-content founder-route-navigation"><FounderModuleNavigation active="attendance" /></div><AttendancePage management /></ProtectedErp>;
+}

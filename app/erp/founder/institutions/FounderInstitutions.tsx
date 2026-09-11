@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { apiFetchV2, ApiError } from "@/lib/api/client";
+import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
 
 type Owner = { id: string; name: string };
@@ -454,6 +455,7 @@ function Content() {
   return (
     <main className="erp-main">
       <div className="erp-content founder-content">
+        <FounderModuleNavigation active="institutions" />
         <section className="erp-welcome">
           <div>
             <p className="erp-kicker">Institutional partnerships</p>

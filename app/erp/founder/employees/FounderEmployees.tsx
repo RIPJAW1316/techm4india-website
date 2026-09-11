@@ -345,11 +345,18 @@ function FounderEmployeesContent() {
           </div>
           <nav className="erp-sidebar-nav">
             <a href="/erp/founder/dashboard">Control centre</a>
+            <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
             <a className="is-active" href="#employees-top">
               Employees
             </a>
             <a href="/erp/founder/users">Users &amp; Roles ↗</a>
             <a href="/erp/founder/organization">Organization ↗</a>
+            <a href="/erp/founder/attendance">Attendance ↗</a>
+            <a href="/erp/founder/leave">Leave ↗</a>
+            <a href="/erp/founder/payroll">Payroll ↗</a>
+            <a href="/erp/founder/finance">Finance ↗</a>
+            <a href="/erp/founder/crm">CRM ↗</a>
+            <a href="/erp/founder/institutions">Institutions ↗</a>
           </nav>
           <button
             className="erp-sidebar-logout"

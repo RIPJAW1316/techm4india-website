@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { apiFetch, apiFetchV2, ApiError } from "@/lib/api/client";
 import { ErpLoading, ProtectedErp } from "@/app/erp/components/ProtectedErp";
+import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
 
 type AnyRecord = Record<string, any>;
 function FounderPayrollContent() {
@@ -176,6 +177,7 @@ function FounderPayrollContent() {
   return (
     <main className="erp-main">
       <div className="erp-content">
+        <FounderModuleNavigation active="payroll" />
         <section className="erp-welcome">
           <div>
             <p className="erp-kicker">Finance operations · configured values</p>

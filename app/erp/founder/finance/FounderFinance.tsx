@@ -4,6 +4,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { ApiError, apiFetchV2 } from "@/lib/api/client";
 import { ErpLoading, ProtectedErp } from "@/app/erp/components/ProtectedErp";
+import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
 
 type Row = Record<string, any>;
 type Tab = "overview" | "invoices" | "parties" | "expenses" | "payments" | "gst" | "ledger";
@@ -53,7 +54,7 @@ function FounderFinanceContent() {
   async function action(path: string, body?: Row) { setBusy(true); try { await apiFetchV2(path, { method: "POST", body: body ? JSON.stringify(body) : undefined }); await load(); } catch (reason) { setError(reason instanceof ApiError ? reason.message : "Finance action failed."); } finally { setBusy(false); } }
   function confirmAction(message: string, path: string) { if (window.confirm(message)) void action(path, { reason: message }); }
   if (loading) return <ErpLoading label="Loading finance workspace" />;
-  return <main className="erp-main"><div className="erp-content">
+  return <main className="erp-main"><div className="erp-content"><FounderModuleNavigation active="finance" />
     <section className="erp-welcome"><div><p className="erp-kicker">Finance operations · configurable records</p><h1>Finance &amp; <em>GST</em></h1><p>Manage commercial records, receivables, expenses and manual journals without assuming statutory treatment.</p></div><div className="erp-welcome-code"><span>Currency</span><strong>INR</strong></div></section>
     {error && <div className="erp-error" role="alert"><p>{error}</p><button className="erp-text-button" onClick={() => void load()}>Try again ↗</button></div>}
     <p className="erp-form-note">GST configuration and reports are based on organization-entered tax settings and should be reviewed by an authorized finance/tax professional before statutory filing.</p>
