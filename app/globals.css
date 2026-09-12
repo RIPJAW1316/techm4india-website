@@ -1898,7 +1898,7 @@ em {
   top: 64px;
   width: min(calc(100% - 64px), 1240px);
   min-height: 82px;
-  grid-template-columns: 300px 1fr 176px;
+  grid-template-columns: 300px 1fr auto;
   z-index: 35;
 }
 .floating-header::before {
@@ -1937,9 +1937,40 @@ em {
   font-size: 15px;
   padding-bottom: 8px;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 2px;
+  padding-right: 9px;
+}
+.header-login {
+  min-height: 46px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--tm-red);
+  color: #fff;
+  font-family: var(--tm-sans);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.header-login:hover {
+  background: var(--tm-navy);
+  transform: translateY(-1px);
+}
+.header-login i {
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1;
+}
 .menu-trigger {
   height: 54px;
-  margin: 0 13px 9px 0;
+  margin: 0 0 9px 0;
   padding-inline: 24px;
   background: var(--tm-navy);
 }
@@ -1968,6 +1999,17 @@ em {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+.menu-erp-access {
+  padding: 21px 0;
+  border-bottom: 1px solid var(--tm-line);
+}
+.menu-erp-access > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--tm-serif);
+  font-size: 22px;
 }
 .menu-top {
   min-height: 105px;
@@ -4750,7 +4792,7 @@ em {
   }
   .floating-header {
     width: calc(100% - 48px);
-    grid-template-columns: 260px 1fr 158px;
+    grid-template-columns: 260px 1fr auto;
   }
   .division-editorial-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -4817,7 +4859,7 @@ em {
     top: 52px;
     width: calc(100% - 24px);
     min-height: 70px;
-    grid-template-columns: 1fr 94px;
+    grid-template-columns: 1fr auto;
   }
   .floating-header::before {
     clip-path: polygon(0 0, 100% 0, 100% 78%, 94% 100%, 6% 100%, 0 78%);
@@ -4842,6 +4884,15 @@ em {
     margin: 0 7px 8px 0;
     padding-inline: 15px;
     justify-content: center;
+  }
+  .header-actions {
+    gap: 0;
+    padding-right: 5px;
+  }
+  .header-login {
+    min-height: 46px;
+    padding-inline: 12px;
+    font-size: 10px;
   }
   .menu-trigger span {
     display: none;

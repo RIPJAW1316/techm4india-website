@@ -83,19 +83,24 @@ export function SiteHeader() {
           <span className="brand-type">TECHM4<span>INDIA</span></span>
         </Link>
         <p className="header-prompt">Engineering imagination into impact.</p>
-        <button
-          ref={menuButton}
-          className="menu-trigger"
-          type="button"
-          aria-label="Open navigation menu"
-          aria-expanded={open}
-          aria-controls="site-menu"
-          tabIndex={open ? -1 : 0}
-          onClick={() => setOpen(true)}
-        >
-          <span>Menu</span>
-          <i aria-hidden="true" />
-        </button>
+        <div className="header-actions">
+          <Link className="header-login" href="/login">
+            <span>ERP login</span><i aria-hidden="true">↗</i>
+          </Link>
+          <button
+            ref={menuButton}
+            className="menu-trigger"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded={open}
+            aria-controls="site-menu"
+            tabIndex={open ? -1 : 0}
+            onClick={() => setOpen(true)}
+          >
+            <span>Menu</span>
+            <i aria-hidden="true" />
+          </button>
+        </div>
       </header>
 
       <div
@@ -139,6 +144,12 @@ export function SiteHeader() {
             </ol>
           </nav>
           <div className="menu-aside">
+            <div className="menu-erp-access">
+              <p className="menu-label">Internal workspace</p>
+              <Link href="/login" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
+                Sign in to ERP <span aria-hidden="true">↗</span>
+              </Link>
+            </div>
             <div>
               <p className="menu-label">Our ecosystem</p>
               <ul>
