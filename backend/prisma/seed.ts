@@ -11,6 +11,14 @@ import { OFFICIAL_ROLE_CATALOG } from "../src/admin/role-catalog";
 
 const prisma = new PrismaClient();
 
+const hashPassword = (password: string) =>
+  argon2.hash(password, {
+    memoryCost: 19_456,
+    parallelism: 1,
+    timeCost: 2,
+    type: argon2.argon2id,
+  });
+
 const divisions = [
   {
     name: "TechM4Engineering",
@@ -585,15 +593,103 @@ async function main(): Promise<void> {
     }
   }
 
+  const bootstrapFounderEnabled =
+    process.env.NODE_ENV === "production" &&
+    process.env.BOOTSTRAP_FOUNDER_ENABLED === "true";
+  const bootstrapFounderEmail = process.env.BOOTSTRAP_FOUNDER_EMAIL
+    ?.trim()
+    .toLowerCase();
+  const bootstrapFounderPassword = process.env.BOOTSTRAP_FOUNDER_PASSWORD;
+
+  if (
+    bootstrapFounderEnabled &&
+    (!bootstrapFounderEmail || !bootstrapFounderPassword)
+  ) {
+    throw new Error(
+      "BOOTSTRAP_FOUNDER_EMAIL and BOOTSTRAP_FOUNDER_PASSWORD are required when production founder bootstrap is enabled",
+    );
+  }
+
+  if (bootstrapFounderEnabled) {
+    const founderRole = roles.get("FOUNDER_CEO");
+    const engineering = divisionRecords.get("engineering");
+    if (!founderRole || !engineering) {
+      throw new Error("Required organization or Founder role seed failed");
+    }
+
+    const softwareDepartment = await prisma.department.findFirstOrThrow({
+      where: { divisionId: engineering.id, slug: "software-engineering" },
+    });
+    const existingFounder = await prisma.userRole.findFirst({
+      where: { roleId: founderRole.id },
+      include: { user: true },
+    });
+
+    if (existingFounder && existingFounder.user.email !== bootstrapFounderEmail) {
+      throw new Error(
+        "Production Founder bootstrap refused because a Founder account already exists",
+      );
+    }
+
+    const founderPasswordHash = await hashPassword(bootstrapFounderPassword as string);
+    const existingUser = await prisma.user.findUnique({
+      where: { email: bootstrapFounderEmail },
+    });
+    const founderUser = existingUser
+      ? await prisma.user.update({
+          where: { id: existingUser.id },
+          data: { status: UserStatus.ACTIVE, passwordHash: founderPasswordHash },
+        })
+      : await prisma.user.create({
+          data: {
+            email: bootstrapFounderEmail as string,
+            passwordHash: founderPasswordHash,
+            status: UserStatus.ACTIVE,
+          },
+        });
+
+    await prisma.userRole.upsert({
+      where: {
+        userId_roleId: { userId: founderUser.id, roleId: founderRole.id },
+      },
+      update: {},
+      create: { userId: founderUser.id, roleId: founderRole.id },
+    });
+    await prisma.employee.upsert({
+      where: { employeeCode: "TM4-FOUNDER-001" },
+      update: {
+        userId: founderUser.id,
+        firstName: "TechM4India",
+        lastName: "Founder",
+        designation: "Founder / CEO",
+        divisionId: engineering.id,
+        departmentId: softwareDepartment.id,
+        employmentStatus: "ACTIVE",
+      },
+      create: {
+        userId: founderUser.id,
+        employeeCode: "TM4-FOUNDER-001",
+        firstName: "TechM4India",
+        lastName: "Founder",
+        designation: "Founder / CEO",
+        joiningDate: new Date(),
+        divisionId: engineering.id,
+        departmentId: softwareDepartment.id,
+      },
+    });
+    await prisma.auditLog.create({
+      data: {
+        action: "PRODUCTION_FOUNDER_BOOTSTRAPPED",
+        entityType: "User",
+        entityId: founderUser.id,
+        metadata: { source: "environment-gated-seed" },
+      },
+    });
+    console.log("Production Founder account provisioned.");
+  }
+
   const seedPassword = process.env.SEED_DEMO_PASSWORD;
-  const passwordHash = seedPassword
-    ? await argon2.hash(seedPassword, {
-        memoryCost: 19_456,
-        parallelism: 1,
-        timeCost: 2,
-        type: argon2.argon2id,
-      })
-    : undefined;
+  const passwordHash = seedPassword ? await hashPassword(seedPassword) : undefined;
   const seedDemoData =
     process.env.NODE_ENV !== "production" && Boolean(passwordHash);
   if (!seedDemoData) {
