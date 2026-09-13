@@ -830,6 +830,57 @@ async function main(): Promise<void> {
     }
   }
 
+  // Hosted demo founder account for this demo deployment (idempotent upsert).
+  // Email/password are overridable via DEMO_FOUNDER_EMAIL / DEMO_FOUNDER_PASSWORD;
+  // otherwise a known demo credential is used so the deployed site is accessible.
+  {
+    const demoFounderEmail = (
+      process.env.DEMO_FOUNDER_EMAIL || "founder@techm4india.com"
+    )
+      .trim()
+      .toLowerCase();
+    const demoFounderPassword =
+      process.env.DEMO_FOUNDER_PASSWORD || "TechM4India!2026";
+    const demoFounderRole = roles.get("FOUNDER_CEO");
+    const demoEngineering = divisionRecords.get("engineering");
+    if (demoFounderRole && demoEngineering) {
+      const demoFounderHash = await hashPassword(demoFounderPassword);
+      const demoDepartment = await prisma.department.findFirst({
+        where: { divisionId: demoEngineering.id, slug: "software-engineering" },
+      });
+      const demoUser = await prisma.user.upsert({
+        where: { email: demoFounderEmail },
+        update: { status: UserStatus.ACTIVE, passwordHash: demoFounderHash },
+        create: {
+          email: demoFounderEmail,
+          passwordHash: demoFounderHash,
+          status: UserStatus.ACTIVE,
+        },
+      });
+      await prisma.userRole.upsert({
+        where: {
+          userId_roleId: { userId: demoUser.id, roleId: demoFounderRole.id },
+        },
+        update: {},
+        create: { userId: demoUser.id, roleId: demoFounderRole.id },
+      });
+      await prisma.employee.upsert({
+        where: { userId: demoUser.id },
+        update: {},
+        create: {
+          userId: demoUser.id,
+          employeeCode: "EMP-DEMO-FOUNDER",
+          firstName: "Demo",
+          lastName: "Founder",
+          designation: "Founder / CEO",
+          divisionId: demoEngineering.id,
+          departmentId: demoDepartment?.id,
+        },
+      });
+      console.log(`Demo founder account ready: ${demoFounderEmail}`);
+    }
+  }
+
   const bootstrapFounderEnabled =
     process.env.NODE_ENV === "production" &&
     process.env.BOOTSTRAP_FOUNDER_ENABLED === "true";
