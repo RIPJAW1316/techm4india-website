@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "nest build",
-    "start": "node dist/src/main.js",
+    "start": "prisma migrate deploy && node dist/src/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "postinstall": "prisma generate",
@@ -36,6 +36,8 @@
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "6.19.3",
     "argon2": "^0.45.1",
+    "prisma": "6.19.3",
+    "tsx": "4.20.6",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.2",
     "cookie-parser": "^1.4.7",
@@ -60,11 +62,9 @@
     "eslint": "9.39.4",
     "globals": "16.4.0",
     "jest": "30.0.5",
-    "prisma": "6.19.3",
     "supertest": "7.1.4",
     "ts-jest": "29.4.5",
     "ts-node": "10.9.2",
-    "tsx": "4.20.6",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3"
   }

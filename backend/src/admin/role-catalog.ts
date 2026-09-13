@@ -79,8 +79,9 @@ export const OFFICIAL_ROLE_CATALOG = [
   {
     name: "FACULTY_TRAINER",
     displayName: "Faculty / Trainer",
-    description: "Reserved training and LMS role.",
-    capabilityState: "RESERVED_FUTURE",
+    description:
+      "Programme curriculum authoring, batch delivery, and learner enrollment management.",
+    capabilityState: "IMPLEMENTED",
   },
   {
     name: "STUDENT",
@@ -97,14 +98,14 @@ export const OFFICIAL_ROLE_CATALOG = [
   {
     name: "CONTENT_MANAGER",
     displayName: "Content Manager",
-    description: "Reserved CMS-management role.",
-    capabilityState: "RESERVED_FUTURE",
+    description: "CMS content authoring and revision management.",
+    capabilityState: "IMPLEMENTED",
   },
   {
     name: "IT_ADMIN",
     displayName: "IT Admin",
-    description: "System and integration administration foundation.",
-    capabilityState: "RESERVED_FUTURE",
+    description: "Helpdesk support agent and system administration foundation.",
+    capabilityState: "IMPLEMENTED",
   },
   {
     name: "VENDOR",

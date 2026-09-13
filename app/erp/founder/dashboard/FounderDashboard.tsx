@@ -456,6 +456,7 @@ function FounderDashboardContent() {
             </a>
             <a href="#workforce">Tasks / Work</a>
             <a href="/erp/founder/employees">Employees ↗</a>
+            <a href="/erp/founder/recruitment">Recruitment ↗</a>
             <a href="/erp/founder/users">Users &amp; Roles ↗</a>
             <a href="/erp/founder/organization">Organization ↗</a>
             <a href="/erp/founder/attendance">Attendance ↗</a>
@@ -464,6 +465,14 @@ function FounderDashboardContent() {
             <a href="/erp/founder/finance">Finance ↗</a>
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
+            <a href="/erp/founder/programs">Programs ↗</a>
+            <a href="/erp/founder/performance">Performance ↗</a>
+            <a href="/erp/founder/supply-chain">Supply Chain ↗</a>
+            <a href="/erp/founder/support">Helpdesk ↗</a>
+            <a href="/erp/founder/cms">Content ↗</a>
+            <a href="/erp/founder/compliance">Compliance ↗</a>
+            <a href="/erp/founder/delivery">Delivery ↗</a>
+            <a href="/erp/founder/analytics">Analytics ↗</a>
           </nav>
           <button
             className="erp-sidebar-logout"

@@ -24,6 +24,15 @@ import { InstitutionsModule } from "./institutions/institutions.module";
 import { AdminModule } from "./admin/admin.module";
 import { PayrollModule } from "./payroll/payroll.module";
 import { FinanceModule } from "./finance/finance.module";
+import { RecruitmentModule } from "./recruitment/recruitment.module";
+import { ProgramsModule } from "./programs/programs.module";
+import { PerformanceModule } from "./performance/performance.module";
+import { SupplyChainModule } from "./supply-chain/supply-chain.module";
+import { SupportModule } from "./support/support.module";
+import { CmsModule } from "./cms/cms.module";
+import { ComplianceModule } from "./compliance/compliance.module";
+import { ProjectDeliveryModule } from "./project-delivery/project-delivery.module";
+import { AnalyticsModule } from "./analytics/analytics.module";
 
 @Module({
   imports: [
@@ -53,6 +62,15 @@ import { FinanceModule } from "./finance/finance.module";
     AdminModule,
     PayrollModule,
     FinanceModule,
+    RecruitmentModule,
+    ProgramsModule,
+    PerformanceModule,
+    SupplyChainModule,
+    SupportModule,
+    CmsModule,
+    ComplianceModule,
+    ProjectDeliveryModule,
+    AnalyticsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

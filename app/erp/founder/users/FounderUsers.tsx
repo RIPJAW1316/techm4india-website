@@ -402,6 +402,7 @@ function FounderUsersContent() {
             <a href="/erp/founder/dashboard">Dashboard</a>
             <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
             <a href="/erp/founder/employees">Employees ↗</a>
+            <a href="/erp/founder/recruitment">Recruitment ↗</a>
             <a className="is-active" href="#users-top">
               Users & Roles
             </a>

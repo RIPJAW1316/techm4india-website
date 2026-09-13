@@ -31,6 +31,15 @@ export function ProtectedErp({
   requiredAdmin = false,
   requiredPayroll = false,
   requiredFinance = false,
+  requiredRecruitment = false,
+  requiredPrograms = false,
+  requiredPerformance = false,
+  requiredSupplyChain = false,
+  requiredSupport = false,
+  requiredCms = false,
+  requiredCompliance = false,
+  requiredDelivery = false,
+  requiredAnalytics = false,
 }: {
   children: ReactNode;
   requiredDivision?: DivisionSlug;
@@ -39,6 +48,15 @@ export function ProtectedErp({
   requiredAdmin?: boolean;
   requiredPayroll?: boolean;
   requiredFinance?: boolean;
+  requiredRecruitment?: boolean;
+  requiredPrograms?: boolean;
+  requiredPerformance?: boolean;
+  requiredSupplyChain?: boolean;
+  requiredSupport?: boolean;
+  requiredCms?: boolean;
+  requiredCompliance?: boolean;
+  requiredDelivery?: boolean;
+  requiredAnalytics?: boolean;
 }) {
   const { status, context } = useErpAuth();
   const router = useRouter();
@@ -57,12 +75,44 @@ export function ProtectedErp({
   const financeAllowed =
     !requiredFinance ||
     Boolean(context?.permissions.includes("finance.dashboard.read"));
+  const recruitmentAllowed =
+    !requiredRecruitment ||
+    Boolean(context?.permissions.includes("recruitment.dashboard.read"));
+  const programsAllowed =
+    !requiredPrograms ||
+    Boolean(context?.permissions.includes("programs.read"));
+  const performanceAllowed =
+    !requiredPerformance ||
+    Boolean(context?.permissions.includes("performance.cycles.read"));
+  const supplyChainAllowed =
+    !requiredSupplyChain ||
+    Boolean(
+      context?.permissions.some((permission) =>
+        [
+          "procurement.vendors.read",
+          "procurement.orders.read",
+          "inventory.read",
+          "assets.read",
+        ].includes(permission),
+      ),
+    );
+  const supportAllowed =
+    !requiredSupport ||
+    Boolean(context?.permissions.includes("support.tickets.read"));
+  const cmsAllowed =
+    !requiredCms || Boolean(context?.permissions.includes("cms.content.read"));
+  const complianceAllowed =
+    !requiredCompliance || Boolean(context?.permissions.includes("compliance.read"));
+  const deliveryAllowed =
+    !requiredDelivery || Boolean(context?.permissions.includes("projects.delivery.read"));
+  const analyticsAllowed =
+    !requiredAnalytics || Boolean(context?.permissions.includes("analytics.read"));
 
   useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
     if (
       status === "authenticated" &&
-      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed)
+      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed || !recruitmentAllowed || !programsAllowed || !performanceAllowed || !supplyChainAllowed || !supportAllowed || !cmsAllowed || !complianceAllowed || !deliveryAllowed || !analyticsAllowed)
     )
       router.replace(resolveDashboardPath(context));
   }, [
@@ -74,13 +124,22 @@ export function ProtectedErp({
     adminAllowed,
     payrollAllowed,
     financeAllowed,
+    recruitmentAllowed,
+    programsAllowed,
+    performanceAllowed,
+    supplyChainAllowed,
+    supportAllowed,
+    cmsAllowed,
+    complianceAllowed,
+    deliveryAllowed,
+    analyticsAllowed,
     router,
   ]);
 
   if (status === "loading") return <ErpLoading />;
   if (status === "unauthenticated")
     return <ErpLoading label="Taking you to sign in" />;
-  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed)
+  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed || !recruitmentAllowed || !programsAllowed || !performanceAllowed || !supplyChainAllowed || !supportAllowed || !cmsAllowed || !complianceAllowed || !deliveryAllowed || !analyticsAllowed)
     return <ErpLoading label="Opening your permitted workspace" />;
   return <>{children}</>;
 }

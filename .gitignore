@@ -46,3 +46,7 @@ yarn-error.log*
 /backend/.env
 /backend/.env.*
 !/backend/.env.example
+
+# local scratch / editor config
+/tmp/
+.claude/

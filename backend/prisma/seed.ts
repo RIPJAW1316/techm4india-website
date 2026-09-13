@@ -154,6 +154,59 @@ const permissionKeys = [
   "finance.ledger.manage",
   "finance.ledger.post",
   "finance.gst.read",
+  "recruitment.dashboard.read",
+  "recruitment.requisitions.read",
+  "recruitment.requisitions.manage",
+  "recruitment.requisitions.approve",
+  "recruitment.applicants.read",
+  "recruitment.applicants.manage",
+  "recruitment.interviews.manage",
+  "recruitment.offers.read",
+  "recruitment.offers.manage",
+  "recruitment.onboarding.manage",
+  "programs.dashboard.read",
+  "programs.read",
+  "programs.manage",
+  "programs.publish",
+  "programs.content.manage",
+  "programs.batches.read",
+  "programs.batches.manage",
+  "programs.enrollments.manage",
+  "students.read",
+  "students.manage",
+  "performance.dashboard.read",
+  "performance.cycles.read",
+  "performance.cycles.manage",
+  "performance.goals.read",
+  "performance.goals.manage",
+  "performance.reviews.read",
+  "performance.reviews.manage",
+  "performance.reviews.finalize",
+  "performance.reviews.self",
+  "procurement.vendors.read",
+  "procurement.vendors.manage",
+  "procurement.orders.read",
+  "procurement.orders.manage",
+  "procurement.orders.approve",
+  "inventory.read",
+  "inventory.manage",
+  "assets.read",
+  "assets.manage",
+  "support.dashboard.read",
+  "support.tickets.read",
+  "support.tickets.manage",
+  "support.tickets.resolve",
+  "cms.dashboard.read",
+  "cms.content.read",
+  "cms.content.manage",
+  "cms.content.publish",
+  "compliance.dashboard.read",
+  "compliance.read",
+  "compliance.manage",
+  "projects.delivery.read",
+  "projects.delivery.manage",
+  "projects.timelog.manage",
+  "analytics.read",
 ] as const;
 
 const founderPermissionKeys = [
@@ -226,6 +279,72 @@ const institutionManagePermissionKeys = [
   "institutions.contacts.manage",
   "institutions.engagements.manage",
   "institutions.assign",
+] as const;
+const recruitmentReadPermissionKeys = [
+  "recruitment.dashboard.read",
+  "recruitment.requisitions.read",
+  "recruitment.applicants.read",
+] as const;
+const recruitmentManagePermissionKeys = [
+  "recruitment.requisitions.manage",
+  "recruitment.requisitions.approve",
+  "recruitment.applicants.manage",
+  "recruitment.interviews.manage",
+  "recruitment.offers.read",
+  "recruitment.offers.manage",
+  "recruitment.onboarding.manage",
+] as const;
+const programsReadPermissionKeys = [
+  "programs.dashboard.read",
+  "programs.read",
+  "programs.batches.read",
+] as const;
+const programsDeliveryPermissionKeys = [
+  "programs.content.manage",
+  "programs.batches.manage",
+  "programs.enrollments.manage",
+] as const;
+const programsAdminPermissionKeys = [
+  "programs.manage",
+  "programs.publish",
+  "students.manage",
+] as const;
+const performanceReadPermissionKeys = [
+  "performance.dashboard.read",
+  "performance.cycles.read",
+  "performance.goals.read",
+  "performance.reviews.read",
+] as const;
+const performanceManagePermissionKeys = [
+  "performance.cycles.manage",
+  "performance.goals.manage",
+  "performance.reviews.manage",
+] as const;
+const performanceSelfPermissionKeys = ["performance.reviews.self"] as const;
+const supplyChainReadPermissionKeys = [
+  "procurement.vendors.read",
+  "procurement.orders.read",
+  "inventory.read",
+  "assets.read",
+] as const;
+const supplyChainManagePermissionKeys = [
+  "procurement.vendors.manage",
+  "procurement.orders.manage",
+  "inventory.manage",
+  "assets.manage",
+] as const;
+const supportBasePermissionKeys = [
+  "support.tickets.read",
+  "support.tickets.manage",
+] as const;
+const supportAgentPermissionKeys = [
+  "support.dashboard.read",
+  "support.tickets.resolve",
+] as const;
+const cmsReadPermissionKeys = ["cms.dashboard.read", "cms.content.read"] as const;
+const complianceReadPermissionKeys = [
+  "compliance.dashboard.read",
+  "compliance.read",
 ] as const;
 
 async function main(): Promise<void> {
@@ -365,6 +484,30 @@ async function main(): Promise<void> {
               "finance.ledger.manage",
               "finance.ledger.post",
               "finance.gst.read",
+              ...recruitmentReadPermissionKeys,
+              ...recruitmentManagePermissionKeys,
+              ...programsReadPermissionKeys,
+              ...programsDeliveryPermissionKeys,
+              ...programsAdminPermissionKeys,
+              "students.read",
+              ...performanceReadPermissionKeys,
+              ...performanceManagePermissionKeys,
+              "performance.reviews.finalize",
+              ...performanceSelfPermissionKeys,
+              ...supplyChainReadPermissionKeys,
+              ...supplyChainManagePermissionKeys,
+              "procurement.orders.approve",
+              ...supportBasePermissionKeys,
+              ...supportAgentPermissionKeys,
+              ...cmsReadPermissionKeys,
+              "cms.content.manage",
+              "cms.content.publish",
+              ...complianceReadPermissionKeys,
+              "compliance.manage",
+              "projects.delivery.read",
+              "projects.delivery.manage",
+              "projects.timelog.manage",
+              "analytics.read",
             ]
           : name === "DIRECTOR"
             ? permissionKeys
@@ -391,9 +534,22 @@ async function main(): Promise<void> {
                     key !== "hr.employees.read_private" &&
                     !key.startsWith("admin.") &&
                     !key.startsWith("payroll.") &&
-                    !key.startsWith("finance."),
+                    !key.startsWith("finance.") &&
+                    !key.startsWith("recruitment.") &&
+                    !key.startsWith("programs.") &&
+                    !key.startsWith("students.") &&
+                    !key.startsWith("performance.") &&
+                    !key.startsWith("procurement.") &&
+                    !key.startsWith("inventory.") &&
+                    !key.startsWith("assets.") &&
+                    !key.startsWith("support.") &&
+                    !key.startsWith("cms.") &&
+                    !key.startsWith("compliance."),
                 )
                 .concat([
+                  "employees.read_all",
+                  "projects.read_all",
+                  "tasks.read_all",
                   "crm.dashboard.read",
                   "institutions.dashboard.read",
                   ...institutionReadPermissionKeys,
@@ -401,6 +557,18 @@ async function main(): Promise<void> {
                   "finance.invoices.read",
                   "finance.expenses.read",
                   "finance.gst.read",
+                  ...recruitmentReadPermissionKeys,
+                  ...programsReadPermissionKeys,
+                  "students.read",
+                  ...performanceReadPermissionKeys,
+                  "performance.reviews.finalize",
+                  ...performanceSelfPermissionKeys,
+                  ...supplyChainReadPermissionKeys,
+                  ...supportBasePermissionKeys,
+                  ...supportAgentPermissionKeys,
+                  ...cmsReadPermissionKeys,
+                  "cms.content.publish",
+                  ...complianceReadPermissionKeys,
                 ])
             : name === "DIVISION_HEAD"
               ? [
@@ -427,6 +595,13 @@ async function main(): Promise<void> {
                   "leave.read",
                   "leave.review",
                   "holidays.read",
+                  ...programsReadPermissionKeys,
+                  ...performanceReadPermissionKeys,
+                  "performance.reviews.manage",
+                  ...performanceSelfPermissionKeys,
+                  "projects.delivery.read",
+                  "projects.delivery.manage",
+                  "projects.timelog.manage",
                 ]
               : name === "HR_MANAGER"
                 ? [
@@ -448,6 +623,11 @@ async function main(): Promise<void> {
                     "leave.manage_balances",
                     "payroll.compensation.read",
                     "payroll.compensation.manage",
+                    ...recruitmentReadPermissionKeys,
+                    ...recruitmentManagePermissionKeys,
+                    ...performanceReadPermissionKeys,
+                    ...performanceManagePermissionKeys,
+                    ...performanceSelfPermissionKeys,
                   ]
                 : name === "HR_EXECUTIVE"
                   ? [
@@ -462,6 +642,13 @@ async function main(): Promise<void> {
                       "leave.self.read",
                       "leave.read",
                       "holidays.read",
+                      ...recruitmentReadPermissionKeys,
+                      "recruitment.requisitions.manage",
+                      "recruitment.applicants.manage",
+                      "recruitment.interviews.manage",
+                      "recruitment.onboarding.manage",
+                      ...performanceReadPermissionKeys,
+                      ...performanceSelfPermissionKeys,
                     ]
                   : name === "FINANCE_MANAGER"
                     ? [
@@ -497,6 +684,10 @@ async function main(): Promise<void> {
                         "finance.ledger.manage",
                         "finance.ledger.post",
                         "finance.gst.read",
+                        ...supplyChainReadPermissionKeys,
+                        ...supplyChainManagePermissionKeys,
+                        ...complianceReadPermissionKeys,
+                        "compliance.manage",
                       ]
                     : name === "FINANCE_EXECUTIVE"
                       ? [
@@ -561,7 +752,47 @@ async function main(): Promise<void> {
                             "task_comments.create",
                             "notifications.read_self",
                             "organization.read_self",
+                            "performance.reviews.read",
+                            "performance.reviews.manage",
+                            ...performanceSelfPermissionKeys,
+                            "projects.delivery.read",
+                            "projects.delivery.manage",
+                            "projects.timelog.manage",
                           ]
+                        : name === "IT_ADMIN"
+                          ? [
+                              "notifications.read_self",
+                              "organization.read_all",
+                              ...attendanceEmployeeKeys,
+                              ...leaveEmployeeKeys,
+                              ...supportBasePermissionKeys,
+                              ...supportAgentPermissionKeys,
+                            ]
+                        : name === "CONTENT_MANAGER"
+                          ? [
+                              "notifications.read_self",
+                              "organization.read_self",
+                              ...attendanceEmployeeKeys,
+                              ...leaveEmployeeKeys,
+                              ...cmsReadPermissionKeys,
+                              "cms.content.manage",
+                              ...supportBasePermissionKeys,
+                            ]
+                        : name === "FACULTY_TRAINER"
+                          ? [
+                              "notifications.read_self",
+                              "organization.read_self",
+                              ...attendanceEmployeeKeys,
+                              ...leaveEmployeeKeys,
+                              "payroll.payslip.read_self",
+                              ...programsReadPermissionKeys,
+                              "students.read",
+                              ...programsDeliveryPermissionKeys,
+                              "performance.reviews.read",
+                              ...performanceSelfPermissionKeys,
+                              ...supportBasePermissionKeys,
+                              "cms.content.read",
+                            ]
                         : name === "EMPLOYEE"
                           ? [
                               "employees.read_self",
@@ -575,6 +806,12 @@ async function main(): Promise<void> {
                               ...attendanceEmployeeKeys,
                               ...leaveEmployeeKeys,
                               "payroll.payslip.read_self",
+                              "performance.reviews.read",
+                              ...performanceSelfPermissionKeys,
+                              ...supportBasePermissionKeys,
+                              "cms.content.read",
+                              "projects.delivery.read",
+                              "projects.timelog.manage",
                             ]
                           : [
                               "notifications.read_self",

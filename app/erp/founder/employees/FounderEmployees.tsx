@@ -349,6 +349,7 @@ function FounderEmployeesContent() {
             <a className="is-active" href="#employees-top">
               Employees
             </a>
+            <a href="/erp/founder/recruitment">Recruitment ↗</a>
             <a href="/erp/founder/users">Users &amp; Roles ↗</a>
             <a href="/erp/founder/organization">Organization ↗</a>
             <a href="/erp/founder/attendance">Attendance ↗</a>
