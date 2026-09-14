@@ -7395,3 +7395,95 @@ body:has(.login-route) {
     padding: 20px 18px 22px;
   }
 }
+
+/* ============================================================
+   Sitewide visual fixes
+   1. Render arrow glyphs (↗) as text, not emoji, everywhere.
+   2. Repair the ERP sidebar so its full nav is legible and
+      scrollable instead of spilling off the navy panel.
+   3. Light hover polish on marketing product cards.
+   ============================================================ */
+
+/* 1. Arrow glyphs render as text (brand colour), never emoji */
+body,
+.arrow-link i,
+.division-arrow,
+.trust-item i,
+.erp-button,
+.erp-text-button,
+.erp-sidebar-nav a,
+.founder-module-nav a {
+  font-variant-emoji: text;
+}
+.arrow-link i {
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* 2. ERP sidebar — scrollable, compact, clearly legible */
+.erp-sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+.erp-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.erp-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 99px;
+}
+.erp-sidebar-division {
+  margin: 28px 7px 20px;
+  padding-block: 15px;
+}
+.erp-sidebar-nav {
+  gap: 3px;
+}
+.erp-sidebar-nav a {
+  min-height: 38px;
+  padding: 9px 13px;
+  border-radius: 9px;
+  color: #b6bccb;
+}
+.erp-sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.erp-sidebar-nav a.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--tm-red);
+}
+.erp-sidebar-logout {
+  margin-top: 18px;
+}
+
+/* 3. Marketing product cards — subtle interactive polish */
+.product-editorial {
+  transition: background 0.18s ease;
+}
+.product-editorial:hover {
+  background: rgba(37, 46, 74, 0.02);
+}
+.product-editorial:hover h3 {
+  color: var(--tm-red);
+}
+.product-editorial h3,
+.product-editorial .arrow-link i {
+  transition: color 0.18s ease, transform 0.2s ease;
+}
+
+/* Team photo frames — subtle rounding + legible index badge */
+.person-image {
+  border-radius: 14px;
+  box-shadow: var(--erp-shadow-sm);
+}
+.person-image > span {
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: rgba(20, 27, 49, 0.5);
+  text-shadow: none;
+  font-weight: 700;
+}

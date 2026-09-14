@@ -66,7 +66,7 @@ export function SectionHeading({
 export function ArrowLink({ href, children, light = false }: { href: string; children: ReactNode; light?: boolean }) {
   return (
     <Link className={"arrow-link" + (light ? " arrow-link-light" : "")} href={href}>
-      <span>{children}</span><i aria-hidden="true">↗</i>
+      <span>{children}</span><i aria-hidden="true">{"↗︎"}</i>
     </Link>
   );
 }
