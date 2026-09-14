@@ -6991,3 +6991,407 @@ body:has(.login-route) {
     margin-top: 35px;
   }
 }
+
+/* ============================================================
+   ERP V2 workspace polish
+   Defines previously-missing shared classes (erp-stat-grid,
+   founder-tabs, founder-form-wide, inline forms, plain lists)
+   and elevates the founder workspace surfaces into a cohesive,
+   card-based system. Appended last so it wins the cascade.
+   ============================================================ */
+:root {
+  --erp-radius: 16px;
+  --erp-radius-sm: 10px;
+  --erp-card: #ffffff;
+  --erp-card-2: #fbfbf9;
+  --erp-shadow-sm: 0 1px 2px rgba(20, 27, 49, 0.05);
+  --erp-shadow: 0 2px 4px rgba(20, 27, 49, 0.05), 0 18px 40px -24px rgba(20, 27, 49, 0.35);
+  --erp-ring: 0 0 0 3px rgba(199, 45, 55, 0.15);
+}
+
+/* Roomier content column */
+.erp-content {
+  width: min(100% - 80px, 1180px);
+  padding-top: 50px;
+}
+
+/* Page hero */
+.erp-welcome {
+  align-items: flex-end;
+  gap: 32px;
+}
+.erp-welcome-code {
+  min-width: 176px;
+  padding: 17px 20px;
+  border-left: 0;
+  border-radius: var(--erp-radius);
+  background: linear-gradient(158deg, var(--tm-navy) 0%, var(--tm-navy-deep) 100%);
+  box-shadow: var(--erp-shadow);
+}
+.erp-welcome-code span {
+  color: rgba(255, 255, 255, 0.62);
+}
+.erp-welcome-code strong {
+  margin-top: 9px;
+  color: #fff;
+  font-family: var(--tm-serif);
+  font-size: 30px;
+  line-height: 1;
+}
+
+/* Top module navigation → segmented pill bar */
+.founder-module-nav {
+  gap: 3px;
+  margin: 0 0 34px;
+  padding: 6px;
+  border: 1px solid var(--tm-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--erp-shadow-sm);
+}
+.founder-module-nav a {
+  padding: 8px 15px;
+  border-radius: 999px;
+  color: var(--tm-muted);
+  font-size: 10px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.founder-module-nav a:hover {
+  background: rgba(37, 46, 74, 0.07);
+  color: var(--tm-navy);
+}
+.founder-module-nav a.is-active {
+  background: var(--tm-navy);
+  color: #fff;
+  box-shadow: 0 8px 18px -10px rgba(20, 27, 49, 0.75);
+}
+
+/* Summary stat grid (previously undefined) */
+.erp-stat-grid {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.erp-stat-grid article {
+  position: relative;
+  padding: 21px 22px 19px;
+  border: 1px solid var(--tm-line);
+  border-radius: var(--erp-radius);
+  background: var(--erp-card);
+  box-shadow: var(--erp-shadow-sm);
+  overflow: hidden;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.erp-stat-grid article::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(var(--tm-red), var(--tm-orange));
+}
+.erp-stat-grid article:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--erp-shadow);
+}
+.erp-stat-grid article > span {
+  display: block;
+  color: var(--tm-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.erp-stat-grid article > strong {
+  display: block;
+  margin: 13px 0 5px;
+  color: var(--tm-navy-deep);
+  font-family: var(--tm-serif);
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 0.85;
+}
+.erp-stat-grid article > small {
+  display: block;
+  color: #9098a5;
+  font-size: 11px;
+}
+
+/* Sections become cards */
+.erp-section {
+  margin-top: 24px;
+  padding: 26px 28px 28px;
+  border: 1px solid var(--tm-line);
+  border-radius: var(--erp-radius);
+  background: var(--erp-card);
+  box-shadow: var(--erp-shadow-sm);
+}
+.erp-section-heading {
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+.erp-section-heading h2 {
+  font-size: clamp(23px, 3vw, 29px);
+}
+
+/* Workspace tabs (previously undefined) */
+.founder-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 6px 0 24px;
+  padding: 5px;
+  border: 1px solid var(--tm-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--erp-shadow-sm);
+}
+.founder-tabs button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 17px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--tm-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.founder-tabs button:hover:not(:disabled) {
+  background: rgba(37, 46, 74, 0.07);
+  color: var(--tm-navy);
+}
+.founder-tabs button.is-active {
+  background: var(--tm-navy);
+  color: #fff;
+}
+.founder-tabs button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Forms */
+.founder-form {
+  gap: 18px;
+}
+.founder-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.founder-form-wide {
+  grid-column: 1 / -1;
+}
+.founder-form input,
+.founder-form select,
+.founder-form textarea,
+.founder-filters input,
+.founder-filters select {
+  min-height: 44px;
+  border-radius: var(--erp-radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.founder-form input:focus,
+.founder-form select:focus,
+.founder-form textarea:focus,
+.founder-filters input:focus,
+.founder-filters select:focus {
+  border-color: var(--tm-red);
+  outline: none;
+  box-shadow: var(--erp-ring);
+}
+.founder-form-inline {
+  display: grid;
+  gap: 7px;
+  max-width: 480px;
+  color: var(--tm-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.founder-form-inline select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--tm-line);
+  border-radius: var(--erp-radius-sm);
+  background: #fff;
+  color: var(--tm-navy);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.founder-inline-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.founder-inline-form select {
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid var(--tm-line);
+  border-radius: var(--erp-radius-sm);
+  background: #fff;
+  color: var(--tm-navy);
+  font: inherit;
+  font-size: 12px;
+}
+
+/* Plain bullet lists (curriculum lessons, etc.) */
+.founder-plain-list {
+  margin: 9px 0 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 5px;
+}
+.founder-plain-list li {
+  position: relative;
+  padding-left: 15px;
+  color: var(--tm-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.founder-plain-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tm-orange);
+}
+
+/* Notification / record rows → clean flex cards (robust for 2 or 3 children) */
+.erp-notification-list {
+  border-top: 0;
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+.erp-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 15px 18px;
+  border: 1px solid var(--tm-line);
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-card-2);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.erp-notification:hover {
+  border-color: rgba(37, 46, 74, 0.3);
+  background: #fff;
+}
+.erp-notification > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.erp-notification > div.founder-org-row-actions {
+  flex: 0 0 auto;
+  align-items: center;
+}
+.erp-notification .erp-notification-dot {
+  flex: 0 0 auto;
+}
+.erp-notification h3 {
+  font-size: 15px;
+}
+
+/* Buttons */
+.erp-button {
+  min-height: 48px;
+  gap: 14px;
+  border-radius: var(--erp-radius-sm);
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+.erp-button-primary {
+  background: var(--tm-navy);
+  box-shadow: 0 10px 22px -12px rgba(20, 27, 49, 0.75);
+}
+.erp-button-primary:hover {
+  background: var(--tm-red);
+}
+.erp-button:active {
+  transform: translateY(1px);
+}
+.erp-text-button {
+  padding: 6px 11px;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+}
+.erp-text-button:hover {
+  background: rgba(199, 45, 55, 0.09);
+  text-decoration: none;
+}
+
+/* Status pill — scoped so the dashboard workforce table is untouched */
+.founder-org-row-actions .founder-status,
+.erp-section-heading .founder-status {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(37, 46, 74, 0.07);
+  color: var(--tm-navy) !important;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Alerts + states */
+.erp-error,
+.erp-success {
+  border-radius: var(--erp-radius-sm);
+  border: 1px solid transparent;
+}
+.erp-error {
+  border-color: rgba(199, 45, 55, 0.25);
+}
+.erp-success {
+  border-color: rgba(46, 111, 89, 0.25);
+}
+.erp-empty {
+  padding: 24px;
+  border: 1px dashed var(--tm-line);
+  border-radius: var(--erp-radius-sm);
+  text-align: center;
+}
+
+/* Founder code chip */
+.founder-org-code {
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+@media (max-width: 900px) {
+  .erp-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .founder-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .erp-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .erp-welcome-code {
+    align-self: stretch;
+  }
+}
+@media (max-width: 560px) {
+  .erp-stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .erp-content {
+    width: min(100% - 36px, 1180px);
+  }
+  .erp-section {
+    padding: 20px 18px 22px;
+  }
+}
