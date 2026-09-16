@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { ApiError, apiFetchV2 } from "@/lib/api/client";
@@ -36,8 +30,7 @@ type FormState = {
   phone: string;
   personalEmail: string;
 };
-type Modal =
-  { kind: "create" } | { kind: "edit"; employee: HrEmployeeSummary } | null;
+type Modal = { kind: "create" } | { kind: "edit"; employee: HrEmployeeSummary } | null;
 const emptyForm: FormState = {
   officialEmail: "",
   firstName: "",
@@ -142,19 +135,13 @@ function FounderEmployeesContent() {
         ...(typeFilter ? { employmentType: typeFilter } : {}),
         ...(statusFilter ? { status: statusFilter } : {}),
       });
-      const [
-        employeeResponse,
-        divisionResponse,
-        departmentResponse,
-        branchResponse,
-      ] = await Promise.all([
-        apiFetchV2<ApiResponse<HrEmployeeSummary[]>>(
-          `/hr/employees?${params.toString()}`,
-        ),
-        apiFetchV2<ApiResponse<CompanyDivision[]>>("/company/divisions"),
-        apiFetchV2<ApiResponse<CompanyDepartment[]>>("/company/departments"),
-        apiFetchV2<ApiResponse<CompanyBranch[]>>("/company/branches?limit=100"),
-      ]);
+      const [employeeResponse, divisionResponse, departmentResponse, branchResponse] =
+        await Promise.all([
+          apiFetchV2<ApiResponse<HrEmployeeSummary[]>>(`/hr/employees?${params.toString()}`),
+          apiFetchV2<ApiResponse<CompanyDivision[]>>("/company/divisions"),
+          apiFetchV2<ApiResponse<CompanyDepartment[]>>("/company/departments"),
+          apiFetchV2<ApiResponse<CompanyBranch[]>>("/company/branches?limit=100"),
+        ]);
       setEmployees(employeeResponse.data);
       setDivisions(divisionResponse.data);
       setDepartments(departmentResponse.data);
@@ -185,16 +172,10 @@ function FounderEmployeesContent() {
     setDetailLoading(true);
     setError(null);
     try {
-      const response = await apiFetchV2<ApiResponse<HrEmployeeDetail>>(
-        `/hr/employees/${id}`,
-      );
+      const response = await apiFetchV2<ApiResponse<HrEmployeeDetail>>(`/hr/employees/${id}`);
       setDetail(response.data);
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "Employee record could not load.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "Employee record could not load.");
     } finally {
       setDetailLoading(false);
     }
@@ -209,8 +190,7 @@ function FounderEmployeesContent() {
   const departmentsFor = useMemo(
     () =>
       departments.filter(
-        (department) =>
-          !form.divisionId || department.divisionId === form.divisionId,
+        (department) => !form.divisionId || department.divisionId === form.divisionId,
       ),
     [departments, form.divisionId],
   );
@@ -248,31 +228,20 @@ function FounderEmployeesContent() {
     event.preventDefault();
     setBusy(true);
     setError(null);
-    const body = Object.fromEntries(
-      Object.entries(form).filter(([, value]) => value !== ""),
-    );
+    const body = Object.fromEntries(Object.entries(form).filter(([, value]) => value !== ""));
     try {
-      const path =
-        modal?.kind === "edit"
-          ? `/hr/employees/${modal.employee.id}`
-          : "/hr/employees";
+      const path = modal?.kind === "edit" ? `/hr/employees/${modal.employee.id}` : "/hr/employees";
       await apiFetchV2(path, {
         method: modal?.kind === "edit" ? "PATCH" : "POST",
         body: JSON.stringify(body),
       });
       setModal(null);
-      setMessage(
-        modal?.kind === "edit"
-          ? "Employee record updated."
-          : "Employee record created.",
-      );
+      setMessage(modal?.kind === "edit" ? "Employee record updated." : "Employee record created.");
       await load();
       if (modal?.kind === "edit") await loadDetail(modal.employee.id);
     } catch (reason) {
       setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "The employee record could not be saved.",
+        reason instanceof ApiError ? reason.message : "The employee record could not be saved.",
       );
     } finally {
       setBusy(false);
@@ -298,11 +267,7 @@ function FounderEmployeesContent() {
       await loadDetail(detail.id);
       event.currentTarget.reset();
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "Skill could not be added.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "Skill could not be added.");
     } finally {
       setBusy(false);
     }
@@ -312,14 +277,10 @@ function FounderEmployeesContent() {
     await logout();
     router.replace("/login");
   }
-  if (loading && employees.length === 0)
-    return <ErpLoading label="Loading employee master" />;
+  if (loading && employees.length === 0) return <ErpLoading label="Loading employee master" />;
   return (
     <div className="erp-app-shell founder-shell founder-hr-shell">
-      <aside
-        className="erp-sidebar founder-sidebar"
-        aria-label="HR workspace navigation"
-      >
+      <aside className="erp-sidebar founder-sidebar" aria-label="HR workspace navigation">
         <div className="erp-sidebar-head">
           <a className="erp-sidebar-brand" href="/erp/founder/dashboard">
             <span className="erp-mini-mark" aria-hidden="true">
@@ -337,9 +298,7 @@ function FounderEmployeesContent() {
           <div className="erp-sidebar-division">
             <span>People operations</span>
             <strong>
-              {context?.user.roles.includes("FOUNDER_CEO")
-                ? "Founder / CEO"
-                : "HR workspace"}
+              {context?.user.roles.includes("FOUNDER_CEO") ? "Founder / CEO" : "HR workspace"}
             </strong>
             <small>Safe employee master</small>
           </div>
@@ -359,11 +318,7 @@ function FounderEmployeesContent() {
             <a href="/erp/founder/crm">CRM ↗</a>
             <a href="/erp/founder/institutions">Institutions ↗</a>
           </nav>
-          <button
-            className="erp-sidebar-logout"
-            type="button"
-            onClick={() => void signOut()}
-          >
+          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
             Log out <span aria-hidden="true">↗</span>
           </button>
         </div>
@@ -372,9 +327,7 @@ function FounderEmployeesContent() {
         <header className="erp-topbar">
           <div>
             <span className="erp-topbar-label">Founder Employees</span>
-            <span className="erp-topbar-path">
-              TechM4India / People and employment
-            </span>
+            <span className="erp-topbar-path">TechM4India / People and employment</span>
           </div>
           <div className="erp-user-chip">
             <span>
@@ -400,8 +353,8 @@ function FounderEmployeesContent() {
                 People, <em>clearly recorded.</em>
               </h1>
               <p>
-                A safe operational directory for the people, structure and
-                employment changes that keep TechM4India moving.
+                A safe operational directory for the people, structure and employment changes that
+                keep TechM4India moving.
               </p>
             </div>
             <button
@@ -448,9 +401,7 @@ function FounderEmployeesContent() {
                 <option value="">All departments</option>
                 {departments
                   .filter(
-                    (department) =>
-                      !divisionFilter ||
-                      department.divisionId === divisionFilter,
+                    (department) => !divisionFilter || department.divisionId === divisionFilter,
                   )
                   .map((department) => (
                     <option key={department.id} value={department.id}>
@@ -507,10 +458,7 @@ function FounderEmployeesContent() {
             </label>
             <label>
               <span>Employment</span>
-              <select
-                value={typeFilter}
-                onChange={(event) => setTypeFilter(event.target.value)}
-              >
+              <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
                 <option value="">All types</option>
                 {types.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -542,9 +490,7 @@ function FounderEmployeesContent() {
                   {employees.length} employee{employees.length === 1 ? "" : "s"}
                 </h2>
               </div>
-              <span className="erp-section-count">
-                Operational records only
-              </span>
+              <span className="erp-section-count">Operational records only</span>
             </div>
             <div className="founder-hr-table-wrap">
               <table className="founder-hr-table">
@@ -566,10 +512,7 @@ function FounderEmployeesContent() {
                       <td colSpan={8}>
                         <div className="erp-empty">
                           <strong>No employee records match.</strong>
-                          <span>
-                            Try a different filter or add an operational
-                            employee record.
-                          </span>
+                          <span>Try a different filter or add an operational employee record.</span>
                         </div>
                       </td>
                     </tr>
@@ -586,15 +529,11 @@ function FounderEmployeesContent() {
                             {employee.officialEmail}
                           </small>
                         </td>
-                        <td data-label="Division">
-                          {employee.division?.name ?? "Not assigned"}
-                        </td>
+                        <td data-label="Division">{employee.division?.name ?? "Not assigned"}</td>
                         <td data-label="Department">
                           {employee.department?.name ?? "Not assigned"}
                         </td>
-                        <td data-label="Branch">
-                          {employee.branch?.name ?? "Not assigned"}
-                        </td>
+                        <td data-label="Branch">{employee.branch?.name ?? "Not assigned"}</td>
                         <td data-label="Role">
                           <span>{employee.designation ?? "Not set"}</span>
                           <small>
@@ -615,9 +554,7 @@ function FounderEmployeesContent() {
                             {label(employee.employmentStatus)}
                           </small>
                         </td>
-                        <td data-label="Joined">
-                          {formatDate(employee.joiningDate)}
-                        </td>
+                        <td data-label="Joined">{formatDate(employee.joiningDate)}</td>
                         <td data-label="Actions">
                           <div className="founder-row-actions">
                             <button
@@ -644,17 +581,12 @@ function FounderEmployeesContent() {
             </div>
           </section>
           {(selectedId || detailLoading) && (
-            <section
-              className="founder-hr-detail"
-              aria-labelledby="employee-detail-title"
-            >
+            <section className="founder-hr-detail" aria-labelledby="employee-detail-title">
               <div className="erp-section-heading">
                 <div>
                   <p className="erp-kicker">Employee record</p>
                   <h2 id="employee-detail-title">
-                    {detail
-                      ? `${detail.firstName} ${detail.lastName}`
-                      : "Loading record"}
+                    {detail ? `${detail.firstName} ${detail.lastName}` : "Loading record"}
                   </h2>
                 </div>
                 <button
@@ -683,9 +615,7 @@ function FounderEmployeesContent() {
                     </div>
                     <div>
                       <span>Department</span>
-                      <strong>
-                        {detail.department?.name ?? "Not assigned"}
-                      </strong>
+                      <strong>{detail.department?.name ?? "Not assigned"}</strong>
                     </div>
                     <div>
                       <span>Manager</span>
@@ -713,9 +643,7 @@ function FounderEmployeesContent() {
                         {formatDate(detail.joiningDate)}
                       </p>
                       <p>Confirmation: {formatDate(detail.confirmationDate)}</p>
-                      <p>
-                        Probation end: {formatDate(detail.probationEndDate)}
-                      </p>
+                      <p>Probation end: {formatDate(detail.probationEndDate)}</p>
                       <p>
                         {detail.directReportCount} direct report
                         {detail.directReportCount === 1 ? "" : "s"}
@@ -748,16 +676,12 @@ function FounderEmployeesContent() {
                             <strong>{skill.name}</strong>
                             <span>
                               {skill.level ?? "Level not set"}
-                              {skill.yearsExperience
-                                ? ` · ${skill.yearsExperience} years`
-                                : ""}
+                              {skill.yearsExperience ? ` · ${skill.yearsExperience} years` : ""}
                             </span>
                           </div>
                         ))
                       ) : (
-                        <p className="founder-hr-muted">
-                          No skills recorded yet.
-                        </p>
+                        <p className="founder-hr-muted">No skills recorded yet.</p>
                       )}
                       <form
                         className="founder-hr-inline-form"
@@ -765,11 +689,7 @@ function FounderEmployeesContent() {
                       >
                         <input name="name" required placeholder="Add a skill" />
                         <input name="level" placeholder="Level" />
-                        <button
-                          className="erp-text-button"
-                          type="submit"
-                          disabled={busy}
-                        >
+                        <button className="erp-text-button" type="submit" disabled={busy}>
                           Add ↗
                         </button>
                       </form>
@@ -787,22 +707,16 @@ function FounderEmployeesContent() {
                           </div>
                         ))
                       ) : (
-                        <p className="founder-hr-muted">
-                          No employment history recorded.
-                        </p>
+                        <p className="founder-hr-muted">No employment history recorded.</p>
                       )}
                     </article>
                     <article>
                       <p className="erp-kicker">Contact and privacy</p>
-                      <h3>
-                        {detail.addresses.length
-                          ? "Addresses"
-                          : "No addresses recorded"}
-                      </h3>
+                      <h3>{detail.addresses.length ? "Addresses" : "No addresses recorded"}</h3>
                       {detail.addresses.map((address) => (
                         <p key={address.id}>
-                          {address.type}: {address.addressLine1}, {address.city}
-                          , {address.state} {address.postalCode}
+                          {address.type}: {address.addressLine1}, {address.city}, {address.state}{" "}
+                          {address.postalCode}
                         </p>
                       ))}
                       <h3>
@@ -812,8 +726,7 @@ function FounderEmployeesContent() {
                       </h3>
                       {detail.emergencyContacts.map((contact) => (
                         <p key={contact.id}>
-                          {contact.name} · {contact.relationship} ·{" "}
-                          {contact.phone}
+                          {contact.name} · {contact.relationship} · {contact.phone}
                         </p>
                       ))}
                     </article>
@@ -839,27 +752,18 @@ function FounderEmployeesContent() {
                   {modal.kind === "create" ? "Add employee" : "Edit employee"}
                 </h2>
               </div>
-              <button
-                className="erp-text-button"
-                type="button"
-                onClick={() => setModal(null)}
-              >
+              <button className="erp-text-button" type="button" onClick={() => setModal(null)}>
                 Close ×
               </button>
             </div>
-            <form
-              className="founder-form"
-              onSubmit={(event) => void submit(event)}
-            >
+            <form className="founder-form" onSubmit={(event) => void submit(event)}>
               <div className="founder-form-grid">
                 <label>
                   <span>First name</span>
                   <input
                     required
                     value={form.firstName}
-                    onChange={(event) =>
-                      updateForm("firstName", event.target.value)
-                    }
+                    onChange={(event) => updateForm("firstName", event.target.value)}
                   />
                 </label>
                 <label>
@@ -867,9 +771,7 @@ function FounderEmployeesContent() {
                   <input
                     required
                     value={form.lastName}
-                    onChange={(event) =>
-                      updateForm("lastName", event.target.value)
-                    }
+                    onChange={(event) => updateForm("lastName", event.target.value)}
                   />
                 </label>
                 <label>
@@ -877,9 +779,7 @@ function FounderEmployeesContent() {
                   <input
                     required
                     value={form.employeeCode}
-                    onChange={(event) =>
-                      updateForm("employeeCode", event.target.value)
-                    }
+                    onChange={(event) => updateForm("employeeCode", event.target.value)}
                   />
                 </label>
                 <label>
@@ -888,9 +788,7 @@ function FounderEmployeesContent() {
                     type="email"
                     required={modal.kind === "create"}
                     value={form.officialEmail}
-                    onChange={(event) =>
-                      updateForm("officialEmail", event.target.value)
-                    }
+                    onChange={(event) => updateForm("officialEmail", event.target.value)}
                   />
                 </label>
                 <label>
@@ -898,9 +796,7 @@ function FounderEmployeesContent() {
                   <select
                     required
                     value={form.divisionId}
-                    onChange={(event) =>
-                      updateForm("divisionId", event.target.value)
-                    }
+                    onChange={(event) => updateForm("divisionId", event.target.value)}
                   >
                     <option value="">Choose division</option>
                     {divisions.map((division) => (
@@ -915,9 +811,7 @@ function FounderEmployeesContent() {
                   <select
                     required
                     value={form.departmentId}
-                    onChange={(event) =>
-                      updateForm("departmentId", event.target.value)
-                    }
+                    onChange={(event) => updateForm("departmentId", event.target.value)}
                   >
                     <option value="">Choose department</option>
                     {departmentsFor.map((department) => (
@@ -931,9 +825,7 @@ function FounderEmployeesContent() {
                   <span>Branch</span>
                   <select
                     value={form.branchId}
-                    onChange={(event) =>
-                      updateForm("branchId", event.target.value)
-                    }
+                    onChange={(event) => updateForm("branchId", event.target.value)}
                   >
                     <option value="">No branch</option>
                     {branches.map((branch) => (
@@ -947,18 +839,14 @@ function FounderEmployeesContent() {
                   <span>Designation</span>
                   <input
                     value={form.designation}
-                    onChange={(event) =>
-                      updateForm("designation", event.target.value)
-                    }
+                    onChange={(event) => updateForm("designation", event.target.value)}
                   />
                 </label>
                 <label>
                   <span>Employment type</span>
                   <select
                     value={form.employmentType}
-                    onChange={(event) =>
-                      updateForm("employmentType", event.target.value)
-                    }
+                    onChange={(event) => updateForm("employmentType", event.target.value)}
                   >
                     {types.map((type) => (
                       <option key={type.value} value={type.value}>
@@ -972,18 +860,14 @@ function FounderEmployeesContent() {
                   <input
                     type="date"
                     value={form.joiningDate}
-                    onChange={(event) =>
-                      updateForm("joiningDate", event.target.value)
-                    }
+                    onChange={(event) => updateForm("joiningDate", event.target.value)}
                   />
                 </label>
                 <label>
                   <span>Phone</span>
                   <input
                     value={form.phone}
-                    onChange={(event) =>
-                      updateForm("phone", event.target.value)
-                    }
+                    onChange={(event) => updateForm("phone", event.target.value)}
                   />
                 </label>
                 <label>
@@ -991,29 +875,19 @@ function FounderEmployeesContent() {
                   <input
                     type="email"
                     value={form.personalEmail}
-                    onChange={(event) =>
-                      updateForm("personalEmail", event.target.value)
-                    }
+                    onChange={(event) => updateForm("personalEmail", event.target.value)}
                   />
                 </label>
               </div>
               <p className="founder-form-note">
-                Credentials are never generated or displayed here. New records
-                receive an invited account for a future provisioning flow.
+                Credentials are never generated or displayed here. New records receive an invited
+                account for a future provisioning flow.
               </p>
               <div className="founder-dialog-actions">
-                <button
-                  className="erp-text-button"
-                  type="button"
-                  onClick={() => setModal(null)}
-                >
+                <button className="erp-text-button" type="button" onClick={() => setModal(null)}>
                   Cancel
                 </button>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                  type="submit"
-                >
+                <button className="erp-button erp-button-primary" disabled={busy} type="submit">
                   {busy ? "Saving…" : "Save employee ↗"}
                 </button>
               </div>

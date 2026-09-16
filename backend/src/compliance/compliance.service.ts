@@ -119,9 +119,16 @@ export class ComplianceService extends V2ServiceBase {
     } catch (error) {
       this.duplicate(error, "A compliance obligation with this code already exists");
     }
-    await this.record("COMPLIANCE_OBLIGATION_CREATED", principal, "ComplianceObligation", row.id, request, {
-      code: row.code,
-    });
+    await this.record(
+      "COMPLIANCE_OBLIGATION_CREATED",
+      principal,
+      "ComplianceObligation",
+      row.id,
+      request,
+      {
+        code: row.code,
+      },
+    );
     return row;
   }
 
@@ -160,10 +167,7 @@ export class ComplianceService extends V2ServiceBase {
     request?: RequestMetadata,
   ) {
     const current = await this.obligation(principal, id);
-    const transitions: Record<
-      typeof action,
-      { from: ComplianceStatus[]; to: ComplianceStatus }
-    > = {
+    const transitions: Record<typeof action, { from: ComplianceStatus[]; to: ComplianceStatus }> = {
       start: { from: [ComplianceStatus.PENDING], to: ComplianceStatus.IN_PROGRESS },
       submit: {
         from: [ComplianceStatus.IN_PROGRESS],
@@ -174,11 +178,7 @@ export class ComplianceService extends V2ServiceBase {
         to: ComplianceStatus.COMPLETED,
       },
       waive: {
-        from: [
-          ComplianceStatus.PENDING,
-          ComplianceStatus.IN_PROGRESS,
-          ComplianceStatus.SUBMITTED,
-        ],
+        from: [ComplianceStatus.PENDING, ComplianceStatus.IN_PROGRESS, ComplianceStatus.SUBMITTED],
         to: ComplianceStatus.WAIVED,
       },
     };
@@ -199,10 +199,17 @@ export class ComplianceService extends V2ServiceBase {
       },
       include: obligationInclude,
     });
-    await this.record(`COMPLIANCE_OBLIGATION_${action.toUpperCase()}`, principal, "ComplianceObligation", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      `COMPLIANCE_OBLIGATION_${action.toUpperCase()}`,
+      principal,
+      "ComplianceObligation",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 }

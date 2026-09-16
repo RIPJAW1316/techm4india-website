@@ -1,9 +1,4 @@
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-  OmitType,
-  PartialType,
-} from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
 import {
   AddressType,
@@ -26,8 +21,7 @@ import {
   Min,
 } from "class-validator";
 
-const EmptyToUndefined = () =>
-  Transform(({ value }) => (value === "" ? undefined : value));
+const EmptyToUndefined = () => Transform(({ value }) => (value === "" ? undefined : value));
 
 export class HrEmployeeQueryDto {
   @ApiPropertyOptional()
@@ -209,9 +203,7 @@ export class CreateEmployeeAddressDto {
   country?: string;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isPrimary?: boolean;
 }
-export class UpdateEmployeeAddressDto extends PartialType(
-  CreateEmployeeAddressDto,
-) {}
+export class UpdateEmployeeAddressDto extends PartialType(CreateEmployeeAddressDto) {}
 
 export class CreateEmergencyContactDto {
   @ApiProperty() @IsString() @MaxLength(160) name!: string;
@@ -225,9 +217,7 @@ export class CreateEmergencyContactDto {
   @ApiPropertyOptional() @IsOptional() @IsEmail() email?: string;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isPrimary?: boolean;
 }
-export class UpdateEmergencyContactDto extends PartialType(
-  CreateEmergencyContactDto,
-) {}
+export class UpdateEmergencyContactDto extends PartialType(CreateEmergencyContactDto) {}
 
 export class CreateEmployeeSkillDto {
   @ApiProperty() @IsString() @MaxLength(120) name!: string;
@@ -244,9 +234,7 @@ export class CreateEmployeeSkillDto {
   @Max(80)
   yearsExperience?: number;
 }
-export class UpdateEmployeeSkillDto extends PartialType(
-  CreateEmployeeSkillDto,
-) {}
+export class UpdateEmployeeSkillDto extends PartialType(CreateEmployeeSkillDto) {}
 
 export class CreateEmployeeCertificationDto {
   @ApiProperty() @IsString() @MaxLength(160) name!: string;
@@ -272,9 +260,7 @@ export class CreateEmployeeCertificationDto {
   @MaxLength(500)
   credentialUrl?: string;
 }
-export class UpdateEmployeeCertificationDto extends PartialType(
-  CreateEmployeeCertificationDto,
-) {}
+export class UpdateEmployeeCertificationDto extends PartialType(CreateEmployeeCertificationDto) {}
 
 export class CreateEmployeeEducationDto {
   @ApiProperty() @IsString() @MaxLength(200) institution!: string;
@@ -300,8 +286,6 @@ export class CreateEmployeeEducationDto {
   @MaxLength(80)
   gradeOrScore?: string;
 }
-export class UpdateEmployeeEducationDto extends PartialType(
-  CreateEmployeeEducationDto,
-) {}
+export class UpdateEmployeeEducationDto extends PartialType(CreateEmployeeEducationDto) {}
 
 export type HrHistoryEvent = EmploymentHistoryEventType;

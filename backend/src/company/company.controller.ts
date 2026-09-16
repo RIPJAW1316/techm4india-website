@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 
@@ -9,7 +21,11 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../auth/guards/permissions.guard";
 import { BranchQueryDto, CreateBranchDto, UpdateBranchDto } from "./dto/branch.dto";
 import { UpdateCompanyProfileDto } from "./dto/company-profile.dto";
-import { CostCentreQueryDto, CreateCostCentreDto, UpdateCostCentreDto } from "./dto/cost-centre.dto";
+import {
+  CostCentreQueryDto,
+  CreateCostCentreDto,
+  UpdateCostCentreDto,
+} from "./dto/cost-centre.dto";
 import { StructureQueryDto } from "./dto/structure-query.dto";
 import { AddTeamMemberDto, CreateTeamDto, TeamQueryDto, UpdateTeamDto } from "./dto/team.dto";
 import { CompanyService } from "./company.service";
@@ -31,8 +47,15 @@ export class CompanyController {
   @Patch("profile")
   @RequirePermissions("company.profile.manage")
   @ApiOperation({ summary: "Update company profile metadata" })
-  async updateProfile(@CurrentPrincipal() principal: Principal, @Body() dto: UpdateCompanyProfileDto, @Req() request: Request) {
-    return { success: true, data: await this.company.updateProfile(principal, dto, this.metadata(request)) };
+  async updateProfile(
+    @CurrentPrincipal() principal: Principal,
+    @Body() dto: UpdateCompanyProfileDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.updateProfile(principal, dto, this.metadata(request)),
+    };
   }
 
   @Get("divisions")
@@ -53,7 +76,11 @@ export class CompanyController {
   @RequirePermissions("branches.read")
   @ApiOperation({ summary: "List organization branches" })
   @ApiQuery({ name: "search", required: false, type: String })
-  @ApiQuery({ name: "type", required: false, enum: ["HEADQUARTERS", "REGIONAL_OFFICE", "PARTNER_LAB", "OTHER"] })
+  @ApiQuery({
+    name: "type",
+    required: false,
+    enum: ["HEADQUARTERS", "REGIONAL_OFFICE", "PARTNER_LAB", "OTHER"],
+  })
   @ApiQuery({ name: "isActive", required: false, type: Boolean })
   async branches(@CurrentPrincipal() principal: Principal, @Query() query: BranchQueryDto) {
     return { success: true, ...(await this.company.branches(principal, query)) };
@@ -69,15 +96,30 @@ export class CompanyController {
   @Post("branches")
   @RequirePermissions("branches.manage")
   @ApiOperation({ summary: "Create a branch" })
-  async createBranch(@CurrentPrincipal() principal: Principal, @Body() dto: CreateBranchDto, @Req() request: Request) {
-    return { success: true, data: await this.company.createBranch(principal, dto, this.metadata(request)) };
+  async createBranch(
+    @CurrentPrincipal() principal: Principal,
+    @Body() dto: CreateBranchDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.createBranch(principal, dto, this.metadata(request)),
+    };
   }
 
   @Patch("branches/:id")
   @RequirePermissions("branches.manage")
   @ApiOperation({ summary: "Update branch metadata or lifecycle" })
-  async updateBranch(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateBranchDto, @Req() request: Request) {
-    return { success: true, data: await this.company.updateBranch(principal, id, dto, this.metadata(request)) };
+  async updateBranch(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: UpdateBranchDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.updateBranch(principal, id, dto, this.metadata(request)),
+    };
   }
 
   @Get("cost-centres")
@@ -89,22 +131,40 @@ export class CompanyController {
 
   @Get("cost-centres/:id")
   @RequirePermissions("cost_centres.read")
-  async costCentre(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
+  async costCentre(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+  ) {
     return { success: true, data: await this.company.costCentre(principal, id) };
   }
 
   @Post("cost-centres")
   @RequirePermissions("cost_centres.manage")
   @ApiOperation({ summary: "Create a structural cost centre" })
-  async createCostCentre(@CurrentPrincipal() principal: Principal, @Body() dto: CreateCostCentreDto, @Req() request: Request) {
-    return { success: true, data: await this.company.createCostCentre(principal, dto, this.metadata(request)) };
+  async createCostCentre(
+    @CurrentPrincipal() principal: Principal,
+    @Body() dto: CreateCostCentreDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.createCostCentre(principal, dto, this.metadata(request)),
+    };
   }
 
   @Patch("cost-centres/:id")
   @RequirePermissions("cost_centres.manage")
   @ApiOperation({ summary: "Update cost centre metadata or lifecycle" })
-  async updateCostCentre(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateCostCentreDto, @Req() request: Request) {
-    return { success: true, data: await this.company.updateCostCentre(principal, id, dto, this.metadata(request)) };
+  async updateCostCentre(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: UpdateCostCentreDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.updateCostCentre(principal, id, dto, this.metadata(request)),
+    };
   }
 
   @Get("teams")
@@ -124,15 +184,30 @@ export class CompanyController {
   @Post("teams")
   @RequirePermissions("teams.manage")
   @ApiOperation({ summary: "Create a team" })
-  async createTeam(@CurrentPrincipal() principal: Principal, @Body() dto: CreateTeamDto, @Req() request: Request) {
-    return { success: true, data: await this.company.createTeam(principal, dto, this.metadata(request)) };
+  async createTeam(
+    @CurrentPrincipal() principal: Principal,
+    @Body() dto: CreateTeamDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.createTeam(principal, dto, this.metadata(request)),
+    };
   }
 
   @Patch("teams/:id")
   @RequirePermissions("teams.manage")
   @ApiOperation({ summary: "Update team metadata or lifecycle" })
-  async updateTeam(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string, @Body() dto: UpdateTeamDto, @Req() request: Request) {
-    return { success: true, data: await this.company.updateTeam(principal, id, dto, this.metadata(request)) };
+  async updateTeam(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: UpdateTeamDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.updateTeam(principal, id, dto, this.metadata(request)),
+    };
   }
 
   @Get("teams/:id/members")
@@ -145,15 +220,31 @@ export class CompanyController {
   @Post("teams/:id/members")
   @RequirePermissions("teams.manage")
   @ApiOperation({ summary: "Add an employee to a team" })
-  async addMember(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string, @Body() dto: AddTeamMemberDto, @Req() request: Request) {
-    return { success: true, data: await this.company.addMember(principal, id, dto, this.metadata(request)) };
+  async addMember(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: AddTeamMemberDto,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.addMember(principal, id, dto, this.metadata(request)),
+    };
   }
 
   @Delete("teams/:id/members/:employeeId")
   @RequirePermissions("teams.manage")
   @ApiOperation({ summary: "Remove a member by setting removedAt" })
-  async removeMember(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string, @Param("employeeId", ParseUUIDPipe) employeeId: string, @Req() request: Request) {
-    return { success: true, data: await this.company.removeMember(principal, id, employeeId, this.metadata(request)) };
+  async removeMember(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+    @Param("employeeId", ParseUUIDPipe) employeeId: string,
+    @Req() request: Request,
+  ) {
+    return {
+      success: true,
+      data: await this.company.removeMember(principal, id, employeeId, this.metadata(request)),
+    };
   }
 
   private metadata(request: Request) {

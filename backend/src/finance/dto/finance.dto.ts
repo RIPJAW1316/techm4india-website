@@ -80,7 +80,11 @@ export class InvoiceDto {
   @IsOptional() @IsString() notes?: string;
   @IsOptional() @IsString() terms?: string;
   @IsOptional() @IsString() placeOfSupply?: string;
-  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => InvoiceLineDto) lines?: InvoiceLineDto[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => InvoiceLineDto)
+  lines?: InvoiceLineDto[];
 }
 export class InvoiceQueryDto extends FinancePagingDto {
   @IsOptional() @IsString() status?: string;
@@ -113,7 +117,9 @@ export class PaymentQueryDto extends FinancePagingDto {
   @IsOptional() @IsDateString() to?: string;
   @IsOptional() @IsString() @Length(3, 3) currency?: string;
 }
-export class ReasonDto { @IsString() @Length(2, 1000) reason!: string; }
+export class ReasonDto {
+  @IsString() @Length(2, 1000) reason!: string;
+}
 
 export class ExpenseLineDto {
   @IsString() @Length(1, 1000) description!: string;
@@ -129,7 +135,11 @@ export class ExpenseDto {
   @IsOptional() @IsDateString() expenseDate?: string;
   @IsOptional() @IsString() @Length(3, 3) currency?: string;
   @IsOptional() @IsString() reference?: string;
-  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => ExpenseLineDto) lines?: ExpenseLineDto[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ExpenseLineDto)
+  lines?: ExpenseLineDto[];
 }
 export class ExpenseQueryDto extends FinancePagingDto {
   @IsOptional() @IsString() status?: string;

@@ -74,7 +74,9 @@ describe("V2 compliance calendar", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -102,7 +104,12 @@ describe("V2 compliance calendar", () => {
     founder = await fixture("FOUNDER_CEO", divisionId, departmentId, "Founder");
     officer = await fixture("FINANCE_MANAGER", divisionId, departmentId, "Officer");
     employee = await fixture("EMPLOYEE", divisionId, departmentId, "Employee");
-    foreignFounder = await fixture("FOUNDER_CEO", foreignDivision.id, foreignDepartment.id, "Foreign");
+    foreignFounder = await fixture(
+      "FOUNDER_CEO",
+      foreignDivision.id,
+      foreignDepartment.id,
+      "Foreign",
+    );
   });
 
   afterAll(async () => {
@@ -114,10 +121,16 @@ describe("V2 compliance calendar", () => {
       // RED phase runs before compliance tables exist.
     }
     const fixtures = [founder, officer, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: foreignOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: foreignOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: foreignOrganizationId } });
     await prisma.organization.delete({ where: { id: foreignOrganizationId } });
     await app.close();

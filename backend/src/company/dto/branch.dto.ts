@@ -1,12 +1,26 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from "@nestjs/swagger";
 import { Type, Transform } from "class-transformer";
 import { BranchType } from "@prisma/client";
-import { IsBoolean, IsEmail, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from "class-validator";
+import {
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from "class-validator";
 
 export class BranchQueryDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(100) search?: string;
   @ApiPropertyOptional({ enum: BranchType }) @IsOptional() @IsEnum(BranchType) type?: BranchType;
-  @ApiPropertyOptional() @IsOptional() @Transform(({ value }) => value === undefined ? undefined : value === true || value === "true") @IsBoolean() isActive?: boolean;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }) => (value === undefined ? undefined : value === true || value === "true"))
+  @IsBoolean()
+  isActive?: boolean;
   @Type(() => Number) @IsInt() @Min(1) page = 1;
   @Type(() => Number) @IsInt() @Min(1) @Max(100) limit = 20;
 }

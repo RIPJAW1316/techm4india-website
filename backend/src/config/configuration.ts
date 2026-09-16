@@ -14,8 +14,7 @@ export default () => ({
     refreshCookieName: process.env.REFRESH_COOKIE_NAME ?? "tm4_refresh",
     cookieDomain: process.env.COOKIE_DOMAIN || undefined,
     cookieSameSite: process.env.COOKIE_SAME_SITE ?? "lax",
-    cookieSecure:
-      process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production",
+    cookieSecure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production",
   },
   trustProxy: process.env.TRUST_PROXY === "true",
 });

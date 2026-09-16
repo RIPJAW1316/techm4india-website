@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { UserStatus } from "@prisma/client";
@@ -9,11 +6,7 @@ import { CookieOptions } from "express";
 
 import { AuditService } from "../audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
-import {
-  ACCESS_TOKEN_TYPE,
-  AUTH_AUDIT_ACTIONS,
-  AUTH_COOKIE_PATH,
-} from "./auth.constants";
+import { ACCESS_TOKEN_TYPE, AUTH_AUDIT_ACTIONS, AUTH_COOKIE_PATH } from "./auth.constants";
 import { LoginDto } from "./dto/login.dto";
 import { PasswordService } from "./password.service";
 import { RequestMetadata } from "./interfaces/request-metadata";
@@ -46,7 +39,8 @@ export class AuthService {
     const ttl = this.configService.get<string>("auth.refreshTokenTtl") ?? "30d";
     const secure = this.configService.get<boolean>("auth.cookieSecure") ?? false;
     const domain = this.configService.get<string>("auth.cookieDomain");
-    const sameSite = this.configService.get<CookieOptions["sameSite"]>("auth.cookieSameSite") ?? "lax";
+    const sameSite =
+      this.configService.get<CookieOptions["sameSite"]>("auth.cookieSameSite") ?? "lax";
     return {
       domain,
       httpOnly: true,
@@ -60,9 +54,7 @@ export class AuthService {
   async login(dto: LoginDto, request: RequestMetadata): Promise<AuthResult> {
     const email = dto.email.trim().toLowerCase();
     const user = await this.findUserByEmail(email);
-    const valid = user
-      ? await this.passwordService.verify(user.passwordHash, dto.password)
-      : false;
+    const valid = user ? await this.passwordService.verify(user.passwordHash, dto.password) : false;
 
     if (!user || !valid || user.status !== UserStatus.ACTIVE) {
       await this.auditService.record({
@@ -120,11 +112,7 @@ export class AuthService {
     }
 
     const now = new Date();
-    if (
-      session.revokedAt ||
-      session.replacedBySessionId ||
-      session.expiresAt <= now
-    ) {
+    if (session.revokedAt || session.replacedBySessionId || session.expiresAt <= now) {
       if (session.revokedAt || session.replacedBySessionId) {
         await this.handleRefreshReuse(session.userId, session.id, request);
       }
@@ -139,7 +127,12 @@ export class AuthService {
     try {
       nextSession = await this.prisma.$transaction(async (tx) => {
         const claimed = await tx.refreshSession.updateMany({
-          where: { id: session.id, revokedAt: null, replacedBySessionId: null, expiresAt: { gt: now } },
+          where: {
+            id: session.id,
+            revokedAt: null,
+            replacedBySessionId: null,
+            expiresAt: { gt: now },
+          },
           data: { lastUsedAt: now, revokedAt: now },
         });
         if (claimed.count !== 1) throw new RefreshRotationConflict();
@@ -152,7 +145,10 @@ export class AuthService {
             userId: session.userId,
           },
         });
-        await tx.refreshSession.update({ where: { id: session.id }, data: { replacedBySessionId: created.id } });
+        await tx.refreshSession.update({
+          where: { id: session.id },
+          data: { replacedBySessionId: created.id },
+        });
         await tx.auditLog.create({
           data: {
             action: AUTH_AUDIT_ACTIONS.REFRESH_ROTATED,
@@ -281,20 +277,36 @@ export class AuthService {
   private async findUserByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
-      include: { employee: { include: { division: true, department: true } }, roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } },
+      include: {
+        employee: { include: { division: true, department: true } },
+        roles: {
+          include: { role: { include: { permissions: { include: { permission: true } } } } },
+        },
+      },
     });
   }
 
   private async findUserById(id: string) {
     return this.prisma.user.findUnique({
       where: { id },
-      include: { employee: { include: { division: true, department: true } }, roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } },
+      include: {
+        employee: { include: { division: true, department: true } },
+        roles: {
+          include: { role: { include: { permissions: { include: { permission: true } } } } },
+        },
+      },
     });
   }
 
-  private toSafeContext(user: NonNullable<Awaited<ReturnType<AuthService["findUserById"]>>>): SafeAuthContext {
+  private toSafeContext(
+    user: NonNullable<Awaited<ReturnType<AuthService["findUserById"]>>>,
+  ): SafeAuthContext {
     const roles = user.roles.map(({ role }) => role.name);
-    const permissions = [...new Set(user.roles.flatMap(({ role }) => role.permissions.map(({ permission }) => permission.key)))];
+    const permissions = [
+      ...new Set(
+        user.roles.flatMap(({ role }) => role.permissions.map(({ permission }) => permission.key)),
+      ),
+    ];
     const employee = user.employee;
     return {
       user: { id: user.id, email: user.email, roles },
@@ -306,10 +318,18 @@ export class AuthService {
             lastName: employee.lastName,
             designation: employee.designation,
             division: employee.division
-              ? { id: employee.division.id, slug: employee.division.slug, name: employee.division.name }
+              ? {
+                  id: employee.division.id,
+                  slug: employee.division.slug,
+                  name: employee.division.name,
+                }
               : null,
             department: employee.department
-              ? { id: employee.department.id, slug: employee.department.slug, name: employee.department.name }
+              ? {
+                  id: employee.department.id,
+                  slug: employee.department.slug,
+                  name: employee.department.name,
+                }
               : null,
           }
         : null,

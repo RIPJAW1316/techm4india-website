@@ -93,7 +93,9 @@ export class VendorsController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.vendors.transitionVendor(principal, id, "reinstate", this.metadata(request)));
+    return this.ok(
+      this.vendors.transitionVendor(principal, id, "reinstate", this.metadata(request)),
+    );
   }
 
   @Post(":id/blacklist")
@@ -103,7 +105,9 @@ export class VendorsController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.vendors.transitionVendor(principal, id, "blacklist", this.metadata(request)));
+    return this.ok(
+      this.vendors.transitionVendor(principal, id, "blacklist", this.metadata(request)),
+    );
   }
 }
 
@@ -198,7 +202,9 @@ export class ProcurementController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.procurement.transitionOrder(principal, id, "submit", this.metadata(request)));
+    return this.ok(
+      this.procurement.transitionOrder(principal, id, "submit", this.metadata(request)),
+    );
   }
 
   @Post(":id/approve")
@@ -208,7 +214,9 @@ export class ProcurementController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.procurement.transitionOrder(principal, id, "approve", this.metadata(request)));
+    return this.ok(
+      this.procurement.transitionOrder(principal, id, "approve", this.metadata(request)),
+    );
   }
 
   @Post(":id/issue")
@@ -218,7 +226,9 @@ export class ProcurementController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.procurement.transitionOrder(principal, id, "issue", this.metadata(request)));
+    return this.ok(
+      this.procurement.transitionOrder(principal, id, "issue", this.metadata(request)),
+    );
   }
 
   @Post(":id/receive")
@@ -238,7 +248,9 @@ export class ProcurementController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.procurement.transitionOrder(principal, id, "cancel", this.metadata(request)));
+    return this.ok(
+      this.procurement.transitionOrder(principal, id, "cancel", this.metadata(request)),
+    );
   }
 }
 

@@ -1,14 +1,5 @@
 import { Type } from "class-transformer";
-import {
-  IsBoolean,
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-  Max,
-  Min,
-} from "class-validator";
+import { IsBoolean, IsEnum, IsOptional, IsString, IsUUID, Length, Max, Min } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Priority, SupportTicketCategory, SupportTicketStatus } from "@prisma/client";
 

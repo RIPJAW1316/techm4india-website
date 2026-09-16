@@ -1,10 +1,6 @@
 import argon2 from "argon2";
 import cookieParser from "cookie-parser";
-import {
-  INestApplication,
-  ValidationPipe,
-  VersioningType,
-} from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 
@@ -81,7 +77,9 @@ describe("V2 recruitment and onboarding", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -106,11 +104,41 @@ describe("V2 recruitment and onboarding", () => {
       data: { divisionId: otherDivision.id, name: "Other", slug: "other" },
     });
 
-    founder = await createFixture("FOUNDER_CEO", organizationId, divisionId, departmentId, "Founder");
-    hrManager = await createFixture("HR_MANAGER", organizationId, divisionId, departmentId, "Manager");
-    hrExecutive = await createFixture("HR_EXECUTIVE", organizationId, divisionId, departmentId, "Executive");
-    employee = await createFixture("EMPLOYEE", organizationId, divisionId, departmentId, "Employee");
-    foreignFounder = await createFixture("FOUNDER_CEO", other.id, otherDivision.id, otherDepartment.id, "Foreign");
+    founder = await createFixture(
+      "FOUNDER_CEO",
+      organizationId,
+      divisionId,
+      departmentId,
+      "Founder",
+    );
+    hrManager = await createFixture(
+      "HR_MANAGER",
+      organizationId,
+      divisionId,
+      departmentId,
+      "Manager",
+    );
+    hrExecutive = await createFixture(
+      "HR_EXECUTIVE",
+      organizationId,
+      divisionId,
+      departmentId,
+      "Executive",
+    );
+    employee = await createFixture(
+      "EMPLOYEE",
+      organizationId,
+      divisionId,
+      departmentId,
+      "Employee",
+    );
+    foreignFounder = await createFixture(
+      "FOUNDER_CEO",
+      other.id,
+      otherDivision.id,
+      otherDepartment.id,
+      "Foreign",
+    );
     hiringManagerId = founder.employeeId;
   });
 
@@ -133,11 +161,19 @@ describe("V2 recruitment and onboarding", () => {
       }
     }
     const fixtures = [founder, hrManager, hrExecutive, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.notification.deleteMany({ where: { userId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.notification.deleteMany({
+      where: { userId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: otherOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: otherOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: otherOrganizationId } });
     await prisma.organization.delete({ where: { id: otherOrganizationId } });
     await app.close();
@@ -253,7 +289,11 @@ describe("V2 recruitment and onboarding", () => {
     await request(app.getHttpServer())
       .post(`/api/v2/recruitment/interviews/${interview.body.data.id}/complete`)
       .set(await auth(hrManager))
-      .send({ score: 4.5, recommendation: "STRONG_HIRE", feedback: "Strong technical and teaching evidence." })
+      .send({
+        score: 4.5,
+        recommendation: "STRONG_HIRE",
+        feedback: "Strong technical and teaching evidence.",
+      })
       .expect(201);
 
     await request(app.getHttpServer())

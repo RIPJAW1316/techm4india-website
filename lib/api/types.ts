@@ -58,8 +58,7 @@ export type Task = {
   id: string;
   title: string;
   description: string | null;
-  status:
-    "TODO" | "IN_PROGRESS" | "BLOCKED" | "REVIEW" | "COMPLETED" | "CANCELLED";
+  status: "TODO" | "IN_PROGRESS" | "BLOCKED" | "REVIEW" | "COMPLETED" | "CANCELLED";
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   dueDate: string | null;
   completedAt: string | null;
@@ -582,22 +581,10 @@ export type RecruitmentDashboard = {
 };
 
 export type JobRequisitionStatus =
-  | "DRAFT"
-  | "PENDING_APPROVAL"
-  | "APPROVED"
-  | "OPEN"
-  | "ON_HOLD"
-  | "CLOSED"
-  | "CANCELLED";
+  "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "OPEN" | "ON_HOLD" | "CLOSED" | "CANCELLED";
 
 export type RecruitmentApplicantStatus =
-  | "APPLIED"
-  | "SCREENING"
-  | "INTERVIEW"
-  | "OFFERED"
-  | "HIRED"
-  | "REJECTED"
-  | "WITHDRAWN";
+  "APPLIED" | "SCREENING" | "INTERVIEW" | "OFFERED" | "HIRED" | "REJECTED" | "WITHDRAWN";
 
 export type JobRequisition = {
   id: string;
@@ -690,12 +677,7 @@ export type ProgramStatus = "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
 export type ProgramDeliveryMode = "ONLINE" | "OFFLINE" | "HYBRID";
 export type ProgramContentType = "TEXT" | "VIDEO" | "PDF" | "LIVE";
 export type ProgramLessonStatus = "DRAFT" | "PUBLISHED";
-export type ProgramBatchStatus =
-  | "PLANNED"
-  | "OPEN"
-  | "ACTIVE"
-  | "COMPLETED"
-  | "CANCELLED";
+export type ProgramBatchStatus = "PLANNED" | "OPEN" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type StudentStatus = "ACTIVE" | "INACTIVE" | "ALUMNI";
 export type ProgramEnrollmentStatus = "ACTIVE" | "COMPLETED" | "CANCELLED";
 
@@ -854,28 +836,12 @@ export type AnalyticsOverview = {
   };
 };
 
-export type PerformanceCycleType =
-  | "ANNUAL"
-  | "HALF_YEARLY"
-  | "QUARTERLY"
-  | "PROBATION";
+export type PerformanceCycleType = "ANNUAL" | "HALF_YEARLY" | "QUARTERLY" | "PROBATION";
 export type PerformanceCycleStatus = "DRAFT" | "ACTIVE" | "CLOSED";
-export type PerformanceGoalCategory =
-  | "BUSINESS"
-  | "TECHNICAL"
-  | "BEHAVIORAL"
-  | "LEARNING";
-export type PerformanceGoalStatus =
-  | "DRAFT"
-  | "ACTIVE"
-  | "COMPLETED"
-  | "CANCELLED";
+export type PerformanceGoalCategory = "BUSINESS" | "TECHNICAL" | "BEHAVIORAL" | "LEARNING";
+export type PerformanceGoalStatus = "DRAFT" | "ACTIVE" | "COMPLETED" | "CANCELLED";
 export type PerformanceReviewStatus =
-  | "PENDING_SELF"
-  | "PENDING_MANAGER"
-  | "PENDING_FINALIZATION"
-  | "FINALIZED"
-  | "ACKNOWLEDGED";
+  "PENDING_SELF" | "PENDING_MANAGER" | "PENDING_FINALIZATION" | "FINALIZED" | "ACKNOWLEDGED";
 
 export type PerformanceEmployeeRef = {
   id: string;
@@ -943,11 +909,7 @@ export type PerformanceReview = {
   updatedAt: string;
 };
 
-export type VendorStatus =
-  | "PENDING_APPROVAL"
-  | "ACTIVE"
-  | "SUSPENDED"
-  | "BLACKLISTED";
+export type VendorStatus = "PENDING_APPROVAL" | "ACTIVE" | "SUSPENDED" | "BLACKLISTED";
 export type VendorCategory = "GOODS" | "SERVICES" | "BOTH";
 
 export type Vendor = {
@@ -1029,12 +991,7 @@ export type PurchaseOrder = {
 };
 
 export type AssetCategory =
-  | "IT_EQUIPMENT"
-  | "FURNITURE"
-  | "VEHICLE"
-  | "MACHINERY"
-  | "FACILITY"
-  | "OTHER";
+  "IT_EQUIPMENT" | "FURNITURE" | "VEHICLE" | "MACHINERY" | "FACILITY" | "OTHER";
 export type AssetStatus = "IN_STORE" | "ASSIGNED" | "IN_REPAIR" | "RETIRED";
 
 export type Asset = {
@@ -1058,19 +1015,9 @@ export type Asset = {
 };
 
 export type SupportTicketCategory =
-  | "TECHNICAL"
-  | "ACCESS"
-  | "HR"
-  | "FINANCE"
-  | "FACILITIES"
-  | "OTHER";
+  "TECHNICAL" | "ACCESS" | "HR" | "FINANCE" | "FACILITIES" | "OTHER";
 export type SupportTicketStatus =
-  | "OPEN"
-  | "IN_PROGRESS"
-  | "PENDING"
-  | "RESOLVED"
-  | "CLOSED"
-  | "REOPENED";
+  "OPEN" | "IN_PROGRESS" | "PENDING" | "RESOLVED" | "CLOSED" | "REOPENED";
 
 type SupportPerson = {
   id: string;
@@ -1134,25 +1081,9 @@ export type CmsPage = {
 };
 
 export type ComplianceCategory =
-  | "TAX"
-  | "LABOUR"
-  | "CORPORATE"
-  | "DATA_PRIVACY"
-  | "ENVIRONMENTAL"
-  | "LICENSING"
-  | "OTHER";
-export type ComplianceFrequency =
-  | "ONE_TIME"
-  | "MONTHLY"
-  | "QUARTERLY"
-  | "HALF_YEARLY"
-  | "ANNUAL";
-export type ComplianceStatus =
-  | "PENDING"
-  | "IN_PROGRESS"
-  | "SUBMITTED"
-  | "COMPLETED"
-  | "WAIVED";
+  "TAX" | "LABOUR" | "CORPORATE" | "DATA_PRIVACY" | "ENVIRONMENTAL" | "LICENSING" | "OTHER";
+export type ComplianceFrequency = "ONE_TIME" | "MONTHLY" | "QUARTERLY" | "HALF_YEARLY" | "ANNUAL";
+export type ComplianceStatus = "PENDING" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED" | "WAIVED";
 
 export type ComplianceEvidence = {
   id: string;
@@ -1186,11 +1117,7 @@ export type ComplianceObligation = {
   updatedAt: string;
 };
 
-export type ProjectMilestoneStatus =
-  | "PENDING"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "MISSED";
+export type ProjectMilestoneStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "MISSED";
 
 export type ProjectMilestone = {
   id: string;

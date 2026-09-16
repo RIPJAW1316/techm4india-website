@@ -12,11 +12,7 @@ import {
   Min,
   ValidateNested,
 } from "class-validator";
-import {
-  PayrollCalculationType,
-  PayrollComponentType,
-  PayrollPeriodStatus,
-} from "@prisma/client";
+import { PayrollCalculationType, PayrollComponentType, PayrollPeriodStatus } from "@prisma/client";
 
 export class CreateComponentDto {
   @IsString() code!: string;

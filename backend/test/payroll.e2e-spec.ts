@@ -1,10 +1,6 @@
 import cookieParser from "cookie-parser";
 import argon2 from "argon2";
-import {
-  INestApplication,
-  ValidationPipe,
-  VersioningType,
-} from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
@@ -107,7 +103,15 @@ describe("MVP-2 payroll engine", () => {
           passwordHash,
           status: "ACTIVE",
           roles: { create: { roleId: role.id } },
-          employee: { create: { employeeCode: `${stamp}-${code}`, firstName: "Payroll", lastName: code, divisionId, departmentId } },
+          employee: {
+            create: {
+              employeeCode: `${stamp}-${code}`,
+              firstName: "Payroll",
+              lastName: code,
+              divisionId,
+              departmentId,
+            },
+          },
         },
         include: { employee: true },
       });
@@ -210,17 +214,40 @@ describe("MVP-2 payroll engine", () => {
       data: { legalName: "External Payroll Org", slug: `${stamp}-external` },
     });
     externalOrganizationId = externalOrganization.id;
-    const externalDivision = await prisma.division.create({ data: { organizationId: externalOrganizationId, name: "External Division", slug: `${stamp}-external` } });
+    const externalDivision = await prisma.division.create({
+      data: {
+        organizationId: externalOrganizationId,
+        name: "External Division",
+        slug: `${stamp}-external`,
+      },
+    });
     externalDivisionId = externalDivision.id;
-    const externalDepartment = await prisma.department.create({ data: { divisionId: externalDivisionId, name: "External Department", slug: `${stamp}-external` } });
+    const externalDepartment = await prisma.department.create({
+      data: {
+        divisionId: externalDivisionId,
+        name: "External Department",
+        slug: `${stamp}-external`,
+      },
+    });
     externalDepartmentId = externalDepartment.id;
     const externalRole = await prisma.role.findUniqueOrThrow({ where: { name: "FOUNDER_CEO" } });
     const external = await prisma.user.create({
       data: {
-        email: `${stamp}-external@test.local`, passwordHash, status: "ACTIVE",
+        email: `${stamp}-external@test.local`,
+        passwordHash,
+        status: "ACTIVE",
         roles: { create: { roleId: externalRole.id } },
-        employee: { create: { employeeCode: `${stamp}-EXT`, firstName: "External", lastName: "Founder", divisionId: externalDivisionId, departmentId: externalDepartmentId } },
-      }, include: { employee: true },
+        employee: {
+          create: {
+            employeeCode: `${stamp}-EXT`,
+            firstName: "External",
+            lastName: "Founder",
+            divisionId: externalDivisionId,
+            departmentId: externalDepartmentId,
+          },
+        },
+      },
+      include: { employee: true },
     });
     externalFounder = { id: external.employee!.id, userId: external.id, email: external.email };
     founderToken = await login(founder.email);
@@ -236,27 +263,89 @@ describe("MVP-2 payroll engine", () => {
   });
 
   afterAll(async () => {
-    if (!employee || !otherEmployee || !financeExecutive || !financeManager || !superAdmin || !hr || !sales || !viewer || !externalFounder) {
+    if (
+      !employee ||
+      !otherEmployee ||
+      !financeExecutive ||
+      !financeManager ||
+      !superAdmin ||
+      !hr ||
+      !sales ||
+      !viewer ||
+      !externalFounder
+    ) {
       await app.close();
       return;
     }
     await prisma.payrollLineItem.deleteMany({
       where: {
-        result: { employeeId: { in: [employee.id, otherEmployee.id, financeExecutive.id, financeManager.id, superAdmin.id, hr.id, sales.id, viewer.id] } },
+        result: {
+          employeeId: {
+            in: [
+              employee.id,
+              otherEmployee.id,
+              financeExecutive.id,
+              financeManager.id,
+              superAdmin.id,
+              hr.id,
+              sales.id,
+              viewer.id,
+            ],
+          },
+        },
       },
     });
     await prisma.payrollEmployeeResult.deleteMany({
-      where: { employeeId: { in: [employee.id, otherEmployee.id, financeExecutive.id, financeManager.id, superAdmin.id, hr.id, sales.id, viewer.id] } },
+      where: {
+        employeeId: {
+          in: [
+            employee.id,
+            otherEmployee.id,
+            financeExecutive.id,
+            financeManager.id,
+            superAdmin.id,
+            hr.id,
+            sales.id,
+            viewer.id,
+          ],
+        },
+      },
     });
     await prisma.payrollRun.deleteMany({ where: { organizationId } });
     await prisma.payrollPeriod.deleteMany({ where: { organizationId } });
     await prisma.employeeCompensationComponent.deleteMany({
       where: {
-        compensation: { employeeId: { in: [employee.id, otherEmployee.id, financeExecutive.id, financeManager.id, superAdmin.id, hr.id, sales.id, viewer.id] } },
+        compensation: {
+          employeeId: {
+            in: [
+              employee.id,
+              otherEmployee.id,
+              financeExecutive.id,
+              financeManager.id,
+              superAdmin.id,
+              hr.id,
+              sales.id,
+              viewer.id,
+            ],
+          },
+        },
       },
     });
     await prisma.employeeCompensation.deleteMany({
-      where: { employeeId: { in: [employee.id, otherEmployee.id, financeExecutive.id, financeManager.id, superAdmin.id, hr.id, sales.id, viewer.id] } },
+      where: {
+        employeeId: {
+          in: [
+            employee.id,
+            otherEmployee.id,
+            financeExecutive.id,
+            financeManager.id,
+            superAdmin.id,
+            hr.id,
+            sales.id,
+            viewer.id,
+          ],
+        },
+      },
     });
     await prisma.salaryStructureComponent.deleteMany({
       where: { salaryStructure: { organizationId } },
@@ -265,27 +354,87 @@ describe("MVP-2 payroll engine", () => {
     await prisma.payrollComponent.deleteMany({ where: { organizationId } });
     await prisma.notification.deleteMany({
       where: {
-        userId: { in: [employee.userId, otherEmployee.userId, founder.userId, financeExecutive.userId, financeManager.userId, superAdmin.userId, hr.userId, sales.userId, viewer.userId] },
+        userId: {
+          in: [
+            employee.userId,
+            otherEmployee.userId,
+            founder.userId,
+            financeExecutive.userId,
+            financeManager.userId,
+            superAdmin.userId,
+            hr.userId,
+            sales.userId,
+            viewer.userId,
+          ],
+        },
       },
     });
     await prisma.auditLog.deleteMany({
       where: {
         actorUserId: {
-          in: [employee.userId, otherEmployee.userId, founder.userId, financeExecutive.userId, financeManager.userId, superAdmin.userId, hr.userId, sales.userId, viewer.userId],
+          in: [
+            employee.userId,
+            otherEmployee.userId,
+            founder.userId,
+            financeExecutive.userId,
+            financeManager.userId,
+            superAdmin.userId,
+            hr.userId,
+            sales.userId,
+            viewer.userId,
+          ],
         },
       },
     });
     await prisma.refreshSession.deleteMany({
       where: {
-        userId: { in: [employee.userId, otherEmployee.userId, founder.userId, financeExecutive.userId, financeManager.userId, superAdmin.userId, hr.userId, sales.userId, viewer.userId] },
+        userId: {
+          in: [
+            employee.userId,
+            otherEmployee.userId,
+            founder.userId,
+            financeExecutive.userId,
+            financeManager.userId,
+            superAdmin.userId,
+            hr.userId,
+            sales.userId,
+            viewer.userId,
+          ],
+        },
       },
     });
     await prisma.employee.deleteMany({
-      where: { id: { in: [employee.id, otherEmployee.id, founder.id, financeExecutive.id, financeManager.id, superAdmin.id, hr.id, sales.id, viewer.id] } },
+      where: {
+        id: {
+          in: [
+            employee.id,
+            otherEmployee.id,
+            founder.id,
+            financeExecutive.id,
+            financeManager.id,
+            superAdmin.id,
+            hr.id,
+            sales.id,
+            viewer.id,
+          ],
+        },
+      },
     });
     await prisma.user.deleteMany({
       where: {
-        id: { in: [employee.userId, otherEmployee.userId, founder.userId, financeExecutive.userId, financeManager.userId, superAdmin.userId, hr.userId, sales.userId, viewer.userId] },
+        id: {
+          in: [
+            employee.userId,
+            otherEmployee.userId,
+            founder.userId,
+            financeExecutive.userId,
+            financeManager.userId,
+            superAdmin.userId,
+            hr.userId,
+            sales.userId,
+            viewer.userId,
+          ],
+        },
       },
     });
     await prisma.department.deleteMany({ where: { id: departmentId } });
@@ -334,7 +483,13 @@ describe("MVP-2 payroll engine", () => {
     await request(app.getHttpServer())
       .post("/api/v2/payroll/components")
       .set({ Authorization: `Bearer ${superAdminToken}` })
-      .send({ code: "SUPER_ADMIN_CONFIG", name: "SuperAdmin configured value", type: "EARNING", calculationType: "FIXED", defaultValue: 0 })
+      .send({
+        code: "SUPER_ADMIN_CONFIG",
+        name: "SuperAdmin configured value",
+        type: "EARNING",
+        calculationType: "FIXED",
+        defaultValue: 0,
+      })
       .expect(201);
     await request(app.getHttpServer())
       .get("/api/v2/payroll/compensations")
@@ -479,9 +634,7 @@ describe("MVP-2 payroll engine", () => {
     expect(String(calculated.results[0].grossEarnings)).toBe("150000");
     expect(String(calculated.results[0].totalDeductions)).toBe("10000");
     expect(String(calculated.results[0].netPay)).toBe("140000");
-    expect(String(calculated.results[0].employerContributionTotal)).toBe(
-      "12000",
-    );
+    expect(String(calculated.results[0].employerContributionTotal)).toBe("12000");
     await request(app.getHttpServer())
       .get("/api/v2/payroll/me/payslips")
       .set({ Authorization: `Bearer ${employeeToken}` })
@@ -531,13 +684,27 @@ describe("MVP-2 payroll engine", () => {
       .set(headers)
       .expect(200);
     expect(String(historical.body.data.netPay)).toBe("140000");
-    expect(String(historical.body.data.lineItems.find((line: { componentCodeSnapshot: string }) => line.componentCodeSnapshot === "BASIC").amount)).toBe("100000");
-    expect(await prisma.notification.count({ where: { userId: employee.userId, resourceId: run.id } })).toBe(1);
-    expect(await prisma.auditLog.count({ where: { actorUserId: financeManager.userId, entityId: run.id, action: "PAYROLL_RUN_FINALIZED" } })).toBe(1);
+    expect(
+      String(
+        historical.body.data.lineItems.find(
+          (line: { componentCodeSnapshot: string }) => line.componentCodeSnapshot === "BASIC",
+        ).amount,
+      ),
+    ).toBe("100000");
+    expect(
+      await prisma.notification.count({ where: { userId: employee.userId, resourceId: run.id } }),
+    ).toBe(1);
+    expect(
+      await prisma.auditLog.count({
+        where: {
+          actorUserId: financeManager.userId,
+          entityId: run.id,
+          action: "PAYROLL_RUN_FINALIZED",
+        },
+      }),
+    ).toBe(1);
     await request(app.getHttpServer())
-      .patch(
-        `/api/v2/payroll/runs/${run.id}/results/${finalizedResultId}`,
-      )
+      .patch(`/api/v2/payroll/runs/${run.id}/results/${finalizedResultId}`)
       .set(headers)
       .send({ payableDays: 10, reason: "Should be immutable" })
       .expect(409);
@@ -549,83 +716,185 @@ describe("MVP-2 payroll engine", () => {
 
   it("selects effective compensation, rounds configurable components, and requires explicit overrides", async () => {
     const headers = { Authorization: `Bearer ${founderToken}` };
-    const createComponent = async (payload: Record<string, unknown>) => (
-      await request(app.getHttpServer()).post("/api/v2/payroll/components").set(headers).send(payload).expect(201)
-    ).body.data;
-    const fixedEarning = await createComponent({ code: "ROUND_BASIC", name: "Rounded basic", type: "EARNING", calculationType: "FIXED", defaultValue: 100.01 });
-    const fixedDeduction = await createComponent({ code: "FIXED_DED", name: "Fixed deduction", type: "DEDUCTION", calculationType: "FIXED", defaultValue: 10.1 });
-    const percentageEarning = await createComponent({ code: "ROUND_EARN", name: "Rounded percentage earning", type: "EARNING", calculationType: "PERCENTAGE", percentageValue: 33.3333, percentageBaseComponentId: fixedEarning.id });
-    const percentageDeduction = await createComponent({ code: "PCT_DED", name: "Percentage deduction", type: "DEDUCTION", calculationType: "PERCENTAGE", percentageValue: 10, percentageBaseComponentId: fixedEarning.id });
-    const manual = await createComponent({ code: "MANUAL", name: "Manual allowance", type: "EARNING", calculationType: "MANUAL" });
-    const cycleA = await createComponent({ code: "CYCLE_A", name: "Cycle A", type: "EARNING", calculationType: "PERCENTAGE", percentageValue: 1 });
-    const cycleB = await createComponent({ code: "CYCLE_B", name: "Cycle B", type: "EARNING", calculationType: "PERCENTAGE", percentageValue: 1, percentageBaseComponentId: cycleA.id });
+    const createComponent = async (payload: Record<string, unknown>) =>
+      (
+        await request(app.getHttpServer())
+          .post("/api/v2/payroll/components")
+          .set(headers)
+          .send(payload)
+          .expect(201)
+      ).body.data;
+    const fixedEarning = await createComponent({
+      code: "ROUND_BASIC",
+      name: "Rounded basic",
+      type: "EARNING",
+      calculationType: "FIXED",
+      defaultValue: 100.01,
+    });
+    const fixedDeduction = await createComponent({
+      code: "FIXED_DED",
+      name: "Fixed deduction",
+      type: "DEDUCTION",
+      calculationType: "FIXED",
+      defaultValue: 10.1,
+    });
+    const percentageEarning = await createComponent({
+      code: "ROUND_EARN",
+      name: "Rounded percentage earning",
+      type: "EARNING",
+      calculationType: "PERCENTAGE",
+      percentageValue: 33.3333,
+      percentageBaseComponentId: fixedEarning.id,
+    });
+    const percentageDeduction = await createComponent({
+      code: "PCT_DED",
+      name: "Percentage deduction",
+      type: "DEDUCTION",
+      calculationType: "PERCENTAGE",
+      percentageValue: 10,
+      percentageBaseComponentId: fixedEarning.id,
+    });
+    const manual = await createComponent({
+      code: "MANUAL",
+      name: "Manual allowance",
+      type: "EARNING",
+      calculationType: "MANUAL",
+    });
+    const cycleA = await createComponent({
+      code: "CYCLE_A",
+      name: "Cycle A",
+      type: "EARNING",
+      calculationType: "PERCENTAGE",
+      percentageValue: 1,
+    });
+    const cycleB = await createComponent({
+      code: "CYCLE_B",
+      name: "Cycle B",
+      type: "EARNING",
+      calculationType: "PERCENTAGE",
+      percentageValue: 1,
+      percentageBaseComponentId: cycleA.id,
+    });
     await request(app.getHttpServer())
       .patch(`/api/v2/payroll/components/${cycleA.id}`)
       .set(headers)
       .send({ percentageBaseComponentId: cycleB.id })
       .expect(400);
     const structure = (
-      await request(app.getHttpServer()).post("/api/v2/payroll/salary-structures").set(headers).send({
-        name: "Rounding structure",
-        components: [
-          { payrollComponentId: fixedEarning.id },
-          { payrollComponentId: fixedDeduction.id },
-          { payrollComponentId: percentageEarning.id },
-          { payrollComponentId: percentageDeduction.id },
-          { payrollComponentId: manual.id, value: 1.23 },
-        ],
-      }).expect(201)
+      await request(app.getHttpServer())
+        .post("/api/v2/payroll/salary-structures")
+        .set(headers)
+        .send({
+          name: "Rounding structure",
+          components: [
+            { payrollComponentId: fixedEarning.id },
+            { payrollComponentId: fixedDeduction.id },
+            { payrollComponentId: percentageEarning.id },
+            { payrollComponentId: percentageDeduction.id },
+            { payrollComponentId: manual.id, value: 1.23 },
+          ],
+        })
+        .expect(201)
     ).body.data;
     const compensation = await request(app.getHttpServer())
-      .post(`/api/v2/payroll/employees/${otherEmployee.id}/compensation`).set(headers)
-      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-01" }).expect(201);
+      .post(`/api/v2/payroll/employees/${otherEmployee.id}/compensation`)
+      .set(headers)
+      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-01" })
+      .expect(201);
     expect(compensation.body.data.status).toBe("ACTIVE");
     await request(app.getHttpServer())
-      .post(`/api/v2/payroll/employees/${otherEmployee.id}/compensation`).set(headers)
-      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-15" }).expect(409);
+      .post(`/api/v2/payroll/employees/${otherEmployee.id}/compensation`)
+      .set(headers)
+      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-15" })
+      .expect(409);
     await request(app.getHttpServer())
-      .post(`/api/v2/payroll/employees/${financeExecutive.id}/compensation`).set(headers)
-      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-03-01" }).expect(201);
+      .post(`/api/v2/payroll/employees/${financeExecutive.id}/compensation`)
+      .set(headers)
+      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-03-01" })
+      .expect(201);
     await request(app.getHttpServer())
-      .post(`/api/v2/payroll/employees/${sales.id}/compensation`).set(headers)
-      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-01", status: "ENDED" }).expect(201);
+      .post(`/api/v2/payroll/employees/${sales.id}/compensation`)
+      .set(headers)
+      .send({ salaryStructureId: structure.id, effectiveFrom: "2026-02-01", status: "ENDED" })
+      .expect(201);
     const period = (
-      await request(app.getHttpServer()).post("/api/v2/payroll/periods").set(headers)
-        .send({ year: 2026, month: 2, startDate: "2026-02-01", endDate: "2026-02-28" }).expect(201)
+      await request(app.getHttpServer())
+        .post("/api/v2/payroll/periods")
+        .set(headers)
+        .send({ year: 2026, month: 2, startDate: "2026-02-01", endDate: "2026-02-28" })
+        .expect(201)
     ).body.data;
     const run = (
-      await request(app.getHttpServer()).post("/api/v2/payroll/runs").set(headers)
-        .send({ payrollPeriodId: period.id }).expect(201)
+      await request(app.getHttpServer())
+        .post("/api/v2/payroll/runs")
+        .set(headers)
+        .send({ payrollPeriodId: period.id })
+        .expect(201)
     ).body.data;
     const calculated = (
-      await request(app.getHttpServer()).post(`/api/v2/payroll/runs/${run.id}/calculate`).set(headers).send({}).expect(201)
+      await request(app.getHttpServer())
+        .post(`/api/v2/payroll/runs/${run.id}/calculate`)
+        .set(headers)
+        .send({})
+        .expect(201)
     ).body.data;
     expect(calculated.results).toHaveLength(2);
-    expect(calculated.results.some((row: { employeeId: string }) => row.employeeId === employee.id)).toBe(true);
-    const result = calculated.results.find((row: { employeeId: string }) => row.employeeId === otherEmployee.id);
+    expect(
+      calculated.results.some((row: { employeeId: string }) => row.employeeId === employee.id),
+    ).toBe(true);
+    const result = calculated.results.find(
+      (row: { employeeId: string }) => row.employeeId === otherEmployee.id,
+    );
     expect(result).toBeDefined();
     expect(result.employeeId).toBe(otherEmployee.id);
     expect(String(result.grossEarnings)).toBe("134.58");
     expect(Number(result.totalDeductions)).toBe(20.1);
     expect(String(result.netPay)).toBe("114.48");
-    await request(app.getHttpServer()).get("/api/v2/payroll/me/payslips")
-      .set({ Authorization: `Bearer ${otherEmployeeToken}` }).expect(200)
+    await request(app.getHttpServer())
+      .get("/api/v2/payroll/me/payslips")
+      .set({ Authorization: `Bearer ${otherEmployeeToken}` })
+      .expect(200)
       .expect(({ body }) => expect(body.data).toHaveLength(0));
     const dayOverride = await request(app.getHttpServer())
-      .patch(`/api/v2/payroll/runs/${run.id}/results/${result.id}`).set(headers)
-      .send({ payableDays: 10, leaveWithoutPayDays: 2, reason: "Manual LOP review; no automatic policy" }).expect(200);
+      .patch(`/api/v2/payroll/runs/${run.id}/results/${result.id}`)
+      .set(headers)
+      .send({
+        payableDays: 10,
+        leaveWithoutPayDays: 2,
+        reason: "Manual LOP review; no automatic policy",
+      })
+      .expect(200);
     expect(String(dayOverride.body.data.payableDays)).toBe("10");
     expect(String(dayOverride.body.data.leaveWithoutPayDays)).toBe("2");
     expect(Number(dayOverride.body.data.netPay)).toBe(114.48);
     const adjusted = await request(app.getHttpServer())
-      .patch(`/api/v2/payroll/runs/${run.id}/results/${result.id}`).set(headers)
-      .send({ componentAdjustments: [{ payrollComponentId: fixedEarning.id, value: 200 }], reason: "Approved manual adjustment" }).expect(200);
+      .patch(`/api/v2/payroll/runs/${run.id}/results/${result.id}`)
+      .set(headers)
+      .send({
+        componentAdjustments: [{ payrollComponentId: fixedEarning.id, value: 200 }],
+        reason: "Approved manual adjustment",
+      })
+      .expect(200);
     expect(Number(adjusted.body.data.netPay)).toBe(237.8);
-    await request(app.getHttpServer()).post(`/api/v2/payroll/runs/${run.id}/submit-review`).set(headers).send({}).expect(201);
-    await request(app.getHttpServer()).post(`/api/v2/payroll/runs/${run.id}/finalize`).set({ Authorization: `Bearer ${financeManagerToken}` }).send({}).expect(201);
-    await request(app.getHttpServer()).patch(`/api/v2/payroll/salary-structures/${structure.id}`).set(headers)
-      .send({ name: "Changed after finalization" }).expect(200);
-    const finalResult = await request(app.getHttpServer()).get(`/api/v2/payroll/runs/${run.id}/results/${result.id}`).set(headers).expect(200);
+    await request(app.getHttpServer())
+      .post(`/api/v2/payroll/runs/${run.id}/submit-review`)
+      .set(headers)
+      .send({})
+      .expect(201);
+    await request(app.getHttpServer())
+      .post(`/api/v2/payroll/runs/${run.id}/finalize`)
+      .set({ Authorization: `Bearer ${financeManagerToken}` })
+      .send({})
+      .expect(201);
+    await request(app.getHttpServer())
+      .patch(`/api/v2/payroll/salary-structures/${structure.id}`)
+      .set(headers)
+      .send({ name: "Changed after finalization" })
+      .expect(200);
+    const finalResult = await request(app.getHttpServer())
+      .get(`/api/v2/payroll/runs/${run.id}/results/${result.id}`)
+      .set(headers)
+      .expect(200);
     expect(Number(finalResult.body.data.netPay)).toBe(237.8);
     expect(finalResult.body.data.status).toBe("FINALIZED");
     expect(finalResult.body.data.salaryStructureNameSnapshot).toBe("Rounding structure");

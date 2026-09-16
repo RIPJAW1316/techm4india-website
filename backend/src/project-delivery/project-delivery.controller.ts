@@ -56,7 +56,9 @@ export class ProjectDeliveryController extends V2Controller {
     @Body() dto: CreateMilestoneDto,
     @Req() request: Request,
   ) {
-    return this.ok(this.delivery.createMilestone(principal, projectId, dto, this.metadata(request)));
+    return this.ok(
+      this.delivery.createMilestone(principal, projectId, dto, this.metadata(request)),
+    );
   }
 
   @Post("project-milestones/:id/start")
@@ -66,7 +68,9 @@ export class ProjectDeliveryController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.delivery.transitionMilestone(principal, id, "start", this.metadata(request)));
+    return this.ok(
+      this.delivery.transitionMilestone(principal, id, "start", this.metadata(request)),
+    );
   }
 
   @Post("project-milestones/:id/complete")
@@ -76,7 +80,9 @@ export class ProjectDeliveryController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.delivery.transitionMilestone(principal, id, "complete", this.metadata(request)));
+    return this.ok(
+      this.delivery.transitionMilestone(principal, id, "complete", this.metadata(request)),
+    );
   }
 
   @Get("projects/:projectId/risks")
@@ -149,7 +155,9 @@ export class ProjectDeliveryController extends V2Controller {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(this.delivery.transitionSprint(principal, id, "complete", this.metadata(request)));
+    return this.ok(
+      this.delivery.transitionSprint(principal, id, "complete", this.metadata(request)),
+    );
   }
 
   @Get("projects/:projectId/time-logs")

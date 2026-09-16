@@ -113,8 +113,8 @@ function FounderCmsContent() {
               Content <em>studio</em>
             </h1>
             <p>
-              Author pages, articles and announcements with versioned revisions and a
-              draft → review → publish workflow, so only approved content goes live.
+              Author pages, articles and announcements with versioned revisions and a draft → review
+              → publish workflow, so only approved content goes live.
             </p>
           </div>
           <div className="erp-welcome-code">
@@ -123,43 +123,166 @@ function FounderCmsContent() {
           </div>
         </section>
 
-        {error ? <div className="erp-error" role="alert">{error}</div> : null}
-        {notice ? <div className="erp-success" role="status">{notice}</div> : null}
+        {error ? (
+          <div className="erp-error" role="alert">
+            {error}
+          </div>
+        ) : null}
+        {notice ? (
+          <div className="erp-success" role="status">
+            {notice}
+          </div>
+        ) : null}
 
         {canManage ? (
           <section className="erp-section">
-            <div className="erp-section-heading"><div><p className="erp-kicker">New content</p><h2>Create page</h2></div></div>
+            <div className="erp-section-heading">
+              <div>
+                <p className="erp-kicker">New content</p>
+                <h2>Create page</h2>
+              </div>
+            </div>
             <form className="founder-form" onSubmit={(event) => void createPage(event)}>
               <div className="founder-form-grid">
-                <label><span>Slug</span><input required value={pageForm.slug} onChange={(event) => setPageForm({ ...pageForm, slug: event.target.value })} /></label>
-                <label><span>Type</span><select value={pageForm.type} onChange={(event) => setPageForm({ ...pageForm, type: event.target.value })}>{["PAGE", "ARTICLE", "ANNOUNCEMENT", "FAQ"].map((item) => <option key={item} value={item}>{pretty(item)}</option>)}</select></label>
-                <label className="founder-form-wide"><span>Title</span><input required value={pageForm.title} onChange={(event) => setPageForm({ ...pageForm, title: event.target.value })} /></label>
-                <label className="founder-form-wide"><span>Summary</span><input value={pageForm.summary} onChange={(event) => setPageForm({ ...pageForm, summary: event.target.value })} /></label>
-                <label className="founder-form-wide"><span>Body</span><textarea required minLength={2} value={pageForm.body} onChange={(event) => setPageForm({ ...pageForm, body: event.target.value })} /></label>
+                <label>
+                  <span>Slug</span>
+                  <input
+                    required
+                    value={pageForm.slug}
+                    onChange={(event) => setPageForm({ ...pageForm, slug: event.target.value })}
+                  />
+                </label>
+                <label>
+                  <span>Type</span>
+                  <select
+                    value={pageForm.type}
+                    onChange={(event) => setPageForm({ ...pageForm, type: event.target.value })}
+                  >
+                    {["PAGE", "ARTICLE", "ANNOUNCEMENT", "FAQ"].map((item) => (
+                      <option key={item} value={item}>
+                        {pretty(item)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="founder-form-wide">
+                  <span>Title</span>
+                  <input
+                    required
+                    value={pageForm.title}
+                    onChange={(event) => setPageForm({ ...pageForm, title: event.target.value })}
+                  />
+                </label>
+                <label className="founder-form-wide">
+                  <span>Summary</span>
+                  <input
+                    value={pageForm.summary}
+                    onChange={(event) => setPageForm({ ...pageForm, summary: event.target.value })}
+                  />
+                </label>
+                <label className="founder-form-wide">
+                  <span>Body</span>
+                  <textarea
+                    required
+                    minLength={2}
+                    value={pageForm.body}
+                    onChange={(event) => setPageForm({ ...pageForm, body: event.target.value })}
+                  />
+                </label>
               </div>
-              <button className="erp-button erp-button-primary" disabled={busy}>Create page ↗</button>
+              <button className="erp-button erp-button-primary" disabled={busy}>
+                Create page ↗
+              </button>
             </form>
           </section>
         ) : null}
 
         {loading ? (
-          <div className="erp-state" role="status"><span className="erp-loader" aria-hidden="true" /><p>Loading content</p></div>
+          <div className="erp-state" role="status">
+            <span className="erp-loader" aria-hidden="true" />
+            <p>Loading content</p>
+          </div>
         ) : null}
 
         {!loading ? (
           <section className="erp-section">
-            <div className="erp-section-heading"><div><p className="erp-kicker">Library</p><h2>Content pages</h2></div></div>
-            {pages.length === 0 ? <div className="erp-empty"><strong>No content yet.</strong><span>Create a page to begin the publishing workflow.</span></div> : (
+            <div className="erp-section-heading">
+              <div>
+                <p className="erp-kicker">Library</p>
+                <h2>Content pages</h2>
+              </div>
+            </div>
+            {pages.length === 0 ? (
+              <div className="erp-empty">
+                <strong>No content yet.</strong>
+                <span>Create a page to begin the publishing workflow.</span>
+              </div>
+            ) : (
               <div className="erp-notification-list">
                 {pages.map((item) => (
                   <article className="erp-notification" key={item.id}>
-                    <div><span className="founder-org-code">{item.slug}</span><h3>{item.title}</h3><p>{pretty(item.type)} · {item._count?.revisions ?? 0} revision{(item._count?.revisions ?? 0) === 1 ? "" : "s"}</p></div>
+                    <div>
+                      <span className="founder-org-code">{item.slug}</span>
+                      <h3>{item.title}</h3>
+                      <p>
+                        {pretty(item.type)} · {item._count?.revisions ?? 0} revision
+                        {(item._count?.revisions ?? 0) === 1 ? "" : "s"}
+                      </p>
+                    </div>
                     <div className="founder-org-row-actions">
                       <strong className="founder-status">{pretty(item.status)}</strong>
-                      <button type="button" className="erp-text-button" onClick={() => void openPage(item.id)}>Open</button>
-                      {canManage && item.status === "DRAFT" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/cms/pages/${item.id}/submit`, { method: "POST" }), "Submitted for review.")}>Submit for review</button> : null}
-                      {canPublish && item.status === "IN_REVIEW" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/cms/pages/${item.id}/publish`, { method: "POST" }), "Content published.")}>Publish</button> : null}
-                      {canPublish && item.status === "PUBLISHED" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/cms/pages/${item.id}/archive`, { method: "POST" }), "Content archived.")}>Archive</button> : null}
+                      <button
+                        type="button"
+                        className="erp-text-button"
+                        onClick={() => void openPage(item.id)}
+                      >
+                        Open
+                      </button>
+                      {canManage && item.status === "DRAFT" ? (
+                        <button
+                          type="button"
+                          className="erp-text-button"
+                          disabled={busy}
+                          onClick={() =>
+                            void runAction(
+                              () => apiFetchV2(`/cms/pages/${item.id}/submit`, { method: "POST" }),
+                              "Submitted for review.",
+                            )
+                          }
+                        >
+                          Submit for review
+                        </button>
+                      ) : null}
+                      {canPublish && item.status === "IN_REVIEW" ? (
+                        <button
+                          type="button"
+                          className="erp-text-button"
+                          disabled={busy}
+                          onClick={() =>
+                            void runAction(
+                              () => apiFetchV2(`/cms/pages/${item.id}/publish`, { method: "POST" }),
+                              "Content published.",
+                            )
+                          }
+                        >
+                          Publish
+                        </button>
+                      ) : null}
+                      {canPublish && item.status === "PUBLISHED" ? (
+                        <button
+                          type="button"
+                          className="erp-text-button"
+                          disabled={busy}
+                          onClick={() =>
+                            void runAction(
+                              () => apiFetchV2(`/cms/pages/${item.id}/archive`, { method: "POST" }),
+                              "Content archived.",
+                            )
+                          }
+                        >
+                          Archive
+                        </button>
+                      ) : null}
                     </div>
                   </article>
                 ))}
@@ -170,22 +293,56 @@ function FounderCmsContent() {
 
         {selected ? (
           <section className="erp-section">
-            <div className="erp-section-heading"><div><p className="erp-kicker">{pretty(selected.status)} · {pretty(selected.type)}</p><h2>{selected.title}</h2><p>{selected.slug}</p></div></div>
+            <div className="erp-section-heading">
+              <div>
+                <p className="erp-kicker">
+                  {pretty(selected.status)} · {pretty(selected.type)}
+                </p>
+                <h2>{selected.title}</h2>
+                <p>{selected.slug}</p>
+              </div>
+            </div>
             <div className="erp-notification-list">
               {(selected.revisions ?? []).map((item) => (
                 <article className="erp-notification" key={item.id}>
-                  <div><span className="founder-org-code">v{item.version}</span><h3>{item.title}</h3><p>{item.summary ?? item.body.slice(0, 120)}</p></div>
-                  {selected.publishedRevisionId === item.id ? <strong className="founder-status">Live</strong> : null}
+                  <div>
+                    <span className="founder-org-code">v{item.version}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.summary ?? item.body.slice(0, 120)}</p>
+                  </div>
+                  {selected.publishedRevisionId === item.id ? (
+                    <strong className="founder-status">Live</strong>
+                  ) : null}
                 </article>
               ))}
             </div>
             {canManage && (selected.status === "DRAFT" || selected.status === "IN_REVIEW") ? (
               <form className="founder-form" onSubmit={(event) => void addRevision(event)}>
                 <div className="founder-form-grid">
-                  <label className="founder-form-wide"><span>Revision title</span><input required value={revisionForm.title} onChange={(event) => setRevisionForm({ ...revisionForm, title: event.target.value })} /></label>
-                  <label className="founder-form-wide"><span>Revision body</span><textarea required value={revisionForm.body} onChange={(event) => setRevisionForm({ ...revisionForm, body: event.target.value })} /></label>
+                  <label className="founder-form-wide">
+                    <span>Revision title</span>
+                    <input
+                      required
+                      value={revisionForm.title}
+                      onChange={(event) =>
+                        setRevisionForm({ ...revisionForm, title: event.target.value })
+                      }
+                    />
+                  </label>
+                  <label className="founder-form-wide">
+                    <span>Revision body</span>
+                    <textarea
+                      required
+                      value={revisionForm.body}
+                      onChange={(event) =>
+                        setRevisionForm({ ...revisionForm, body: event.target.value })
+                      }
+                    />
+                  </label>
                 </div>
-                <button className="erp-button erp-button-primary" disabled={busy}>Add revision ↗</button>
+                <button className="erp-button erp-button-primary" disabled={busy}>
+                  Add revision ↗
+                </button>
               </form>
             ) : null}
           </section>

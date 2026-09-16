@@ -1,2 +1,4 @@
 import { AttendancePage } from "../../components/AttendancePage";
-export default function SchoolsAttendancePage() { return <AttendancePage divisionSlug="schools" />; }
+export default function SchoolsAttendancePage() {
+  return <AttendancePage divisionSlug="schools" />;
+}

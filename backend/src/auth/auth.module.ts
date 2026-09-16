@@ -39,6 +39,13 @@ import { parseDurationMs } from "./auth.utils";
     TrustedOriginGuard,
     AuthorizationPolicy,
   ],
-  exports: [AuthService, AuditService, AuthorizationPolicy, JwtStrategy, PermissionsGuard, PasswordService],
+  exports: [
+    AuthService,
+    AuditService,
+    AuthorizationPolicy,
+    JwtStrategy,
+    PermissionsGuard,
+    PasswordService,
+  ],
 })
 export class AuthModule {}

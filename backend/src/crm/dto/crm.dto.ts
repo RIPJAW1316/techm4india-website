@@ -36,15 +36,8 @@ export class LeadQueryDto extends PagingDto {
   @IsOptional() @IsDateString() followUpFrom?: string;
   @IsOptional() @IsDateString() followUpTo?: string;
   @IsOptional()
-  @IsEnum([
-    "createdAt",
-    "updatedAt",
-    "nextFollowUpAt",
-    "estimatedValue",
-    "name",
-  ] as const)
-  sortBy?:
-    "createdAt" | "updatedAt" | "nextFollowUpAt" | "estimatedValue" | "name";
+  @IsEnum(["createdAt", "updatedAt", "nextFollowUpAt", "estimatedValue", "name"] as const)
+  sortBy?: "createdAt" | "updatedAt" | "nextFollowUpAt" | "estimatedValue" | "name";
   @IsOptional() @IsEnum(["asc", "desc"] as const) sortOrder?: "asc" | "desc";
   @IsOptional() @Type(() => Boolean) @IsBoolean() includeArchived?: boolean;
 }

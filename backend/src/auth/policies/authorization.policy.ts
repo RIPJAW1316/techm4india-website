@@ -15,7 +15,11 @@ export interface TaskScope extends ProjectScope {
 @Injectable()
 export class AuthorizationPolicy {
   isOrganizationWide(principal: Principal): boolean {
-    return principal.roles.includes("SUPER_ADMIN") || principal.roles.includes("DIRECTOR") || principal.roles.includes("FOUNDER_CEO");
+    return (
+      principal.roles.includes("SUPER_ADMIN") ||
+      principal.roles.includes("DIRECTOR") ||
+      principal.roles.includes("FOUNDER_CEO")
+    );
   }
 
   canAccessDivision(principal: Principal, divisionId: string, permission: string): boolean {
@@ -27,9 +31,10 @@ export class AuthorizationPolicy {
     if (this.isOrganizationWide(principal)) {
       return principal.permissions.includes("organization.read_all");
     }
-    return principal.divisionId === divisionId && (
-      principal.permissions.includes("organization.read_division") ||
-      principal.permissions.includes("organization.read_self")
+    return (
+      principal.divisionId === divisionId &&
+      (principal.permissions.includes("organization.read_division") ||
+        principal.permissions.includes("organization.read_self"))
     );
   }
 
@@ -37,9 +42,14 @@ export class AuthorizationPolicy {
     return this.canReadDivision(principal, divisionId);
   }
 
-  canReadEmployee(principal: Principal, target: { id: string; divisionId?: string | null }): boolean {
-    if (principal.employeeId === target.id) return principal.permissions.includes("employees.read_self");
-    if (this.isOrganizationWide(principal)) return principal.permissions.includes("employees.read_all");
+  canReadEmployee(
+    principal: Principal,
+    target: { id: string; divisionId?: string | null },
+  ): boolean {
+    if (principal.employeeId === target.id)
+      return principal.permissions.includes("employees.read_self");
+    if (this.isOrganizationWide(principal))
+      return principal.permissions.includes("employees.read_all");
     return Boolean(
       target.divisionId &&
       principal.divisionId === target.divisionId &&
@@ -59,13 +69,24 @@ export class AuthorizationPolicy {
   }
 
   canAccessProject(principal: Principal, project: ProjectScope): boolean {
-    const member = Boolean(principal.employeeId && project.memberEmployeeIds?.includes(principal.employeeId));
-    const manager = Boolean(principal.employeeId && project.projectManagerId === principal.employeeId);
+    const member = Boolean(
+      principal.employeeId && project.memberEmployeeIds?.includes(principal.employeeId),
+    );
+    const manager = Boolean(
+      principal.employeeId && project.projectManagerId === principal.employeeId,
+    );
     if (member || manager) return true;
     if (this.isOrganizationWide(principal)) {
-      return principal.permissions.includes("projects.read_all") || principal.permissions.includes("projects.read_division") || principal.permissions.includes("projects.manage");
+      return (
+        principal.permissions.includes("projects.read_all") ||
+        principal.permissions.includes("projects.read_division") ||
+        principal.permissions.includes("projects.manage")
+      );
     }
-    return principal.divisionId === project.divisionId && principal.permissions.includes("projects.read_division");
+    return (
+      principal.divisionId === project.divisionId &&
+      principal.permissions.includes("projects.read_division")
+    );
   }
 
   canAccessTask(principal: Principal, task: TaskScope): boolean {
@@ -74,9 +95,15 @@ export class AuthorizationPolicy {
     const manager = principal.employeeId && task.projectManagerId === principal.employeeId;
     if (assigned || member || manager) return true;
     if (this.isOrganizationWide(principal)) {
-      return principal.permissions.includes("tasks.read_all") || principal.permissions.includes("tasks.manage");
+      return (
+        principal.permissions.includes("tasks.read_all") ||
+        principal.permissions.includes("tasks.manage")
+      );
     }
-    return Boolean(principal.divisionId === task.divisionId && principal.permissions.includes("tasks.read_project"));
+    return Boolean(
+      principal.divisionId === task.divisionId &&
+      principal.permissions.includes("tasks.read_project"),
+    );
   }
 
   canManageProject(principal: Principal, project: ProjectScope): boolean {

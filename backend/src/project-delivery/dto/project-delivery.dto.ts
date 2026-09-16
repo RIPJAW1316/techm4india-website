@@ -11,11 +11,7 @@ import {
   Min,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import {
-  ProjectRiskLikelihood,
-  ProjectRiskSeverity,
-  ProjectRiskStatus,
-} from "@prisma/client";
+import { ProjectRiskLikelihood, ProjectRiskSeverity, ProjectRiskStatus } from "@prisma/client";
 
 export class PagingDto {
   @ApiPropertyOptional({ default: 1, minimum: 1 })
@@ -123,7 +119,9 @@ export class CreateSprintDto {
 }
 
 export class CreateTimeLogDto {
-  @ApiPropertyOptional({ description: "Defaults to the caller; other employees require manage rights" })
+  @ApiPropertyOptional({
+    description: "Defaults to the caller; other employees require manage rights",
+  })
   @IsOptional()
   @IsUUID()
   employeeId?: string;

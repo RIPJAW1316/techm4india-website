@@ -109,10 +109,17 @@ export class ProjectDeliveryService extends V2ServiceBase {
         completedAt: action === "complete" ? new Date() : current.completedAt,
       },
     });
-    await this.record(`PROJECT_MILESTONE_${action.toUpperCase()}`, principal, "ProjectMilestone", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      `PROJECT_MILESTONE_${action.toUpperCase()}`,
+      principal,
+      "ProjectMilestone",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 
@@ -161,7 +168,9 @@ export class ProjectDeliveryService extends V2ServiceBase {
         createdByUserId: principal.userId,
       },
     });
-    await this.record("PROJECT_RISK_CREATED", principal, "ProjectRisk", row.id, request, { projectId });
+    await this.record("PROJECT_RISK_CREATED", principal, "ProjectRisk", row.id, request, {
+      projectId,
+    });
     return row;
   }
 
@@ -235,7 +244,9 @@ export class ProjectDeliveryService extends V2ServiceBase {
     } catch (error) {
       this.duplicate(error, "A sprint with this name already exists for the project");
     }
-    await this.record("PROJECT_SPRINT_CREATED", principal, "ProjectSprint", row.id, request, { projectId });
+    await this.record("PROJECT_SPRINT_CREATED", principal, "ProjectSprint", row.id, request, {
+      projectId,
+    });
     return row;
   }
 
@@ -268,10 +279,17 @@ export class ProjectDeliveryService extends V2ServiceBase {
       where: { id },
       data: { status: transition.to },
     });
-    await this.record(`PROJECT_SPRINT_${action.toUpperCase()}`, principal, "ProjectSprint", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      `PROJECT_SPRINT_${action.toUpperCase()}`,
+      principal,
+      "ProjectSprint",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 

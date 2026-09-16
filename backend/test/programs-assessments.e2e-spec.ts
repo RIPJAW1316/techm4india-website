@@ -77,7 +77,9 @@ describe("V2 programs assessments (assignments, grading, certificates)", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -105,7 +107,12 @@ describe("V2 programs assessments (assignments, grading, certificates)", () => {
     founder = await fixture("FOUNDER_CEO", divisionId, departmentId, "Founder");
     trainer = await fixture("FACULTY_TRAINER", divisionId, departmentId, "Trainer");
     employee = await fixture("EMPLOYEE", divisionId, departmentId, "Employee");
-    foreignFounder = await fixture("FOUNDER_CEO", foreignDivision.id, foreignDepartment.id, "Foreign");
+    foreignFounder = await fixture(
+      "FOUNDER_CEO",
+      foreignDivision.id,
+      foreignDepartment.id,
+      "Foreign",
+    );
 
     const stamp = Date.now();
     const program = await prisma.program.create({
@@ -138,14 +145,32 @@ describe("V2 programs assessments (assignments, grading, certificates)", () => {
     });
     const [studentA, studentB] = await Promise.all([
       prisma.student.create({
-        data: { organizationId, studentCode: `STU-A-${stamp}`, firstName: "Aisha", lastName: "Khan", consentAt: new Date() },
+        data: {
+          organizationId,
+          studentCode: `STU-A-${stamp}`,
+          firstName: "Aisha",
+          lastName: "Khan",
+          consentAt: new Date(),
+        },
       }),
       prisma.student.create({
-        data: { organizationId, studentCode: `STU-B-${stamp}`, firstName: "Rohan", lastName: "Mehta", consentAt: new Date() },
+        data: {
+          organizationId,
+          studentCode: `STU-B-${stamp}`,
+          firstName: "Rohan",
+          lastName: "Mehta",
+          consentAt: new Date(),
+        },
       }),
     ]);
     const completed = await prisma.programEnrollment.create({
-      data: { organizationId, batchId: batch.id, studentId: studentA.id, status: "COMPLETED", progressPercent: 100 },
+      data: {
+        organizationId,
+        batchId: batch.id,
+        studentId: studentA.id,
+        status: "COMPLETED",
+        progressPercent: 100,
+      },
     });
     const active = await prisma.programEnrollment.create({
       data: { organizationId, batchId: batch.id, studentId: studentB.id, status: "ACTIVE" },
@@ -158,7 +183,9 @@ describe("V2 programs assessments (assignments, grading, certificates)", () => {
     try {
       const orgs = [organizationId, foreignOrganizationId];
       await prisma.programCertificate.deleteMany({ where: { organizationId: { in: orgs } } });
-      await prisma.assignmentSubmission.deleteMany({ where: { assignment: { organizationId: { in: orgs } } } });
+      await prisma.assignmentSubmission.deleteMany({
+        where: { assignment: { organizationId: { in: orgs } } },
+      });
       await prisma.programAssignment.deleteMany({ where: { organizationId: { in: orgs } } });
       await prisma.programEnrollment.deleteMany({ where: { organizationId: { in: orgs } } });
       await prisma.programBatch.deleteMany({ where: { organizationId: { in: orgs } } });
@@ -168,10 +195,16 @@ describe("V2 programs assessments (assignments, grading, certificates)", () => {
       // RED phase runs before assessment tables exist.
     }
     const fixtures = [founder, trainer, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: foreignOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: foreignOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: foreignOrganizationId } });
     await prisma.organization.delete({ where: { id: foreignOrganizationId } });
     await app.close();

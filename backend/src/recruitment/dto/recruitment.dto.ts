@@ -167,7 +167,9 @@ export class CreateApplicantDto {
   @IsDateString()
   consentAt!: string;
 
-  @ApiPropertyOptional({ description: "Approved HTTPS document URL; storage upload is handled separately" })
+  @ApiPropertyOptional({
+    description: "Approved HTTPS document URL; storage upload is handled separately",
+  })
   @IsOptional()
   @IsString()
   @Matches(/^https:\/\//i)

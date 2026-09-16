@@ -16,8 +16,7 @@ export const OFFICIAL_ROLE_CATALOG = [
   {
     name: "DIRECTOR",
     displayName: "Director",
-    description:
-      "Leadership and organization-wide visibility according to permissions.",
+    description: "Leadership and organization-wide visibility according to permissions.",
     capabilityState: "IMPLEMENTED",
   },
   {
@@ -41,15 +40,13 @@ export const OFFICIAL_ROLE_CATALOG = [
   {
     name: "FINANCE_MANAGER",
     displayName: "Finance Manager",
-    description:
-      "Payroll and finance operations management within configured permissions.",
+    description: "Payroll and finance operations management within configured permissions.",
     capabilityState: "IMPLEMENTED",
   },
   {
     name: "FINANCE_EXECUTIVE",
     displayName: "Finance Executive",
-    description:
-      "Payroll processing operations with limited approval authority.",
+    description: "Payroll processing operations with limited approval authority.",
     capabilityState: "IMPLEMENTED",
   },
   {
@@ -127,14 +124,9 @@ export const OFFICIAL_ROLE_CATALOG = [
   },
 ] as const;
 
-export const OFFICIAL_ROLE_NAMES = OFFICIAL_ROLE_CATALOG.map(
-  (role) => role.name,
-);
+export const OFFICIAL_ROLE_NAMES = OFFICIAL_ROLE_CATALOG.map((role) => role.name);
 
-export const ADMINISTRATIVE_ROLE_NAMES = [
-  "SUPER_ADMIN",
-  "FOUNDER_CEO",
-] as const;
+export const ADMINISTRATIVE_ROLE_NAMES = ["SUPER_ADMIN", "FOUNDER_CEO"] as const;
 
 export function roleCatalogueEntry(name: string) {
   return OFFICIAL_ROLE_CATALOG.find((role) => role.name === name);

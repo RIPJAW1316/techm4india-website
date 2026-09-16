@@ -28,19 +28,16 @@ export class LeaveService {
     private readonly config: ConfigService,
   ) {}
   private org(p: Principal) {
-    if (!p.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!p.organizationId) throw new ForbiddenException("Organization context unavailable");
     return p.organizationId;
   }
   private date(s: string) {
     const d = new Date(`${s}T00:00:00.000Z`);
-    if (Number.isNaN(d.getTime()))
-      throw new BadRequestException("Invalid date");
+    if (Number.isNaN(d.getTime())) throw new BadRequestException("Invalid date");
     return d;
   }
   private employee(p: Principal) {
-    if (!p.employeeId)
-      throw new ForbiddenException("Employee profile unavailable");
+    if (!p.employeeId) throw new ForbiddenException("Employee profile unavailable");
     return p.employeeId;
   }
   private management(p: Principal) {
@@ -59,9 +56,7 @@ export class LeaveService {
     if (
       !p.permissions.includes("leave.review") ||
       !p.roles.some((r) =>
-        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "DIVISION_HEAD"].includes(
-          r,
-        ),
+        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "DIVISION_HEAD"].includes(r),
       )
     )
       throw new ForbiddenException("Leave review denied");
@@ -73,8 +68,7 @@ export class LeaveService {
     divisionId?: string | null,
     branchId?: string | null,
   ) {
-    if (end < start)
-      throw new BadRequestException("End date must be on or after start date");
+    if (end < start) throw new BadRequestException("End date must be on or after start date");
     const holidays = await this.prisma.holiday.findMany({
       where: { organizationId, date: { gte: start, lte: end } },
       select: { date: true, divisionId: true, branchId: true },
@@ -89,11 +83,7 @@ export class LeaveService {
         .map((h) => h.date.toISOString().slice(0, 10)),
     );
     let count = 0;
-    for (
-      let cursor = new Date(start);
-      cursor <= end;
-      cursor.setUTCDate(cursor.getUTCDate() + 1)
-    )
+    for (let cursor = new Date(start); cursor <= end; cursor.setUTCDate(cursor.getUTCDate() + 1))
       if (!holidaySet.has(cursor.toISOString().slice(0, 10))) count++;
     return count;
   }
@@ -110,9 +100,7 @@ export class LeaveService {
   async createType(p: Principal, dto: LeaveTypeDto) {
     if (
       !p.permissions.includes("leave.manage_types") ||
-      !p.roles.some((r) =>
-        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER"].includes(r),
-      )
+      !p.roles.some((r) => ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER"].includes(r))
     )
       throw new ForbiddenException("Leave type management denied");
     if (!dto.code?.trim() || !dto.name?.trim())
@@ -151,29 +139,17 @@ export class LeaveService {
     const row = await this.prisma.leaveType.update({
       where: { id },
       data: {
-        ...(dto.code !== undefined
-          ? { code: dto.code.trim().toUpperCase() }
-          : {}),
+        ...(dto.code !== undefined ? { code: dto.code.trim().toUpperCase() } : {}),
         ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-        ...(dto.description !== undefined
-          ? { description: dto.description.trim() }
-          : {}),
+        ...(dto.description !== undefined ? { description: dto.description.trim() } : {}),
         ...(dto.unit !== undefined ? { unit: dto.unit } : {}),
-        ...(dto.annualAllowance !== undefined
-          ? { annualAllowance: dto.annualAllowance }
-          : {}),
-        ...(dto.balanceTracked !== undefined
-          ? { balanceTracked: dto.balanceTracked }
-          : {}),
+        ...(dto.annualAllowance !== undefined ? { annualAllowance: dto.annualAllowance } : {}),
+        ...(dto.balanceTracked !== undefined ? { balanceTracked: dto.balanceTracked } : {}),
         ...(dto.carryForwardAllowed !== undefined
           ? { carryForwardAllowed: dto.carryForwardAllowed }
           : {}),
-        ...(dto.maxCarryForward !== undefined
-          ? { maxCarryForward: dto.maxCarryForward }
-          : {}),
-        ...(dto.requiresApproval !== undefined
-          ? { requiresApproval: dto.requiresApproval }
-          : {}),
+        ...(dto.maxCarryForward !== undefined ? { maxCarryForward: dto.maxCarryForward } : {}),
+        ...(dto.requiresApproval !== undefined ? { requiresApproval: dto.requiresApproval } : {}),
         ...(dto.isPaid !== undefined ? { isPaid: dto.isPaid } : {}),
         ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
       },
@@ -195,15 +171,12 @@ export class LeaveService {
     });
   }
   async balances(p: Principal, year = new Date().getUTCFullYear()) {
-    if (!this.management(p))
-      throw new ForbiddenException("Leave balance access denied");
+    if (!this.management(p)) throw new ForbiddenException("Leave balance access denied");
     const where: Prisma.LeaveBalanceWhereInput = {
       year,
       employee: {
         division: { organizationId: this.org(p) },
-        ...(p.roles.includes("DIVISION_HEAD") && p.divisionId
-          ? { divisionId: p.divisionId }
-          : {}),
+        ...(p.roles.includes("DIVISION_HEAD") && p.divisionId ? { divisionId: p.divisionId } : {}),
       },
     };
     return this.prisma.leaveBalance.findMany({
@@ -253,9 +226,7 @@ export class LeaveService {
       employee: {
         division: { organizationId: this.org(p) },
         ...(q.employeeId ? { id: q.employeeId } : {}),
-        ...(p.roles.includes("DIVISION_HEAD") && p.divisionId
-          ? { divisionId: p.divisionId }
-          : {}),
+        ...(p.roles.includes("DIVISION_HEAD") && p.divisionId ? { divisionId: p.divisionId } : {}),
       },
       ...(q.status ? { status: q.status } : {}),
       ...(q.leaveTypeId ? { leaveTypeId: q.leaveTypeId } : {}),
@@ -320,10 +291,7 @@ export class LeaveService {
         endDate: { gte: start },
       },
     });
-    if (overlap)
-      throw new ConflictException(
-        "Leave dates overlap an existing application",
-      );
+    if (overlap) throw new ConflictException("Leave dates overlap an existing application");
     const year = start.getUTCFullYear();
     const balance = await this.prisma.leaveBalance.findUnique({
       where: {
@@ -389,24 +357,17 @@ export class LeaveService {
       include: { leaveType: true },
     });
     if (!app) throw new NotFoundException("Leave application not found");
-    if (
-      app.status !== LeaveStatus.PENDING &&
-      app.status !== LeaveStatus.APPROVED
-    )
+    if (app.status !== LeaveStatus.PENDING && app.status !== LeaveStatus.APPROVED)
       throw new ConflictException("This leave cannot be cancelled");
     if (app.status === LeaveStatus.APPROVED && app.startDate <= new Date())
-      throw new ConflictException(
-        "Completed or active leave cannot be cancelled",
-      );
+      throw new ConflictException("Completed or active leave cannot be cancelled");
     const row = await this.prisma.$transaction(async (tx) => {
       const claimed = await tx.leaveApplication.updateMany({
         where: { id, status: app.status },
         data: { status: LeaveStatus.CANCELLED, cancelledAt: new Date() },
       });
       if (!claimed.count)
-        throw new ConflictException(
-          "Leave application has already been finalized",
-        );
+        throw new ConflictException("Leave application has already been finalized");
       if (app.status === LeaveStatus.APPROVED && app.leaveType.balanceTracked)
         await tx.leaveBalance.updateMany({
           where: {
@@ -438,12 +399,7 @@ export class LeaveService {
     });
     return row;
   }
-  async review(
-    p: Principal,
-    id: string,
-    status: "APPROVED" | "REJECTED",
-    dto: LeaveReviewDto,
-  ) {
+  async review(p: Principal, id: string, status: "APPROVED" | "REJECTED", dto: LeaveReviewDto) {
     this.reviewer(p);
     if (status === "REJECTED" && !dto.comment?.trim())
       throw new BadRequestException("A rejection comment is required");
@@ -464,13 +420,9 @@ export class LeaveService {
     });
     if (!app) throw new NotFoundException("Leave application not found");
     if (app.status !== LeaveStatus.PENDING)
-      throw new ConflictException(
-        "Leave application has already been reviewed",
-      );
+      throw new ConflictException("Leave application has already been reviewed");
     const type =
-      status === "APPROVED"
-        ? NotificationType.LEAVE_APPROVED
-        : NotificationType.LEAVE_REJECTED;
+      status === "APPROVED" ? NotificationType.LEAVE_APPROVED : NotificationType.LEAVE_REJECTED;
     const row = await this.prisma.$transaction(async (tx) => {
       const claimed = await tx.leaveApplication.updateMany({
         where: { id, status: LeaveStatus.PENDING },
@@ -483,9 +435,7 @@ export class LeaveService {
         },
       });
       if (!claimed.count)
-        throw new ConflictException(
-          "Leave application has already been reviewed",
-        );
+        throw new ConflictException("Leave application has already been reviewed");
       if (status === "APPROVED" && app.leaveType.balanceTracked) {
         const balance = await tx.leaveBalance.findUnique({
           where: {
@@ -496,8 +446,7 @@ export class LeaveService {
             },
           },
         });
-        if (!balance)
-          throw new BadRequestException("Leave balance is not initialized");
+        if (!balance) throw new BadRequestException("Leave balance is not initialized");
         if (
           balance.openingBalance +
             balance.accrued +
@@ -524,8 +473,7 @@ export class LeaveService {
         data: {
           userId: app.employee.userId,
           type,
-          title:
-            status === "APPROVED" ? "Leave approved" : "Leave request declined",
+          title: status === "APPROVED" ? "Leave approved" : "Leave request declined",
           body:
             dto.comment?.trim() ||
             `Your ${app.leaveType.name} request was ${status.toLowerCase()}.`,
@@ -544,20 +492,22 @@ export class LeaveService {
           some: {
             role: {
               name: {
-                in: [
-                  "FOUNDER_CEO",
-                  "SUPER_ADMIN",
-                  "HR_MANAGER",
-                  "DIVISION_HEAD",
-                ],
+                in: ["FOUNDER_CEO", "SUPER_ADMIN", "HR_MANAGER", "DIVISION_HEAD"],
               },
             },
           },
         },
         status: "ACTIVE",
         OR: [
-          { roles: { some: { role: { name: { in: ["FOUNDER_CEO", "SUPER_ADMIN", "HR_MANAGER"] } } } } },
-          { roles: { some: { role: { name: "DIVISION_HEAD" } } }, ...(p.divisionId ? { employee: { divisionId: p.divisionId } } : {}) },
+          {
+            roles: {
+              some: { role: { name: { in: ["FOUNDER_CEO", "SUPER_ADMIN", "HR_MANAGER"] } } },
+            },
+          },
+          {
+            roles: { some: { role: { name: "DIVISION_HEAD" } } },
+            ...(p.divisionId ? { employee: { divisionId: p.divisionId } } : {}),
+          },
         ],
       },
       select: { id: true },

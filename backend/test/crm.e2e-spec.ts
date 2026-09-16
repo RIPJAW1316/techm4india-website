@@ -1,10 +1,6 @@
 import cookieParser from "cookie-parser";
 import argon2 from "argon2";
-import {
-  INestApplication,
-  ValidationPipe,
-  VersioningType,
-} from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
@@ -144,26 +140,11 @@ describe("V2-5 CRM", () => {
     founder = await fixture("FOUNDER_CEO", orgId, departmentId, "Founder");
     manager = await fixture("SALES_MANAGER", orgId, departmentId, "Manager");
     director = await fixture("DIRECTOR", orgId, departmentId, "Director");
-    executive = await fixture(
-      "SALES_EXECUTIVE",
-      orgId,
-      departmentId,
-      "Executive",
-    );
-    otherExecutive = await fixture(
-      "SALES_EXECUTIVE",
-      orgId,
-      departmentId,
-      "OtherExecutive",
-    );
+    executive = await fixture("SALES_EXECUTIVE", orgId, departmentId, "Executive");
+    otherExecutive = await fixture("SALES_EXECUTIVE", orgId, departmentId, "OtherExecutive");
     employee = await fixture("EMPLOYEE", orgId, departmentId, "Employee");
     hr = await fixture("HR_MANAGER", orgId, departmentId, "Hr");
-    foreignFounder = await fixture(
-      "FOUNDER_CEO",
-      otherOrgId,
-      otherDepartmentId,
-      "ForeignFounder",
-    );
+    foreignFounder = await fixture("FOUNDER_CEO", otherOrgId, otherDepartmentId, "ForeignFounder");
   });
   afterAll(async () => {
     await prisma.crmActivity.deleteMany({

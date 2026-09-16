@@ -38,15 +38,44 @@ export class ExecutiveService {
     const organizationId = this.organizationId(principal);
     const { start } = businessDayBoundaries(new Date(), "Asia/Kolkata");
     const taskScope = { project: { organizationId } } satisfies Prisma.ProjectTaskWhereInput;
-    const [employeesTotal, employeesActive, activeTasks, completedTasks, overdueTasks, activeProjects] = await Promise.all([
+    const [
+      employeesTotal,
+      employeesActive,
+      activeTasks,
+      completedTasks,
+      overdueTasks,
+      activeProjects,
+    ] = await Promise.all([
       this.prisma.employee.count({ where: { division: { organizationId } } }),
-      this.prisma.employee.count({ where: { division: { organizationId }, employmentStatus: EmploymentStatus.ACTIVE } }),
-      this.prisma.projectTask.count({ where: { ...taskScope, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } } }),
+      this.prisma.employee.count({
+        where: { division: { organizationId }, employmentStatus: EmploymentStatus.ACTIVE },
+      }),
+      this.prisma.projectTask.count({
+        where: { ...taskScope, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } },
+      }),
       this.prisma.projectTask.count({ where: { ...taskScope, status: TaskStatus.COMPLETED } }),
-      this.prisma.projectTask.count({ where: { ...taskScope, dueDate: { lt: start }, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } } }),
-      this.prisma.project.count({ where: { organizationId, status: { notIn: [ProjectStatus.COMPLETED, ProjectStatus.CANCELLED] } } }),
+      this.prisma.projectTask.count({
+        where: {
+          ...taskScope,
+          dueDate: { lt: start },
+          status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] },
+        },
+      }),
+      this.prisma.project.count({
+        where: {
+          organizationId,
+          status: { notIn: [ProjectStatus.COMPLETED, ProjectStatus.CANCELLED] },
+        },
+      }),
     ]);
-    return { employeesTotal, employeesActive, activeTasks, completedTasks, overdueTasks, activeProjects };
+    return {
+      employeesTotal,
+      employeesActive,
+      activeTasks,
+      completedTasks,
+      overdueTasks,
+      activeProjects,
+    };
   }
 
   async employees(principal: Principal, query: ExecutiveEmployeeQueryDto) {
@@ -57,14 +86,16 @@ export class ExecutiveService {
       divisionId: query.divisionId,
       departmentId: query.departmentId,
       employmentStatus: query.status,
-      ...(search ? {
-        OR: [
-          { firstName: { contains: search, mode: "insensitive" } },
-          { lastName: { contains: search, mode: "insensitive" } },
-          { employeeCode: { contains: search, mode: "insensitive" } },
-          { designation: { contains: search, mode: "insensitive" } },
-        ],
-      } : {}),
+      ...(search
+        ? {
+            OR: [
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+              { employeeCode: { contains: search, mode: "insensitive" } },
+              { designation: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
     };
     const [total, rows] = await this.prisma.$transaction([
       this.prisma.employee.count({ where }),
@@ -74,7 +105,12 @@ export class ExecutiveService {
         skip: (query.page - 1) * query.limit,
         take: query.limit,
         select: {
-          id: true, employeeCode: true, firstName: true, lastName: true, designation: true, employmentStatus: true,
+          id: true,
+          employeeCode: true,
+          firstName: true,
+          lastName: true,
+          designation: true,
+          employmentStatus: true,
           division: { select: { id: true, name: true, slug: true } },
           department: { select: { id: true, name: true } },
         },
@@ -82,12 +118,31 @@ export class ExecutiveService {
     ]);
     const employeeIds = rows.map((row) => row.id);
     const { start } = businessDayBoundaries(new Date(), "Asia/Kolkata");
-    const counts = employeeIds.length ? await Promise.all([
-      this.prisma.projectTask.groupBy({ by: ["assigneeId", "status"], where: { assigneeId: { in: employeeIds }, project: { organizationId } }, _count: { _all: true } }),
-      this.prisma.projectTask.groupBy({ by: ["assigneeId"], where: { assigneeId: { in: employeeIds }, project: { organizationId }, dueDate: { lt: start }, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } }, _count: { _all: true } }),
-    ]) : [[], []];
+    const counts = employeeIds.length
+      ? await Promise.all([
+          this.prisma.projectTask.groupBy({
+            by: ["assigneeId", "status"],
+            where: { assigneeId: { in: employeeIds }, project: { organizationId } },
+            _count: { _all: true },
+          }),
+          this.prisma.projectTask.groupBy({
+            by: ["assigneeId"],
+            where: {
+              assigneeId: { in: employeeIds },
+              project: { organizationId },
+              dueDate: { lt: start },
+              status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] },
+            },
+            _count: { _all: true },
+          }),
+        ])
+      : [[], []];
     const statusCounts = new Map<string, Record<string, number>>();
-    for (const row of counts[0] as Array<{ assigneeId: string | null; status: TaskStatus; _count: { _all: number } }>) {
+    for (const row of counts[0] as Array<{
+      assigneeId: string | null;
+      status: TaskStatus;
+      _count: { _all: number };
+    }>) {
       if (!row.assigneeId) continue;
       const item = statusCounts.get(row.assigneeId) ?? {};
       item[row.status] = row._count._all;
@@ -111,10 +166,20 @@ export class ExecutiveService {
           status: employee.employmentStatus,
           division: employee.division,
           department: employee.department,
-          workSummary: { active: totalTasks - completed - cancelled, completed, overdue: overdueCounts.get(employee.id) ?? 0, total: totalTasks },
+          workSummary: {
+            active: totalTasks - completed - cancelled,
+            completed,
+            overdue: overdueCounts.get(employee.id) ?? 0,
+            total: totalTasks,
+          },
         };
       }),
-      meta: { page: query.page, limit: query.limit, total, totalPages: Math.ceil(total / query.limit) },
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
     };
   }
 
@@ -123,25 +188,73 @@ export class ExecutiveService {
     const employee = await this.prisma.employee.findFirst({
       where: { id: employeeId, division: { organizationId } },
       select: {
-        id: true, employeeCode: true, firstName: true, lastName: true, designation: true, employmentStatus: true,
+        id: true,
+        employeeCode: true,
+        firstName: true,
+        lastName: true,
+        designation: true,
+        employmentStatus: true,
         division: { select: { id: true, name: true, slug: true } },
         department: { select: { id: true, name: true } },
       },
     });
     if (!employee) throw new NotFoundException("Employee not found");
-    const taskScope: Prisma.ProjectTaskWhereInput = { assigneeId: employeeId, project: { organizationId } };
+    const taskScope: Prisma.ProjectTaskWhereInput = {
+      assigneeId: employeeId,
+      project: { organizationId },
+    };
     const { start } = businessDayBoundaries(new Date(), "Asia/Kolkata");
-    const [activeTasks, completedTasks, cancelledTasks, total, overdue, projects] = await Promise.all([
-      this.prisma.projectTask.findMany({ where: { ...taskScope, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } }, select: safeTaskSelect, orderBy: [{ dueDate: "asc" }, { priority: "desc" }], take: 100 }),
-      this.prisma.projectTask.findMany({ where: { ...taskScope, status: TaskStatus.COMPLETED }, select: safeTaskSelect, orderBy: { completedAt: "desc" }, take: 100 }),
-      this.prisma.projectTask.findMany({ where: { ...taskScope, status: TaskStatus.CANCELLED }, select: safeTaskSelect, orderBy: { updatedAt: "desc" }, take: 100 }),
-      this.prisma.projectTask.count({ where: taskScope }),
-      this.prisma.projectTask.count({ where: { ...taskScope, dueDate: { lt: start }, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } } }),
-      this.prisma.project.findMany({ where: { organizationId, OR: [{ projectManagerId: employeeId }, { members: { some: { employeeId, removedAt: null } } }, { tasks: { some: { assigneeId: employeeId } } }] }, select: { id: true, code: true, name: true }, orderBy: { updatedAt: "desc" }, take: 100 }),
-    ]);
+    const [activeTasks, completedTasks, cancelledTasks, total, overdue, projects] =
+      await Promise.all([
+        this.prisma.projectTask.findMany({
+          where: { ...taskScope, status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] } },
+          select: safeTaskSelect,
+          orderBy: [{ dueDate: "asc" }, { priority: "desc" }],
+          take: 100,
+        }),
+        this.prisma.projectTask.findMany({
+          where: { ...taskScope, status: TaskStatus.COMPLETED },
+          select: safeTaskSelect,
+          orderBy: { completedAt: "desc" },
+          take: 100,
+        }),
+        this.prisma.projectTask.findMany({
+          where: { ...taskScope, status: TaskStatus.CANCELLED },
+          select: safeTaskSelect,
+          orderBy: { updatedAt: "desc" },
+          take: 100,
+        }),
+        this.prisma.projectTask.count({ where: taskScope }),
+        this.prisma.projectTask.count({
+          where: {
+            ...taskScope,
+            dueDate: { lt: start },
+            status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] },
+          },
+        }),
+        this.prisma.project.findMany({
+          where: {
+            organizationId,
+            OR: [
+              { projectManagerId: employeeId },
+              { members: { some: { employeeId, removedAt: null } } },
+              { tasks: { some: { assigneeId: employeeId } } },
+            ],
+          },
+          select: { id: true, code: true, name: true },
+          orderBy: { updatedAt: "desc" },
+          take: 100,
+        }),
+      ]);
     return {
       employee: { ...employee, name: `${employee.firstName} ${employee.lastName}`.trim() },
-      taskSummary: { total, active: activeTasks.length, completed: completedTasks.length, cancelled: cancelledTasks.length, overdue },
+      taskSummary: {
+        total,
+        active: activeTasks.length,
+        completed: completedTasks.length,
+        cancelled: cancelledTasks.length,
+        overdue,
+      },
       activeTasks: activeTasks.map((task) => this.taskResponse(task)),
       completedTasks: completedTasks.map((task) => this.taskResponse(task)),
       cancelledTasks: cancelledTasks.map((task) => this.taskResponse(task)),
@@ -153,28 +266,55 @@ export class ExecutiveService {
     const organizationId = this.organizationId(principal);
     return this.prisma.project.findMany({
       where: { organizationId, status: { not: ProjectStatus.CANCELLED } },
-      select: { id: true, code: true, name: true, status: true, division: { select: { id: true, name: true, slug: true } } },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        status: true,
+        division: { select: { id: true, name: true, slug: true } },
+      },
       orderBy: [{ status: "asc" }, { name: "asc" }],
       take: 200,
     });
   }
 
-  async createTask(principal: Principal, employeeId: string, dto: CreateExecutiveTaskDto, request: RequestMetadata) {
-    const task = await this.tasks.createForExecutive(principal, employeeId, dto.projectId, {
-      title: dto.title,
-      description: dto.description,
-      priority: dto.priority,
-      dueDate: dto.dueDate,
-    } satisfies CreateTaskDto, request);
+  async createTask(
+    principal: Principal,
+    employeeId: string,
+    dto: CreateExecutiveTaskDto,
+    request: RequestMetadata,
+  ) {
+    const task = await this.tasks.createForExecutive(
+      principal,
+      employeeId,
+      dto.projectId,
+      {
+        title: dto.title,
+        description: dto.description,
+        priority: dto.priority,
+        dueDate: dto.dueDate,
+      } satisfies CreateTaskDto,
+      request,
+    );
     return task;
   }
 
-  async updateTask(principal: Principal, taskId: string, dto: UpdateExecutiveTaskDto, request: RequestMetadata) {
+  async updateTask(
+    principal: Principal,
+    taskId: string,
+    dto: UpdateExecutiveTaskDto,
+    request: RequestMetadata,
+  ) {
     return this.tasks.updateForExecutive(principal, taskId, dto satisfies UpdateTaskDto, request);
   }
 
   async cancelTask(principal: Principal, taskId: string, request: RequestMetadata) {
-    return this.tasks.updateForExecutive(principal, taskId, { status: TaskStatus.CANCELLED }, request);
+    return this.tasks.updateForExecutive(
+      principal,
+      taskId,
+      { status: TaskStatus.CANCELLED },
+      request,
+    );
   }
 
   private organizationId(principal: Principal) {
@@ -184,11 +324,28 @@ export class ExecutiveService {
 
   private taskResponse(task: SafeTask) {
     return {
-      id: task.id, title: task.title, description: task.description, status: task.status, priority: task.priority,
-      dueDate: task.dueDate, completedAt: task.completedAt,
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate,
+      completedAt: task.completedAt,
       project: task.project,
-      assignee: task.assignee ? { id: task.assignee.id, name: `${task.assignee.firstName} ${task.assignee.lastName}`.trim(), designation: task.assignee.designation } : null,
-      createdBy: task.createdByEmployee ? { id: task.createdByEmployee.id, name: `${task.createdByEmployee.firstName} ${task.createdByEmployee.lastName}`.trim(), designation: task.createdByEmployee.designation } : null,
+      assignee: task.assignee
+        ? {
+            id: task.assignee.id,
+            name: `${task.assignee.firstName} ${task.assignee.lastName}`.trim(),
+            designation: task.assignee.designation,
+          }
+        : null,
+      createdBy: task.createdByEmployee
+        ? {
+            id: task.createdByEmployee.id,
+            name: `${task.createdByEmployee.firstName} ${task.createdByEmployee.lastName}`.trim(),
+            designation: task.createdByEmployee.designation,
+          }
+        : null,
     };
   }
 }

@@ -28,7 +28,9 @@ export function PageHero({
       <img className="page-hero-image" src={image} alt={imageAlt} />
       <div className="page-hero-shade" />
       <div className="page-hero-content shell">
-        <p className="eyebrow"><span /> {eyebrow}</p>
+        <p className="eyebrow">
+          <span /> {eyebrow}
+        </p>
         <h1 id="page-title">{title}</h1>
         <div className="page-hero-bottom">
           <p>{description}</p>
@@ -38,7 +40,10 @@ export function PageHero({
         </div>
       </div>
       {credit && <small className="image-credit">{credit}</small>}
-      <div className="scroll-cue" aria-hidden="true"><span>Discover</span><i /></div>
+      <div className="scroll-cue" aria-hidden="true">
+        <span>Discover</span>
+        <i />
+      </div>
     </section>
   );
 }
@@ -56,17 +61,28 @@ export function SectionHeading({
 }) {
   return (
     <header className={"section-heading section-heading-" + align} data-reveal>
-      <p className="section-kicker"><span>{eyebrow}</span></p>
+      <p className="section-kicker">
+        <span>{eyebrow}</span>
+      </p>
       <h2>{title}</h2>
       {text && <p className="section-copy">{text}</p>}
     </header>
   );
 }
 
-export function ArrowLink({ href, children, light = false }: { href: string; children: ReactNode; light?: boolean }) {
+export function ArrowLink({
+  href,
+  children,
+  light = false,
+}: {
+  href: string;
+  children: ReactNode;
+  light?: boolean;
+}) {
   return (
     <Link className={"arrow-link" + (light ? " arrow-link-light" : "")} href={href}>
-      <span>{children}</span><i aria-hidden="true">{"↗︎"}</i>
+      <span>{children}</span>
+      <i aria-hidden="true">{"↗︎"}</i>
     </Link>
   );
 }
@@ -84,7 +100,13 @@ export function StatRow({ items }: { items: { value: string; label: string }[] }
   );
 }
 
-export function PeopleGrid({ compact = false, members = people }: { compact?: boolean; members?: Person[] }) {
+export function PeopleGrid({
+  compact = false,
+  members = people,
+}: {
+  compact?: boolean;
+  members?: Person[];
+}) {
   return (
     <div className={"people-grid" + (compact ? " people-grid-compact" : "")}>
       {members.map((person, index) => (
@@ -100,7 +122,11 @@ export function PeopleGrid({ compact = false, members = people }: { compact?: bo
           </div>
           <p>{person.role}</p>
           <h3>{person.name}</h3>
-          {!compact && <div className="person-bio"><p>{person.bio}</p></div>}
+          {!compact && (
+            <div className="person-bio">
+              <p>{person.bio}</p>
+            </div>
+          )}
         </article>
       ))}
     </div>
@@ -119,14 +145,33 @@ export function PartnershipCTA({
   return (
     <section className="partnership-cta">
       <div className="partnership-image">
-        <img src="/images/home/workshop-crowd.jpeg" alt="TechM4India workshop with students collaborating" loading="lazy" />
+        <img
+          src="/images/home/workshop-crowd.jpeg"
+          alt="TechM4India workshop with students collaborating"
+          loading="lazy"
+        />
       </div>
       <div className="partnership-panel">
-        <div className="panel-motif" aria-hidden="true"><i /><i /><i /><i /></div>
-        <p className="section-kicker section-kicker-light"><span>{eyebrow}</span></p>
-        <h2>{title || <>Your institution&apos;s <em>innovation era</em> starts today.</>}</h2>
+        <div className="panel-motif" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
+        <p className="section-kicker section-kicker-light">
+          <span>{eyebrow}</span>
+        </p>
+        <h2>
+          {title || (
+            <>
+              Your institution&apos;s <em>innovation era</em> starts today.
+            </>
+          )}
+        </h2>
         <p>{text}</p>
-        <ArrowLink href="/contact" light>Partner with TechM4India</ArrowLink>
+        <ArrowLink href="/contact" light>
+          Partner with TechM4India
+        </ArrowLink>
       </div>
     </section>
   );

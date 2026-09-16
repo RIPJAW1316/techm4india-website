@@ -72,14 +72,11 @@ export class InstitutionsService {
     private readonly notifications: NotificationsService,
   ) {}
   private org(p: Principal) {
-    if (!p.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!p.organizationId) throw new ForbiddenException("Organization context unavailable");
     return p.organizationId;
   }
   private full(p: Principal) {
-    return p.roles.some((r) =>
-      ["FOUNDER_CEO", "SUPER_ADMIN", "SALES_MANAGER"].includes(r),
-    );
+    return p.roles.some((r) => ["FOUNDER_CEO", "SUPER_ADMIN", "SALES_MANAGER"].includes(r));
   }
   private executive(p: Principal) {
     return p.roles.includes("SALES_EXECUTIVE") && !this.full(p);
@@ -101,8 +98,7 @@ export class InstitutionsService {
   }
   private own(p: Principal, requested?: string) {
     if (!this.executive(p)) return requested;
-    if (!p.employeeId)
-      throw new ForbiddenException("Employee profile unavailable");
+    if (!p.employeeId) throw new ForbiddenException("Employee profile unavailable");
     if (requested && requested !== p.employeeId)
       throw new ForbiddenException("Institution ownership is restricted");
     return p.employeeId;
@@ -138,9 +134,7 @@ export class InstitutionsService {
       select: owner,
     });
     if (!row)
-      throw new BadRequestException(
-        "Active relationship owner not found in this organization",
-      );
+      throw new BadRequestException("Active relationship owner not found in this organization");
     return row;
   }
   private async institution(p: Principal, id: string, writable = false) {
@@ -148,9 +142,7 @@ export class InstitutionsService {
       where: {
         id,
         organizationId: this.org(p),
-        ...(this.executive(p)
-          ? { relationshipOwnerEmployeeId: p.employeeId }
-          : {}),
+        ...(this.executive(p) ? { relationshipOwnerEmployeeId: p.employeeId } : {}),
       },
       include: institutionInclude,
     });
@@ -164,8 +156,7 @@ export class InstitutionsService {
     const row = await this.prisma.crmAccount.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!row)
-      throw new BadRequestException("CRM account is not in this organization");
+    if (!row) throw new BadRequestException("CRM account is not in this organization");
     return row;
   }
   private async opportunity(orgId: string, id?: string) {
@@ -173,10 +164,7 @@ export class InstitutionsService {
     const row = await this.prisma.crmOpportunity.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!row)
-      throw new BadRequestException(
-        "CRM opportunity is not in this organization",
-      );
+    if (!row) throw new BadRequestException("CRM opportunity is not in this organization");
     return row;
   }
   private async notify(
@@ -220,11 +208,7 @@ export class InstitutionsService {
       studentStrength: dto.studentStrength,
       notes: dto.notes?.trim(),
       archivedAt:
-        dto.status === InstitutionStatus.ARCHIVED
-          ? new Date()
-          : dto.status
-            ? null
-            : undefined,
+        dto.status === InstitutionStatus.ARCHIVED ? new Date() : dto.status ? null : undefined,
     });
   }
   async list(p: Principal, q: InstitutionQueryDto) {
@@ -236,11 +220,7 @@ export class InstitutionsService {
     const where: Prisma.InstitutionWhereInput = {
       organizationId: org,
       ...(ownerId ? { relationshipOwnerEmployeeId: ownerId } : {}),
-      ...(q.status
-        ? { status: q.status }
-        : q.includeArchived
-          ? {}
-          : { archivedAt: null }),
+      ...(q.status ? { status: q.status } : q.includeArchived ? {} : { archivedAt: null }),
       ...(q.type ? { type: q.type } : {}),
       ...(q.city ? { city: { equals: q.city, mode: "insensitive" } } : {}),
       ...(q.state ? { state: { equals: q.state, mode: "insensitive" } } : {}),
@@ -293,10 +273,7 @@ export class InstitutionsService {
     if (!dto.code?.trim() || !dto.name?.trim())
       throw new BadRequestException("Institution code and name are required");
     const org = this.org(p),
-      ownerId =
-        this.own(p, dto.relationshipOwnerEmployeeId) ??
-        p.employeeId ??
-        undefined;
+      ownerId = this.own(p, dto.relationshipOwnerEmployeeId) ?? p.employeeId ?? undefined;
     const employee = await this.employee(org, ownerId);
     await this.account(org, dto.crmAccountId);
     try {
@@ -330,13 +307,8 @@ export class InstitutionsService {
       );
       return row;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
-        throw new ConflictException(
-          "Institution code already exists in this organization",
-        );
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+        throw new ConflictException("Institution code already exists in this organization");
       throw error;
     }
   }
@@ -348,9 +320,7 @@ export class InstitutionsService {
       where: { organizationId: this.org(p), crmAccountId: accountId },
     });
     if (duplicate)
-      throw new ConflictException(
-        "This CRM account is already linked to an institution",
-      );
+      throw new ConflictException("This CRM account is already linked to an institution");
     return this.create(p, {
       ...dto,
       name: dto.name ?? account.name,
@@ -381,9 +351,7 @@ export class InstitutionsService {
         },
       });
       if (!contact)
-        throw new BadRequestException(
-          "Primary contact does not belong to this institution",
-        );
+        throw new BadRequestException("Primary contact does not belong to this institution");
     }
     const row = await this.prisma.institution.update({
       where: { id },
@@ -469,20 +437,14 @@ export class InstitutionsService {
     });
     return row;
   }
-  async updateContact(
-    p: Principal,
-    id: string,
-    contactId: string,
-    dto: InstitutionContactDto,
-  ) {
+  async updateContact(p: Principal, id: string, contactId: string, dto: InstitutionContactDto) {
     this.manage(p, "institutions.contacts.manage");
     await this.institution(p, id, true);
     const contact = await this.prisma.institutionContact.findFirst({
       where: { id: contactId, institutionId: id },
     });
     if (!contact) throw new NotFoundException("Institution contact not found");
-    if (contact.archivedAt)
-      throw new ConflictException("Archived contacts cannot be changed");
+    if (contact.archivedAt) throw new ConflictException("Archived contacts cannot be changed");
     const row = await this.prisma.$transaction(async (tx) => {
       if (dto.isPrimary)
         await tx.institutionContact.updateMany({
@@ -512,9 +474,7 @@ export class InstitutionsService {
       return updated;
     });
     await this.audit.record({
-      action: dto.isPrimary
-        ? "INSTITUTION_PRIMARY_CONTACT_CHANGED"
-        : "INSTITUTION_CONTACT_UPDATED",
+      action: dto.isPrimary ? "INSTITUTION_PRIMARY_CONTACT_CHANGED" : "INSTITUTION_CONTACT_UPDATED",
       actorUserId: p.userId,
       entityType: "InstitutionContact",
       entityId: contactId,
@@ -533,11 +493,7 @@ export class InstitutionsService {
       where: {
         institutionId: id,
         ...(ownerId ? { ownerEmployeeId: ownerId } : {}),
-        ...(q.status
-          ? { status: q.status }
-          : q.includeArchived
-            ? {}
-            : { archivedAt: null }),
+        ...(q.status ? { status: q.status } : q.includeArchived ? {} : { archivedAt: null }),
         ...(q.type ? { type: q.type } : {}),
         ...(q.from || q.to
           ? {
@@ -560,23 +516,11 @@ export class InstitutionsService {
     currentOwner?: string | null,
   ) {
     const org = this.org(p);
-    if (
-      dto.startDate &&
-      dto.endDate &&
-      this.date(dto.endDate)! < this.date(dto.startDate)!
-    )
-      throw new BadRequestException(
-        "Engagement end date cannot precede start date",
-      );
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== currentOwner
-    )
-      this.assign(p);
+    if (dto.startDate && dto.endDate && this.date(dto.endDate)! < this.date(dto.startDate)!)
+      throw new BadRequestException("Engagement end date cannot precede start date");
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== currentOwner) this.assign(p);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.own(p, dto.ownerEmployeeId);
+      dto.ownerEmployeeId === undefined ? undefined : this.own(p, dto.ownerEmployeeId);
     const employee = await this.employee(org, ownerId);
     await this.opportunity(org, dto.crmOpportunityId);
     return {
@@ -602,15 +546,10 @@ export class InstitutionsService {
       ownerId,
     };
   }
-  async createEngagement(
-    p: Principal,
-    id: string,
-    dto: InstitutionEngagementDto,
-  ) {
+  async createEngagement(p: Principal, id: string, dto: InstitutionEngagementDto) {
     this.manage(p, "institutions.engagements.manage");
     await this.institution(p, id, true);
-    if (!dto.title?.trim())
-      throw new BadRequestException("Engagement title is required");
+    if (!dto.title?.trim()) throw new BadRequestException("Engagement title is required");
     const prepared = await this.engagementData(p, dto);
     const row = await this.prisma.institutionEngagement.create({
       data: {
@@ -662,13 +601,8 @@ export class InstitutionsService {
     this.manage(p, "institutions.engagements.manage");
     await this.institution(p, id, true);
     const existing = await this.engagement(p, id, engagementId);
-    if (existing.archivedAt)
-      throw new ConflictException("Archived engagements cannot be changed");
-    const prepared = await this.engagementData(
-      p,
-      dto,
-      existing.ownerEmployeeId,
-    );
+    if (existing.archivedAt) throw new ConflictException("Archived engagements cannot be changed");
+    const prepared = await this.engagementData(p, dto, existing.ownerEmployeeId);
     const row = await this.prisma.institutionEngagement.update({
       where: { id: engagementId },
       data: prepared.data as Prisma.InstitutionEngagementUncheckedUpdateInput,
@@ -699,74 +633,60 @@ export class InstitutionsService {
   async dashboard(p: Principal) {
     this.read(p, "institutions.dashboard.read");
     const org = this.org(p),
-      scoped = this.executive(p)
-        ? { relationshipOwnerEmployeeId: p.employeeId }
-        : {};
-    const [
-      total,
-      active,
-      prospects,
-      onboarding,
-      byType,
-      engagements,
-      upcoming,
-      owners,
-    ] = await Promise.all([
-      this.prisma.institution.count({
-        where: { organizationId: org, archivedAt: null, ...scoped },
-      }),
-      this.prisma.institution.count({
-        where: { organizationId: org, status: "ACTIVE", ...scoped },
-      }),
-      this.prisma.institution.count({
-        where: { organizationId: org, status: "PROSPECT", ...scoped },
-      }),
-      this.prisma.institution.count({
-        where: { organizationId: org, status: "ONBOARDING", ...scoped },
-      }),
-      this.prisma.institution.groupBy({
-        by: ["type"],
-        where: { organizationId: org, archivedAt: null, ...scoped },
-        _count: true,
-      }),
-      this.prisma.institutionEngagement.groupBy({
-        by: ["status"],
-        where: {
-          organizationId: org,
-          archivedAt: null,
-          ...(this.executive(p) ? { ownerEmployeeId: p.employeeId } : {}),
-        },
-        _count: true,
-      }),
-      this.prisma.institutionEngagement.findMany({
-        where: {
-          organizationId: org,
-          archivedAt: null,
-          status: { in: ["PLANNED", "CONFIRMED"] },
-          startDate: { gte: new Date() },
-          ...(this.executive(p) ? { ownerEmployeeId: p.employeeId } : {}),
-        },
-        include: engagementInclude,
-        orderBy: { startDate: "asc" },
-        take: 8,
-      }),
-      this.prisma.institution.groupBy({
-        by: ["relationshipOwnerEmployeeId"],
-        where: { organizationId: org, archivedAt: null, ...scoped },
-        _count: true,
-      }),
-    ]);
+      scoped = this.executive(p) ? { relationshipOwnerEmployeeId: p.employeeId } : {};
+    const [total, active, prospects, onboarding, byType, engagements, upcoming, owners] =
+      await Promise.all([
+        this.prisma.institution.count({
+          where: { organizationId: org, archivedAt: null, ...scoped },
+        }),
+        this.prisma.institution.count({
+          where: { organizationId: org, status: "ACTIVE", ...scoped },
+        }),
+        this.prisma.institution.count({
+          where: { organizationId: org, status: "PROSPECT", ...scoped },
+        }),
+        this.prisma.institution.count({
+          where: { organizationId: org, status: "ONBOARDING", ...scoped },
+        }),
+        this.prisma.institution.groupBy({
+          by: ["type"],
+          where: { organizationId: org, archivedAt: null, ...scoped },
+          _count: true,
+        }),
+        this.prisma.institutionEngagement.groupBy({
+          by: ["status"],
+          where: {
+            organizationId: org,
+            archivedAt: null,
+            ...(this.executive(p) ? { ownerEmployeeId: p.employeeId } : {}),
+          },
+          _count: true,
+        }),
+        this.prisma.institutionEngagement.findMany({
+          where: {
+            organizationId: org,
+            archivedAt: null,
+            status: { in: ["PLANNED", "CONFIRMED"] },
+            startDate: { gte: new Date() },
+            ...(this.executive(p) ? { ownerEmployeeId: p.employeeId } : {}),
+          },
+          include: engagementInclude,
+          orderBy: { startDate: "asc" },
+          take: 8,
+        }),
+        this.prisma.institution.groupBy({
+          by: ["relationshipOwnerEmployeeId"],
+          where: { organizationId: org, archivedAt: null, ...scoped },
+          _count: true,
+        }),
+      ]);
     return {
       total,
       active,
       prospects,
       onboarding,
-      byType: Object.fromEntries(
-        byType.map((item) => [item.type, item._count]),
-      ),
-      engagementCounts: Object.fromEntries(
-        engagements.map((item) => [item.status, item._count]),
-      ),
+      byType: Object.fromEntries(byType.map((item) => [item.type, item._count])),
+      engagementCounts: Object.fromEntries(engagements.map((item) => [item.status, item._count])),
       upcoming,
       ownerSummary: owners.map((item) => ({
         ownerEmployeeId: item.relationshipOwnerEmployeeId,

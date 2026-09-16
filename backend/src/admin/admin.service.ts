@@ -9,11 +9,7 @@ import { Principal } from "../auth/auth.types";
 import { RequestMetadata } from "../auth/interfaces/request-metadata";
 import { businessDayBoundaries } from "../common/time/business-time";
 import { PrismaService } from "../prisma/prisma.service";
-import {
-  ADMINISTRATIVE_ROLE_NAMES,
-  OFFICIAL_ROLE_NAMES,
-  roleCatalogueEntry,
-} from "./role-catalog";
+import { ADMINISTRATIVE_ROLE_NAMES, OFFICIAL_ROLE_NAMES, roleCatalogueEntry } from "./role-catalog";
 import { AdminUserQueryDto } from "./dto/admin.dto";
 
 const taskSelect = {
@@ -62,10 +58,7 @@ export class AdminService {
       this.prisma.user.count({ where }),
       this.prisma.user.findMany({
         where,
-        orderBy: [
-          { employee: { lastName: "asc" } },
-          { employee: { firstName: "asc" } },
-        ],
+        orderBy: [{ employee: { lastName: "asc" } }, { employee: { firstName: "asc" } }],
         skip: (query.page - 1) * query.limit,
         take: query.limit,
         select: this.userListSelect(),
@@ -369,20 +362,13 @@ export class AdminService {
       roles: permission.roles
         .map(({ role }) => role)
         .filter((role) =>
-          OFFICIAL_ROLE_NAMES.includes(
-            role.name as (typeof OFFICIAL_ROLE_NAMES)[number],
-          ),
+          OFFICIAL_ROLE_NAMES.includes(role.name as (typeof OFFICIAL_ROLE_NAMES)[number]),
         )
         .sort((a, b) => a.name.localeCompare(b.name)),
     }));
   }
 
-  async assignRole(
-    principal: Principal,
-    userId: string,
-    roleId: string,
-    request: RequestMetadata,
-  ) {
+  async assignRole(principal: Principal, userId: string, roleId: string, request: RequestMetadata) {
     const target = await this.target(principal, userId);
     const role = await this.prisma.role.findFirst({
       where: { id: roleId, name: { in: [...OFFICIAL_ROLE_NAMES] } },
@@ -392,8 +378,7 @@ export class AdminService {
     const existing = await this.prisma.userRole.findUnique({
       where: { userId_roleId: { userId, roleId } },
     });
-    if (existing)
-      return { userId, role, assignedAt: existing.assignedAt, created: false };
+    if (existing) return { userId, role, assignedAt: existing.assignedAt, created: false };
     const assignment = await this.prisma.$transaction(async (tx) => {
       const row = await tx.userRole.create({ data: { userId, roleId } });
       await tx.auditLog.create({
@@ -412,12 +397,7 @@ export class AdminService {
     return { userId, role, assignedAt: assignment.assignedAt, created: true };
   }
 
-  async removeRole(
-    principal: Principal,
-    userId: string,
-    roleId: string,
-    request: RequestMetadata,
-  ) {
+  async removeRole(principal: Principal, userId: string, roleId: string, request: RequestMetadata) {
     const target = await this.target(principal, userId);
     const assignment = await this.prisma.userRole.findUnique({
       where: { userId_roleId: { userId, roleId } },
@@ -425,9 +405,7 @@ export class AdminService {
     });
     if (
       !assignment ||
-      !OFFICIAL_ROLE_NAMES.includes(
-        assignment.role.name as (typeof OFFICIAL_ROLE_NAMES)[number],
-      )
+      !OFFICIAL_ROLE_NAMES.includes(assignment.role.name as (typeof OFFICIAL_ROLE_NAMES)[number])
     )
       throw new NotFoundException("Role assignment not found");
     if (
@@ -448,9 +426,7 @@ export class AdminService {
         },
       });
       if (remainingAdministrativeRoles === 0)
-        throw new ConflictException(
-          "You cannot remove your own final administrative role",
-        );
+        throw new ConflictException("You cannot remove your own final administrative role");
     }
     await this.prisma.$transaction(async (tx) => {
       await tx.userRole.delete({
@@ -475,11 +451,7 @@ export class AdminService {
     return { userId, role: assignment.role, removed: true };
   }
 
-  async activate(
-    principal: Principal,
-    userId: string,
-    request: RequestMetadata,
-  ) {
+  async activate(principal: Principal, userId: string, request: RequestMetadata) {
     const target = await this.target(principal, userId);
     if (target.status === UserStatus.ACTIVE)
       return {
@@ -513,11 +485,7 @@ export class AdminService {
     return { ...user, changed: true };
   }
 
-  async deactivate(
-    principal: Principal,
-    userId: string,
-    request: RequestMetadata,
-  ) {
+  async deactivate(principal: Principal, userId: string, request: RequestMetadata) {
     const target = await this.target(principal, userId);
     if (userId === principal.userId)
       throw new ConflictException("You cannot deactivate your own account");
@@ -534,9 +502,7 @@ export class AdminService {
         },
       });
       if (activeSuperAdmins <= 1)
-        throw new ConflictException(
-          "The only active Super Admin cannot be deactivated",
-        );
+        throw new ConflictException("The only active Super Admin cannot be deactivated");
     }
     if (target.status === UserStatus.DISABLED)
       return {
@@ -654,9 +620,7 @@ export class AdminService {
       ...user,
       roles: user.roles.map(({ assignedAt, role }) => ({
         ...role,
-        displayName:
-          roleCatalogueEntry(role.name)?.displayName ??
-          role.name.replaceAll("_", " "),
+        displayName: roleCatalogueEntry(role.name)?.displayName ?? role.name.replaceAll("_", " "),
         assignedAt,
       })),
       employee: user.employee
@@ -677,8 +641,7 @@ export class AdminService {
   }
 
   private organizationId(principal: Principal) {
-    if (!principal.organizationId)
-      throw new ForbiddenException("Organization context required");
+    if (!principal.organizationId) throw new ForbiddenException("Organization context required");
     return principal.organizationId;
   }
 }

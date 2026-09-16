@@ -10,11 +10,7 @@ import {
 } from "@/lib/erp/divisions";
 import { useErpAuth } from "./AuthProvider";
 
-export function ErpLoading({
-  label = "Restoring your workspace",
-}: {
-  label?: string;
-}) {
+export function ErpLoading({ label = "Restoring your workspace" }: { label?: string }) {
   return (
     <div className="erp-state" role="status">
       <span className="erp-loader" aria-hidden="true" />
@@ -62,28 +58,19 @@ export function ProtectedErp({
   const router = useRouter();
   const divisionAllowed =
     !requiredDivision || canAccessDivisionWorkspace(context, requiredDivision);
-  const executiveAllowed =
-    !requiredExecutive || canAccessExecutiveWorkspace(context);
-  const hrAllowed =
-    !requiredHr || Boolean(context?.permissions.includes("hr.employees.read"));
-  const adminAllowed =
-    !requiredAdmin ||
-    Boolean(context?.permissions.includes("admin.users.read"));
+  const executiveAllowed = !requiredExecutive || canAccessExecutiveWorkspace(context);
+  const hrAllowed = !requiredHr || Boolean(context?.permissions.includes("hr.employees.read"));
+  const adminAllowed = !requiredAdmin || Boolean(context?.permissions.includes("admin.users.read"));
   const payrollAllowed =
-    !requiredPayroll ||
-    Boolean(context?.permissions.includes("payroll.dashboard.read"));
+    !requiredPayroll || Boolean(context?.permissions.includes("payroll.dashboard.read"));
   const financeAllowed =
-    !requiredFinance ||
-    Boolean(context?.permissions.includes("finance.dashboard.read"));
+    !requiredFinance || Boolean(context?.permissions.includes("finance.dashboard.read"));
   const recruitmentAllowed =
-    !requiredRecruitment ||
-    Boolean(context?.permissions.includes("recruitment.dashboard.read"));
+    !requiredRecruitment || Boolean(context?.permissions.includes("recruitment.dashboard.read"));
   const programsAllowed =
-    !requiredPrograms ||
-    Boolean(context?.permissions.includes("programs.read"));
+    !requiredPrograms || Boolean(context?.permissions.includes("programs.read"));
   const performanceAllowed =
-    !requiredPerformance ||
-    Boolean(context?.permissions.includes("performance.cycles.read"));
+    !requiredPerformance || Boolean(context?.permissions.includes("performance.cycles.read"));
   const supplyChainAllowed =
     !requiredSupplyChain ||
     Boolean(
@@ -97,10 +84,8 @@ export function ProtectedErp({
       ),
     );
   const supportAllowed =
-    !requiredSupport ||
-    Boolean(context?.permissions.includes("support.tickets.read"));
-  const cmsAllowed =
-    !requiredCms || Boolean(context?.permissions.includes("cms.content.read"));
+    !requiredSupport || Boolean(context?.permissions.includes("support.tickets.read"));
+  const cmsAllowed = !requiredCms || Boolean(context?.permissions.includes("cms.content.read"));
   const complianceAllowed =
     !requiredCompliance || Boolean(context?.permissions.includes("compliance.read"));
   const deliveryAllowed =
@@ -112,7 +97,21 @@ export function ProtectedErp({
     if (status === "unauthenticated") router.replace("/login");
     if (
       status === "authenticated" &&
-      (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed || !recruitmentAllowed || !programsAllowed || !performanceAllowed || !supplyChainAllowed || !supportAllowed || !cmsAllowed || !complianceAllowed || !deliveryAllowed || !analyticsAllowed)
+      (!divisionAllowed ||
+        !executiveAllowed ||
+        !hrAllowed ||
+        !adminAllowed ||
+        !payrollAllowed ||
+        !financeAllowed ||
+        !recruitmentAllowed ||
+        !programsAllowed ||
+        !performanceAllowed ||
+        !supplyChainAllowed ||
+        !supportAllowed ||
+        !cmsAllowed ||
+        !complianceAllowed ||
+        !deliveryAllowed ||
+        !analyticsAllowed)
     )
       router.replace(resolveDashboardPath(context));
   }, [
@@ -137,9 +136,24 @@ export function ProtectedErp({
   ]);
 
   if (status === "loading") return <ErpLoading />;
-  if (status === "unauthenticated")
-    return <ErpLoading label="Taking you to sign in" />;
-  if (!divisionAllowed || !executiveAllowed || !hrAllowed || !adminAllowed || !payrollAllowed || !financeAllowed || !recruitmentAllowed || !programsAllowed || !performanceAllowed || !supplyChainAllowed || !supportAllowed || !cmsAllowed || !complianceAllowed || !deliveryAllowed || !analyticsAllowed)
+  if (status === "unauthenticated") return <ErpLoading label="Taking you to sign in" />;
+  if (
+    !divisionAllowed ||
+    !executiveAllowed ||
+    !hrAllowed ||
+    !adminAllowed ||
+    !payrollAllowed ||
+    !financeAllowed ||
+    !recruitmentAllowed ||
+    !programsAllowed ||
+    !performanceAllowed ||
+    !supplyChainAllowed ||
+    !supportAllowed ||
+    !cmsAllowed ||
+    !complianceAllowed ||
+    !deliveryAllowed ||
+    !analyticsAllowed
+  )
     return <ErpLoading label="Opening your permitted workspace" />;
   return <>{children}</>;
 }

@@ -45,11 +45,7 @@ export class VendorsService extends V2ServiceBase {
     return { data, meta: { page, limit, total } };
   }
 
-  async createVendor(
-    principal: Principal,
-    dto: CreateVendorDto,
-    request?: RequestMetadata,
-  ) {
+  async createVendor(principal: Principal, dto: CreateVendorDto, request?: RequestMetadata) {
     let row;
     try {
       row = await this.prisma.vendor.create({
@@ -88,19 +84,12 @@ export class VendorsService extends V2ServiceBase {
     request?: RequestMetadata,
   ) {
     const current = await this.vendor(principal, id);
-    const transitions: Record<
-      typeof action,
-      { from: VendorStatus[]; to: VendorStatus }
-    > = {
+    const transitions: Record<typeof action, { from: VendorStatus[]; to: VendorStatus }> = {
       approve: { from: [VendorStatus.PENDING_APPROVAL], to: VendorStatus.ACTIVE },
       suspend: { from: [VendorStatus.ACTIVE], to: VendorStatus.SUSPENDED },
       reinstate: { from: [VendorStatus.SUSPENDED], to: VendorStatus.ACTIVE },
       blacklist: {
-        from: [
-          VendorStatus.PENDING_APPROVAL,
-          VendorStatus.ACTIVE,
-          VendorStatus.SUSPENDED,
-        ],
+        from: [VendorStatus.PENDING_APPROVAL, VendorStatus.ACTIVE, VendorStatus.SUSPENDED],
         to: VendorStatus.BLACKLISTED,
       },
     };

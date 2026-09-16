@@ -4,11 +4,7 @@ import { CmsContentStatus, Prisma } from "@prisma/client";
 import { Principal } from "../auth/auth.types";
 import { RequestMetadata } from "../auth/interfaces/request-metadata";
 import { V2ServiceBase } from "../common/v2-service.base";
-import {
-  AddCmsRevisionDto,
-  CmsPageQueryDto,
-  CreateCmsPageDto,
-} from "./dto/cms.dto";
+import { AddCmsRevisionDto, CmsPageQueryDto, CreateCmsPageDto } from "./dto/cms.dto";
 
 @Injectable()
 export class CmsService extends V2ServiceBase {
@@ -83,11 +79,7 @@ export class CmsService extends V2ServiceBase {
       });
   }
 
-  async createPage(
-    principal: Principal,
-    dto: CreateCmsPageDto,
-    request?: RequestMetadata,
-  ) {
+  async createPage(principal: Principal, dto: CreateCmsPageDto, request?: RequestMetadata) {
     const organizationId = this.organizationId(principal);
     let row;
     try {

@@ -24,12 +24,14 @@ export function pageMetadata({
       siteName: "TechM4India",
       title,
       description,
-      images: [{
-        url: "/og.png",
-        width: 1200,
-        height: 630,
-        alt: "TechM4India — engineering imagination into impact",
-      }],
+      images: [
+        {
+          url: "/og.png",
+          width: 1200,
+          height: 630,
+          alt: "TechM4India — engineering imagination into impact",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",

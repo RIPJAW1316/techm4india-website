@@ -37,14 +37,11 @@ describe("Health endpoint", () => {
   });
 
   it("returns the API health payload", async () => {
-    await request(app.getHttpServer())
-      .get("/api/v1/health")
-      .expect(200)
-      .expect({
-        status: "ok",
-        service: "techm4india-erp-api",
-        database: "connected",
-        timestamp: "2026-01-01T00:00:00.000Z",
-      });
+    await request(app.getHttpServer()).get("/api/v1/health").expect(200).expect({
+      status: "ok",
+      service: "techm4india-erp-api",
+      database: "connected",
+      timestamp: "2026-01-01T00:00:00.000Z",
+    });
   });
 });

@@ -14,12 +14,7 @@ import {
 
 @Module({
   imports: [AuthModule],
-  controllers: [
-    VendorsController,
-    InventoryController,
-    ProcurementController,
-    AssetsController,
-  ],
+  controllers: [VendorsController, InventoryController, ProcurementController, AssetsController],
   providers: [VendorsService, InventoryService, ProcurementService, AssetsService],
 })
 export class SupplyChainModule {}

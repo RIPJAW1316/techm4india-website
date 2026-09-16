@@ -83,14 +83,7 @@ type Dashboard = {
   upcoming: Engagement[];
 };
 type Tab = "overview" | "contacts" | "engagements" | "crm";
-const types = [
-  "SCHOOL",
-  "COLLEGE",
-  "UNIVERSITY",
-  "TRAINING_INSTITUTE",
-  "CORPORATE",
-  "OTHER",
-];
+const types = ["SCHOOL", "COLLEGE", "UNIVERSITY", "TRAINING_INSTITUTE", "CORPORATE", "OTHER"];
 const statuses = ["PROSPECT", "ONBOARDING", "ACTIVE", "INACTIVE", "ARCHIVED"];
 const engagementTypes = [
   "WORKSHOP",
@@ -181,13 +174,9 @@ function Content() {
   const [contactForm, setContactForm] = useState(emptyContact);
   const [editingContact, setEditingContact] = useState<string | null>(null);
   const [engagementForm, setEngagementForm] = useState(emptyEngagement);
-  const [editingEngagement, setEditingEngagement] = useState<string | null>(
-    null,
-  );
+  const [editingEngagement, setEditingEngagement] = useState<string | null>(null);
   const errorText = (reason: unknown) =>
-    reason instanceof ApiError
-      ? reason.message
-      : "Institution operation failed.";
+    reason instanceof ApiError ? reason.message : "Institution operation failed.";
   const hydrateForm = (item: Institution) =>
     setForm({
       code: item.code,
@@ -206,25 +195,23 @@ function Content() {
       country: item.country ?? "",
       relationshipOwnerEmployeeId: item.relationshipOwnerEmployeeId ?? "",
       crmAccountId: item.crmAccountId ?? "",
-      studentStrength:
-        item.studentStrength === null ? "" : String(item.studentStrength),
+      studentStrength: item.studentStrength === null ? "" : String(item.studentStrength),
       notes: item.notes ?? "",
     });
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [summary, list, people, accountList, opportunityList] =
-        await Promise.all([
-          apiFetchV2<{ data: Dashboard }>("/institutions/dashboard"),
-          apiFetchV2<{ data: Institution[] }>(
-            `/institutions?limit=100${search ? `&search=${encodeURIComponent(search)}` : ""}${status === "ALL" ? "" : `&status=${status}`}`,
-          ),
-          apiFetchV2<{
-            data: Array<{ id: string; firstName: string; lastName: string }>;
-          }>("/executive/employees?limit=100"),
-          apiFetchV2<{ data: Account[] }>("/crm/accounts?limit=100"),
-          apiFetchV2<{ data: Opportunity[] }>("/crm/opportunities?limit=100"),
-        ]);
+      const [summary, list, people, accountList, opportunityList] = await Promise.all([
+        apiFetchV2<{ data: Dashboard }>("/institutions/dashboard"),
+        apiFetchV2<{ data: Institution[] }>(
+          `/institutions?limit=100${search ? `&search=${encodeURIComponent(search)}` : ""}${status === "ALL" ? "" : `&status=${status}`}`,
+        ),
+        apiFetchV2<{
+          data: Array<{ id: string; firstName: string; lastName: string }>;
+        }>("/executive/employees?limit=100"),
+        apiFetchV2<{ data: Account[] }>("/crm/accounts?limit=100"),
+        apiFetchV2<{ data: Opportunity[] }>("/crm/opportunities?limit=100"),
+      ]);
       setDashboard(summary.data);
       setInstitutions(list.data);
       setEmployees(
@@ -245,9 +232,7 @@ function Content() {
   const openDetail = useCallback(async (id: string) => {
     setDetailLoading(true);
     try {
-      const response = await apiFetchV2<{ data: Institution }>(
-        `/institutions/${id}`,
-      );
+      const response = await apiFetchV2<{ data: Institution }>(`/institutions/${id}`);
       setDetail(response.data);
       hydrateForm(response.data);
       setError(null);
@@ -261,11 +246,7 @@ function Content() {
     const timer = window.setTimeout(() => void load(), 0);
     return () => window.clearTimeout(timer);
   }, [load]);
-  async function mutate(
-    action: () => Promise<unknown>,
-    success: string,
-    refresh = true,
-  ) {
+  async function mutate(action: () => Promise<unknown>, success: string, refresh = true) {
     setBusy(true);
     setError(null);
     try {
@@ -295,9 +276,7 @@ function Content() {
     country: form.country || undefined,
     relationshipOwnerEmployeeId: form.relationshipOwnerEmployeeId || undefined,
     crmAccountId: form.crmAccountId || undefined,
-    studentStrength: form.studentStrength
-      ? Number(form.studentStrength)
-      : undefined,
+    studentStrength: form.studentStrength ? Number(form.studentStrength) : undefined,
     notes: form.notes || undefined,
   });
   async function createInstitution(event: FormEvent) {
@@ -337,13 +316,10 @@ function Content() {
   async function archiveInstitution() {
     if (
       detail &&
-      window.confirm(
-        `Archive ${detail.name}? Its history will be preserved and editing disabled.`,
-      )
+      window.confirm(`Archive ${detail.name}? Its history will be preserved and editing disabled.`)
     )
       await mutate(
-        () =>
-          apiFetchV2(`/institutions/${detail.id}/archive`, { method: "POST" }),
+        () => apiFetchV2(`/institutions/${detail.id}/archive`, { method: "POST" }),
         "Institution archived.",
       );
   }
@@ -434,9 +410,7 @@ function Content() {
       ownerEmployeeId: item.ownerEmployeeId ?? "",
       crmOpportunityId: item.crmOpportunityId ?? "",
       estimatedParticipants:
-        item.estimatedParticipants === null
-          ? ""
-          : String(item.estimatedParticipants),
+        item.estimatedParticipants === null ? "" : String(item.estimatedParticipants),
       notes: item.notes ?? "",
     });
   };
@@ -463,8 +437,8 @@ function Content() {
               Institutions <em>workspace</em>
             </h1>
             <p>
-              Manage schools, colleges, universities and training relationships
-              without mixing CRM or student records.
+              Manage schools, colleges, universities and training relationships without mixing CRM
+              or student records.
             </p>
           </div>
           <div className="erp-welcome-code">
@@ -477,9 +451,7 @@ function Content() {
             <p>{error}</p>
             <button
               className="erp-text-button"
-              onClick={() =>
-                detail ? void openDetail(detail.id) : void load()
-              }
+              onClick={() => (detail ? void openDetail(detail.id) : void load())}
             >
               Try again ↗
             </button>
@@ -520,10 +492,7 @@ function Content() {
               />
               <span>Create from CRM Account</span>
             </label>
-            <form
-              className="founder-form"
-              onSubmit={(event) => void createInstitution(event)}
-            >
+            <form className="founder-form" onSubmit={(event) => void createInstitution(event)}>
               <div className="founder-form-grid">
                 <label>
                   <span>Code</span>
@@ -543,18 +512,14 @@ function Content() {
                   <input
                     required={!fromCrm}
                     value={form.name}
-                    onChange={(event) =>
-                      setForm({ ...form, name: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, name: event.target.value })}
                   />
                 </label>
                 <label>
                   <span>Type</span>
                   <select
                     value={form.type}
-                    onChange={(event) =>
-                      setForm({ ...form, type: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, type: event.target.value })}
                   >
                     {types.map((item) => (
                       <option key={item}>{item}</option>
@@ -566,9 +531,7 @@ function Content() {
                   <select
                     required={fromCrm}
                     value={form.crmAccountId}
-                    onChange={(event) =>
-                      setForm({ ...form, crmAccountId: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, crmAccountId: event.target.value })}
                   >
                     <option value="">No account</option>
                     {accounts.map((item) => (
@@ -589,9 +552,7 @@ function Content() {
                   <input
                     type="email"
                     value={form.officialEmail}
-                    onChange={(event) =>
-                      setForm({ ...form, officialEmail: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, officialEmail: event.target.value })}
                   />
                 </label>
               </div>
@@ -620,10 +581,7 @@ function Content() {
             </label>
             <label>
               <span>Status</span>
-              <select
-                value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
+              <select value={status} onChange={(event) => setStatus(event.target.value)}>
                 <option value="ALL">All statuses</option>
                 {statuses.map((item) => (
                   <option key={item}>{item}</option>
@@ -639,8 +597,7 @@ function Content() {
                     <h3>{item.name}</h3>
                     <p>
                       {item.code} · {item.type} ·{" "}
-                      {[item.city, item.state].filter(Boolean).join(", ") ||
-                        "Location pending"}
+                      {[item.city, item.state].filter(Boolean).join(", ") || "Location pending"}
                     </p>
                     <small>
                       {item.primaryContact
@@ -697,24 +654,20 @@ function Content() {
               </button>
             </div>
             <nav className="crm-tabs" aria-label="Institution detail sections">
-              {(["overview", "contacts", "engagements", "crm"] as Tab[]).map(
-                (item) => (
-                  <button
-                    key={item}
-                    className={tab === item ? "is-active" : ""}
-                    onClick={() => setTab(item)}
-                  >
-                    {item === "crm" ? "CRM Relationship" : item}
-                  </button>
-                ),
-              )}
+              {(["overview", "contacts", "engagements", "crm"] as Tab[]).map((item) => (
+                <button
+                  key={item}
+                  className={tab === item ? "is-active" : ""}
+                  onClick={() => setTab(item)}
+                >
+                  {item === "crm" ? "CRM Relationship" : item}
+                </button>
+              ))}
             </nav>
             {archived && (
               <div className="erp-empty">
                 <strong>Archived institution.</strong>
-                <span>
-                  History remains visible; mutation controls are disabled.
-                </span>
+                <span>History remains visible; mutation controls are disabled.</span>
               </div>
             )}
             {tab === "overview" && (
@@ -752,27 +705,21 @@ function Content() {
                         <input
                           required
                           value={form.name}
-                          onChange={(event) =>
-                            setForm({ ...form, name: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, name: event.target.value })}
                         />
                       </label>
                       <label>
                         <span>Short name</span>
                         <input
                           value={form.shortName}
-                          onChange={(event) =>
-                            setForm({ ...form, shortName: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, shortName: event.target.value })}
                         />
                       </label>
                       <label>
                         <span>Type</span>
                         <select
                           value={form.type}
-                          onChange={(event) =>
-                            setForm({ ...form, type: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, type: event.target.value })}
                         >
                           {types.map((item) => (
                             <option key={item}>{item}</option>
@@ -783,9 +730,7 @@ function Content() {
                         <span>Status</span>
                         <select
                           value={form.status}
-                          onChange={(event) =>
-                            setForm({ ...form, status: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, status: event.target.value })}
                         >
                           {statuses
                             .filter((item) => item !== "ARCHIVED")
@@ -798,9 +743,7 @@ function Content() {
                         <span>Website</span>
                         <input
                           value={form.website}
-                          onChange={(event) =>
-                            setForm({ ...form, website: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, website: event.target.value })}
                         />
                       </label>
                       <label>
@@ -856,36 +799,28 @@ function Content() {
                         <span>City</span>
                         <input
                           value={form.city}
-                          onChange={(event) =>
-                            setForm({ ...form, city: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, city: event.target.value })}
                         />
                       </label>
                       <label>
                         <span>State</span>
                         <input
                           value={form.state}
-                          onChange={(event) =>
-                            setForm({ ...form, state: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, state: event.target.value })}
                         />
                       </label>
                       <label>
                         <span>Country</span>
                         <input
                           value={form.country}
-                          onChange={(event) =>
-                            setForm({ ...form, country: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, country: event.target.value })}
                         />
                       </label>
                       <label>
                         <span>Postal code</span>
                         <input
                           value={form.postalCode}
-                          onChange={(event) =>
-                            setForm({ ...form, postalCode: event.target.value })
-                          }
+                          onChange={(event) => setForm({ ...form, postalCode: event.target.value })}
                         />
                       </label>
                       <label>
@@ -904,13 +839,11 @@ function Content() {
                       </label>
                       <label>
                         <span>Owner</span>
-                        {ownerSelect(
-                          form.relationshipOwnerEmployeeId,
-                          (value) =>
-                            setForm({
-                              ...form,
-                              relationshipOwnerEmployeeId: value,
-                            }),
+                        {ownerSelect(form.relationshipOwnerEmployeeId, (value) =>
+                          setForm({
+                            ...form,
+                            relationshipOwnerEmployeeId: value,
+                          }),
                         )}
                       </label>
                       <label>
@@ -937,9 +870,7 @@ function Content() {
                       <span>Notes</span>
                       <textarea
                         value={form.notes}
-                        onChange={(event) =>
-                          setForm({ ...form, notes: event.target.value })
-                        }
+                        onChange={(event) => setForm({ ...form, notes: event.target.value })}
                       />
                     </label>
                     <div className="founder-dialog-actions">
@@ -950,10 +881,7 @@ function Content() {
                       >
                         Archive institution
                       </button>
-                      <button
-                        className="erp-button erp-button-primary"
-                        disabled={busy}
-                      >
+                      <button className="erp-button erp-button-primary" disabled={busy}>
                         Save changes ↗
                       </button>
                     </div>
@@ -963,10 +891,7 @@ function Content() {
             )}
             {tab === "contacts" && (
               <>
-                <form
-                  className="founder-form"
-                  onSubmit={(event) => void saveContact(event)}
-                >
+                <form className="founder-form" onSubmit={(event) => void saveContact(event)}>
                   <div className="erp-section-heading">
                     <div>
                       <p className="erp-kicker">Contacts</p>
@@ -1090,10 +1015,7 @@ function Content() {
                       <span>Decision maker</span>
                     </label>
                   </div>
-                  <button
-                    className="erp-button erp-button-primary"
-                    disabled={busy || archived}
-                  >
+                  <button className="erp-button erp-button-primary" disabled={busy || archived}>
                     {editingContact ? "Save contact" : "Add contact"} ↗
                   </button>
                 </form>
@@ -1104,26 +1026,19 @@ function Content() {
                         <div>
                           <h3>
                             {item.firstName} {item.lastName}{" "}
-                            {item.isPrimary && (
-                              <span className="erp-status">Primary</span>
-                            )}
+                            {item.isPrimary && <span className="erp-status">Primary</span>}
                           </h3>
                           <p>
-                            {item.roleTitle ?? "No role"} ·{" "}
-                            {item.department ?? "No department"}
+                            {item.roleTitle ?? "No role"} · {item.department ?? "No department"}
                           </p>
                           <small>
-                            {item.email ?? "No email"} ·{" "}
-                            {item.phone ?? "No phone"}
+                            {item.email ?? "No email"} · {item.phone ?? "No phone"}
                             {item.isDecisionMaker ? " · Decision maker" : ""}
                           </small>
                         </div>
                         {!archived && (
                           <div className="crm-row-actions">
-                            <button
-                              className="erp-text-button"
-                              onClick={() => editContact(item)}
-                            >
+                            <button className="erp-text-button" onClick={() => editContact(item)}>
                               Edit
                             </button>
                             {!item.isPrimary && (
@@ -1149,18 +1064,11 @@ function Content() {
             )}
             {tab === "engagements" && (
               <>
-                <form
-                  className="founder-form"
-                  onSubmit={(event) => void saveEngagement(event)}
-                >
+                <form className="founder-form" onSubmit={(event) => void saveEngagement(event)}>
                   <div className="erp-section-heading">
                     <div>
                       <p className="erp-kicker">Engagements</p>
-                      <h3>
-                        {editingEngagement
-                          ? "Edit engagement"
-                          : "Create engagement"}
-                      </h3>
+                      <h3>{editingEngagement ? "Edit engagement" : "Create engagement"}</h3>
                     </div>
                   </div>
                   <div className="founder-form-grid">
@@ -1290,14 +1198,8 @@ function Content() {
                       }
                     />
                   </label>
-                  <button
-                    className="erp-button erp-button-primary"
-                    disabled={busy || archived}
-                  >
-                    {editingEngagement
-                      ? "Save engagement"
-                      : "Create engagement"}{" "}
-                    ↗
+                  <button className="erp-button erp-button-primary" disabled={busy || archived}>
+                    {editingEngagement ? "Save engagement" : "Create engagement"} ↗
                   </button>
                 </form>
                 <div className="crm-list institution-sublist">
@@ -1307,8 +1209,7 @@ function Content() {
                         <div>
                           <h3>{item.title}</h3>
                           <p>
-                            {item.type} · {date(item.startDate)} to{" "}
-                            {date(item.endDate)} ·{" "}
+                            {item.type} · {date(item.startDate)} to {date(item.endDate)} ·{" "}
                             {item.owner
                               ? `${item.owner.firstName} ${item.owner.lastName}`
                               : "Unassigned"}
@@ -1372,8 +1273,7 @@ function Content() {
                       <div>
                         <h3>{detail.crmAccount.name}</h3>
                         <p>
-                          {detail.crmAccount.accountType} ·{" "}
-                          {detail.crmAccount.status}
+                          {detail.crmAccount.accountType} · {detail.crmAccount.status}
                         </p>
                         <small>
                           {detail.crmAccount.owner
@@ -1403,9 +1303,8 @@ function Content() {
                             </p>
                             <small>
                               {item.crmOpportunity?.currency}{" "}
-                              {item.crmOpportunity?.estimatedValue ??
-                                "Value not recorded"}{" "}
-                              · Estimated pipeline, not revenue
+                              {item.crmOpportunity?.estimatedValue ?? "Value not recorded"} ·
+                              Estimated pipeline, not revenue
                             </small>
                           </div>
                         </article>

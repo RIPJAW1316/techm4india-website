@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { currentUser, loginRequest, logoutRequest, restoreSession } from "@/lib/api/auth";
 import type { AuthContext } from "@/lib/api/types";
 
@@ -33,7 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => { void refreshSession(); }, 0);
+    const timer = window.setTimeout(() => {
+      void refreshSession();
+    }, 0);
     return () => window.clearTimeout(timer);
   }, [refreshSession]);
 
@@ -50,7 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setStatus("unauthenticated");
   }, []);
 
-  const value = useMemo(() => ({ status, context, login, refreshSession, logout }), [status, context, login, refreshSession, logout]);
+  const value = useMemo(
+    () => ({ status, context, login, refreshSession, logout }),
+    [status, context, login, refreshSession, logout],
+  );
   return <AuthContextState.Provider value={value}>{children}</AuthContextState.Provider>;
 }
 

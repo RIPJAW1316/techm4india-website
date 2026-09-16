@@ -98,10 +98,7 @@ const hrDetailInclude = {
   certifications: { orderBy: { issuedAt: "desc" as const } },
   education: { orderBy: { endDate: "desc" as const } },
   employmentHistory: {
-    orderBy: [
-      { effectiveDate: "desc" as const },
-      { createdAt: "desc" as const },
-    ],
+    orderBy: [{ effectiveDate: "desc" as const }, { createdAt: "desc" as const }],
   },
   _count: { select: { directReports: true } },
 } satisfies Prisma.EmployeeInclude;
@@ -122,9 +119,7 @@ export class HrService {
     const organizationId = this.requireOrganization(principal);
     const where: Prisma.EmployeeWhereInput = {
       division: { organizationId },
-      ...(this.isDivisionScoped(principal)
-        ? { divisionId: principal.divisionId }
-        : {}),
+      ...(this.isDivisionScoped(principal) ? { divisionId: principal.divisionId } : {}),
       ...(query.divisionId ? { divisionId: query.divisionId } : {}),
       ...(query.departmentId ? { departmentId: query.departmentId } : {}),
       ...(query.branchId ? { branchId: query.branchId } : {}),
@@ -137,9 +132,7 @@ export class HrService {
             },
           }
         : {}),
-      ...(query.role
-        ? { user: { roles: { some: { role: { name: query.role } } } } }
-        : {}),
+      ...(query.role ? { user: { roles: { some: { role: { name: query.role } } } } } : {}),
       ...(query.employmentType ? { employmentType: query.employmentType } : {}),
       ...(query.status ? { employmentStatus: query.status } : {}),
       ...(query.search?.trim()
@@ -211,11 +204,7 @@ export class HrService {
     ]);
     return {
       data: rows.map((row) =>
-        this.toResponse(
-          row as HrEmployeeDetail,
-          this.canReadPrivate(principal),
-          false,
-        ),
+        this.toResponse(row as HrEmployeeDetail, this.canReadPrivate(principal), false),
       ),
       meta: {
         page: query.page,
@@ -227,27 +216,15 @@ export class HrService {
   }
 
   async getById(principal: Principal, id: string) {
-    const employee = await this.findEmployee(
-      id,
-      this.requireOrganization(principal),
-    );
+    const employee = await this.findEmployee(id, this.requireOrganization(principal));
     this.assertReadTarget(principal, employee);
     return this.toResponse(employee, this.canReadPrivate(principal), true);
   }
 
-  async create(
-    principal: Principal,
-    dto: CreateHrEmployeeDto,
-    request: RequestMetadata,
-  ) {
+  async create(principal: Principal, dto: CreateHrEmployeeDto, request: RequestMetadata) {
     this.assertManage(principal);
     const organizationId = this.requireOrganization(principal);
-    await this.validateStructure(
-      organizationId,
-      dto.divisionId,
-      dto.departmentId,
-      dto.branchId,
-    );
+    await this.validateStructure(organizationId, dto.divisionId, dto.departmentId, dto.branchId);
     if (dto.managerEmployeeId)
       await this.validateManager(organizationId, null, dto.managerEmployeeId);
     if (!dto.userId && !dto.officialEmail)
@@ -267,18 +244,14 @@ export class HrService {
             select: { id: true, employee: { select: { id: true } } },
           });
           if (!user) throw new BadRequestException("User account not found");
-          if (user.employee)
-            throw new ConflictException("User already has an employee profile");
+          if (user.employee) throw new ConflictException("User already has an employee profile");
         } else {
-          const passwordHash = await argon2.hash(
-            randomBytes(32).toString("hex"),
-            {
-              type: argon2.argon2id,
-              memoryCost: 19_456,
-              parallelism: 1,
-              timeCost: 2,
-            },
-          );
+          const passwordHash = await argon2.hash(randomBytes(32).toString("hex"), {
+            type: argon2.argon2id,
+            memoryCost: 19_456,
+            parallelism: 1,
+            timeCost: 2,
+          });
           const user = await tx.user.create({
             data: {
               email: dto.officialEmail!.trim().toLowerCase(),
@@ -350,9 +323,7 @@ export class HrService {
       return this.getById(principal, created.id);
     } catch (error) {
       if (this.isUnique(error))
-        throw new ConflictException(
-          "Employee code or official email already exists",
-        );
+        throw new ConflictException("Employee code or official email already exists");
       throw error;
     }
   }
@@ -370,16 +341,12 @@ export class HrService {
       organizationId,
       dto.divisionId ?? current.divisionId ?? undefined,
       dto.departmentId ?? current.departmentId ?? undefined,
-      dto.branchId === undefined
-        ? (current.branchId ?? undefined)
-        : dto.branchId,
+      dto.branchId === undefined ? (current.branchId ?? undefined) : dto.branchId,
     );
     if (dto.managerEmployeeId !== undefined)
       await this.validateManager(organizationId, id, dto.managerEmployeeId);
     const joiningDate =
-      dto.joiningDate === undefined
-        ? current.joiningDate
-        : this.date(dto.joiningDate);
+      dto.joiningDate === undefined ? current.joiningDate : this.date(dto.joiningDate);
     const confirmationDate =
       dto.confirmationDate === undefined
         ? current.confirmationDate
@@ -400,63 +367,35 @@ export class HrService {
         const employee = await tx.employee.update({
           where: { id },
           data: {
-            ...(dto.employeeCode !== undefined
-              ? { employeeCode: dto.employeeCode.trim() }
-              : {}),
-            ...(dto.firstName !== undefined
-              ? { firstName: dto.firstName.trim() }
-              : {}),
-            ...(dto.lastName !== undefined
-              ? { lastName: dto.lastName.trim() }
-              : {}),
-            ...(dto.designation !== undefined
-              ? { designation: this.clean(dto.designation) }
-              : {}),
-            ...(dto.gradeText !== undefined
-              ? { gradeText: this.clean(dto.gradeText) }
-              : {}),
-            ...(dto.phone !== undefined
-              ? { phone: this.clean(dto.phone) }
-              : {}),
+            ...(dto.employeeCode !== undefined ? { employeeCode: dto.employeeCode.trim() } : {}),
+            ...(dto.firstName !== undefined ? { firstName: dto.firstName.trim() } : {}),
+            ...(dto.lastName !== undefined ? { lastName: dto.lastName.trim() } : {}),
+            ...(dto.designation !== undefined ? { designation: this.clean(dto.designation) } : {}),
+            ...(dto.gradeText !== undefined ? { gradeText: this.clean(dto.gradeText) } : {}),
+            ...(dto.phone !== undefined ? { phone: this.clean(dto.phone) } : {}),
             ...(dto.personalEmail !== undefined
               ? { personalEmail: this.clean(dto.personalEmail) }
               : {}),
             ...(dto.alternatePhone !== undefined
               ? { alternatePhone: this.clean(dto.alternatePhone) }
               : {}),
-            ...(dto.gender !== undefined
-              ? { gender: this.clean(dto.gender) }
-              : {}),
-            ...(dto.dateOfBirth !== undefined
-              ? { dateOfBirth: this.date(dto.dateOfBirth) }
-              : {}),
-            ...(dto.nationality !== undefined
-              ? { nationality: this.clean(dto.nationality) }
-              : {}),
-            ...(dto.bloodGroup !== undefined
-              ? { bloodGroup: this.clean(dto.bloodGroup) }
-              : {}),
+            ...(dto.gender !== undefined ? { gender: this.clean(dto.gender) } : {}),
+            ...(dto.dateOfBirth !== undefined ? { dateOfBirth: this.date(dto.dateOfBirth) } : {}),
+            ...(dto.nationality !== undefined ? { nationality: this.clean(dto.nationality) } : {}),
+            ...(dto.bloodGroup !== undefined ? { bloodGroup: this.clean(dto.bloodGroup) } : {}),
             ...(dto.profilePhotoUrl !== undefined
               ? { profilePhotoUrl: this.clean(dto.profilePhotoUrl) }
               : {}),
-            ...(dto.biometricId !== undefined
-              ? { biometricId: this.clean(dto.biometricId) }
-              : {}),
+            ...(dto.biometricId !== undefined ? { biometricId: this.clean(dto.biometricId) } : {}),
             ...(dto.joiningDate !== undefined ? { joiningDate } : {}),
             ...(dto.confirmationDate !== undefined ? { confirmationDate } : {}),
             ...(dto.probationEndDate !== undefined ? { probationEndDate } : {}),
-            ...(dto.employmentType !== undefined
-              ? { employmentType: dto.employmentType }
-              : {}),
+            ...(dto.employmentType !== undefined ? { employmentType: dto.employmentType } : {}),
             ...(dto.employmentStatus !== undefined
               ? { employmentStatus: dto.employmentStatus }
               : {}),
-            ...(dto.divisionId !== undefined
-              ? { divisionId: dto.divisionId }
-              : {}),
-            ...(dto.departmentId !== undefined
-              ? { departmentId: dto.departmentId }
-              : {}),
+            ...(dto.divisionId !== undefined ? { divisionId: dto.divisionId } : {}),
+            ...(dto.departmentId !== undefined ? { departmentId: dto.departmentId } : {}),
             ...(dto.branchId !== undefined ? { branchId: dto.branchId } : {}),
             ...(dto.managerEmployeeId !== undefined
               ? { managerEmployeeId: dto.managerEmployeeId }
@@ -491,24 +430,14 @@ export class HrService {
       return this.getById(principal, updated.id);
     } catch (error) {
       if (this.isUnique(error))
-        throw new ConflictException(
-          "Employee code or official email already exists",
-        );
+        throw new ConflictException("Employee code or official email already exists");
       throw error;
     }
   }
 
-  async exit(
-    principal: Principal,
-    id: string,
-    dto: ExitEmployeeDto,
-    request: RequestMetadata,
-  ) {
+  async exit(principal: Principal, id: string, dto: ExitEmployeeDto, request: RequestMetadata) {
     this.assertManage(principal);
-    const employee = await this.findEmployee(
-      id,
-      this.requireOrganization(principal),
-    );
+    const employee = await this.findEmployee(id, this.requireOrganization(principal));
     if (employee.employmentStatus === EmploymentStatus.EXITED)
       return this.toResponse(employee, this.canReadPrivate(principal), true);
     const effectiveDate = this.date(dto.effectiveDate) ?? new Date();
@@ -547,10 +476,7 @@ export class HrService {
   async history(principal: Principal, id: string) {
     if (!principal.permissions.includes("hr.employment_history.read"))
       throw new ForbiddenException("Employment history access denied");
-    const employee = await this.findEmployee(
-      id,
-      this.requireOrganization(principal),
-    );
+    const employee = await this.findEmployee(id, this.requireOrganization(principal));
     this.assertReadTarget(principal, employee);
     return this.prisma.employmentHistory.findMany({
       where: { employeeId: id },
@@ -635,21 +561,13 @@ export class HrService {
       where: { id: addressId },
       data: {
         ...(dto.type !== undefined ? { type: dto.type } : {}),
-        ...(dto.addressLine1 !== undefined
-          ? { addressLine1: dto.addressLine1.trim() }
-          : {}),
-        ...(dto.addressLine2 !== undefined
-          ? { addressLine2: this.clean(dto.addressLine2) }
-          : {}),
+        ...(dto.addressLine1 !== undefined ? { addressLine1: dto.addressLine1.trim() } : {}),
+        ...(dto.addressLine2 !== undefined ? { addressLine2: this.clean(dto.addressLine2) } : {}),
         ...(dto.city !== undefined ? { city: dto.city.trim() } : {}),
         ...(dto.state !== undefined ? { state: dto.state.trim() } : {}),
-        ...(dto.postalCode !== undefined
-          ? { postalCode: dto.postalCode.trim() }
-          : {}),
+        ...(dto.postalCode !== undefined ? { postalCode: dto.postalCode.trim() } : {}),
         ...(dto.country !== undefined ? { country: dto.country.trim() } : {}),
-        ...(dto.isPrimary !== undefined
-          ? { isPrimary: Boolean(dto.isPrimary) }
-          : {}),
+        ...(dto.isPrimary !== undefined ? { isPrimary: Boolean(dto.isPrimary) } : {}),
       },
     });
     await this.audit.record({
@@ -747,17 +665,13 @@ export class HrService {
       where: { id: contactId },
       data: {
         ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-        ...(dto.relationship !== undefined
-          ? { relationship: dto.relationship.trim() }
-          : {}),
+        ...(dto.relationship !== undefined ? { relationship: dto.relationship.trim() } : {}),
         ...(dto.phone !== undefined ? { phone: dto.phone.trim() } : {}),
         ...(dto.alternatePhone !== undefined
           ? { alternatePhone: this.clean(dto.alternatePhone) }
           : {}),
         ...(dto.email !== undefined ? { email: this.clean(dto.email) } : {}),
-        ...(dto.isPrimary !== undefined
-          ? { isPrimary: Boolean(dto.isPrimary) }
-          : {}),
+        ...(dto.isPrimary !== undefined ? { isPrimary: Boolean(dto.isPrimary) } : {}),
       },
     });
     await this.audit.record({
@@ -843,9 +757,7 @@ export class HrService {
       data: {
         ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
         ...(dto.level !== undefined ? { level: this.clean(dto.level) } : {}),
-        ...(dto.yearsExperience !== undefined
-          ? { yearsExperience: dto.yearsExperience }
-          : {}),
+        ...(dto.yearsExperience !== undefined ? { yearsExperience: dto.yearsExperience } : {}),
       },
     });
     await this.audit.record({
@@ -858,12 +770,7 @@ export class HrService {
     });
     return row;
   }
-  async removeSkill(
-    principal: Principal,
-    id: string,
-    skillId: string,
-    request: RequestMetadata,
-  ) {
+  async removeSkill(principal: Principal, id: string, skillId: string, request: RequestMetadata) {
     await this.assertChildWrite(principal, id);
     const existing = await this.prisma.employeeSkill.findFirst({
       where: { id: skillId, employeeId: id },
@@ -934,15 +841,9 @@ export class HrService {
       data: {
         ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
         ...(dto.issuer !== undefined ? { issuer: dto.issuer.trim() } : {}),
-        ...(dto.issuedAt !== undefined
-          ? { issuedAt: this.date(dto.issuedAt) }
-          : {}),
-        ...(dto.expiresAt !== undefined
-          ? { expiresAt: this.date(dto.expiresAt) }
-          : {}),
-        ...(dto.credentialId !== undefined
-          ? { credentialId: this.clean(dto.credentialId) }
-          : {}),
+        ...(dto.issuedAt !== undefined ? { issuedAt: this.date(dto.issuedAt) } : {}),
+        ...(dto.expiresAt !== undefined ? { expiresAt: this.date(dto.expiresAt) } : {}),
+        ...(dto.credentialId !== undefined ? { credentialId: this.clean(dto.credentialId) } : {}),
         ...(dto.credentialUrl !== undefined
           ? { credentialUrl: this.clean(dto.credentialUrl) }
           : {}),
@@ -1034,24 +935,12 @@ export class HrService {
     const row = await this.prisma.employeeEducation.update({
       where: { id: educationId },
       data: {
-        ...(dto.institution !== undefined
-          ? { institution: dto.institution.trim() }
-          : {}),
-        ...(dto.qualification !== undefined
-          ? { qualification: dto.qualification.trim() }
-          : {}),
-        ...(dto.fieldOfStudy !== undefined
-          ? { fieldOfStudy: this.clean(dto.fieldOfStudy) }
-          : {}),
-        ...(dto.startDate !== undefined
-          ? { startDate: this.date(dto.startDate) }
-          : {}),
-        ...(dto.endDate !== undefined
-          ? { endDate: this.date(dto.endDate) }
-          : {}),
-        ...(dto.gradeOrScore !== undefined
-          ? { gradeOrScore: this.clean(dto.gradeOrScore) }
-          : {}),
+        ...(dto.institution !== undefined ? { institution: dto.institution.trim() } : {}),
+        ...(dto.qualification !== undefined ? { qualification: dto.qualification.trim() } : {}),
+        ...(dto.fieldOfStudy !== undefined ? { fieldOfStudy: this.clean(dto.fieldOfStudy) } : {}),
+        ...(dto.startDate !== undefined ? { startDate: this.date(dto.startDate) } : {}),
+        ...(dto.endDate !== undefined ? { endDate: this.date(dto.endDate) } : {}),
+        ...(dto.gradeOrScore !== undefined ? { gradeOrScore: this.clean(dto.gradeOrScore) } : {}),
       },
     });
     await this.audit.record({
@@ -1088,10 +977,7 @@ export class HrService {
     return { id: educationId, removed: true };
   }
 
-  private async findEmployee(
-    id: string,
-    organizationId: string,
-  ): Promise<HrEmployeeDetail> {
+  private async findEmployee(id: string, organizationId: string): Promise<HrEmployeeDetail> {
     const employee = await this.prisma.employee.findFirst({
       where: { id, division: { organizationId } },
       include: hrDetailInclude,
@@ -1109,26 +995,21 @@ export class HrService {
       throw new ForbiddenException("HR employee management access denied");
   }
   private requireOrganization(principal: Principal) {
-    if (!principal.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!principal.organizationId) throw new ForbiddenException("Organization context unavailable");
     return principal.organizationId;
   }
   private isDivisionScoped(principal: Principal) {
     return (
       principal.roles.includes("DIVISION_HEAD") &&
       !principal.roles.some((role) =>
-        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "HR_EXECUTIVE"].includes(
-          role,
-        ),
+        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "HR_EXECUTIVE"].includes(role),
       )
     );
   }
   private canReadPrivate(principal: Principal) {
     return (
       principal.permissions.includes("hr.employees.read_private") ||
-      principal.roles.some((role) =>
-        ["FOUNDER_CEO", "SUPER_ADMIN", "HR_MANAGER"].includes(role),
-      )
+      principal.roles.some((role) => ["FOUNDER_CEO", "SUPER_ADMIN", "HR_MANAGER"].includes(role))
     );
   }
 
@@ -1136,52 +1017,24 @@ export class HrService {
     if (principal.employeeId === employee.id) return;
     if (!principal.permissions.includes("hr.employees.read"))
       throw new ForbiddenException("Employee access denied");
-    if (
-      this.isDivisionScoped(principal) &&
-      principal.divisionId !== employee.divisionId
-    )
+    if (this.isDivisionScoped(principal) && principal.divisionId !== employee.divisionId)
       throw new ForbiddenException("Employee access denied");
   }
-  private async assertChildRead(
-    principal: Principal,
-    id: string,
-    privateOnly = false,
-  ) {
-    const employee = await this.findEmployee(
-      id,
-      this.requireOrganization(principal),
-    );
+  private async assertChildRead(principal: Principal, id: string, privateOnly = false) {
+    const employee = await this.findEmployee(id, this.requireOrganization(principal));
     this.assertReadTarget(principal, employee);
-    if (
-      privateOnly &&
-      !this.canReadPrivate(principal) &&
-      principal.employeeId !== id
-    )
+    if (privateOnly && !this.canReadPrivate(principal) && principal.employeeId !== id)
       throw new ForbiddenException("Private HR access denied");
     return employee;
   }
-  private async assertChildWrite(
-    principal: Principal,
-    id: string,
-    privateOnly = false,
-  ) {
-    const employee = await this.findEmployee(
-      id,
-      this.requireOrganization(principal),
-    );
+  private async assertChildWrite(principal: Principal, id: string, privateOnly = false) {
+    const employee = await this.findEmployee(id, this.requireOrganization(principal));
     if (principal.employeeId === id && !privateOnly) return employee;
     if (!principal.permissions.includes("hr.employees.manage"))
       throw new ForbiddenException("HR employee management access denied");
-    if (
-      privateOnly &&
-      !this.canReadPrivate(principal) &&
-      principal.employeeId !== id
-    )
+    if (privateOnly && !this.canReadPrivate(principal) && principal.employeeId !== id)
       throw new ForbiddenException("Private HR access denied");
-    if (
-      this.isDivisionScoped(principal) &&
-      principal.divisionId !== employee.divisionId
-    )
+    if (this.isDivisionScoped(principal) && principal.divisionId !== employee.divisionId)
       throw new ForbiddenException("Employee access denied");
     return employee;
   }
@@ -1203,18 +1056,13 @@ export class HrService {
       select: { id: true },
     });
     if (!division || !department)
-      throw new BadRequestException(
-        "Department does not belong to the selected division",
-      );
+      throw new BadRequestException("Department does not belong to the selected division");
     if (branchId) {
       const branch = await this.prisma.branch.findFirst({
         where: { id: branchId, organizationId },
         select: { id: true },
       });
-      if (!branch)
-        throw new BadRequestException(
-          "Branch does not belong to this organization",
-        );
+      if (!branch) throw new BadRequestException("Branch does not belong to this organization");
     }
   }
   private async validateManager(
@@ -1229,9 +1077,7 @@ export class HrService {
     const visited = new Set<string>();
     while (currentId) {
       if (currentId === employeeId)
-        throw new BadRequestException(
-          "Manager relationship would create a cycle",
-        );
+        throw new BadRequestException("Manager relationship would create a cycle");
       if (visited.has(currentId))
         throw new BadRequestException("Manager relationship contains a cycle");
       visited.add(currentId);
@@ -1240,10 +1086,7 @@ export class HrService {
           where: { id: currentId, division: { organizationId } },
           select: { id: true, managerEmployeeId: true },
         });
-      if (!current)
-        throw new BadRequestException(
-          "Manager does not belong to this organization",
-        );
+      if (!current) throw new BadRequestException("Manager does not belong to this organization");
       currentId = current.managerEmployeeId;
     }
   }
@@ -1253,13 +1096,9 @@ export class HrService {
     probationEndDate: Date | null,
   ) {
     if (joiningDate && confirmationDate && confirmationDate < joiningDate)
-      throw new BadRequestException(
-        "Confirmation date cannot precede joining date",
-      );
+      throw new BadRequestException("Confirmation date cannot precede joining date");
     if (joiningDate && probationEndDate && probationEndDate < joiningDate)
-      throw new BadRequestException(
-        "Probation end date cannot precede joining date",
-      );
+      throw new BadRequestException("Probation end date cannot precede joining date");
   }
   private date(value?: string | Date | null) {
     return value ? new Date(value) : null;
@@ -1268,13 +1107,8 @@ export class HrService {
     const trimmed = value?.trim();
     return trimmed || null;
   }
-  private isUnique(
-    error: unknown,
-  ): error is Prisma.PrismaClientKnownRequestError {
-    return (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    );
+  private isUnique(error: unknown): error is Prisma.PrismaClientKnownRequestError {
+    return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
   }
 
   private historyChanges(current: HrEmployeeDetail, dto: UpdateHrEmployeeDto) {
@@ -1340,11 +1174,7 @@ export class HrService {
     return changes;
   }
 
-  private toResponse(
-    employee: HrEmployeeDetail,
-    includePrivate: boolean,
-    detail: boolean,
-  ) {
+  private toResponse(employee: HrEmployeeDetail, includePrivate: boolean, detail: boolean) {
     const base = {
       id: employee.id,
       employeeCode: employee.employeeCode,

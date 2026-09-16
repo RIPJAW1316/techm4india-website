@@ -63,19 +63,13 @@ export class RecruitmentController {
 
   @Get("requisitions")
   @RequirePermissions("recruitment.requisitions.read")
-  listRequisitions(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: RequisitionQueryDto,
-  ) {
+  listRequisitions(@CurrentPrincipal() principal: Principal, @Query() query: RequisitionQueryDto) {
     return this.list(this.recruitment.listRequisitions(principal, query));
   }
 
   @Get("requisitions/:id")
   @RequirePermissions("recruitment.requisitions.read")
-  getRequisition(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getRequisition(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.recruitment.getRequisition(principal, id));
   }
 
@@ -86,9 +80,7 @@ export class RecruitmentController {
     @Body() dto: CreateRequisitionDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.createRequisition(principal, dto, this.metadata(request)),
-    );
+    return this.ok(this.recruitment.createRequisition(principal, dto, this.metadata(request)));
   }
 
   @Post("requisitions/:id/submit")
@@ -99,12 +91,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "submit",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "submit", this.metadata(request)),
     );
   }
 
@@ -116,12 +103,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "approve",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "approve", this.metadata(request)),
     );
   }
 
@@ -133,12 +115,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "open",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "open", this.metadata(request)),
     );
   }
 
@@ -150,12 +127,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "hold",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "hold", this.metadata(request)),
     );
   }
 
@@ -167,12 +139,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "close",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "close", this.metadata(request)),
     );
   }
 
@@ -184,30 +151,19 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.transitionRequisition(
-        principal,
-        id,
-        "cancel",
-        this.metadata(request),
-      ),
+      this.recruitment.transitionRequisition(principal, id, "cancel", this.metadata(request)),
     );
   }
 
   @Get("applicants")
   @RequirePermissions("recruitment.applicants.read")
-  listApplicants(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: ApplicantQueryDto,
-  ) {
+  listApplicants(@CurrentPrincipal() principal: Principal, @Query() query: ApplicantQueryDto) {
     return this.list(this.recruitment.listApplicants(principal, query));
   }
 
   @Get("applicants/:id")
   @RequirePermissions("recruitment.applicants.read")
-  getApplicant(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getApplicant(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.recruitment.getApplicant(principal, id));
   }
 
@@ -218,9 +174,7 @@ export class RecruitmentController {
     @Body() dto: CreateApplicantDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.createApplicant(principal, dto, this.metadata(request)),
-    );
+    return this.ok(this.recruitment.createApplicant(principal, dto, this.metadata(request)));
   }
 
   @Post("applicants/:id/interviews")
@@ -231,14 +185,7 @@ export class RecruitmentController {
     @Body() dto: ScheduleInterviewDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.scheduleInterview(
-        principal,
-        id,
-        dto,
-        this.metadata(request),
-      ),
-    );
+    return this.ok(this.recruitment.scheduleInterview(principal, id, dto, this.metadata(request)));
   }
 
   @Post("interviews/:id/complete")
@@ -249,14 +196,7 @@ export class RecruitmentController {
     @Body() dto: CompleteInterviewDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.completeInterview(
-        principal,
-        id,
-        dto,
-        this.metadata(request),
-      ),
-    );
+    return this.ok(this.recruitment.completeInterview(principal, id, dto, this.metadata(request)));
   }
 
   @Post("applicants/:id/offers")
@@ -267,9 +207,7 @@ export class RecruitmentController {
     @Body() dto: CreateOfferDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.createOffer(principal, id, dto, this.metadata(request)),
-    );
+    return this.ok(this.recruitment.createOffer(principal, id, dto, this.metadata(request)));
   }
 
   @Post("offers/:id/issue")
@@ -279,9 +217,7 @@ export class RecruitmentController {
     @Param("id", ParseUUIDPipe) id: string,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.recruitment.issueOffer(principal, id, this.metadata(request)),
-    );
+    return this.ok(this.recruitment.issueOffer(principal, id, this.metadata(request)));
   }
 
   @Post("offers/:id/record-response")
@@ -293,12 +229,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.recordOfferResponse(
-        principal,
-        id,
-        dto,
-        this.metadata(request),
-      ),
+      this.recruitment.recordOfferResponse(principal, id, dto, this.metadata(request)),
     );
   }
 
@@ -311,12 +242,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.createOnboardingTask(
-        principal,
-        id,
-        dto,
-        this.metadata(request),
-      ),
+      this.recruitment.createOnboardingTask(principal, id, dto, this.metadata(request)),
     );
   }
 
@@ -329,12 +255,7 @@ export class RecruitmentController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.recruitment.updateOnboardingTask(
-        principal,
-        id,
-        dto,
-        this.metadata(request),
-      ),
+      this.recruitment.updateOnboardingTask(principal, id, dto, this.metadata(request)),
     );
   }
 }

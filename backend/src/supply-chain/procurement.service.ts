@@ -4,10 +4,7 @@ import { Prisma, PurchaseOrderStatus, StockMovementType } from "@prisma/client";
 import { Principal } from "../auth/auth.types";
 import { RequestMetadata } from "../auth/interfaces/request-metadata";
 import { V2ServiceBase } from "../common/v2-service.base";
-import {
-  CreatePurchaseOrderDto,
-  PurchaseOrderQueryDto,
-} from "./dto/supply-chain.dto";
+import { CreatePurchaseOrderDto, PurchaseOrderQueryDto } from "./dto/supply-chain.dto";
 
 const orderInclude = {
   vendor: { select: { id: true, code: true, name: true, status: true } },
@@ -59,11 +56,7 @@ export class ProcurementService extends V2ServiceBase {
     return { data, meta: { page, limit, total } };
   }
 
-  async createOrder(
-    principal: Principal,
-    dto: CreatePurchaseOrderDto,
-    request?: RequestMetadata,
-  ) {
+  async createOrder(principal: Principal, dto: CreatePurchaseOrderDto, request?: RequestMetadata) {
     const organizationId = this.organizationId(principal);
     const vendor = await this.prisma.vendor.findFirst({
       where: { id: dto.vendorId, organizationId },
@@ -73,9 +66,7 @@ export class ProcurementService extends V2ServiceBase {
     if (vendor.status !== "ACTIVE") {
       throw new ConflictException("Purchase orders require an active vendor");
     }
-    const itemIds = dto.items
-      .map((item) => item.itemId)
-      .filter((id): id is string => Boolean(id));
+    const itemIds = dto.items.map((item) => item.itemId).filter((id): id is string => Boolean(id));
     if (itemIds.length > 0) {
       const found = await this.prisma.inventoryItem.count({
         where: { id: { in: itemIds }, organizationId },
@@ -84,10 +75,7 @@ export class ProcurementService extends V2ServiceBase {
         throw new NotFoundException("One or more inventory items were not found");
       }
     }
-    const total = dto.items.reduce(
-      (sum, item) => sum + item.quantity * item.unitCost,
-      0,
-    );
+    const total = dto.items.reduce((sum, item) => sum + item.quantity * item.unitCost, 0);
     let row;
     try {
       row = await this.prisma.purchaseOrder.create({
@@ -157,18 +145,23 @@ export class ProcurementService extends V2ServiceBase {
       data: {
         status: transition.to,
         ...(action === "submit" ? { submittedAt: now } : {}),
-        ...(action === "approve"
-          ? { approvedByUserId: principal.userId, approvedAt: now }
-          : {}),
+        ...(action === "approve" ? { approvedByUserId: principal.userId, approvedAt: now } : {}),
         ...(action === "issue" ? { issuedAt: now } : {}),
         ...(action === "cancel" ? { closedAt: now } : {}),
       },
       include: orderInclude,
     });
-    await this.record(`PURCHASE_ORDER_${action.toUpperCase()}`, principal, "PurchaseOrder", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      `PURCHASE_ORDER_${action.toUpperCase()}`,
+      principal,
+      "PurchaseOrder",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 

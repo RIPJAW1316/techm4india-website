@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
 import { Request, Response } from "express";
@@ -46,10 +38,7 @@ export class AuthController {
   @ApiOperation({ summary: "Rotate the opaque refresh session" })
   @ApiResponse({ status: 200, description: "Refresh session rotated" })
   @ApiResponse({ status: 401, description: "Refresh session invalid" })
-  async refresh(
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async refresh(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     const result = await this.authService.refresh(
       request.cookies?.[this.authService.refreshCookieName] as string | undefined,
       this.metadata(request),
@@ -62,10 +51,7 @@ export class AuthController {
   @UseGuards(TrustedOriginGuard)
   @ApiOperation({ summary: "Revoke the current refresh session" })
   @ApiResponse({ status: 200, description: "Logged out" })
-  async logout(
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
     await this.authService.logout(
       request.cookies?.[this.authService.refreshCookieName] as string | undefined,
       this.metadata(request),

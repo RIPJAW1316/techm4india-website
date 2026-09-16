@@ -41,13 +41,11 @@ export class PayrollService {
   ) {}
 
   private org(principal: Principal) {
-    if (!principal.organizationId)
-      throw new ForbiddenException("Organization context required");
+    if (!principal.organizationId) throw new ForbiddenException("Organization context required");
     return principal.organizationId;
   }
   private assertEmployee(principal: Principal) {
-    if (!principal.employeeId)
-      throw new ForbiddenException("Employee context required");
+    if (!principal.employeeId) throw new ForbiddenException("Employee context required");
     return principal.employeeId;
   }
   private async component(principal: Principal, id: string) {
@@ -107,9 +105,7 @@ export class PayrollService {
             year: current.year,
             month: current.month,
             status: current.status,
-            run: current.run
-              ? { id: current.run.id, status: current.run.status }
-              : null,
+            run: current.run ? { id: current.run.id, status: current.run.status } : null,
           }
         : null,
       summary: {
@@ -128,11 +124,7 @@ export class PayrollService {
       orderBy: [{ displayOrder: "asc" }, { code: "asc" }],
     });
   }
-  async createComponent(
-    principal: Principal,
-    dto: CreateComponentDto,
-    request?: RequestMetadata,
-  ) {
+  async createComponent(principal: Principal, dto: CreateComponentDto, request?: RequestMetadata) {
     const organizationId = this.org(principal);
     await this.validateBase(principal, dto.percentageBaseComponentId);
     const row = await this.prisma.payrollComponent.create({
@@ -197,23 +189,15 @@ export class PayrollService {
     });
     return row;
   }
-  private async validateBase(
-    principal: Principal,
-    baseId?: string,
-    selfId?: string,
-  ) {
+  private async validateBase(principal: Principal, baseId?: string, selfId?: string) {
     if (!baseId) return;
     if (baseId === selfId)
-      throw new BadRequestException(
-        "Percentage component cannot reference itself",
-      );
+      throw new BadRequestException("Percentage component cannot reference itself");
     const visited = new Set<string>();
     let cursor: string | null = baseId;
     while (cursor) {
       if (visited.has(cursor) || cursor === selfId)
-        throw new BadRequestException(
-          "Circular percentage dependency rejected",
-        );
+        throw new BadRequestException("Circular percentage dependency rejected");
       visited.add(cursor);
       const base = await this.component(principal, cursor);
       cursor = base.percentageBaseComponentId;
@@ -245,16 +229,9 @@ export class PayrollService {
     if (!row) throw new NotFoundException("Salary structure not found");
     return row;
   }
-  async createStructure(
-    principal: Principal,
-    dto: CreateStructureDto,
-    request?: RequestMetadata,
-  ) {
+  async createStructure(principal: Principal, dto: CreateStructureDto, request?: RequestMetadata) {
     const organizationId = this.org(principal);
-    const components = await this.structureComponents(
-      principal,
-      dto.components,
-    );
+    const components = await this.structureComponents(principal, dto.components);
     const row = await this.prisma.salaryStructure.create({
       data: {
         organizationId,
@@ -282,10 +259,7 @@ export class PayrollService {
     request?: RequestMetadata,
   ) {
     await this.structure(principal, id);
-    const components = await this.structureComponents(
-      principal,
-      dto.components,
-    );
+    const components = await this.structureComponents(principal, dto.components);
     const row = await this.prisma.$transaction(async (tx) => {
       if (dto.components)
         await tx.salaryStructureComponent.deleteMany({
@@ -329,9 +303,7 @@ export class PayrollService {
       },
     });
     if (valid.length !== items.length)
-      throw new BadRequestException(
-        "All components must belong to the organization",
-      );
+      throw new BadRequestException("All components must belong to the organization");
     return items.map((item, index) => ({
       payrollComponentId: item.payrollComponentId,
       value: item.value,
@@ -397,9 +369,7 @@ export class PayrollService {
     const from = new Date(dto.effectiveFrom);
     const to = dto.effectiveTo ? new Date(dto.effectiveTo) : null;
     if (to && to < from)
-      throw new BadRequestException(
-        "effectiveTo must be on or after effectiveFrom",
-      );
+      throw new BadRequestException("effectiveTo must be on or after effectiveFrom");
     const overlap = await this.prisma.employeeCompensation.findFirst({
       where: {
         employeeId,
@@ -408,8 +378,7 @@ export class PayrollService {
         OR: [{ effectiveTo: null }, { effectiveTo: { gte: from } }],
       },
     });
-    if (overlap)
-      throw new ConflictException("Compensation effective dates overlap");
+    if (overlap) throw new ConflictException("Compensation effective dates overlap");
     const row = await this.prisma.employeeCompensation.create({
       data: {
         employeeId,
@@ -443,18 +412,13 @@ export class PayrollService {
   ) {
     const current = await this.compensation(principal, id);
     if (current.status === "ENDED")
-      throw new ConflictException(
-        "Ended compensation is historical and cannot be edited",
-      );
-    const salaryStructureId =
-      dto.salaryStructureId ?? current.salaryStructureId;
+      throw new ConflictException("Ended compensation is historical and cannot be edited");
+    const salaryStructureId = dto.salaryStructureId ?? current.salaryStructureId;
     const structure = await this.prisma.salaryStructure.findFirst({
       where: { id: salaryStructureId, organizationId: this.org(principal) },
     });
     if (!structure) throw new NotFoundException("Salary structure not found");
-    const from = dto.effectiveFrom
-      ? new Date(dto.effectiveFrom)
-      : current.effectiveFrom;
+    const from = dto.effectiveFrom ? new Date(dto.effectiveFrom) : current.effectiveFrom;
     const to =
       dto.effectiveTo === undefined
         ? current.effectiveTo
@@ -470,8 +434,7 @@ export class PayrollService {
         OR: [{ effectiveTo: null }, { effectiveTo: { gte: from } }],
       },
     });
-    if (overlap)
-      throw new ConflictException("Compensation effective dates overlap");
+    if (overlap) throw new ConflictException("Compensation effective dates overlap");
     const row = await this.prisma.$transaction(async (tx) => {
       if (dto.overrides)
         await tx.employeeCompensationComponent.deleteMany({
@@ -502,10 +465,7 @@ export class PayrollService {
     });
     return row;
   }
-  private async overrideData(
-    principal: Principal,
-    items: CompensationOverrideDto[],
-  ) {
+  private async overrideData(principal: Principal, items: CompensationOverrideDto[]) {
     const valid = await this.prisma.payrollComponent.findMany({
       where: {
         organizationId: this.org(principal),
@@ -535,11 +495,7 @@ export class PayrollService {
       include: { run: { select: { id: true, status: true } } },
     });
   }
-  async createPeriod(
-    principal: Principal,
-    dto: CreatePeriodDto,
-    request?: RequestMetadata,
-  ) {
+  async createPeriod(principal: Principal, dto: CreatePeriodDto, request?: RequestMetadata) {
     const organizationId = this.org(principal);
     let row;
     try {
@@ -554,13 +510,8 @@ export class PayrollService {
         },
       });
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      ) {
-        throw new ConflictException(
-          "Payroll period already exists for this month",
-        );
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new ConflictException("Payroll period already exists for this month");
       }
       throw error;
     }
@@ -623,11 +574,7 @@ export class PayrollService {
     if (!row) throw new NotFoundException("Payroll run not found");
     return row;
   }
-  async createRun(
-    principal: Principal,
-    dto: CreateRunDto,
-    request?: RequestMetadata,
-  ) {
+  async createRun(principal: Principal, dto: CreateRunDto, request?: RequestMetadata) {
     const organizationId = this.org(principal);
     const period = await this.prisma.payrollPeriod.findFirst({
       where: { id: dto.payrollPeriodId, organizationId },
@@ -638,10 +585,7 @@ export class PayrollService {
     const existing = await this.prisma.payrollRun.findUnique({
       where: { payrollPeriodId: period.id },
     });
-    if (existing)
-      throw new ConflictException(
-        "A payroll run already exists for this period",
-      );
+    if (existing) throw new ConflictException("A payroll run already exists for this period");
     const row = await this.prisma.payrollRun.create({
       data: {
         organizationId,
@@ -671,8 +615,7 @@ export class PayrollService {
       include: { period: true },
     });
     if (!run) throw new NotFoundException("Payroll run not found");
-    if (run.status === "FINALIZED")
-      throw new ConflictException("Finalized payroll is immutable");
+    if (run.status === "FINALIZED") throw new ConflictException("Finalized payroll is immutable");
     const employees = await this.prisma.employee.findMany({
       where: {
         division: { organizationId: run.organizationId },
@@ -690,10 +633,7 @@ export class PayrollService {
             employeeId: employee.id,
             status: "ACTIVE",
             effectiveFrom: { lte: run.period.startDate },
-            OR: [
-              { effectiveTo: null },
-              { effectiveTo: { gte: run.period.startDate } },
-            ],
+            OR: [{ effectiveTo: null }, { effectiveTo: { gte: run.period.startDate } }],
           },
           orderBy: { effectiveFrom: "desc" },
           include: {
@@ -719,14 +659,8 @@ export class PayrollService {
             totalDeductions: computed.deductions,
             netPay: computed.net,
             employerContributionTotal: computed.employer,
-            workingDays: this.daysInPeriod(
-              run.period.startDate,
-              run.period.endDate,
-            ),
-            payableDays: this.daysInPeriod(
-              run.period.startDate,
-              run.period.endDate,
-            ),
+            workingDays: this.daysInPeriod(run.period.startDate, run.period.endDate),
+            payableDays: this.daysInPeriod(run.period.startDate, run.period.endDate),
             leaveWithoutPayDays: 0,
             lineItems: { create: computed.lines },
           },
@@ -756,9 +690,7 @@ export class PayrollService {
     const lines: any[] = [];
     const all = [...comp.salaryStructure.components];
     for (const override of comp.overrides) {
-      const found = all.find(
-        (item) => item.payrollComponentId === override.payrollComponentId,
-      );
+      const found = all.find((item) => item.payrollComponentId === override.payrollComponentId);
       if (found) {
         found.value = override.value;
         found.percentage = override.percentage;
@@ -779,17 +711,13 @@ export class PayrollService {
       if (baseId && !values.has(baseId)) {
         pending.push(item);
         if (pending.length === 1)
-          throw new BadRequestException(
-            "Circular percentage dependency rejected",
-          );
+          throw new BadRequestException("Circular percentage dependency rejected");
         continue;
       }
       let amount = money(item.value ?? c.defaultValue);
       const pct = item.percentage ?? c.percentageValue;
       if (c.calculationType === "PERCENTAGE") {
-        const base = baseId
-          ? values.get(baseId)!
-          : money(comp.monthlyGrossTarget ?? 0);
+        const base = baseId ? values.get(baseId)! : money(comp.monthlyGrossTarget ?? 0);
         amount = money(base.mul(new Prisma.Decimal(pct ?? 0)).div(100));
       }
       if (c.calculationType === "MANUAL") amount = money(item.value ?? 0);
@@ -807,24 +735,15 @@ export class PayrollService {
         },
       });
     }
-    if (pending.length)
-      throw new BadRequestException("Circular percentage dependency rejected");
+    if (pending.length) throw new BadRequestException("Circular percentage dependency rejected");
     const gross = lines
-      .filter(
-        (line) => line.componentTypeSnapshot === PayrollComponentType.EARNING,
-      )
+      .filter((line) => line.componentTypeSnapshot === PayrollComponentType.EARNING)
       .reduce((sum, line) => sum.plus(line.amount), money(0));
     const deductions = lines
-      .filter(
-        (line) => line.componentTypeSnapshot === PayrollComponentType.DEDUCTION,
-      )
+      .filter((line) => line.componentTypeSnapshot === PayrollComponentType.DEDUCTION)
       .reduce((sum, line) => sum.plus(line.amount), money(0));
     const employer = lines
-      .filter(
-        (line) =>
-          line.componentTypeSnapshot ===
-          PayrollComponentType.EMPLOYER_CONTRIBUTION,
-      )
+      .filter((line) => line.componentTypeSnapshot === PayrollComponentType.EMPLOYER_CONTRIBUTION)
       .reduce((sum, line) => sum.plus(line.amount), money(0));
     return {
       lines,
@@ -835,9 +754,7 @@ export class PayrollService {
     };
   }
   private daysInPeriod(start: Date, end: Date) {
-    return new Prisma.Decimal(
-      Math.floor((end.getTime() - start.getTime()) / 86400000) + 1,
-    );
+    return new Prisma.Decimal(Math.floor((end.getTime() - start.getTime()) / 86400000) + 1);
   }
   async results(principal: Principal, runId: string) {
     const run = await this.run(principal, runId);
@@ -882,10 +799,7 @@ export class PayrollService {
     )
       throw new ConflictException("Finalized payroll is immutable");
     if (dto.componentAdjustments?.length) {
-      const adjustments = await this.overrideData(
-        principal,
-        dto.componentAdjustments,
-      );
+      const adjustments = await this.overrideData(principal, dto.componentAdjustments);
       const components = await this.prisma.payrollComponent.findMany({
         where: {
           organizationId: this.org(principal),
@@ -909,7 +823,7 @@ export class PayrollService {
         const computed = this.compute({
           ...compensation,
           overrides: [
-          ...compensation.overrides,
+            ...compensation.overrides,
             ...adjustments.map((item) => ({
               ...item,
               component: componentById.get(item.payrollComponentId)!,
@@ -954,16 +868,10 @@ export class PayrollService {
     });
     return updated;
   }
-  async submitReview(
-    principal: Principal,
-    id: string,
-    request?: RequestMetadata,
-  ) {
+  async submitReview(principal: Principal, id: string, request?: RequestMetadata) {
     const run = await this.run(principal, id);
     if (run.status !== PayrollRunStatus.PROCESSING)
-      throw new ConflictException(
-        "Payroll run must be calculated before review",
-      );
+      throw new ConflictException("Payroll run must be calculated before review");
     const updated = await this.prisma.payrollRun.update({
       where: { id },
       data: { status: "REVIEW" },

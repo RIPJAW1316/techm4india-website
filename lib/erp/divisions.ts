@@ -50,7 +50,9 @@ export function getDivisionConfig(slug: string | null | undefined): DivisionConf
 
 export function isOrganizationWideContext(context: AuthContext | null): boolean {
   if (!context) return false;
-  const hasOrganizationRole = context.user.roles.some((role) => role === "SUPER_ADMIN" || role === "DIRECTOR" || role === "FOUNDER_CEO");
+  const hasOrganizationRole = context.user.roles.some(
+    (role) => role === "SUPER_ADMIN" || role === "DIRECTOR" || role === "FOUNDER_CEO",
+  );
   return hasOrganizationRole && context.permissions.includes("organization.read_all");
 }
 
@@ -65,7 +67,10 @@ export function resolveDashboardPath(context: AuthContext | null): string {
   return getDivisionConfig(context.employee?.division?.slug)?.dashboardPath ?? "/erp";
 }
 
-export function canAccessDivisionWorkspace(context: AuthContext | null, divisionSlug: DivisionSlug): boolean {
+export function canAccessDivisionWorkspace(
+  context: AuthContext | null,
+  divisionSlug: DivisionSlug,
+): boolean {
   if (!context) return false;
   if (isOrganizationWideContext(context)) return true;
   return context.employee?.division?.slug === divisionSlug;

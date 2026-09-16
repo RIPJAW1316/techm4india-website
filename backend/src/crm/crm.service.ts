@@ -5,12 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import {
-  CrmAccountStatus,
-  CrmOpportunityStage,
-  NotificationType,
-  Prisma,
-} from "@prisma/client";
+import { CrmAccountStatus, CrmOpportunityStage, NotificationType, Prisma } from "@prisma/client";
 import { Principal } from "../auth/auth.types";
 import { AuditService } from "../audit/audit.service";
 import { NotificationsService } from "../notifications/notifications.service";
@@ -75,14 +70,11 @@ export class CrmService {
     private readonly notifications: NotificationsService,
   ) {}
   private org(p: Principal) {
-    if (!p.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!p.organizationId) throw new ForbiddenException("Organization context unavailable");
     return p.organizationId;
   }
   private full(p: Principal) {
-    return p.roles.some((role) =>
-      ["SUPER_ADMIN", "FOUNDER_CEO", "SALES_MANAGER"].includes(role),
-    );
+    return p.roles.some((role) => ["SUPER_ADMIN", "FOUNDER_CEO", "SALES_MANAGER"].includes(role));
   }
   private executive(p: Principal) {
     return p.roles.includes("SALES_EXECUTIVE");
@@ -101,10 +93,7 @@ export class CrmService {
       throw new ForbiddenException("CRM access denied");
   }
   private manage(p: Principal, permission: string) {
-    if (
-      !p.permissions.includes(permission) ||
-      !(this.full(p) || this.executive(p))
-    )
+    if (!p.permissions.includes(permission) || !(this.full(p) || this.executive(p)))
       throw new ForbiddenException("CRM management denied");
   }
   private assign(p: Principal) {
@@ -144,16 +133,12 @@ export class CrmService {
       where: { id, employmentStatus: "ACTIVE", division: { organizationId } },
       select: ownerSelect,
     });
-    if (!employee)
-      throw new BadRequestException(
-        "Active CRM owner not found in this organization",
-      );
+    if (!employee) throw new BadRequestException("Active CRM owner not found in this organization");
     return employee;
   }
   private ownId(p: Principal, requested?: string) {
     if (this.scoped(p)) {
-      if (!p.employeeId)
-        throw new ForbiddenException("Employee profile unavailable");
+      if (!p.employeeId) throw new ForbiddenException("Employee profile unavailable");
       if (requested && requested !== p.employeeId)
         throw new ForbiddenException("CRM ownership is restricted");
       return p.employeeId;
@@ -165,8 +150,7 @@ export class CrmService {
     const account = await this.prisma.crmAccount.findFirst({
       where: { id, organizationId },
     });
-    if (!account)
-      throw new BadRequestException("CRM account is not in this organization");
+    if (!account) throw new BadRequestException("CRM account is not in this organization");
     return account;
   }
   private async contact(organizationId: string, id?: string) {
@@ -174,8 +158,7 @@ export class CrmService {
     const contact = await this.prisma.crmContact.findFirst({
       where: { id, organizationId },
     });
-    if (!contact)
-      throw new BadRequestException("CRM contact is not in this organization");
+    if (!contact) throw new BadRequestException("CRM contact is not in this organization");
     return contact;
   }
   private async lead(organizationId: string, id?: string) {
@@ -183,8 +166,7 @@ export class CrmService {
     const lead = await this.prisma.crmLead.findFirst({
       where: { id, organizationId },
     });
-    if (!lead)
-      throw new BadRequestException("CRM lead is not in this organization");
+    if (!lead) throw new BadRequestException("CRM lead is not in this organization");
     return lead;
   }
   private async opportunity(organizationId: string, id?: string) {
@@ -192,15 +174,11 @@ export class CrmService {
     const opportunity = await this.prisma.crmOpportunity.findFirst({
       where: { id, organizationId },
     });
-    if (!opportunity)
-      throw new BadRequestException(
-        "CRM opportunity is not in this organization",
-      );
+    if (!opportunity) throw new BadRequestException("CRM opportunity is not in this organization");
     return opportunity;
   }
   private assertWritableArchived(archivedAt: Date | null) {
-    if (archivedAt)
-      throw new ConflictException("Archived CRM records cannot be changed");
+    if (archivedAt) throw new ConflictException("Archived CRM records cannot be changed");
   }
   private async notifyAssignment(
     tx: Prisma.TransactionClient,
@@ -233,11 +211,7 @@ export class CrmService {
     const where: Prisma.CrmLeadWhereInput = {
       organizationId,
       ...(ownerEmployeeId ? { ownerEmployeeId } : {}),
-      ...(q.status
-        ? { status: q.status }
-        : q.includeArchived
-          ? {}
-          : { archivedAt: null }),
+      ...(q.status ? { status: q.status } : q.includeArchived ? {} : { archivedAt: null }),
       ...(q.source ? { source: q.source } : {}),
       ...(q.from || q.to
         ? {
@@ -272,8 +246,7 @@ export class CrmService {
         where,
         include: leadInclude,
         orderBy: {
-          [q.sortBy === "name" ? "firstName" : (q.sortBy ?? "createdAt")]:
-            q.sortOrder ?? "desc",
+          [q.sortBy === "name" ? "firstName" : (q.sortBy ?? "createdAt")]: q.sortOrder ?? "desc",
         },
         skip: page.skip,
         take: page.take,
@@ -306,8 +279,7 @@ export class CrmService {
     if (!dto.firstName?.trim() || !dto.lastName?.trim())
       throw new BadRequestException("Lead first and last name are required");
     const organizationId = this.org(p);
-    const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
+    const ownerId = this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
     const owner = await this.employee(organizationId, ownerId);
     return this.prisma.$transaction(async (tx) => {
       const row = await tx.crmLead.create({
@@ -365,26 +337,14 @@ export class CrmService {
     if (!existing) throw new NotFoundException("Lead not found");
     this.assertWritableArchived(existing.archivedAt);
     if (existing.status === "CONVERTED")
-      throw new ConflictException(
-        "Converted leads are historical and cannot be edited",
-      );
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== existing.ownerEmployeeId
-    )
+      throw new ConflictException("Converted leads are historical and cannot be edited");
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId)
       this.assign(p);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.ownId(p, dto.ownerEmployeeId);
-    const owner =
-      ownerId === undefined
-        ? null
-        : await this.employee(organizationId, ownerId);
+      dto.ownerEmployeeId === undefined ? undefined : this.ownId(p, dto.ownerEmployeeId);
+    const owner = ownerId === undefined ? null : await this.employee(organizationId, ownerId);
     if (dto.status === "CONVERTED" || dto.status === "ARCHIVED")
-      throw new BadRequestException(
-        "Use conversion or archive lifecycle actions",
-      );
+      throw new BadRequestException("Use conversion or archive lifecycle actions");
     return this.prisma.$transaction(async (tx) => {
       const row = await tx.crmLead.update({
         where: { id },
@@ -399,18 +359,11 @@ export class CrmService {
           status: dto.status,
           ownerEmployeeId: ownerId,
           estimatedValue: dto.estimatedValue,
-          currency:
-            dto.currency === undefined
-              ? undefined
-              : this.currency(dto.currency),
+          currency: dto.currency === undefined ? undefined : this.currency(dto.currency),
           nextFollowUpAt:
-            dto.nextFollowUpAt === undefined
-              ? undefined
-              : this.date(dto.nextFollowUpAt),
+            dto.nextFollowUpAt === undefined ? undefined : this.date(dto.nextFollowUpAt),
           lastContactedAt:
-            dto.lastContactedAt === undefined
-              ? undefined
-              : this.date(dto.lastContactedAt),
+            dto.lastContactedAt === undefined ? undefined : this.date(dto.lastContactedAt),
           notes: dto.notes?.trim(),
         }),
         include: leadInclude,
@@ -418,8 +371,7 @@ export class CrmService {
       await tx.auditLog.create({
         data: {
           action:
-            dto.ownerEmployeeId !== undefined &&
-            dto.ownerEmployeeId !== existing.ownerEmployeeId
+            dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId
               ? "CRM_LEAD_REASSIGNED"
               : "CRM_LEAD_UPDATED",
           actorUserId: p.userId,
@@ -432,10 +384,7 @@ export class CrmService {
           },
         },
       });
-      if (
-        dto.ownerEmployeeId !== undefined &&
-        row.ownerEmployeeId !== existing.ownerEmployeeId
-      )
+      if (dto.ownerEmployeeId !== undefined && row.ownerEmployeeId !== existing.ownerEmployeeId)
         await this.notifyAssignment(
           tx,
           owner,
@@ -488,10 +437,7 @@ export class CrmService {
       throw new ConflictException("Lead has already been converted");
     this.assertWritableArchived(existing.archivedAt);
     const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ??
-      existing.ownerEmployeeId ??
-      p.employeeId ??
-      undefined;
+      this.ownId(p, dto.ownerEmployeeId) ?? existing.ownerEmployeeId ?? p.employeeId ?? undefined;
     const owner = await this.employee(organizationId, ownerId);
     const existingAccount = dto.existingAccountId
       ? await this.account(organizationId, dto.existingAccountId)
@@ -504,12 +450,9 @@ export class CrmService {
       existingContact?.accountId &&
       existingAccount.id !== existingContact.accountId
     )
-      throw new BadRequestException(
-        "Existing contact does not belong to the selected account",
-      );
+      throw new BadRequestException("Existing contact does not belong to the selected account");
     return this.prisma.$transaction(async (tx) => {
-      let accountId =
-        existingAccount?.id ?? existingContact?.accountId ?? undefined;
+      let accountId = existingAccount?.id ?? existingContact?.accountId ?? undefined;
       if (!accountId) {
         const account = await tx.crmAccount.create({
           data: {
@@ -603,11 +546,7 @@ export class CrmService {
       organizationId: this.org(p),
       ...(ownerEmployeeId ? { ownerEmployeeId } : {}),
       ...(q.accountType ? { accountType: q.accountType } : {}),
-      ...(q.status
-        ? { status: q.status }
-        : q.includeArchived
-          ? {}
-          : { archivedAt: null }),
+      ...(q.status ? { status: q.status } : q.includeArchived ? {} : { archivedAt: null }),
       ...(search
         ? {
             OR: [
@@ -661,11 +600,9 @@ export class CrmService {
   }
   async createAccount(p: Principal, dto: AccountDto) {
     this.manage(p, "crm.accounts.manage");
-    if (!dto.name?.trim())
-      throw new BadRequestException("Account name is required");
+    if (!dto.name?.trim()) throw new BadRequestException("Account name is required");
     const organizationId = this.org(p);
-    const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
+    const ownerId = this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
     await this.employee(organizationId, ownerId);
     const row = await this.prisma.crmAccount.create({
       data: Object.assign(
@@ -694,15 +631,10 @@ export class CrmService {
     });
     if (!existing) throw new NotFoundException("Account not found");
     this.assertWritableArchived(existing.archivedAt);
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== existing.ownerEmployeeId
-    )
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId)
       this.assign(p);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.ownId(p, dto.ownerEmployeeId);
+      dto.ownerEmployeeId === undefined ? undefined : this.ownId(p, dto.ownerEmployeeId);
     await this.employee(this.org(p), ownerId);
     const row = await this.prisma.crmAccount.update({
       where: { id },
@@ -710,10 +642,7 @@ export class CrmService {
       include: accountInclude,
     });
     await this.audit.record({
-      action:
-        row.status === "ARCHIVED"
-          ? "CRM_ACCOUNT_ARCHIVED"
-          : "CRM_ACCOUNT_UPDATED",
+      action: row.status === "ARCHIVED" ? "CRM_ACCOUNT_ARCHIVED" : "CRM_ACCOUNT_UPDATED",
       actorUserId: p.userId,
       entityType: "CrmAccount",
       entityId: id,
@@ -723,11 +652,7 @@ export class CrmService {
   }
   private accountData(dto: AccountDto, ownerEmployeeId?: string) {
     const archived =
-      dto.status === CrmAccountStatus.ARCHIVED
-        ? new Date()
-        : dto.status
-          ? null
-          : undefined;
+      dto.status === CrmAccountStatus.ARCHIVED ? new Date() : dto.status ? null : undefined;
     return this.clean({
       name: dto.name?.trim(),
       displayName: dto.displayName?.trim(),
@@ -813,8 +738,7 @@ export class CrmService {
       throw new BadRequestException("Contact first and last name are required");
     const organizationId = this.org(p);
     await this.account(organizationId, dto.accountId);
-    const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
+    const ownerId = this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
     await this.employee(organizationId, ownerId);
     const row = await this.prisma.crmContact.create({
       data: Object.assign(
@@ -847,16 +771,11 @@ export class CrmService {
     });
     if (!existing) throw new NotFoundException("Contact not found");
     this.assertWritableArchived(existing.archivedAt);
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== existing.ownerEmployeeId
-    )
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId)
       this.assign(p);
     await this.account(this.org(p), dto.accountId);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.ownId(p, dto.ownerEmployeeId);
+      dto.ownerEmployeeId === undefined ? undefined : this.ownId(p, dto.ownerEmployeeId);
     await this.employee(this.org(p), ownerId);
     const row = await this.prisma.crmContact.update({
       where: { id },
@@ -898,20 +817,12 @@ export class CrmService {
       organizationId,
       ...(ownerEmployeeId ? { ownerEmployeeId } : {}),
       ...(q.accountId ? { accountId: q.accountId } : {}),
-      ...(q.stage
-        ? { stage: q.stage }
-        : q.includeArchived
-          ? {}
-          : { archivedAt: null }),
+      ...(q.stage ? { stage: q.stage } : q.includeArchived ? {} : { archivedAt: null }),
       ...(q.expectedCloseFrom || q.expectedCloseTo
         ? {
             expectedCloseDate: {
-              ...(q.expectedCloseFrom
-                ? { gte: this.date(q.expectedCloseFrom) }
-                : {}),
-              ...(q.expectedCloseTo
-                ? { lte: this.date(q.expectedCloseTo) }
-                : {}),
+              ...(q.expectedCloseFrom ? { gte: this.date(q.expectedCloseFrom) } : {}),
+              ...(q.expectedCloseTo ? { lte: this.date(q.expectedCloseTo) } : {}),
             },
           }
         : {}),
@@ -951,12 +862,10 @@ export class CrmService {
   }
   async createOpportunity(p: Principal, dto: OpportunityDto) {
     this.manage(p, "crm.opportunities.manage");
-    if (!dto.name?.trim())
-      throw new BadRequestException("Opportunity name is required");
+    if (!dto.name?.trim()) throw new BadRequestException("Opportunity name is required");
     const organizationId = this.org(p);
     await this.relations(organizationId, dto);
-    const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
+    const ownerId = this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
     const owner = await this.employee(organizationId, ownerId);
     return this.prisma.$transaction(async (tx) => {
       const created = await tx.crmOpportunity.create({
@@ -1004,10 +913,7 @@ export class CrmService {
     });
     if (!existing) throw new NotFoundException("Opportunity not found");
     this.assertWritableArchived(existing.archivedAt);
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== existing.ownerEmployeeId
-    )
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId)
       this.assign(p);
     if (
       ["WON", "LOST"].includes(existing.stage) &&
@@ -1015,20 +921,15 @@ export class CrmService {
       dto.stage !== existing.stage &&
       !this.full(p)
     )
-      throw new ForbiddenException(
-        "Only CRM management can reopen a closed opportunity",
-      );
+      throw new ForbiddenException("Only CRM management can reopen a closed opportunity");
     if (dto.stage === "LOST" && !dto.lostReason?.trim() && !existing.lostReason)
       throw new BadRequestException("Lost opportunities require a reason");
     await this.relations(organizationId, dto);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.ownId(p, dto.ownerEmployeeId);
+      dto.ownerEmployeeId === undefined ? undefined : this.ownId(p, dto.ownerEmployeeId);
     const owner = await this.employee(organizationId, ownerId);
     return this.prisma.$transaction(async (tx) => {
-      const stageChanged =
-        dto.stage !== undefined && dto.stage !== existing.stage;
+      const stageChanged = dto.stage !== undefined && dto.stage !== existing.stage;
       const row = await tx.crmOpportunity.update({
         where: { id },
         data: this.opportunityData(dto, ownerId, existing),
@@ -1055,10 +956,7 @@ export class CrmService {
           },
         },
       });
-      if (
-        dto.ownerEmployeeId !== undefined &&
-        row.ownerEmployeeId !== existing.ownerEmployeeId
-      )
+      if (dto.ownerEmployeeId !== undefined && row.ownerEmployeeId !== existing.ownerEmployeeId)
         await this.notifyAssignment(
           tx,
           owner,
@@ -1081,9 +979,7 @@ export class CrmService {
     if (dto.accountId && dto.primaryContactId) {
       const contact = await this.contact(organizationId, dto.primaryContactId);
       if (contact?.accountId && contact.accountId !== dto.accountId)
-        throw new BadRequestException(
-          "Primary contact does not belong to this account",
-        );
+        throw new BadRequestException("Primary contact does not belong to this account");
     }
   }
   private opportunityData(
@@ -1100,12 +996,9 @@ export class CrmService {
       description: dto.description?.trim(),
       stage,
       estimatedValue: dto.estimatedValue,
-      currency:
-        dto.currency === undefined ? undefined : this.currency(dto.currency),
+      currency: dto.currency === undefined ? undefined : this.currency(dto.currency),
       expectedCloseDate:
-        dto.expectedCloseDate === undefined
-          ? undefined
-          : this.date(dto.expectedCloseDate),
+        dto.expectedCloseDate === undefined ? undefined : this.date(dto.expectedCloseDate),
       ownerEmployeeId,
       lostReason: dto.lostReason?.trim(),
       closedAt:
@@ -1164,8 +1057,7 @@ export class CrmService {
   }
   async createActivity(p: Principal, dto: ActivityDto) {
     this.manage(p, "crm.activities.manage");
-    if (!dto.subject?.trim())
-      throw new BadRequestException("Activity subject is required");
+    if (!dto.subject?.trim()) throw new BadRequestException("Activity subject is required");
     const organizationId = this.org(p);
     await Promise.all([
       this.lead(organizationId, dto.leadId),
@@ -1173,8 +1065,7 @@ export class CrmService {
       this.contact(organizationId, dto.contactId),
       this.opportunity(organizationId, dto.opportunityId),
     ]);
-    const ownerId =
-      this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
+    const ownerId = this.ownId(p, dto.ownerEmployeeId) ?? p.employeeId ?? undefined;
     await this.employee(organizationId, ownerId);
     const row = await this.prisma.crmActivity.create({
       data: {
@@ -1224,15 +1115,10 @@ export class CrmService {
       this.contact(organizationId, dto.contactId),
       this.opportunity(organizationId, dto.opportunityId),
     ]);
-    if (
-      dto.ownerEmployeeId !== undefined &&
-      dto.ownerEmployeeId !== existing.ownerEmployeeId
-    )
+    if (dto.ownerEmployeeId !== undefined && dto.ownerEmployeeId !== existing.ownerEmployeeId)
       this.assign(p);
     const ownerId =
-      dto.ownerEmployeeId === undefined
-        ? undefined
-        : this.ownId(p, dto.ownerEmployeeId);
+      dto.ownerEmployeeId === undefined ? undefined : this.ownId(p, dto.ownerEmployeeId);
     await this.employee(organizationId, ownerId);
     const row = await this.prisma.crmActivity.update({
       where: { id },
@@ -1245,8 +1131,7 @@ export class CrmService {
         ownerEmployeeId: ownerId,
         subject: dto.subject?.trim(),
         description: dto.description?.trim(),
-        occurredAt:
-          dto.occurredAt === undefined ? undefined : this.date(dto.occurredAt),
+        occurredAt: dto.occurredAt === undefined ? undefined : this.date(dto.occurredAt),
         dueAt: dto.dueAt === undefined ? undefined : this.date(dto.dueAt),
       }),
       include: activityInclude,
@@ -1272,8 +1157,7 @@ export class CrmService {
       },
     });
     if (!row) throw new NotFoundException("Activity not found");
-    if (row.completedAt)
-      throw new ConflictException("Activity is already complete");
+    if (row.completedAt) throw new ConflictException("Activity is already complete");
     const completed = await this.prisma.crmActivity.update({
       where: { id },
       data: { completedAt: new Date() },
@@ -1290,8 +1174,7 @@ export class CrmService {
 
   async dashboard(p: Principal) {
     this.read(p, "crm.dashboard.read");
-    if (this.scoped(p))
-      throw new ForbiddenException("CRM executive dashboard access denied");
+    if (this.scoped(p)) throw new ForbiddenException("CRM executive dashboard access denied");
     const organizationId = this.org(p);
     const now = new Date();
     const openStages: CrmOpportunityStage[] = [
@@ -1300,56 +1183,48 @@ export class CrmService {
       "PROPOSAL",
       "NEGOTIATION",
     ];
-    const [leadStatus, leadSource, opportunityStage, activities, recent] =
-      await Promise.all([
-        this.prisma.crmLead.groupBy({
-          by: ["status"],
-          where: { organizationId },
-          _count: { _all: true },
-        }),
-        this.prisma.crmLead.groupBy({
-          by: ["source"],
-          where: { organizationId },
-          _count: { _all: true },
-        }),
-        this.prisma.crmOpportunity.groupBy({
-          by: ["stage", "currency"],
-          where: { organizationId, archivedAt: null },
-          _count: { _all: true },
-          _sum: { estimatedValue: true },
-        }),
-        this.prisma.crmActivity.findMany({
-          where: { organizationId, completedAt: null, dueAt: { not: null } },
-          include: activityInclude,
-          orderBy: { dueAt: "asc" },
-          take: 20,
-        }),
-        this.prisma.crmActivity.findMany({
-          where: { organizationId },
-          include: activityInclude,
-          orderBy: { updatedAt: "desc" },
-          take: 12,
-        }),
-      ]);
+    const [leadStatus, leadSource, opportunityStage, activities, recent] = await Promise.all([
+      this.prisma.crmLead.groupBy({
+        by: ["status"],
+        where: { organizationId },
+        _count: { _all: true },
+      }),
+      this.prisma.crmLead.groupBy({
+        by: ["source"],
+        where: { organizationId },
+        _count: { _all: true },
+      }),
+      this.prisma.crmOpportunity.groupBy({
+        by: ["stage", "currency"],
+        where: { organizationId, archivedAt: null },
+        _count: { _all: true },
+        _sum: { estimatedValue: true },
+      }),
+      this.prisma.crmActivity.findMany({
+        where: { organizationId, completedAt: null, dueAt: { not: null } },
+        include: activityInclude,
+        orderBy: { dueAt: "asc" },
+        take: 20,
+      }),
+      this.prisma.crmActivity.findMany({
+        where: { organizationId },
+        include: activityInclude,
+        orderBy: { updatedAt: "desc" },
+        take: 12,
+      }),
+    ]);
     const stageSummary = opportunityStage.map((item) => ({
       stage: item.stage,
       currency: item.currency ?? "UNSPECIFIED",
       count: item._count._all,
       estimatedValue: item._sum.estimatedValue?.toString() ?? "0",
     }));
-    const byStatus = Object.fromEntries(
-      leadStatus.map((item) => [item.status, item._count._all]),
-    );
-    const bySource = Object.fromEntries(
-      leadSource.map((item) => [item.source, item._count._all]),
-    );
+    const byStatus = Object.fromEntries(leadStatus.map((item) => [item.status, item._count._all]));
+    const bySource = Object.fromEntries(leadSource.map((item) => [item.source, item._count._all]));
     return {
       leadCounts: byStatus,
       leadSources: bySource,
-      openLeads:
-        (byStatus.NEW ?? 0) +
-        (byStatus.CONTACTED ?? 0) +
-        (byStatus.QUALIFIED ?? 0),
+      openLeads: (byStatus.NEW ?? 0) + (byStatus.CONTACTED ?? 0) + (byStatus.QUALIFIED ?? 0),
       qualifiedLeads: byStatus.QUALIFIED ?? 0,
       convertedLeads: byStatus.CONVERTED ?? 0,
       opportunityStages: stageSummary,
@@ -1384,12 +1259,8 @@ export class CrmService {
           }),
           {},
         ),
-      upcomingFollowUps: activities.filter(
-        (activity) => activity.dueAt && activity.dueAt >= now,
-      ),
-      overdueFollowUps: activities.filter(
-        (activity) => activity.dueAt && activity.dueAt < now,
-      ),
+      upcomingFollowUps: activities.filter((activity) => activity.dueAt && activity.dueAt >= now),
+      overdueFollowUps: activities.filter((activity) => activity.dueAt && activity.dueAt < now),
       recentActivities: recent,
     };
   }

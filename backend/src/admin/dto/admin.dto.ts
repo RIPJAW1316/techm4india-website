@@ -1,16 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { EmploymentStatus, UserStatus } from "@prisma/client";
 import { Type } from "class-transformer";
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Max,
-  MaxLength,
-  Min,
-} from "class-validator";
+import { IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from "class-validator";
 
 export class AdminUserQueryDto {
   @ApiPropertyOptional()

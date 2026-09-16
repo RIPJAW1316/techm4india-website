@@ -17,14 +17,26 @@ export class NotificationsService {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
-        select: { id: true, type: true, title: true, body: true, readAt: true, createdAt: true, resourceType: true, resourceId: true },
+        select: {
+          id: true,
+          type: true,
+          title: true,
+          body: true,
+          readAt: true,
+          createdAt: true,
+          resourceType: true,
+          resourceId: true,
+        },
       }),
     ]);
     return { data, meta: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 
   async markRead(principal: Principal, id: string) {
-    const result = await this.prisma.notification.updateMany({ where: { id, userId: principal.userId }, data: { readAt: new Date() } });
+    const result = await this.prisma.notification.updateMany({
+      where: { id, userId: principal.userId },
+      data: { readAt: new Date() },
+    });
     if (!result.count) throw new NotFoundException("Notification not found");
     return this.prisma.notification.findUniqueOrThrow({ where: { id } });
   }

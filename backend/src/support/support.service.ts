@@ -126,11 +126,7 @@ export class SupportService extends V2ServiceBase {
       });
   }
 
-  async createTicket(
-    principal: Principal,
-    dto: CreateSupportTicketDto,
-    request?: RequestMetadata,
-  ) {
+  async createTicket(principal: Principal, dto: CreateSupportTicketDto, request?: RequestMetadata) {
     const priority = dto.priority ?? Priority.MEDIUM;
     const now = new Date();
     const slaDueAt = new Date(now.getTime() + SLA_HOURS[priority] * 3_600_000);
@@ -229,10 +225,17 @@ export class SupportService extends V2ServiceBase {
       },
       include: ticketInclude,
     });
-    await this.record(`SUPPORT_TICKET_${action.toUpperCase()}`, principal, "SupportTicket", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      `SUPPORT_TICKET_${action.toUpperCase()}`,
+      principal,
+      "SupportTicket",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 

@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 
@@ -14,9 +24,7 @@ import { EmployeesService } from "./employees.service";
 @UseGuards(JwtAuthGuard)
 @Controller("employees")
 export class EmployeesController {
-  constructor(
-    private readonly employeesService: EmployeesService,
-  ) {}
+  constructor(private readonly employeesService: EmployeesService) {}
 
   @Get("me")
   @ApiOperation({ summary: "Return the authenticated employee profile" })
@@ -26,7 +34,11 @@ export class EmployeesController {
 
   @Patch("me")
   @ApiOperation({ summary: "Update the authenticated employee safe profile fields" })
-  async updateMe(@CurrentPrincipal() principal: Principal, @Body() dto: UpdateSelfDto, @Req() request: Request) {
+  async updateMe(
+    @CurrentPrincipal() principal: Principal,
+    @Body() dto: UpdateSelfDto,
+    @Req() request: Request,
+  ) {
     return {
       success: true,
       data: await this.employeesService.updateMe(principal, dto, {

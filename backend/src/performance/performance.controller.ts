@@ -64,19 +64,13 @@ export class PerformanceController {
 
   @Get("cycles")
   @RequirePermissions("performance.cycles.read")
-  listCycles(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: CycleQueryDto,
-  ) {
+  listCycles(@CurrentPrincipal() principal: Principal, @Query() query: CycleQueryDto) {
     return this.list(this.performance.listCycles(principal, query));
   }
 
   @Get("cycles/:id")
   @RequirePermissions("performance.cycles.read")
-  getCycle(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getCycle(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.performance.getCycle(principal, id));
   }
 
@@ -117,10 +111,7 @@ export class PerformanceController {
 
   @Get("goals")
   @RequirePermissions("performance.goals.read")
-  listGoals(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: GoalQueryDto,
-  ) {
+  listGoals(@CurrentPrincipal() principal: Principal, @Query() query: GoalQueryDto) {
     return this.list(this.performance.listGoals(principal, query));
   }
 
@@ -149,19 +140,13 @@ export class PerformanceController {
 
   @Get("reviews")
   @RequirePermissions("performance.reviews.read")
-  listReviews(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: ReviewQueryDto,
-  ) {
+  listReviews(@CurrentPrincipal() principal: Principal, @Query() query: ReviewQueryDto) {
     return this.list(this.performance.listReviews(principal, query));
   }
 
   @Get("reviews/:id")
   @RequirePermissions("performance.reviews.read")
-  getReview(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getReview(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.performance.getReview(principal, id));
   }
 
@@ -226,8 +211,6 @@ export class PerformanceController {
     @Body() dto: AcknowledgeReviewDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.performance.acknowledgeReview(principal, id, dto, this.metadata(request)),
-    );
+    return this.ok(this.performance.acknowledgeReview(principal, id, dto, this.metadata(request)));
   }
 }

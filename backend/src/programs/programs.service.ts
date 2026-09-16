@@ -89,10 +89,7 @@ export class ProgramsService {
   }
 
   private duplicate(error: unknown, message: string): never {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw new ConflictException(message);
     }
     throw error;
@@ -227,11 +224,7 @@ export class ProgramsService {
       });
   }
 
-  async createProgram(
-    principal: Principal,
-    dto: CreateProgramDto,
-    request?: RequestMetadata,
-  ) {
+  async createProgram(principal: Principal, dto: CreateProgramDto, request?: RequestMetadata) {
     await this.validateOrganizationReferences(principal, dto);
     let row;
     try {
@@ -262,22 +255,14 @@ export class ProgramsService {
     } catch (error) {
       this.duplicate(error, "A program with this code or slug and version already exists");
     }
-    await this.record(
-      "PROGRAM_CREATED",
-      principal,
-      "Program",
-      row.id,
-      request,
-      { code: row.code, version: row.version },
-    );
+    await this.record("PROGRAM_CREATED", principal, "Program", row.id, request, {
+      code: row.code,
+      version: row.version,
+    });
     return row;
   }
 
-  async submitProgram(
-    principal: Principal,
-    id: string,
-    request?: RequestMetadata,
-  ) {
+  async submitProgram(principal: Principal, id: string, request?: RequestMetadata) {
     const current = await this.program(principal, id);
     if (current.status !== ProgramStatus.DRAFT) {
       throw new ConflictException("Only draft programs can be submitted for review");
@@ -302,11 +287,7 @@ export class ProgramsService {
     return row;
   }
 
-  async publishProgram(
-    principal: Principal,
-    id: string,
-    request?: RequestMetadata,
-  ) {
+  async publishProgram(principal: Principal, id: string, request?: RequestMetadata) {
     const current = await this.program(principal, id);
     if (current.status !== ProgramStatus.IN_REVIEW) {
       throw new ConflictException("Only programs in review can be published");
@@ -360,14 +341,9 @@ export class ProgramsService {
     } catch (error) {
       this.duplicate(error, "A module already exists at this position");
     }
-    await this.record(
-      "PROGRAM_MODULE_CREATED",
-      principal,
-      "ProgramModule",
-      row.id,
-      request,
-      { programId },
-    );
+    await this.record("PROGRAM_MODULE_CREATED", principal, "ProgramModule", row.id, request, {
+      programId,
+    });
     return row;
   }
 
@@ -391,9 +367,7 @@ export class ProgramsService {
         throw new BadRequestException("Text lessons require a content body");
       }
     } else if (!dto.contentUrl?.trim()) {
-      throw new BadRequestException(
-        "Video, PDF and live lessons require an HTTPS content URL",
-      );
+      throw new BadRequestException("Video, PDF and live lessons require an HTTPS content URL");
     }
     let row;
     try {
@@ -412,14 +386,10 @@ export class ProgramsService {
     } catch (error) {
       this.duplicate(error, "A lesson already exists at this position");
     }
-    await this.record(
-      "PROGRAM_LESSON_CREATED",
-      principal,
-      "ProgramLesson",
-      row.id,
-      request,
-      { moduleId, programId: module.program.id },
-    );
+    await this.record("PROGRAM_LESSON_CREATED", principal, "ProgramLesson", row.id, request, {
+      moduleId,
+      programId: module.program.id,
+    });
     return row;
   }
 
@@ -463,11 +433,7 @@ export class ProgramsService {
     return { data, meta: { page, limit, total } };
   }
 
-  async createStudent(
-    principal: Principal,
-    dto: CreateStudentDto,
-    request?: RequestMetadata,
-  ) {
+  async createStudent(principal: Principal, dto: CreateStudentDto, request?: RequestMetadata) {
     const consentAt = this.consentTimestamp(dto.consentAt);
     if (dto.institutionId) {
       await this.institutionInOrganization(principal, dto.institutionId);
@@ -539,22 +505,14 @@ export class ProgramsService {
     } catch (error) {
       this.duplicate(error, "Batch code already exists in this organization");
     }
-    await this.record(
-      "PROGRAM_BATCH_CREATED",
-      principal,
-      "ProgramBatch",
-      row.id,
-      request,
-      { programId, code: row.code },
-    );
+    await this.record("PROGRAM_BATCH_CREATED", principal, "ProgramBatch", row.id, request, {
+      programId,
+      code: row.code,
+    });
     return row;
   }
 
-  async listBatches(
-    principal: Principal,
-    programId: string,
-    query: ProgramBatchQueryDto,
-  ) {
+  async listBatches(principal: Principal, programId: string, query: ProgramBatchQueryDto) {
     await this.program(principal, programId);
     const { page, limit, skip, take } = this.page(query);
     const where: Prisma.ProgramBatchWhereInput = {
@@ -629,10 +587,7 @@ export class ProgramsService {
     request?: RequestMetadata,
   ) {
     const batch = await this.batch(principal, batchId);
-    if (
-      batch.status !== ProgramBatchStatus.OPEN &&
-      batch.status !== ProgramBatchStatus.ACTIVE
-    ) {
+    if (batch.status !== ProgramBatchStatus.OPEN && batch.status !== ProgramBatchStatus.ACTIVE) {
       throw new ConflictException("Enrollments require an open or active batch");
     }
     const student = await this.prisma.student.findFirst({
@@ -752,9 +707,7 @@ export class ProgramsService {
       });
       const completedSum = Number(aggregate._sum.progressPercent ?? 0);
       const percent =
-        totalLessons > 0
-          ? Math.min(100, Math.round((completedSum / totalLessons) * 100) / 100)
-          : 0;
+        totalLessons > 0 ? Math.min(100, Math.round((completedSum / totalLessons) * 100) / 100) : 0;
       const enrollmentCompleted = totalLessons > 0 && percent >= 100;
       return tx.programEnrollment.update({
         where: { id: enrollmentId },
@@ -817,9 +770,16 @@ export class ProgramsService {
         createdByUserId: principal.userId,
       },
     });
-    await this.record("PROGRAM_ASSIGNMENT_CREATED", principal, "ProgramAssignment", row.id, request, {
-      programId,
-    });
+    await this.record(
+      "PROGRAM_ASSIGNMENT_CREATED",
+      principal,
+      "ProgramAssignment",
+      row.id,
+      request,
+      {
+        programId,
+      },
+    );
     return row;
   }
 
@@ -855,10 +815,17 @@ export class ProgramsService {
     } catch (error) {
       this.duplicate(error, "A submission already exists for this assignment and enrollment");
     }
-    await this.record("PROGRAM_ASSIGNMENT_SUBMITTED", principal, "AssignmentSubmission", row.id, request, {
-      enrollmentId,
-      assignmentId: dto.assignmentId,
-    });
+    await this.record(
+      "PROGRAM_ASSIGNMENT_SUBMITTED",
+      principal,
+      "AssignmentSubmission",
+      row.id,
+      request,
+      {
+        enrollmentId,
+        assignmentId: dto.assignmentId,
+      },
+    );
     return row;
   }
 
@@ -927,9 +894,16 @@ export class ProgramsService {
         issuedByUserId: principal.userId,
       },
     });
-    await this.record("PROGRAM_CERTIFICATE_ISSUED", principal, "ProgramCertificate", row.id, request, {
-      enrollmentId,
-    });
+    await this.record(
+      "PROGRAM_CERTIFICATE_ISSUED",
+      principal,
+      "ProgramCertificate",
+      row.id,
+      request,
+      {
+        enrollmentId,
+      },
+    );
     return row;
   }
 }

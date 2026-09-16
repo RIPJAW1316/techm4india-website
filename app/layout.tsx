@@ -42,12 +42,14 @@ export const metadata: Metadata = {
     description:
       "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, and TechM4Space.",
     url: "https://www.techm4india.com/",
-    images: [{
-      url: "/og.png",
-      width: 1200,
-      height: 630,
-      alt: "TechM4India — engineering imagination into impact",
-    }],
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "TechM4India — engineering imagination into impact",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -66,9 +68,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={`${manrope.variable} ${newsreader.variable}`}>
-        <a className="skip-link" href="#main-content">Skip to main content</a>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
         <SiteHeader />
-        <div id="main-content" tabIndex={-1}>{children}</div>
+        <div id="main-content" tabIndex={-1}>
+          {children}
+        </div>
         <Footer />
         <MotionController />
         <StructuredData
@@ -109,10 +115,26 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   "https://wa.me/916301814246",
                 ],
                 subOrganization: [
-                  { "@type": "Organization", name: "TechM4Engineering", url: "https://www.techm4india.com/engineering" },
-                  { "@type": "Organization", name: "TechM4Solutions", url: "https://www.techm4india.com/solutions" },
-                  { "@type": "Organization", name: "TechM4Schools", url: "https://www.techm4india.com/schools" },
-                  { "@type": "Organization", name: "TechM4Space", url: "https://www.techm4india.com/space" },
+                  {
+                    "@type": "Organization",
+                    name: "TechM4Engineering",
+                    url: "https://www.techm4india.com/engineering",
+                  },
+                  {
+                    "@type": "Organization",
+                    name: "TechM4Solutions",
+                    url: "https://www.techm4india.com/solutions",
+                  },
+                  {
+                    "@type": "Organization",
+                    name: "TechM4Schools",
+                    url: "https://www.techm4india.com/schools",
+                  },
+                  {
+                    "@type": "Organization",
+                    name: "TechM4Space",
+                    url: "https://www.techm4india.com/space",
+                  },
                 ],
               },
             ],

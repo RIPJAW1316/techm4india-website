@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { apiFetchV2, ApiError } from "@/lib/api/client";
 import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
 import type {
@@ -38,9 +32,7 @@ const date = (value: string | null) =>
       }).format(new Date(value))
     : "—";
 const money = (value: string | number | null, currency: string | null) =>
-  value === null
-    ? "—"
-    : `${currency ?? ""} ${Number(value).toLocaleString("en-IN")}`.trim();
+  value === null ? "—" : `${currency ?? ""} ${Number(value).toLocaleString("en-IN")}`.trim();
 
 function FounderCrmContent() {
   const [tab, setTab] = useState<Tab>("overview");
@@ -111,9 +103,7 @@ function FounderCrmContent() {
         apiFetchV2<{ data: CrmAccount[] }>("/crm/accounts?limit=100"),
         apiFetchV2<{ data: CrmContact[] }>("/crm/contacts?limit=100"),
         apiFetchV2<{ data: CrmActivity[] }>("/crm/activities?limit=100"),
-        apiFetchV2<ApiResponse<ExecutiveEmployee[]>>(
-          "/executive/employees?limit=100",
-        ),
+        apiFetchV2<ApiResponse<ExecutiveEmployee[]>>("/executive/employees?limit=100"),
       ]);
       setDashboard(dr.data);
       setLeads(lr.data);
@@ -123,11 +113,7 @@ function FounderCrmContent() {
       setActivities(actr.data);
       setEmployees(er.data);
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "CRM workspace could not load.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "CRM workspace could not load.");
     } finally {
       setLoading(false);
     }
@@ -148,9 +134,7 @@ function FounderCrmContent() {
       setNotice(message);
       await load();
     } catch (reason) {
-      setError(
-        reason instanceof ApiError ? reason.message : "CRM update failed.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "CRM update failed.");
     } finally {
       setBusy(false);
     }
@@ -164,9 +148,7 @@ function FounderCrmContent() {
           body: JSON.stringify({
             ...leadForm,
             ownerEmployeeId: leadForm.ownerEmployeeId || undefined,
-            estimatedValue: leadForm.estimatedValue
-              ? Number(leadForm.estimatedValue)
-              : undefined,
+            estimatedValue: leadForm.estimatedValue ? Number(leadForm.estimatedValue) : undefined,
             nextFollowUpAt: leadForm.nextFollowUpAt || undefined,
           }),
         }),
@@ -279,8 +261,7 @@ function FounderCrmContent() {
     );
     setConversionLead(null);
   }
-  if (loading && !dashboard)
-    return <ErpLoading label="Loading CRM workspace" />;
+  if (loading && !dashboard) return <ErpLoading label="Loading CRM workspace" />;
   return (
     <main className="erp-main">
       <div className="erp-content founder-content">
@@ -292,8 +273,8 @@ function FounderCrmContent() {
               CRM <em>Pipeline</em>
             </h1>
             <p>
-              An organization-wide view of leads, opportunities and the next
-              conversation that matters.
+              An organization-wide view of leads, opportunities and the next conversation that
+              matters.
             </p>
           </div>
           <div className="erp-welcome-code">
@@ -345,8 +326,7 @@ function FounderCrmContent() {
                 <small>
                   {Object.entries(dashboard?.pipelineByCurrency ?? {})
                     .map(
-                      ([currency, value]) =>
-                        `${currency} ${Number(value).toLocaleString("en-IN")}`,
+                      ([currency, value]) => `${currency} ${Number(value).toLocaleString("en-IN")}`,
                     )
                     .join(" · ") || "No value recorded"}
                 </small>
@@ -444,22 +424,13 @@ function FounderCrmContent() {
                     onChange={(event) => setLeadStatus(event.target.value)}
                   >
                     <option value="ALL">All statuses</option>
-                    {[
-                      "NEW",
-                      "CONTACTED",
-                      "QUALIFIED",
-                      "UNQUALIFIED",
-                      "CONVERTED",
-                    ].map((status) => (
+                    {["NEW", "CONTACTED", "QUALIFIED", "UNQUALIFIED", "CONVERTED"].map((status) => (
                       <option key={status}>{status}</option>
                     ))}
                   </select>
                 </label>
               </div>
-              <form
-                className="founder-form"
-                onSubmit={(event) => void createLead(event)}
-              >
+              <form className="founder-form" onSubmit={(event) => void createLead(event)}>
                 <div className="founder-form-grid">
                   <label>
                     <span>First name</span>
@@ -504,29 +475,20 @@ function FounderCrmContent() {
                     <input
                       type="email"
                       value={leadForm.email}
-                      onChange={(event) =>
-                        setLeadForm({ ...leadForm, email: event.target.value })
-                      }
+                      onChange={(event) => setLeadForm({ ...leadForm, email: event.target.value })}
                     />
                   </label>
                   <label>
                     <span>Source</span>
                     <select
                       value={leadForm.source}
-                      onChange={(event) =>
-                        setLeadForm({ ...leadForm, source: event.target.value })
-                      }
+                      onChange={(event) => setLeadForm({ ...leadForm, source: event.target.value })}
                     >
-                      {[
-                        "WEBSITE",
-                        "REFERRAL",
-                        "OUTBOUND",
-                        "EVENT",
-                        "PARTNER",
-                        "OTHER",
-                      ].map((source) => (
-                        <option key={source}>{source}</option>
-                      ))}
+                      {["WEBSITE", "REFERRAL", "OUTBOUND", "EVENT", "PARTNER", "OTHER"].map(
+                        (source) => (
+                          <option key={source}>{source}</option>
+                        ),
+                      )}
                     </select>
                   </label>
                   <label>
@@ -576,10 +538,7 @@ function FounderCrmContent() {
                     />
                   </label>
                 </div>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" disabled={busy}>
                   Create lead ↗
                 </button>
               </form>
@@ -593,8 +552,7 @@ function FounderCrmContent() {
                         {lead.firstName} {lead.lastName}
                       </h3>
                       <p>
-                        {lead.companyName ?? "Independent contact"} ·{" "}
-                        {lead.source} ·{" "}
+                        {lead.companyName ?? "Independent contact"} · {lead.source} ·{" "}
                         {lead.owner
                           ? `${lead.owner.firstName} ${lead.owner.lastName}`
                           : "Unassigned"}
@@ -621,15 +579,11 @@ function FounderCrmContent() {
                           )
                         }
                       >
-                        {[
-                          "NEW",
-                          "CONTACTED",
-                          "QUALIFIED",
-                          "UNQUALIFIED",
-                          "CONVERTED",
-                        ].map((status) => (
-                          <option key={status}>{status}</option>
-                        ))}
+                        {["NEW", "CONTACTED", "QUALIFIED", "UNQUALIFIED", "CONVERTED"].map(
+                          (status) => (
+                            <option key={status}>{status}</option>
+                          ),
+                        )}
                       </select>
                       <select
                         value={lead.ownerEmployeeId ?? ""}
@@ -695,65 +649,60 @@ function FounderCrmContent() {
               </div>
             </div>
             <div className="crm-pipeline">
-              {[
-                "PROSPECTING",
-                "QUALIFICATION",
-                "PROPOSAL",
-                "NEGOTIATION",
-                "WON",
-                "LOST",
-              ].map((stage) => (
-                <section key={stage}>
-                  <h3>{stage.replaceAll("_", " ")}</h3>
-                  {opportunities
-                    .filter((item) => item.stage === stage)
-                    .map((item) => (
-                      <article key={item.id}>
-                        <strong>{item.name}</strong>
-                        <span>{item.account?.name ?? "No account"}</span>
-                        <small>
-                          {money(item.estimatedValue, item.currency)} ·{" "}
-                          {item.owner
-                            ? `${item.owner.firstName} ${item.owner.lastName}`
-                            : "Unassigned"}
-                        </small>
-                        <select
-                          disabled={busy}
-                          value={item.stage}
-                          onChange={(event) =>
-                            void mutate(
-                              () =>
-                                apiFetchV2(`/crm/opportunities/${item.id}`, {
-                                  method: "PATCH",
-                                  body: JSON.stringify({
-                                    stage: event.target.value,
-                                    ...(event.target.value === "LOST"
-                                      ? { lostReason: "Recorded in CRM" }
-                                      : {}),
+              {["PROSPECTING", "QUALIFICATION", "PROPOSAL", "NEGOTIATION", "WON", "LOST"].map(
+                (stage) => (
+                  <section key={stage}>
+                    <h3>{stage.replaceAll("_", " ")}</h3>
+                    {opportunities
+                      .filter((item) => item.stage === stage)
+                      .map((item) => (
+                        <article key={item.id}>
+                          <strong>{item.name}</strong>
+                          <span>{item.account?.name ?? "No account"}</span>
+                          <small>
+                            {money(item.estimatedValue, item.currency)} ·{" "}
+                            {item.owner
+                              ? `${item.owner.firstName} ${item.owner.lastName}`
+                              : "Unassigned"}
+                          </small>
+                          <select
+                            disabled={busy}
+                            value={item.stage}
+                            onChange={(event) =>
+                              void mutate(
+                                () =>
+                                  apiFetchV2(`/crm/opportunities/${item.id}`, {
+                                    method: "PATCH",
+                                    body: JSON.stringify({
+                                      stage: event.target.value,
+                                      ...(event.target.value === "LOST"
+                                        ? { lostReason: "Recorded in CRM" }
+                                        : {}),
+                                    }),
                                   }),
-                                }),
-                              "Opportunity stage updated.",
-                            )
-                          }
-                        >
-                          {[
-                            "PROSPECTING",
-                            "QUALIFICATION",
-                            "PROPOSAL",
-                            "NEGOTIATION",
-                            "WON",
-                            "LOST",
-                          ].map((value) => (
-                            <option key={value}>{value}</option>
-                          ))}
-                        </select>
-                      </article>
-                    ))}
-                  {!opportunities.some((item) => item.stage === stage) && (
-                    <p className="crm-empty-stage">No opportunities</p>
-                  )}
-                </section>
-              ))}
+                                "Opportunity stage updated.",
+                              )
+                            }
+                          >
+                            {[
+                              "PROSPECTING",
+                              "QUALIFICATION",
+                              "PROPOSAL",
+                              "NEGOTIATION",
+                              "WON",
+                              "LOST",
+                            ].map((value) => (
+                              <option key={value}>{value}</option>
+                            ))}
+                          </select>
+                        </article>
+                      ))}
+                    {!opportunities.some((item) => item.stage === stage) && (
+                      <p className="crm-empty-stage">No opportunities</p>
+                    )}
+                  </section>
+                ),
+              )}
             </div>
           </section>
         )}
@@ -767,10 +716,7 @@ function FounderCrmContent() {
                 </div>
                 <span className="erp-section-count">{contacts.length}</span>
               </div>
-              <form
-                className="founder-form"
-                onSubmit={(event) => void createContact(event)}
-              >
+              <form className="founder-form" onSubmit={(event) => void createContact(event)}>
                 <div className="founder-form-grid">
                   <label>
                     <span>First name</span>
@@ -850,10 +796,7 @@ function FounderCrmContent() {
                     </select>
                   </label>
                 </div>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" disabled={busy}>
                   Create contact ↗
                 </button>
               </form>
@@ -883,10 +826,7 @@ function FounderCrmContent() {
                   <h2>Accounts</h2>
                 </div>
               </div>
-              <form
-                className="founder-form"
-                onSubmit={(event) => void createAccount(event)}
-              >
+              <form className="founder-form" onSubmit={(event) => void createAccount(event)}>
                 <div className="founder-form-grid">
                   <label>
                     <span>Account name</span>
@@ -912,11 +852,9 @@ function FounderCrmContent() {
                         })
                       }
                     >
-                      {["PROSPECT", "CUSTOMER", "PARTNER", "OTHER"].map(
-                        (type) => (
-                          <option key={type}>{type}</option>
-                        ),
-                      )}
+                      {["PROSPECT", "CUSTOMER", "PARTNER", "OTHER"].map((type) => (
+                        <option key={type}>{type}</option>
+                      ))}
                     </select>
                   </label>
                   <label>
@@ -939,10 +877,7 @@ function FounderCrmContent() {
                     </select>
                   </label>
                 </div>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" disabled={busy}>
                   Create account ↗
                 </button>
               </form>
@@ -1002,10 +937,7 @@ function FounderCrmContent() {
                   <h2>Activities</h2>
                 </div>
               </div>
-              <form
-                className="founder-form"
-                onSubmit={(event) => void createActivity(event)}
-              >
+              <form className="founder-form" onSubmit={(event) => void createActivity(event)}>
                 <div className="founder-form-grid">
                   <label>
                     <span>Subject</span>
@@ -1031,14 +963,7 @@ function FounderCrmContent() {
                         })
                       }
                     >
-                      {[
-                        "CALL",
-                        "EMAIL",
-                        "MEETING",
-                        "FOLLOW_UP",
-                        "NOTE",
-                        "OTHER",
-                      ].map((type) => (
+                      {["CALL", "EMAIL", "MEETING", "FOLLOW_UP", "NOTE", "OTHER"].map((type) => (
                         <option key={type}>{type}</option>
                       ))}
                     </select>
@@ -1095,10 +1020,7 @@ function FounderCrmContent() {
                     />
                   </label>
                 </div>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" disabled={busy}>
                   Record activity ↗
                 </button>
               </form>
@@ -1130,10 +1052,9 @@ function FounderCrmContent() {
                         onClick={() =>
                           void mutate(
                             () =>
-                              apiFetchV2(
-                                `/crm/activities/${activity.id}/complete`,
-                                { method: "POST" },
-                              ),
+                              apiFetchV2(`/crm/activities/${activity.id}/complete`, {
+                                method: "POST",
+                              }),
                             "Activity completed.",
                           )
                         }
@@ -1172,13 +1093,10 @@ function FounderCrmContent() {
               </button>
             </div>
             <p className="founder-form-note">
-              This preserves the lead, then links a new account, contact and
-              opportunity. Check ownership before converting.
+              This preserves the lead, then links a new account, contact and opportunity. Check
+              ownership before converting.
             </p>
-            <form
-              className="founder-form"
-              onSubmit={(event) => void convertLead(event)}
-            >
+            <form className="founder-form" onSubmit={(event) => void convertLead(event)}>
               <div className="founder-form-grid">
                 <label>
                   <span>Account name</span>
@@ -1301,10 +1219,7 @@ function FounderCrmContent() {
                 >
                   Cancel
                 </button>
-                <button
-                  className="erp-button erp-button-primary"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" disabled={busy}>
                   Convert lead ↗
                 </button>
               </div>

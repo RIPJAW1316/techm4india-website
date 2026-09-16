@@ -20,16 +20,10 @@ function PayslipContent() {
   const [error, setError] = useState<string | null>(null);
   const load = useCallback(async () => {
     try {
-      const response = await apiFetchV2<{ data: any[] }>(
-        "/payroll/me/payslips",
-      );
+      const response = await apiFetchV2<{ data: any[] }>("/payroll/me/payslips");
       setRows(response.data);
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "Payslips could not load.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "Payslips could not load.");
     } finally {
       setLoading(false);
     }
@@ -47,10 +41,7 @@ function PayslipContent() {
             <h1>
               My <em>payslips</em>
             </h1>
-            <p>
-              Only finalized payroll snapshots for your employee profile are
-              shown here.
-            </p>
+            <p>Only finalized payroll snapshots for your employee profile are shown here.</p>
           </div>
         </section>
         {error && (
@@ -64,8 +55,7 @@ function PayslipContent() {
               <article className="erp-notification" key={row.id}>
                 <div>
                   <h3>
-                    {row.run?.period?.year}/
-                    {String(row.run?.period?.month ?? "").padStart(2, "0")}
+                    {row.run?.period?.year}/{String(row.run?.period?.month ?? "").padStart(2, "0")}
                   </h3>
                   <p>
                     {row.employee?.firstName} {row.employee?.lastName} ·{" "}
@@ -78,9 +68,7 @@ function PayslipContent() {
             {!rows.length && (
               <div className="erp-empty">
                 <strong>No finalized payslips yet.</strong>
-                <span>
-                  Your payroll team will publish one after finalization.
-                </span>
+                <span>Your payroll team will publish one after finalization.</span>
               </div>
             )}
           </div>

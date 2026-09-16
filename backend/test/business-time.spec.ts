@@ -11,7 +11,10 @@ describe("business timezone boundaries", () => {
   it("keeps the India business date deterministic at 23:30 UTC", () => {
     const boundaries = businessDayBoundaries(new Date("2026-09-04T23:30:00.000Z"), "Asia/Kolkata");
     expect(boundaries.start.toISOString()).toBe("2026-09-04T18:30:00.000Z");
-    const sameIndiaDate = businessDayBoundaries(new Date("2026-09-04T20:00:00.000Z"), "Asia/Kolkata");
+    const sameIndiaDate = businessDayBoundaries(
+      new Date("2026-09-04T20:00:00.000Z"),
+      "Asia/Kolkata",
+    );
     expect(sameIndiaDate.start.toISOString()).toBe(boundaries.start.toISOString());
   });
 

@@ -83,10 +83,7 @@ export class PerformanceService {
   }
 
   private duplicate(error: unknown, message: string): never {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw new ConflictException(message);
     }
     throw error;
@@ -210,11 +207,7 @@ export class PerformanceService {
     return this.cycle(principal, id);
   }
 
-  async createCycle(
-    principal: Principal,
-    dto: CreateCycleDto,
-    request?: RequestMetadata,
-  ) {
+  async createCycle(principal: Principal, dto: CreateCycleDto, request?: RequestMetadata) {
     const startsOn = new Date(dto.startsOn);
     const endsOn = new Date(dto.endsOn);
     if (endsOn.getTime() <= startsOn.getTime()) {
@@ -449,10 +442,17 @@ export class PerformanceService {
     } catch (error) {
       this.duplicate(error, "A review already exists for this employee in the cycle");
     }
-    await this.record("PERFORMANCE_REVIEW_CREATED", principal, "PerformanceReview", row.id, request, {
-      cycleId,
-      employeeId: dto.employeeId,
-    });
+    await this.record(
+      "PERFORMANCE_REVIEW_CREATED",
+      principal,
+      "PerformanceReview",
+      row.id,
+      request,
+      {
+        cycleId,
+        employeeId: dto.employeeId,
+      },
+    );
     return row;
   }
 
@@ -480,10 +480,17 @@ export class PerformanceService {
       },
       include: reviewInclude,
     });
-    await this.record("PERFORMANCE_REVIEW_SELF_SUBMITTED", principal, "PerformanceReview", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      "PERFORMANCE_REVIEW_SELF_SUBMITTED",
+      principal,
+      "PerformanceReview",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 
@@ -508,10 +515,17 @@ export class PerformanceService {
       },
       include: reviewInclude,
     });
-    await this.record("PERFORMANCE_REVIEW_MANAGER_SUBMITTED", principal, "PerformanceReview", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      "PERFORMANCE_REVIEW_MANAGER_SUBMITTED",
+      principal,
+      "PerformanceReview",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 
@@ -566,10 +580,17 @@ export class PerformanceService {
       },
       include: reviewInclude,
     });
-    await this.record("PERFORMANCE_REVIEW_ACKNOWLEDGED", principal, "PerformanceReview", id, request, {
-      from: current.status,
-      to: row.status,
-    });
+    await this.record(
+      "PERFORMANCE_REVIEW_ACKNOWLEDGED",
+      principal,
+      "PerformanceReview",
+      id,
+      request,
+      {
+        from: current.status,
+        to: row.status,
+      },
+    );
     return row;
   }
 }

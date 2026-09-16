@@ -3,5 +3,12 @@ import { FounderModuleNavigation } from "../../components/FounderModuleNavigatio
 import { ProtectedErp } from "../../components/ProtectedErp";
 
 export default function FounderAttendancePage() {
-  return <ProtectedErp requiredExecutive><div className="erp-content founder-route-navigation"><FounderModuleNavigation active="attendance" /></div><AttendancePage management /></ProtectedErp>;
+  return (
+    <ProtectedErp requiredExecutive>
+      <div className="erp-content founder-route-navigation">
+        <FounderModuleNavigation active="attendance" />
+      </div>
+      <AttendancePage management />
+    </ProtectedErp>
+  );
 }

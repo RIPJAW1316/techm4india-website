@@ -1,10 +1,6 @@
 import cookieParser from "cookie-parser";
 import argon2 from "argon2";
-import {
-  INestApplication,
-  ValidationPipe,
-  VersioningType,
-} from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
@@ -159,26 +155,11 @@ describe("Client MVP admin users and RBAC", () => {
     ).id;
 
     founder = await fixture("FOUNDER_CEO", divisionId, departmentId, "Founder");
-    superAdmin = await fixture(
-      "SUPER_ADMIN",
-      divisionId,
-      departmentId,
-      "SuperAdmin",
-    );
+    superAdmin = await fixture("SUPER_ADMIN", divisionId, departmentId, "SuperAdmin");
     employee = await fixture("EMPLOYEE", divisionId, departmentId, "Employee");
-    secondEmployee = await fixture(
-      "EMPLOYEE",
-      divisionId,
-      departmentId,
-      "SecondEmployee",
-    );
+    secondEmployee = await fixture("EMPLOYEE", divisionId, departmentId, "SecondEmployee");
     hr = await fixture("HR_MANAGER", divisionId, departmentId, "HrManager");
-    sales = await fixture(
-      "SALES_EXECUTIVE",
-      divisionId,
-      departmentId,
-      "SalesExecutive",
-    );
+    sales = await fixture("SALES_EXECUTIVE", divisionId, departmentId, "SalesExecutive");
     viewer = await fixture("VIEWER", divisionId, departmentId, "Viewer");
     foreignEmployee = await fixture(
       "EMPLOYEE",
@@ -265,27 +246,22 @@ describe("Client MVP admin users and RBAC", () => {
     await prisma.leaveApplication.deleteMany({
       where: { employeeId: { in: employeeIds } },
     });
-    if (leaveTypeId)
-      await prisma.leaveType.delete({ where: { id: leaveTypeId } });
+    if (leaveTypeId) await prisma.leaveType.delete({ where: { id: leaveTypeId } });
     await prisma.attendanceRecord.deleteMany({
       where: { employeeId: { in: employeeIds } },
     });
     if (projectId) await prisma.project.delete({ where: { id: projectId } });
     await prisma.employee.deleteMany({ where: { id: { in: employeeIds } } });
     await prisma.user.deleteMany({ where: { id: { in: userIds } } });
-    if (foreignDepartmentId)
-      await prisma.department.delete({ where: { id: foreignDepartmentId } });
-    if (foreignDivisionId)
-      await prisma.division.delete({ where: { id: foreignDivisionId } });
+    if (foreignDepartmentId) await prisma.department.delete({ where: { id: foreignDepartmentId } });
+    if (foreignDivisionId) await prisma.division.delete({ where: { id: foreignDivisionId } });
     if (foreignOrganizationId)
       await prisma.organization.delete({
         where: { id: foreignOrganizationId },
       });
-    if (departmentId)
-      await prisma.department.delete({ where: { id: departmentId } });
+    if (departmentId) await prisma.department.delete({ where: { id: departmentId } });
     if (divisionId) await prisma.division.delete({ where: { id: divisionId } });
-    if (organizationId)
-      await prisma.organization.delete({ where: { id: organizationId } });
+    if (organizationId) await prisma.organization.delete({ where: { id: organizationId } });
     await app.close();
   });
 
@@ -312,9 +288,7 @@ describe("Client MVP admin users and RBAC", () => {
     expect(roleFiltered.body.data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          roles: expect.arrayContaining([
-            expect.objectContaining({ name: "EMPLOYEE" }),
-          ]),
+          roles: expect.arrayContaining([expect.objectContaining({ name: "EMPLOYEE" })]),
         }),
       ]),
     );
@@ -362,9 +336,7 @@ describe("Client MVP admin users and RBAC", () => {
       .expect(200);
     expect(roles.body.data).toHaveLength(20);
     expect(
-      roles.body.data.find(
-        (role: { name: string }) => role.name === "FINANCE_MANAGER",
-      ),
+      roles.body.data.find((role: { name: string }) => role.name === "FINANCE_MANAGER"),
     ).toEqual(expect.objectContaining({ capabilityState: "IMPLEMENTED" }));
     expect(
       roles.body.data
@@ -384,10 +356,7 @@ describe("Client MVP admin users and RBAC", () => {
       .expect(200);
     expect(
       permissions.body.data
-        .find(
-          (permission: { key: string }) =>
-            permission.key === "admin.users.manage_roles",
-        )
+        .find((permission: { key: string }) => permission.key === "admin.users.manage_roles")
         .roles.map((role: { name: string }) => role.name),
     ).toEqual(expect.arrayContaining(["FOUNDER_CEO", "SUPER_ADMIN"]));
     await request(app.getHttpServer())
@@ -414,9 +383,7 @@ describe("Client MVP admin users and RBAC", () => {
       .expect(201);
     expect(duplicate.body.data.created).toBe(false);
     await request(app.getHttpServer())
-      .delete(
-        `/api/v2/admin/users/${employee.userId}/roles/${projectManager.id}`,
-      )
+      .delete(`/api/v2/admin/users/${employee.userId}/roles/${projectManager.id}`)
       .set(founderHeaders)
       .expect(200);
 
@@ -428,10 +395,9 @@ describe("Client MVP admin users and RBAC", () => {
       .post(`/api/v2/admin/users/${employee.userId}/deactivate`)
       .set(founderHeaders)
       .expect(201);
-    expect(
-      (await prisma.user.findUniqueOrThrow({ where: { id: employee.userId } }))
-        .status,
-    ).toBe("DISABLED");
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: employee.userId } })).status).toBe(
+      "DISABLED",
+    );
     expect(
       (
         await prisma.employee.findUniqueOrThrow({
@@ -443,22 +409,16 @@ describe("Client MVP admin users and RBAC", () => {
       .post(`/api/v2/admin/users/${employee.userId}/activate`)
       .set(founderHeaders)
       .expect(201);
-    expect(
-      (await prisma.user.findUniqueOrThrow({ where: { id: employee.userId } }))
-        .status,
-    ).toBe("ACTIVE");
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: employee.userId } })).status).toBe(
+      "ACTIVE",
+    );
 
     const events = await prisma.auditLog.findMany({
       where: {
         actorUserId: founder.userId,
         entityId: employee.userId,
         action: {
-          in: [
-            "USER_ROLE_ASSIGNED",
-            "USER_ROLE_REMOVED",
-            "USER_DEACTIVATED",
-            "USER_ACTIVATED",
-          ],
+          in: ["USER_ROLE_ASSIGNED", "USER_ROLE_REMOVED", "USER_DEACTIVATED", "USER_ACTIVATED"],
         },
       },
     });

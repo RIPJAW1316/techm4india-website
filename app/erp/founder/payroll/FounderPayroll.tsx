@@ -62,11 +62,7 @@ function FounderPayrollContent() {
       setRuns(r.data);
       setEmployees(staff.data);
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "Payroll workspace could not load.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "Payroll workspace could not load.");
     } finally {
       setLoading(false);
     }
@@ -82,12 +78,8 @@ function FounderPayrollContent() {
         method: "POST",
         body: JSON.stringify({
           ...form,
-          defaultValue: form.defaultValue
-            ? Number(form.defaultValue)
-            : undefined,
-          percentageValue: form.percentageValue
-            ? Number(form.percentageValue)
-            : undefined,
+          defaultValue: form.defaultValue ? Number(form.defaultValue) : undefined,
+          percentageValue: form.percentageValue ? Number(form.percentageValue) : undefined,
         }),
       });
       setForm({
@@ -101,11 +93,7 @@ function FounderPayrollContent() {
       });
       await load();
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "Component could not be saved.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "Component could not be saved.");
     } finally {
       setBusy(false);
     }
@@ -126,8 +114,12 @@ function FounderPayrollContent() {
       setStructureForm({ name: "", componentIds: [] });
       await load();
     } catch (reason) {
-      setError(reason instanceof ApiError ? reason.message : "Salary structure could not be saved.");
-    } finally { setBusy(false); }
+      setError(
+        reason instanceof ApiError ? reason.message : "Salary structure could not be saved.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
   async function assignCompensation(e: FormEvent) {
     e.preventDefault();
@@ -135,34 +127,79 @@ function FounderPayrollContent() {
     try {
       await apiFetchV2(`/payroll/employees/${compensationForm.employeeId}/compensation`, {
         method: "POST",
-        body: JSON.stringify({ salaryStructureId: compensationForm.salaryStructureId, effectiveFrom: compensationForm.effectiveFrom, annualCtc: compensationForm.annualCtc ? Number(compensationForm.annualCtc) : undefined, monthlyGrossTarget: compensationForm.monthlyGrossTarget ? Number(compensationForm.monthlyGrossTarget) : undefined }),
+        body: JSON.stringify({
+          salaryStructureId: compensationForm.salaryStructureId,
+          effectiveFrom: compensationForm.effectiveFrom,
+          annualCtc: compensationForm.annualCtc ? Number(compensationForm.annualCtc) : undefined,
+          monthlyGrossTarget: compensationForm.monthlyGrossTarget
+            ? Number(compensationForm.monthlyGrossTarget)
+            : undefined,
+        }),
       });
-      setCompensationForm({ employeeId: "", salaryStructureId: "", effectiveFrom: "", annualCtc: "", monthlyGrossTarget: "" });
+      setCompensationForm({
+        employeeId: "",
+        salaryStructureId: "",
+        effectiveFrom: "",
+        annualCtc: "",
+        monthlyGrossTarget: "",
+      });
       await load();
-    } catch (reason) { setError(reason instanceof ApiError ? reason.message : "Compensation assignment could not be saved."); } finally { setBusy(false); }
+    } catch (reason) {
+      setError(
+        reason instanceof ApiError ? reason.message : "Compensation assignment could not be saved.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
   async function createPeriod(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      await apiFetchV2("/payroll/periods", { method: "POST", body: JSON.stringify({ year: Number(periodForm.year), month: Number(periodForm.month), startDate: periodForm.startDate, endDate: periodForm.endDate }) });
+      await apiFetchV2("/payroll/periods", {
+        method: "POST",
+        body: JSON.stringify({
+          year: Number(periodForm.year),
+          month: Number(periodForm.month),
+          startDate: periodForm.startDate,
+          endDate: periodForm.endDate,
+        }),
+      });
       setPeriodForm((current) => ({ ...current, startDate: "", endDate: "" }));
       await load();
-    } catch (reason) { setError(reason instanceof ApiError ? reason.message : "Payroll period could not be saved."); } finally { setBusy(false); }
+    } catch (reason) {
+      setError(reason instanceof ApiError ? reason.message : "Payroll period could not be saved.");
+    } finally {
+      setBusy(false);
+    }
   }
   async function runAction(runId: string, action: "calculate" | "submit-review" | "finalize") {
-    const label = action === "finalize" ? "Finalize this payroll run? Finalized payslips are immutable." : "";
+    const label =
+      action === "finalize" ? "Finalize this payroll run? Finalized payslips are immutable." : "";
     if (label && !window.confirm(label)) return;
     setBusy(true);
-    try { await apiFetchV2(`/payroll/runs/${runId}/${action}`, { method: "POST" }); await load(); }
-    catch (reason) { setError(reason instanceof ApiError ? reason.message : "Payroll action failed."); }
-    finally { setBusy(false); }
+    try {
+      await apiFetchV2(`/payroll/runs/${runId}/${action}`, { method: "POST" });
+      await load();
+    } catch (reason) {
+      setError(reason instanceof ApiError ? reason.message : "Payroll action failed.");
+    } finally {
+      setBusy(false);
+    }
   }
   async function startRun(payrollPeriodId: string) {
     setBusy(true);
-    try { await apiFetchV2("/payroll/runs", { method: "POST", body: JSON.stringify({ payrollPeriodId }) }); await load(); }
-    catch (reason) { setError(reason instanceof ApiError ? reason.message : "Payroll run could not start."); }
-    finally { setBusy(false); }
+    try {
+      await apiFetchV2("/payroll/runs", {
+        method: "POST",
+        body: JSON.stringify({ payrollPeriodId }),
+      });
+      await load();
+    } catch (reason) {
+      setError(reason instanceof ApiError ? reason.message : "Payroll run could not start.");
+    } finally {
+      setBusy(false);
+    }
   }
   async function reviewRun(runId: string) {
     setBusy(true);
@@ -171,7 +208,9 @@ function FounderPayrollContent() {
       setSelectedRun(response.data);
     } catch (reason) {
       setError(reason instanceof ApiError ? reason.message : "Payroll results could not load.");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
   if (loading) return <ErpLoading label="Loading payroll workspace" />;
   return (
@@ -184,10 +223,7 @@ function FounderPayrollContent() {
             <h1>
               Payroll <em>control</em>
             </h1>
-            <p>
-              Prepare, review, and finalize payroll with immutable historical
-              snapshots.
-            </p>
+            <p>Prepare, review, and finalize payroll with immutable historical snapshots.</p>
           </div>
           <div className="erp-welcome-code">
             <span>Periods</span>
@@ -203,8 +239,8 @@ function FounderPayrollContent() {
           </div>
         )}
         <p className="erp-form-note">
-          Statutory payroll components and rates are organization-configured and
-          should be reviewed by an authorized payroll/finance professional.
+          Statutory payroll components and rates are organization-configured and should be reviewed
+          by an authorized payroll/finance professional.
         </p>
         <section className="erp-kpi-grid">
           <article>
@@ -238,9 +274,7 @@ function FounderPayrollContent() {
               <p className="erp-kicker">Configuration</p>
               <h2>Payroll components</h2>
             </div>
-            <span className="erp-section-count">
-              {components.length} configured
-            </span>
+            <span className="erp-section-count">{components.length} configured</span>
           </div>
           <form className="founder-form" onSubmit={createComponent}>
             <div className="founder-form-grid">
@@ -277,9 +311,7 @@ function FounderPayrollContent() {
                 <span>Calculation</span>
                 <select
                   value={form.calculationType}
-                  onChange={(e) =>
-                    setForm({ ...form, calculationType: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, calculationType: e.target.value })}
                 >
                   <option>FIXED</option>
                   <option>PERCENTAGE</option>
@@ -292,9 +324,7 @@ function FounderPayrollContent() {
                   type="number"
                   step="0.01"
                   value={form.defaultValue}
-                  onChange={(e) =>
-                    setForm({ ...form, defaultValue: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, defaultValue: e.target.value })}
                 />
               </label>
               <label>
@@ -303,18 +333,14 @@ function FounderPayrollContent() {
                   type="number"
                   step="0.0001"
                   value={form.percentageValue}
-                  onChange={(e) =>
-                    setForm({ ...form, percentageValue: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, percentageValue: e.target.value })}
                 />
               </label>
               <label className="founder-checkbox">
                 <input
                   type="checkbox"
                   checked={form.isStatutory}
-                  onChange={(e) =>
-                    setForm({ ...form, isStatutory: e.target.checked })
-                  }
+                  onChange={(e) => setForm({ ...form, isStatutory: e.target.checked })}
                 />
                 <span>Statutory label (configured only)</span>
               </label>
@@ -332,9 +358,7 @@ function FounderPayrollContent() {
                   </h3>
                   <p>
                     {item.type.replaceAll("_", " ")} · {item.calculationType} ·{" "}
-                    {item.isStatutory
-                      ? "Configured statutory value"
-                      : "Organization value"}
+                    {item.isStatutory ? "Configured statutory value" : "Organization value"}
                   </p>
                 </div>
                 <span>{item.defaultValue ?? item.percentageValue ?? "—"}</span>
@@ -353,38 +377,167 @@ function FounderPayrollContent() {
             <div className="founder-form-grid">
               <label>
                 <span>Structure name</span>
-                <input required value={structureForm.name} onChange={(e) => setStructureForm({ ...structureForm, name: e.target.value })} placeholder="Engineering standard" />
+                <input
+                  required
+                  value={structureForm.name}
+                  onChange={(e) => setStructureForm({ ...structureForm, name: e.target.value })}
+                  placeholder="Engineering standard"
+                />
               </label>
               <fieldset className="founder-checkbox">
                 <legend>Included components</legend>
                 {components.map((component) => (
                   <label key={component.id}>
-                    <input type="checkbox" checked={structureForm.componentIds.includes(component.id)} onChange={(e) => setStructureForm({ ...structureForm, componentIds: e.target.checked ? [...structureForm.componentIds, component.id] : structureForm.componentIds.filter((id) => id !== component.id) })} />
-                    <span>{component.code} · {component.name}</span>
+                    <input
+                      type="checkbox"
+                      checked={structureForm.componentIds.includes(component.id)}
+                      onChange={(e) =>
+                        setStructureForm({
+                          ...structureForm,
+                          componentIds: e.target.checked
+                            ? [...structureForm.componentIds, component.id]
+                            : structureForm.componentIds.filter((id) => id !== component.id),
+                        })
+                      }
+                    />
+                    <span>
+                      {component.code} · {component.name}
+                    </span>
                   </label>
                 ))}
               </fieldset>
             </div>
-            <button className="erp-button erp-button-primary" disabled={busy || !components.length}>Create salary structure ↗</button>
+            <button className="erp-button erp-button-primary" disabled={busy || !components.length}>
+              Create salary structure ↗
+            </button>
           </form>
           <form className="founder-form" onSubmit={assignCompensation}>
             <div className="founder-form-grid">
-              <label><span>Employee</span><select required value={compensationForm.employeeId} onChange={(e) => setCompensationForm({ ...compensationForm, employeeId: e.target.value })}><option value="">Select employee</option>{employees.map((employee) => <option key={employee.id} value={employee.id}>{employee.employeeCode} · {employee.firstName} {employee.lastName}</option>)}</select></label>
-              <label><span>Salary structure</span><select required value={compensationForm.salaryStructureId} onChange={(e) => setCompensationForm({ ...compensationForm, salaryStructureId: e.target.value })}><option value="">Select structure</option>{structures.filter((structure) => structure.isActive).map((structure) => <option key={structure.id} value={structure.id}>{structure.name}</option>)}</select></label>
-              <label><span>Effective from</span><input required type="date" value={compensationForm.effectiveFrom} onChange={(e) => setCompensationForm({ ...compensationForm, effectiveFrom: e.target.value })} /></label>
-              <label><span>Annual CTC (optional)</span><input type="number" min="0" step="0.01" value={compensationForm.annualCtc} onChange={(e) => setCompensationForm({ ...compensationForm, annualCtc: e.target.value })} /></label>
-              <label><span>Monthly gross target (optional)</span><input type="number" min="0" step="0.01" value={compensationForm.monthlyGrossTarget} onChange={(e) => setCompensationForm({ ...compensationForm, monthlyGrossTarget: e.target.value })} /></label>
+              <label>
+                <span>Employee</span>
+                <select
+                  required
+                  value={compensationForm.employeeId}
+                  onChange={(e) =>
+                    setCompensationForm({ ...compensationForm, employeeId: e.target.value })
+                  }
+                >
+                  <option value="">Select employee</option>
+                  {employees.map((employee) => (
+                    <option key={employee.id} value={employee.id}>
+                      {employee.employeeCode} · {employee.firstName} {employee.lastName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Salary structure</span>
+                <select
+                  required
+                  value={compensationForm.salaryStructureId}
+                  onChange={(e) =>
+                    setCompensationForm({ ...compensationForm, salaryStructureId: e.target.value })
+                  }
+                >
+                  <option value="">Select structure</option>
+                  {structures
+                    .filter((structure) => structure.isActive)
+                    .map((structure) => (
+                      <option key={structure.id} value={structure.id}>
+                        {structure.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label>
+                <span>Effective from</span>
+                <input
+                  required
+                  type="date"
+                  value={compensationForm.effectiveFrom}
+                  onChange={(e) =>
+                    setCompensationForm({ ...compensationForm, effectiveFrom: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                <span>Annual CTC (optional)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={compensationForm.annualCtc}
+                  onChange={(e) =>
+                    setCompensationForm({ ...compensationForm, annualCtc: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                <span>Monthly gross target (optional)</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={compensationForm.monthlyGrossTarget}
+                  onChange={(e) =>
+                    setCompensationForm({ ...compensationForm, monthlyGrossTarget: e.target.value })
+                  }
+                />
+              </label>
             </div>
-            <button className="erp-button erp-button-primary" disabled={busy || !employees.length || !structures.length}>Assign compensation ↗</button>
+            <button
+              className="erp-button erp-button-primary"
+              disabled={busy || !employees.length || !structures.length}
+            >
+              Assign compensation ↗
+            </button>
           </form>
           <form className="founder-form" onSubmit={createPeriod}>
             <div className="founder-form-grid">
-              <label><span>Year</span><input required type="number" min="2000" max="2200" value={periodForm.year} onChange={(e) => setPeriodForm({ ...periodForm, year: e.target.value })} /></label>
-              <label><span>Month</span><input required type="number" min="1" max="12" value={periodForm.month} onChange={(e) => setPeriodForm({ ...periodForm, month: e.target.value })} /></label>
-              <label><span>Period starts</span><input required type="date" value={periodForm.startDate} onChange={(e) => setPeriodForm({ ...periodForm, startDate: e.target.value })} /></label>
-              <label><span>Period ends</span><input required type="date" value={periodForm.endDate} onChange={(e) => setPeriodForm({ ...periodForm, endDate: e.target.value })} /></label>
+              <label>
+                <span>Year</span>
+                <input
+                  required
+                  type="number"
+                  min="2000"
+                  max="2200"
+                  value={periodForm.year}
+                  onChange={(e) => setPeriodForm({ ...periodForm, year: e.target.value })}
+                />
+              </label>
+              <label>
+                <span>Month</span>
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  max="12"
+                  value={periodForm.month}
+                  onChange={(e) => setPeriodForm({ ...periodForm, month: e.target.value })}
+                />
+              </label>
+              <label>
+                <span>Period starts</span>
+                <input
+                  required
+                  type="date"
+                  value={periodForm.startDate}
+                  onChange={(e) => setPeriodForm({ ...periodForm, startDate: e.target.value })}
+                />
+              </label>
+              <label>
+                <span>Period ends</span>
+                <input
+                  required
+                  type="date"
+                  value={periodForm.endDate}
+                  onChange={(e) => setPeriodForm({ ...periodForm, endDate: e.target.value })}
+                />
+              </label>
             </div>
-            <button className="erp-button erp-button-primary" disabled={busy}>Create payroll period ↗</button>
+            <button className="erp-button erp-button-primary" disabled={busy}>
+              Create payroll period ↗
+            </button>
           </form>
           <div className="erp-notification-list">
             {structures.map((s) => (
@@ -408,42 +561,109 @@ function FounderPayrollContent() {
                 </div>
                 <div>
                   <span>{run.period?.status}</span>
-                  <button className="erp-text-button" disabled={busy} onClick={() => void reviewRun(run.id)}>Review results ↗</button>
-                  {run.status === "DRAFT" || run.status === "PROCESSING" ? <button className="erp-text-button" disabled={busy} onClick={() => void runAction(run.id, "calculate")}>Calculate ↗</button> : null}
-                  {run.status === "PROCESSING" ? <button className="erp-text-button" disabled={busy} onClick={() => void runAction(run.id, "submit-review")}>Submit review ↗</button> : null}
-                  {run.status === "REVIEW" ? <button className="erp-text-button" disabled={busy} onClick={() => void runAction(run.id, "finalize")}>Finalize ↗</button> : null}
+                  <button
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() => void reviewRun(run.id)}
+                  >
+                    Review results ↗
+                  </button>
+                  {run.status === "DRAFT" || run.status === "PROCESSING" ? (
+                    <button
+                      className="erp-text-button"
+                      disabled={busy}
+                      onClick={() => void runAction(run.id, "calculate")}
+                    >
+                      Calculate ↗
+                    </button>
+                  ) : null}
+                  {run.status === "PROCESSING" ? (
+                    <button
+                      className="erp-text-button"
+                      disabled={busy}
+                      onClick={() => void runAction(run.id, "submit-review")}
+                    >
+                      Submit review ↗
+                    </button>
+                  ) : null}
+                  {run.status === "REVIEW" ? (
+                    <button
+                      className="erp-text-button"
+                      disabled={busy}
+                      onClick={() => void runAction(run.id, "finalize")}
+                    >
+                      Finalize ↗
+                    </button>
+                  ) : null}
                 </div>
               </article>
             ))}
-            {periods.filter((period) => !period.run && !["FINALIZED", "CLOSED"].includes(period.status)).map((period) => (
-              <article className="erp-notification" key={period.id}>
-                <div><h3>{period.year}/{String(period.month).padStart(2, "0")}</h3><p>{period.status} · {period.startDate?.slice(0, 10)} to {period.endDate?.slice(0, 10)}</p></div>
-                <button className="erp-text-button" disabled={busy} onClick={() => void startRun(period.id)}>Start run ↗</button>
-              </article>
-            ))}
+            {periods
+              .filter((period) => !period.run && !["FINALIZED", "CLOSED"].includes(period.status))
+              .map((period) => (
+                <article className="erp-notification" key={period.id}>
+                  <div>
+                    <h3>
+                      {period.year}/{String(period.month).padStart(2, "0")}
+                    </h3>
+                    <p>
+                      {period.status} · {period.startDate?.slice(0, 10)} to{" "}
+                      {period.endDate?.slice(0, 10)}
+                    </p>
+                  </div>
+                  <button
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() => void startRun(period.id)}
+                  >
+                    Start run ↗
+                  </button>
+                </article>
+              ))}
             {!structures.length && !runs.length && (
               <div className="erp-empty">
                 <strong>No structures or runs yet.</strong>
-                <span>
-                  Create configured components first, then prepare a payroll
-                  period.
-                </span>
+                <span>Create configured components first, then prepare a payroll period.</span>
               </div>
             )}
           </div>
           {selectedRun && (
             <div className="erp-notification-list" aria-live="polite">
               <div className="erp-section-heading">
-                <div><p className="erp-kicker">Run review</p><h2>{selectedRun.period?.year}/{String(selectedRun.period?.month).padStart(2, "0")} results</h2></div>
-                <button className="erp-text-button" onClick={() => setSelectedRun(null)}>Close ×</button>
+                <div>
+                  <p className="erp-kicker">Run review</p>
+                  <h2>
+                    {selectedRun.period?.year}/{String(selectedRun.period?.month).padStart(2, "0")}{" "}
+                    results
+                  </h2>
+                </div>
+                <button className="erp-text-button" onClick={() => setSelectedRun(null)}>
+                  Close ×
+                </button>
               </div>
               {(selectedRun.results ?? []).map((result: AnyRecord) => (
                 <article className="erp-notification" key={result.id}>
-                  <div><h3>{result.employee?.firstName} {result.employee?.lastName}</h3><p>{result.employee?.employeeCode} · {result.status}</p></div>
-                  <div><span>Gross ₹{result.grossEarnings}</span><span>Deductions ₹{result.totalDeductions}</span><strong>Net ₹{result.netPay}</strong></div>
+                  <div>
+                    <h3>
+                      {result.employee?.firstName} {result.employee?.lastName}
+                    </h3>
+                    <p>
+                      {result.employee?.employeeCode} · {result.status}
+                    </p>
+                  </div>
+                  <div>
+                    <span>Gross ₹{result.grossEarnings}</span>
+                    <span>Deductions ₹{result.totalDeductions}</span>
+                    <strong>Net ₹{result.netPay}</strong>
+                  </div>
                 </article>
               ))}
-              {!(selectedRun.results ?? []).length && <div className="erp-empty"><strong>No calculated results yet.</strong><span>Calculate this run before submitting it for review.</span></div>}
+              {!(selectedRun.results ?? []).length && (
+                <div className="erp-empty">
+                  <strong>No calculated results yet.</strong>
+                  <span>Calculate this run before submitting it for review.</span>
+                </div>
+              )}
             </div>
           )}
         </section>

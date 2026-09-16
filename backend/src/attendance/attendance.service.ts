@@ -27,8 +27,7 @@ export class AttendanceService {
     this.timeZone = config.get<string>("businessTimeZone") ?? "Asia/Kolkata";
   }
   private org(principal: Principal) {
-    if (!principal.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!principal.organizationId) throw new ForbiddenException("Organization context unavailable");
     return principal.organizationId;
   }
   private today() {
@@ -43,8 +42,7 @@ export class AttendanceService {
   }
   private date(value: string) {
     const d = new Date(`${value}T00:00:00.000Z`);
-    if (Number.isNaN(d.getTime()))
-      throw new BadRequestException("Invalid date");
+    if (Number.isNaN(d.getTime())) throw new BadRequestException("Invalid date");
     return d;
   }
   private isManagement(p: Principal) {
@@ -59,23 +57,13 @@ export class AttendanceService {
           "DIVISION_HEAD",
         ].includes(r),
       ) &&
-      (p.permissions.includes("attendance.read") ||
-        p.permissions.includes("attendance.manage"))
+      (p.permissions.includes("attendance.read") || p.permissions.includes("attendance.manage"))
     );
   }
-  private scope(
-    p: Principal,
-    where: Prisma.EmployeeWhereInput = {},
-  ): Prisma.EmployeeWhereInput {
+  private scope(p: Principal, where: Prisma.EmployeeWhereInput = {}): Prisma.EmployeeWhereInput {
     if (
       p.roles.some((r) =>
-        [
-          "SUPER_ADMIN",
-          "FOUNDER_CEO",
-          "DIRECTOR",
-          "HR_MANAGER",
-          "HR_EXECUTIVE",
-        ].includes(r),
+        ["SUPER_ADMIN", "FOUNDER_CEO", "DIRECTOR", "HR_MANAGER", "HR_EXECUTIVE"].includes(r),
       )
     )
       return { division: { organizationId: this.org(p) }, ...where };
@@ -92,8 +80,7 @@ export class AttendanceService {
     };
   }
   async meToday(p: Principal) {
-    if (!p.employeeId)
-      throw new NotFoundException("Employee profile not found");
+    if (!p.employeeId) throw new NotFoundException("Employee profile not found");
     return this.prisma.attendanceRecord.findUnique({
       where: {
         employeeId_businessDate: {
@@ -146,8 +133,7 @@ export class AttendanceService {
         employeeId_businessDate: { employeeId: p.employeeId, businessDate },
       },
     });
-    if (existing?.checkInAt)
-      throw new ConflictException("Already checked in today");
+    if (existing?.checkInAt) throw new ConflictException("Already checked in today");
     const row = await this.prisma.attendanceRecord.upsert({
       where: {
         employeeId_businessDate: { employeeId: p.employeeId, businessDate },
@@ -184,10 +170,8 @@ export class AttendanceService {
         },
       },
     });
-    if (!existing?.checkInAt)
-      throw new BadRequestException("Check in before checking out");
-    if (existing.checkOutAt)
-      throw new ConflictException("Already checked out today");
+    if (!existing?.checkInAt) throw new BadRequestException("Check in before checking out");
+    if (existing.checkOutAt) throw new ConflictException("Already checked out today");
     const row = await this.prisma.attendanceRecord.update({
       where: { id: existing.id },
       data: { checkOutAt: new Date(), updatedByUserId: p.userId },
@@ -201,22 +185,13 @@ export class AttendanceService {
     return row;
   }
   async list(p: Principal, q: AttendanceRangeQueryDto) {
-    if (
-      !this.isManagement(p) &&
-      !p.permissions.includes("attendance.self.read")
-    )
+    if (!this.isManagement(p) && !p.permissions.includes("attendance.self.read"))
       throw new ForbiddenException("Attendance access denied");
     const management = this.isManagement(p);
     if (!management && q.employeeId && q.employeeId !== p.employeeId)
       throw new ForbiddenException("Attendance access denied");
     const orgWide = p.roles.some((r) =>
-      [
-        "SUPER_ADMIN",
-        "FOUNDER_CEO",
-        "DIRECTOR",
-        "HR_MANAGER",
-        "HR_EXECUTIVE",
-      ].includes(r),
+      ["SUPER_ADMIN", "FOUNDER_CEO", "DIRECTOR", "HR_MANAGER", "HR_EXECUTIVE"].includes(r),
     );
     const employeeWhere = this.scope(
       p,
@@ -271,8 +246,7 @@ export class AttendanceService {
     };
   }
   async summary(p: Principal, q: AttendanceSummaryQueryDto) {
-    if (!this.isManagement(p))
-      throw new ForbiddenException("Attendance summary access denied");
+    if (!this.isManagement(p)) throw new ForbiddenException("Attendance summary access denied");
     const date = this.date(q.date);
     const employees = await this.prisma.employee.findMany({
       where: this.scope(p, q.divisionId ? { divisionId: q.divisionId } : {}),
@@ -330,8 +304,7 @@ export class AttendanceService {
       if (!row) {
         const holidayApplies = holidays.some(
           (holiday) =>
-            (!holiday.divisionId ||
-              holiday.divisionId === employee.divisionId) &&
+            (!holiday.divisionId || holiday.divisionId === employee.divisionId) &&
             (!holiday.branchId || holiday.branchId === employee.branchId),
         );
         if (!holidayApplies) counts.absent++;
@@ -340,10 +313,7 @@ export class AttendanceService {
       if (row.status === "ON_LEAVE") counts.onLeave++;
       else if (row.status === "REMOTE") counts.remote++;
       else if (row.status === "HALF_DAY") counts.halfDay++;
-      else if (
-        row.status === "MISSING_CHECKOUT" ||
-        (row.checkInAt && !row.checkOutAt)
-      )
+      else if (row.status === "MISSING_CHECKOUT" || (row.checkInAt && !row.checkOutAt))
         counts.missingCheckout++;
       else if (row.status === "PRESENT") counts.present++;
     }
@@ -360,19 +330,12 @@ export class AttendanceService {
       !existing ||
       !existing.employee.divisionId ||
       (!p.roles.some((r) =>
-        [
-          "SUPER_ADMIN",
-          "FOUNDER_CEO",
-          "DIRECTOR",
-          "HR_MANAGER",
-          "HR_EXECUTIVE",
-        ].includes(r),
+        ["SUPER_ADMIN", "FOUNDER_CEO", "DIRECTOR", "HR_MANAGER", "HR_EXECUTIVE"].includes(r),
       ) &&
         p.divisionId !== existing.employee.divisionId)
     )
       throw new NotFoundException("Attendance record not found");
-    if (!dto.reason.trim())
-      throw new BadRequestException("Correction reason is required");
+    if (!dto.reason.trim()) throw new BadRequestException("Correction reason is required");
     const row = await this.prisma.attendanceRecord.update({
       where: { id },
       data: {

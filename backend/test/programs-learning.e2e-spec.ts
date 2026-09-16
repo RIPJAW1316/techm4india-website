@@ -74,7 +74,9 @@ describe("V2 programs and learning delivery", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -132,10 +134,16 @@ describe("V2 programs and learning delivery", () => {
       // RED phase runs before learning tables exist.
     }
     const fixtures = [founder, trainer, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: foreignOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: foreignOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: foreignOrganizationId } });
     await prisma.organization.delete({ where: { id: foreignOrganizationId } });
     await app.close();
@@ -171,7 +179,11 @@ describe("V2 programs and learning delivery", () => {
     const curriculumModule = await request(app.getHttpServer())
       .post(`/api/v2/programs/${programId}/modules`)
       .set(await auth(trainer))
-      .send({ title: "Sensors and control", description: "Build reliable sensor loops.", position: 1 })
+      .send({
+        title: "Sensors and control",
+        description: "Build reliable sensor loops.",
+        position: 1,
+      })
       .expect(201);
     const lesson = await request(app.getHttpServer())
       .post(`/api/v2/program-modules/${curriculumModule.body.data.id}/lessons`)
@@ -234,10 +246,22 @@ describe("V2 programs and learning delivery", () => {
     const lessonResponse = await request(app.getHttpServer())
       .post(`/api/v2/program-modules/${moduleResponse.body.data.id}/lessons`)
       .set(await auth(founder))
-      .send({ title: "Mission requirements", contentType: "TEXT", contentBody: "Mission requirements lesson.", durationMinutes: 60, position: 1 })
+      .send({
+        title: "Mission requirements",
+        contentType: "TEXT",
+        contentBody: "Mission requirements lesson.",
+        durationMinutes: 60,
+        position: 1,
+      })
       .expect(201);
-    await request(app.getHttpServer()).post(`/api/v2/programs/${programId}/submit`).set(await auth(founder)).expect(201);
-    await request(app.getHttpServer()).post(`/api/v2/programs/${programId}/publish`).set(await auth(founder)).expect(201);
+    await request(app.getHttpServer())
+      .post(`/api/v2/programs/${programId}/submit`)
+      .set(await auth(founder))
+      .expect(201);
+    await request(app.getHttpServer())
+      .post(`/api/v2/programs/${programId}/publish`)
+      .set(await auth(founder))
+      .expect(201);
 
     const student = await request(app.getHttpServer())
       .post("/api/v2/students")
@@ -274,7 +298,9 @@ describe("V2 programs and learning delivery", () => {
       .expect(201);
 
     await request(app.getHttpServer())
-      .put(`/api/v2/program-enrollments/${enrollment.body.data.id}/lessons/${lessonResponse.body.data.id}/progress`)
+      .put(
+        `/api/v2/program-enrollments/${enrollment.body.data.id}/lessons/${lessonResponse.body.data.id}/progress`,
+      )
       .set(await auth(trainer))
       .send({ progressPercent: 100 })
       .expect(200);

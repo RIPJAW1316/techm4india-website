@@ -11,11 +11,7 @@ import {
   Min,
 } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import {
-  ComplianceCategory,
-  ComplianceFrequency,
-  ComplianceStatus,
-} from "@prisma/client";
+import { ComplianceCategory, ComplianceFrequency, ComplianceStatus } from "@prisma/client";
 
 const CODE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9-]{1,39}$/;
 
@@ -104,7 +100,9 @@ export class AddComplianceEvidenceDto {
   @Length(1, 2000)
   note?: string;
 
-  @ApiPropertyOptional({ description: "Approved HTTPS document URL; storage upload handled separately" })
+  @ApiPropertyOptional({
+    description: "Approved HTTPS document URL; storage upload handled separately",
+  })
   @IsOptional()
   @IsString()
   @Matches(/^https:\/\//i)

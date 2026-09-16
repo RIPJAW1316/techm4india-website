@@ -1,13 +1,5 @@
 import { Type } from "class-transformer";
-import {
-  IsEnum,
-  IsOptional,
-  IsString,
-  Length,
-  Matches,
-  Max,
-  Min,
-} from "class-validator";
+import { IsEnum, IsOptional, IsString, Length, Matches, Max, Min } from "class-validator";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { CmsContentStatus, CmsContentType } from "@prisma/client";
 

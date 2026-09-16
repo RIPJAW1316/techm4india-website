@@ -3,10 +3,7 @@ import "reflect-metadata";
 import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
-import {
-  DocumentBuilder,
-  SwaggerModule,
-} from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import cookieParser from "cookie-parser";
 import { json, urlencoded } from "express";
 import helmet from "helmet";
@@ -46,9 +43,7 @@ export async function createConfiguredApp(): Promise<INestApplication> {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle("TechM4India ERP API")
-    .setDescription(
-      "TechM4India ERP API authentication and authorization foundation.",
-    )
+    .setDescription("TechM4India ERP API authentication and authorization foundation.")
     .setVersion("0.1.0")
     .addBearerAuth()
     .build();

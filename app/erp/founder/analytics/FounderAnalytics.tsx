@@ -30,48 +30,51 @@ function FounderAnalyticsContent() {
     void load();
   }, [load]);
 
-  const sections: Array<{ kicker: string; heading: string; stats: Array<[string, number, string]> }> =
-    overview
-      ? [
-          {
-            kicker: "Education",
-            heading: "Learning delivery",
-            stats: [
-              ["Programmes", overview.education.programs, "All lifecycle states"],
-              ["Published", overview.education.publishedPrograms, "Ready for batches"],
-              ["Students", overview.education.students, "Consent on file"],
-              ["Active enrollments", overview.education.activeEnrollments, "In progress"],
-              ["Certificates", overview.education.certificatesIssued, "Completion issued"],
-            ],
-          },
-          {
-            kicker: "Operations",
-            heading: "Service & governance",
-            stats: [
-              ["Open tickets", overview.operations.openTickets, "Awaiting resolution"],
-              ["Pending compliance", overview.operations.pendingCompliance, "Not yet completed"],
-              ["Published content", overview.operations.publishedContent, "Live pages"],
-            ],
-          },
-          {
-            kicker: "Supply chain",
-            heading: "Procurement & assets",
-            stats: [
-              ["Active vendors", overview.supplyChain.activeVendors, "Approved suppliers"],
-              ["Purchase orders", overview.supplyChain.purchaseOrders, "All statuses"],
-              ["Assets", overview.supplyChain.assets, "Registered"],
-            ],
-          },
-          {
-            kicker: "People",
-            heading: "Talent pipeline",
-            stats: [
-              ["Reviews in flight", overview.people.openReviews, "Not yet finalized"],
-              ["Open requisitions", overview.people.openRequisitions, "Actively hiring"],
-            ],
-          },
-        ]
-      : [];
+  const sections: Array<{
+    kicker: string;
+    heading: string;
+    stats: Array<[string, number, string]>;
+  }> = overview
+    ? [
+        {
+          kicker: "Education",
+          heading: "Learning delivery",
+          stats: [
+            ["Programmes", overview.education.programs, "All lifecycle states"],
+            ["Published", overview.education.publishedPrograms, "Ready for batches"],
+            ["Students", overview.education.students, "Consent on file"],
+            ["Active enrollments", overview.education.activeEnrollments, "In progress"],
+            ["Certificates", overview.education.certificatesIssued, "Completion issued"],
+          ],
+        },
+        {
+          kicker: "Operations",
+          heading: "Service & governance",
+          stats: [
+            ["Open tickets", overview.operations.openTickets, "Awaiting resolution"],
+            ["Pending compliance", overview.operations.pendingCompliance, "Not yet completed"],
+            ["Published content", overview.operations.publishedContent, "Live pages"],
+          ],
+        },
+        {
+          kicker: "Supply chain",
+          heading: "Procurement & assets",
+          stats: [
+            ["Active vendors", overview.supplyChain.activeVendors, "Approved suppliers"],
+            ["Purchase orders", overview.supplyChain.purchaseOrders, "All statuses"],
+            ["Assets", overview.supplyChain.assets, "Registered"],
+          ],
+        },
+        {
+          kicker: "People",
+          heading: "Talent pipeline",
+          stats: [
+            ["Reviews in flight", overview.people.openReviews, "Not yet finalized"],
+            ["Open requisitions", overview.people.openRequisitions, "Actively hiring"],
+          ],
+        },
+      ]
+    : [];
 
   return (
     <main className="erp-main">
@@ -85,25 +88,41 @@ function FounderAnalyticsContent() {
               Analytics <em>overview</em>
             </h1>
             <p>
-              A read-only, organization-scoped rollup across education, operations, supply
-              chain and people — every figure stays within your organization boundary.
+              A read-only, organization-scoped rollup across education, operations, supply chain and
+              people — every figure stays within your organization boundary.
             </p>
           </div>
         </section>
 
-        {error ? <div className="erp-error" role="alert">{error}</div> : null}
+        {error ? (
+          <div className="erp-error" role="alert">
+            {error}
+          </div>
+        ) : null}
 
         {loading ? (
-          <div className="erp-state" role="status"><span className="erp-loader" aria-hidden="true" /><p>Loading analytics</p></div>
+          <div className="erp-state" role="status">
+            <span className="erp-loader" aria-hidden="true" />
+            <p>Loading analytics</p>
+          </div>
         ) : null}
 
         {!loading && overview
           ? sections.map((section) => (
               <section className="erp-section" key={section.heading}>
-                <div className="erp-section-heading"><div><p className="erp-kicker">{section.kicker}</p><h2>{section.heading}</h2></div></div>
+                <div className="erp-section-heading">
+                  <div>
+                    <p className="erp-kicker">{section.kicker}</p>
+                    <h2>{section.heading}</h2>
+                  </div>
+                </div>
                 <div className="erp-stat-grid" aria-label={section.heading}>
                   {section.stats.map(([label, value, hint]) => (
-                    <article key={label}><span>{label}</span><strong>{value}</strong><small>{hint}</small></article>
+                    <article key={label}>
+                      <span>{label}</span>
+                      <strong>{value}</strong>
+                      <small>{hint}</small>
+                    </article>
                   ))}
                 </div>
               </section>

@@ -19,25 +19,20 @@ export class HolidaysService {
     private readonly config: ConfigService,
   ) {}
   private org(p: Principal) {
-    if (!p.organizationId)
-      throw new ForbiddenException("Organization context unavailable");
+    if (!p.organizationId) throw new ForbiddenException("Organization context unavailable");
     return p.organizationId;
   }
   private manage(p: Principal) {
     if (
       !p.permissions.includes("holidays.manage") ||
-      !p.roles.some((r) =>
-        ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER"].includes(r),
-      )
+      !p.roles.some((r) => ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER"].includes(r))
     )
       throw new ForbiddenException("Holiday management denied");
   }
   async list(p: Principal, q: HolidayQueryDto) {
     const organizationId = this.org(p);
     const orgWide = p.roles.some((role) =>
-      ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "HR_EXECUTIVE"].includes(
-        role,
-      ),
+      ["SUPER_ADMIN", "FOUNDER_CEO", "HR_MANAGER", "HR_EXECUTIVE"].includes(role),
     );
     const employee =
       !orgWide && p.employeeId
@@ -51,9 +46,7 @@ export class HolidaysService {
       : {
           OR: [
             { divisionId: null, branchId: null },
-            ...(p.divisionId
-              ? [{ divisionId: p.divisionId, branchId: null }]
-              : []),
+            ...(p.divisionId ? [{ divisionId: p.divisionId, branchId: null }] : []),
             ...(employee?.branchId ? [{ branchId: employee.branchId }] : []),
           ],
         };
@@ -113,13 +106,8 @@ export class HolidaysService {
       });
       return row;
     } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === "P2002"
-      )
-        throw new ConflictException(
-          "A holiday already exists for this date and scope",
-        );
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+        throw new ConflictException("A holiday already exists for this date and scope");
       throw error;
     }
   }

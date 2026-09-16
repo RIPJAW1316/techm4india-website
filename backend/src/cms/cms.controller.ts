@@ -18,11 +18,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../auth/guards/permissions.guard";
 import { Principal } from "../auth/auth.types";
 import { V2Controller } from "../common/v2-controller.base";
-import {
-  AddCmsRevisionDto,
-  CmsPageQueryDto,
-  CreateCmsPageDto,
-} from "./dto/cms.dto";
+import { AddCmsRevisionDto, CmsPageQueryDto, CreateCmsPageDto } from "./dto/cms.dto";
 import { CmsService } from "./cms.service";
 
 @ApiTags("cms-v2")

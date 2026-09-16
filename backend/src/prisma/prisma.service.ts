@@ -3,10 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaClient } from "@prisma/client";
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly databaseConfigured: boolean;
 
   constructor(configService: ConfigService) {
@@ -37,9 +34,7 @@ export class PrismaService
     await this.$disconnect();
   }
 
-  async checkConnection(): Promise<
-    "connected" | "unavailable" | "not_configured"
-  > {
+  async checkConnection(): Promise<"connected" | "unavailable" | "not_configured"> {
     if (!this.databaseConfigured) {
       return "not_configured";
     }

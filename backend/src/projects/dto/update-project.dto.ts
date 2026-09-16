@@ -1,5 +1,15 @@
 import { Priority, ProjectStatus } from "@prisma/client";
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from "class-validator";
+import {
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+} from "class-validator";
 
 export class UpdateProjectDto {
   @IsOptional() @IsString() @MaxLength(160) name?: string;

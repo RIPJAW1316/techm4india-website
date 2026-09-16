@@ -12,7 +12,9 @@ export const envValidationSchema = Joi.object({
   JWT_ACCESS_SECRET: Joi.string().min(32).required(),
   ACCESS_TOKEN_TTL: Joi.string().default("15m"),
   REFRESH_TOKEN_TTL: Joi.string().default("30d"),
-  REFRESH_COOKIE_NAME: Joi.string().pattern(/^[A-Za-z0-9_-]+$/).default("tm4_refresh"),
+  REFRESH_COOKIE_NAME: Joi.string()
+    .pattern(/^[A-Za-z0-9_-]+$/)
+    .default("tm4_refresh"),
   COOKIE_DOMAIN: Joi.string().allow("").optional(),
   COOKIE_SAME_SITE: Joi.string().valid("lax", "strict", "none").default("lax"),
   COOKIE_SECURE: Joi.boolean().truthy("true").falsy("false").default(false),

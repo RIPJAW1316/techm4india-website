@@ -32,13 +32,8 @@ export class AdminController {
   @ApiOperation({
     summary: "List organization users and linked employees safely",
   })
-  users(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: AdminUserQueryDto,
-  ) {
-    return this.admin
-      .users(principal, query)
-      .then((result) => ({ success: true, ...result }));
+  users(@CurrentPrincipal() principal: Principal, @Query() query: AdminUserQueryDto) {
+    return this.admin.users(principal, query).then((result) => ({ success: true, ...result }));
   }
 
   @Get("users/:id")
@@ -46,13 +41,8 @@ export class AdminController {
   @ApiOperation({
     summary: "Read a safe consolidated user and employee record",
   })
-  user(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
-    return this.admin
-      .user(principal, id)
-      .then((data) => ({ success: true, data }));
+  user(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
+    return this.admin.user(principal, id).then((data) => ({ success: true, data }));
   }
 
   @Get("roles")
@@ -61,18 +51,14 @@ export class AdminController {
     summary: "Read the official role catalogue and implemented permissions",
   })
   roles(@CurrentPrincipal() principal: Principal) {
-    return this.admin
-      .roles(principal)
-      .then((data) => ({ success: true, data }));
+    return this.admin.roles(principal).then((data) => ({ success: true, data }));
   }
 
   @Get("permissions")
   @RequirePermissions("admin.permissions.read")
   @ApiOperation({ summary: "Read the current role-permission matrix" })
   permissions(@CurrentPrincipal() principal: Principal) {
-    return this.admin
-      .permissions(principal)
-      .then((data) => ({ success: true, data }));
+    return this.admin.permissions(principal).then((data) => ({ success: true, data }));
   }
 
   @Post("users/:id/roles")

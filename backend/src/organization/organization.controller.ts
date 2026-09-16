@@ -27,13 +27,22 @@ export class OrganizationController {
 
   @Get("divisions/:id")
   @ApiOperation({ summary: "Read one authorized division" })
-  async getDivision(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
+  async getDivision(
+    @CurrentPrincipal() principal: Principal,
+    @Param("id", ParseUUIDPipe) id: string,
+  ) {
     return { success: true, data: await this.organizationService.getDivision(principal, id) };
   }
 
   @Get("divisions/:divisionId/departments")
   @ApiOperation({ summary: "List active departments in an authorized division" })
-  async listDepartments(@CurrentPrincipal() principal: Principal, @Param("divisionId", ParseUUIDPipe) divisionId: string) {
-    return { success: true, data: await this.organizationService.listDepartments(principal, divisionId) };
+  async listDepartments(
+    @CurrentPrincipal() principal: Principal,
+    @Param("divisionId", ParseUUIDPipe) divisionId: string,
+  ) {
+    return {
+      success: true,
+      data: await this.organizationService.listDepartments(principal, divisionId),
+    };
   }
 }

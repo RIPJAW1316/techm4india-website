@@ -26,16 +26,26 @@ export class EmployeesService {
 
   async getMe(principal: Principal) {
     if (!principal.employeeId) throw new NotFoundException("Employee profile not found");
-    const employee = await this.prisma.employee.findUnique({ where: { id: principal.employeeId }, include: employeeInclude });
+    const employee = await this.prisma.employee.findUnique({
+      where: { id: principal.employeeId },
+      include: employeeInclude,
+    });
     if (!employee) throw new NotFoundException("Employee profile not found");
     return this.toResponse(employee, false);
   }
 
   async getById(principal: Principal, id: string) {
-    const target = await this.prisma.employee.findUnique({ where: { id }, select: { id: true, divisionId: true } });
+    const target = await this.prisma.employee.findUnique({
+      where: { id },
+      select: { id: true, divisionId: true },
+    });
     if (!target) throw new NotFoundException("Employee not found");
-    if (!this.policy.canReadEmployee(principal, target)) throw new ForbiddenException("Employee access denied");
-    const employee = await this.prisma.employee.findUnique({ where: { id }, include: employeeInclude });
+    if (!this.policy.canReadEmployee(principal, target))
+      throw new ForbiddenException("Employee access denied");
+    const employee = await this.prisma.employee.findUnique({
+      where: { id },
+      include: employeeInclude,
+    });
     if (!employee) throw new NotFoundException("Employee not found");
     const restricted = principal.employeeId !== id && principal.roles.includes("EMPLOYEE");
     return this.toResponse(employee, restricted);
@@ -78,7 +88,12 @@ export class EmployeesService {
     const restricted = principal.roles.includes("EMPLOYEE");
     return {
       data: employees.map((employee) => this.toResponse(employee, restricted)),
-      meta: { page: query.page, limit: query.limit, total, totalPages: Math.ceil(total / query.limit) },
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
     };
   }
 
@@ -100,7 +115,10 @@ export class EmployeesService {
     return this.toResponse(employee, false);
   }
 
-  private toResponse(employee: Prisma.EmployeeGetPayload<{ include: typeof employeeInclude }>, restricted: boolean) {
+  private toResponse(
+    employee: Prisma.EmployeeGetPayload<{ include: typeof employeeInclude }>,
+    restricted: boolean,
+  ) {
     const manager = employee.manager
       ? {
           id: employee.manager.id,
@@ -115,11 +133,25 @@ export class EmployeesService {
       firstName: employee.firstName,
       lastName: employee.lastName,
       email: employee.user.email,
-      ...(restricted ? {} : { phone: employee.phone, joiningDate: employee.joiningDate, profilePhotoUrl: employee.profilePhotoUrl }),
+      ...(restricted
+        ? {}
+        : {
+            phone: employee.phone,
+            joiningDate: employee.joiningDate,
+            profilePhotoUrl: employee.profilePhotoUrl,
+          }),
       designation: employee.designation,
       employmentStatus: employee.employmentStatus,
-      division: employee.division ? { id: employee.division.id, slug: employee.division.slug, name: employee.division.name } : null,
-      department: employee.department ? { id: employee.department.id, slug: employee.department.slug, name: employee.department.name } : null,
+      division: employee.division
+        ? { id: employee.division.id, slug: employee.division.slug, name: employee.division.name }
+        : null,
+      department: employee.department
+        ? {
+            id: employee.department.id,
+            slug: employee.department.slug,
+            name: employee.department.name,
+          }
+        : null,
       manager,
       roles: employee.user.roles.map(({ role }) => role.name),
     };

@@ -74,7 +74,9 @@ describe("V2 CMS content workflow", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -102,7 +104,12 @@ describe("V2 CMS content workflow", () => {
     founder = await fixture("FOUNDER_CEO", divisionId, departmentId, "Founder");
     contentManager = await fixture("CONTENT_MANAGER", divisionId, departmentId, "Author");
     employee = await fixture("EMPLOYEE", divisionId, departmentId, "Employee");
-    foreignFounder = await fixture("FOUNDER_CEO", foreignDivision.id, foreignDepartment.id, "Foreign");
+    foreignFounder = await fixture(
+      "FOUNDER_CEO",
+      foreignDivision.id,
+      foreignDepartment.id,
+      "Foreign",
+    );
   });
 
   afterAll(async () => {
@@ -114,10 +121,16 @@ describe("V2 CMS content workflow", () => {
       // RED phase runs before CMS tables exist.
     }
     const fixtures = [founder, contentManager, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: foreignOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: foreignOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: foreignOrganizationId } });
     await prisma.organization.delete({ where: { id: foreignOrganizationId } });
     await app.close();
@@ -147,7 +160,10 @@ describe("V2 CMS content workflow", () => {
     await request(app.getHttpServer())
       .post(`/api/v2/cms/pages/${pageId}/revisions`)
       .set(await auth(contentManager))
-      .send({ title: "Robotics Lab Safety Guidelines", body: "Updated with the new sensor protocol." })
+      .send({
+        title: "Robotics Lab Safety Guidelines",
+        body: "Updated with the new sensor protocol.",
+      })
       .expect(201)
       .expect(({ body }) => expect(body.data.version).toBe(2));
 

@@ -1,2 +1,4 @@
 import { PayslipsPage } from "../../components/PayslipsPage";
-export default function EngineeringPayslipsPage() { return <PayslipsPage divisionSlug="engineering" />; }
+export default function EngineeringPayslipsPage() {
+  return <PayslipsPage divisionSlug="engineering" />;
+}

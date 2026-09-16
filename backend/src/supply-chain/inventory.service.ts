@@ -71,11 +71,7 @@ export class InventoryService extends V2ServiceBase {
     return { data, meta: { page, limit, total } };
   }
 
-  async createItem(
-    principal: Principal,
-    dto: CreateInventoryItemDto,
-    request?: RequestMetadata,
-  ) {
+  async createItem(principal: Principal, dto: CreateInventoryItemDto, request?: RequestMetadata) {
     let row;
     try {
       row = await this.prisma.inventoryItem.create({

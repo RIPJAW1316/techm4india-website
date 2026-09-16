@@ -13,11 +13,15 @@ describe("Attendance, leave and holiday protection", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
   });
-  afterAll(async () => { await app.close(); });
+  afterAll(async () => {
+    await app.close();
+  });
 
   it("keeps attendance and leave APIs behind authentication", async () => {
     await request(app.getHttpServer()).get("/api/v2/attendance/me/today").expect(401);

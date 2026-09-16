@@ -58,11 +58,7 @@ export class AssetsService extends V2ServiceBase {
     return { data, meta: { page, limit, total } };
   }
 
-  async createAsset(
-    principal: Principal,
-    dto: CreateAssetDto,
-    request?: RequestMetadata,
-  ) {
+  async createAsset(principal: Principal, dto: CreateAssetDto, request?: RequestMetadata) {
     const organizationId = this.organizationId(principal);
     if (dto.vendorId) {
       const vendor = await this.prisma.vendor.findFirst({

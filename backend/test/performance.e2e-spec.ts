@@ -95,7 +95,9 @@ describe("V2 performance management", () => {
     app.setGlobalPrefix("api");
     app.enableVersioning({ defaultVersion: "1", type: VersioningType.URI });
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ forbidNonWhitelisted: true, transform: true, whitelist: true }),
+    );
     app.useGlobalFilters(new HttpExceptionFilter());
     await app.init();
     prisma = app.get(PrismaService);
@@ -141,10 +143,16 @@ describe("V2 performance management", () => {
       // RED phase runs before performance tables exist.
     }
     const fixtures = [founder, hrManager, employee, foreignFounder];
-    await prisma.auditLog.deleteMany({ where: { actorUserId: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.employee.deleteMany({ where: { id: { in: fixtures.map((item) => item.employeeId) } } });
+    await prisma.auditLog.deleteMany({
+      where: { actorUserId: { in: fixtures.map((item) => item.userId) } },
+    });
+    await prisma.employee.deleteMany({
+      where: { id: { in: fixtures.map((item) => item.employeeId) } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: fixtures.map((item) => item.userId) } } });
-    await prisma.department.deleteMany({ where: { division: { organizationId: foreignOrganizationId } } });
+    await prisma.department.deleteMany({
+      where: { division: { organizationId: foreignOrganizationId } },
+    });
     await prisma.division.deleteMany({ where: { organizationId: foreignOrganizationId } });
     await prisma.organization.delete({ where: { id: foreignOrganizationId } });
     await app.close();
@@ -199,7 +207,12 @@ describe("V2 performance management", () => {
     await request(app.getHttpServer())
       .post(`/api/v2/performance/cycles/${cycleId}/goals`)
       .set(await auth(founder))
-      .send({ employeeId: employee.employeeId, title: "Mentor two juniors", category: "BEHAVIORAL", weight: 30 })
+      .send({
+        employeeId: employee.employeeId,
+        title: "Mentor two juniors",
+        category: "BEHAVIORAL",
+        weight: 30,
+      })
       .expect(201);
 
     await request(app.getHttpServer())

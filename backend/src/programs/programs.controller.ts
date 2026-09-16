@@ -62,19 +62,13 @@ export class ProgramsController {
   @Get("programs")
   @RequirePermissions("programs.read")
   @ApiOperation({ summary: "List programs in the organization" })
-  listPrograms(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: ProgramQueryDto,
-  ) {
+  listPrograms(@CurrentPrincipal() principal: Principal, @Query() query: ProgramQueryDto) {
     return this.list(this.programs.listPrograms(principal, query));
   }
 
   @Get("programs/:id")
   @RequirePermissions("programs.read")
-  getProgram(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getProgram(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.programs.getProgram(principal, id));
   }
 
@@ -97,9 +91,7 @@ export class ProgramsController {
     @Body() dto: CreateProgramModuleDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.programs.createModule(principal, id, dto, this.metadata(request)),
-    );
+    return this.ok(this.programs.createModule(principal, id, dto, this.metadata(request)));
   }
 
   @Post("program-modules/:id/lessons")
@@ -110,9 +102,7 @@ export class ProgramsController {
     @Body() dto: CreateProgramLessonDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.programs.createLesson(principal, id, dto, this.metadata(request)),
-    );
+    return this.ok(this.programs.createLesson(principal, id, dto, this.metadata(request)));
   }
 
   @Post("programs/:id/submit")
@@ -139,10 +129,7 @@ export class ProgramsController {
 
   @Get("students")
   @RequirePermissions("students.read")
-  listStudents(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: StudentQueryDto,
-  ) {
+  listStudents(@CurrentPrincipal() principal: Principal, @Query() query: StudentQueryDto) {
     return this.list(this.programs.listStudents(principal, query));
   }
 
@@ -169,10 +156,7 @@ export class ProgramsController {
 
   @Get("program-batches/:id")
   @RequirePermissions("programs.batches.read")
-  getBatch(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getBatch(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.programs.getBatch(principal, id));
   }
 
@@ -205,17 +189,12 @@ export class ProgramsController {
     @Body() dto: CreateEnrollmentDto,
     @Req() request: Request,
   ) {
-    return this.ok(
-      this.programs.createEnrollment(principal, id, dto, this.metadata(request)),
-    );
+    return this.ok(this.programs.createEnrollment(principal, id, dto, this.metadata(request)));
   }
 
   @Get("program-enrollments/:id")
   @RequirePermissions("programs.batches.read")
-  getEnrollment(
-    @CurrentPrincipal() principal: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  getEnrollment(@CurrentPrincipal() principal: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.programs.getEnrollment(principal, id));
   }
 
@@ -230,13 +209,7 @@ export class ProgramsController {
     @Req() request: Request,
   ) {
     return this.ok(
-      this.programs.updateLessonProgress(
-        principal,
-        id,
-        lessonId,
-        dto,
-        this.metadata(request),
-      ),
+      this.programs.updateLessonProgress(principal, id, lessonId, dto, this.metadata(request)),
     );
   }
 

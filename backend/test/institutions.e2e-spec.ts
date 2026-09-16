@@ -1,10 +1,6 @@
 import cookieParser from "cookie-parser";
 import argon2 from "argon2";
-import {
-  INestApplication,
-  ValidationPipe,
-  VersioningType,
-} from "@nestjs/common";
+import { INestApplication, ValidationPipe, VersioningType } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
@@ -137,37 +133,14 @@ describe("V2-6 institutions", () => {
     ).id;
     founder = await fixture("FOUNDER_CEO", orgId, departmentId, "Founder");
     manager = await fixture("SALES_MANAGER", orgId, departmentId, "Manager");
-    executive = await fixture(
-      "SALES_EXECUTIVE",
-      orgId,
-      departmentId,
-      "Executive",
-    );
-    otherExecutive = await fixture(
-      "SALES_EXECUTIVE",
-      orgId,
-      departmentId,
-      "OtherExecutive",
-    );
+    executive = await fixture("SALES_EXECUTIVE", orgId, departmentId, "Executive");
+    otherExecutive = await fixture("SALES_EXECUTIVE", orgId, departmentId, "OtherExecutive");
     employee = await fixture("EMPLOYEE", orgId, departmentId, "Employee");
     hr = await fixture("HR_MANAGER", orgId, departmentId, "Hr");
-    foreignFounder = await fixture(
-      "FOUNDER_CEO",
-      otherOrgId,
-      otherDepartmentId,
-      "ForeignFounder",
-    );
+    foreignFounder = await fixture("FOUNDER_CEO", otherOrgId, otherDepartmentId, "ForeignFounder");
   });
   afterAll(async () => {
-    const users = [
-      founder,
-      manager,
-      executive,
-      otherExecutive,
-      employee,
-      hr,
-      foreignFounder,
-    ];
+    const users = [founder, manager, executive, otherExecutive, employee, hr, foreignFounder];
     await prisma.institutionEngagement.deleteMany({
       where: { organizationId: { in: [orgId, otherOrgId] } },
     });
@@ -316,9 +289,7 @@ describe("V2-6 institutions", () => {
       .get(`/api/v2/institutions/${id}/contacts`)
       .set(h)
       .expect(200);
-    expect(
-      contacts.body.data.filter((x: { isPrimary: boolean }) => x.isPrimary),
-    ).toHaveLength(1);
+    expect(contacts.body.data.filter((x: { isPrimary: boolean }) => x.isPrimary)).toHaveLength(1);
     expect(contacts.body.data[0].id).toBe(second.body.data.id);
     const foreignInstitution = await request(app.getHttpServer())
       .post("/api/v2/institutions")
@@ -350,9 +321,7 @@ describe("V2-6 institutions", () => {
       })
       .expect(201);
     await request(app.getHttpServer())
-      .patch(
-        `/api/v2/institutions/${id}/engagements/${engagement.body.data.id}`,
-      )
+      .patch(`/api/v2/institutions/${id}/engagements/${engagement.body.data.id}`)
       .set(h)
       .send({ status: "COMPLETED" })
       .expect(200);

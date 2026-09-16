@@ -21,16 +21,34 @@ export class OrganizationService {
       throw new NotFoundException("Organization context not found");
     }
     return {
-      organization: { id: employee.division.organization.id, name: employee.division.organization.legalName },
-      division: { id: employee.division.id, slug: employee.division.slug, name: employee.division.name },
-      department: { id: employee.department.id, slug: employee.department.slug, name: employee.department.name },
+      organization: {
+        id: employee.division.organization.id,
+        name: employee.division.organization.legalName,
+      },
+      division: {
+        id: employee.division.id,
+        slug: employee.division.slug,
+        name: employee.division.name,
+      },
+      department: {
+        id: employee.department.id,
+        slug: employee.department.slug,
+        name: employee.department.name,
+      },
     };
   }
 
   async listDivisions(principal: Principal) {
-    const canReadAll = this.policy.isOrganizationWide(principal) && principal.permissions.includes("organization.read_all");
+    const canReadAll =
+      this.policy.isOrganizationWide(principal) &&
+      principal.permissions.includes("organization.read_all");
     const divisions = await this.prisma.division.findMany({
-      where: { status: "ACTIVE", ...(canReadAll ? {} : { id: principal.divisionId ?? "00000000-0000-0000-0000-000000000000" }) },
+      where: {
+        status: "ACTIVE",
+        ...(canReadAll
+          ? {}
+          : { id: principal.divisionId ?? "00000000-0000-0000-0000-000000000000" }),
+      },
       orderBy: { name: "asc" },
       select: { id: true, slug: true, name: true, status: true, organizationId: true },
     });

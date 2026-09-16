@@ -5,11 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import {
-  JobRequisitionStatus,
-  Prisma,
-  RecruitmentApplicantStatus,
-} from "@prisma/client";
+import { JobRequisitionStatus, Prisma, RecruitmentApplicantStatus } from "@prisma/client";
 
 import { AuditService } from "../audit/audit.service";
 import { Principal } from "../auth/auth.types";
@@ -82,10 +78,7 @@ export class RecruitmentService {
   }
 
   private duplicate(error: unknown, message: string): never {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2002"
-    ) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw new ConflictException(message);
     }
     throw error;
@@ -93,10 +86,7 @@ export class RecruitmentService {
 
   private async validateOrganizationReferences(
     principal: Principal,
-    dto: Pick<
-      CreateRequisitionDto,
-      "divisionId" | "departmentId" | "hiringManagerEmployeeId"
-    >,
+    dto: Pick<CreateRequisitionDto, "divisionId" | "departmentId" | "hiringManagerEmployeeId">,
   ): Promise<void> {
     const organizationId = this.organizationId(principal);
     if (dto.divisionId) {
@@ -120,11 +110,7 @@ export class RecruitmentService {
       }
     }
     if (dto.hiringManagerEmployeeId) {
-      await this.employeeInOrganization(
-        principal,
-        dto.hiringManagerEmployeeId,
-        "Hiring manager",
-      );
+      await this.employeeInOrganization(principal, dto.hiringManagerEmployeeId, "Hiring manager");
     }
   }
 
@@ -215,9 +201,7 @@ export class RecruitmentService {
       requisitions: Object.fromEntries(
         requisitions.map((item) => [item.status, item._count.status]),
       ),
-      applicants: Object.fromEntries(
-        applicants.map((item) => [item.status, item._count.status]),
-      ),
+      applicants: Object.fromEntries(applicants.map((item) => [item.status, item._count.status])),
       upcomingInterviews: interviews,
       outstandingOnboardingTasks: onboarding,
     };
@@ -346,31 +330,23 @@ export class RecruitmentService {
     };
     const transition = transitions[action];
     if (!transition.from.includes(current.status)) {
-      throw new ConflictException(
-        `Cannot ${action} a requisition in ${current.status} status`,
-      );
+      throw new ConflictException(`Cannot ${action} a requisition in ${current.status} status`);
     }
     const now = new Date();
     const row = await this.prisma.jobRequisition.update({
       where: { id },
       data: {
         status: transition.to,
-        ...(action === "approve"
-          ? { approvedByUserId: principal.userId, approvedAt: now }
-          : {}),
+        ...(action === "approve" ? { approvedByUserId: principal.userId, approvedAt: now } : {}),
         ...(action === "open" ? { openedAt: now, closedAt: null } : {}),
         ...(action === "close" || action === "cancel" ? { closedAt: now } : {}),
       },
       include: requisitionInclude,
     });
-    await this.record(
-      transition.action,
-      principal,
-      "JobRequisition",
-      row.id,
-      request,
-      { from: current.status, to: row.status },
-    );
+    await this.record(transition.action, principal, "JobRequisition", row.id, request, {
+      from: current.status,
+      to: row.status,
+    });
     return row;
   }
 
@@ -412,11 +388,7 @@ export class RecruitmentService {
     return this.applicant(principal, id);
   }
 
-  async createApplicant(
-    principal: Principal,
-    dto: CreateApplicantDto,
-    request?: RequestMetadata,
-  ) {
+  async createApplicant(principal: Principal, dto: CreateApplicantDto, request?: RequestMetadata) {
     const requisition = await this.requisition(principal, dto.requisitionId);
     if (requisition.status !== JobRequisitionStatus.OPEN) {
       throw new ConflictException("Applicants can only be added to open requisitions");
@@ -464,18 +436,14 @@ export class RecruitmentService {
   ) {
     const applicant = await this.applicant(principal, applicantId);
     const terminalStatuses: RecruitmentApplicantStatus[] = [
-        RecruitmentApplicantStatus.HIRED,
-        RecruitmentApplicantStatus.REJECTED,
-        RecruitmentApplicantStatus.WITHDRAWN,
-      ];
+      RecruitmentApplicantStatus.HIRED,
+      RecruitmentApplicantStatus.REJECTED,
+      RecruitmentApplicantStatus.WITHDRAWN,
+    ];
     if (terminalStatuses.includes(applicant.status)) {
       throw new ConflictException("Applicant is no longer active in recruitment");
     }
-    await this.employeeInOrganization(
-      principal,
-      dto.interviewerEmployeeId,
-      "Interviewer",
-    );
+    await this.employeeInOrganization(principal, dto.interviewerEmployeeId, "Interviewer");
     const scheduledAt = new Date(dto.scheduledAt);
     if (scheduledAt.getTime() <= Date.now()) {
       throw new BadRequestException("Interview must be scheduled in the future");
@@ -573,22 +541,13 @@ export class RecruitmentService {
         joiningDate: new Date(dto.joiningDate),
       },
     });
-    await this.record(
-      "RECRUITMENT_OFFER_CREATED",
-      principal,
-      "RecruitmentOffer",
-      row.id,
-      request,
-      { applicantId },
-    );
+    await this.record("RECRUITMENT_OFFER_CREATED", principal, "RecruitmentOffer", row.id, request, {
+      applicantId,
+    });
     return row;
   }
 
-  async issueOffer(
-    principal: Principal,
-    id: string,
-    request?: RequestMetadata,
-  ) {
+  async issueOffer(principal: Principal, id: string, request?: RequestMetadata) {
     const current = await this.prisma.recruitmentOffer.findFirst({
       where: { id, organizationId: this.organizationId(principal) },
     });
@@ -607,14 +566,9 @@ export class RecruitmentService {
       });
       return offer;
     });
-    await this.record(
-      "RECRUITMENT_OFFER_ISSUED",
-      principal,
-      "RecruitmentOffer",
-      id,
-      request,
-      { applicantId: row.applicantId },
-    );
+    await this.record("RECRUITMENT_OFFER_ISSUED", principal, "RecruitmentOffer", id, request, {
+      applicantId: row.applicantId,
+    });
     return row;
   }
 
@@ -650,9 +604,7 @@ export class RecruitmentService {
       return offer;
     });
     await this.record(
-      dto.accepted
-        ? "RECRUITMENT_OFFER_ACCEPTED"
-        : "RECRUITMENT_OFFER_DECLINED",
+      dto.accepted ? "RECRUITMENT_OFFER_ACCEPTED" : "RECRUITMENT_OFFER_DECLINED",
       principal,
       "RecruitmentOffer",
       id,

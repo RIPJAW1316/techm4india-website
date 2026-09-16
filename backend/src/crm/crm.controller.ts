@@ -39,26 +39,13 @@ export class CrmController {
   dashboard(@CurrentPrincipal() p: Principal) {
     return this.crm.dashboard(p).then((data) => ({ success: true, data }));
   }
-  @Get("leads") leads(
-    @CurrentPrincipal() p: Principal,
-    @Query() q: LeadQueryDto,
-  ) {
-    return this.crm
-      .listLeads(p, q)
-      .then((result) => ({ success: true, ...result }));
+  @Get("leads") leads(@CurrentPrincipal() p: Principal, @Query() q: LeadQueryDto) {
+    return this.crm.listLeads(p, q).then((result) => ({ success: true, ...result }));
   }
-  @Post("leads") createLead(
-    @CurrentPrincipal() p: Principal,
-    @Body() dto: LeadDto,
-  ) {
-    return this.crm
-      .createLead(p, dto)
-      .then((data) => ({ success: true, data }));
+  @Post("leads") createLead(@CurrentPrincipal() p: Principal, @Body() dto: LeadDto) {
+    return this.crm.createLead(p, dto).then((data) => ({ success: true, data }));
   }
-  @Get("leads/:id") lead(
-    @CurrentPrincipal() p: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  @Get("leads/:id") lead(@CurrentPrincipal() p: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.crm.getLead(p, id).then((data) => ({ success: true, data }));
   }
   @Patch("leads/:id") updateLead(
@@ -66,42 +53,26 @@ export class CrmController {
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: LeadDto,
   ) {
-    return this.crm
-      .updateLead(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.updateLead(p, id, dto).then((data) => ({ success: true, data }));
   }
   @Post("leads/:id/archive") archiveLead(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
   ) {
-    return this.crm
-      .archiveLead(p, id)
-      .then((data) => ({ success: true, data }));
+    return this.crm.archiveLead(p, id).then((data) => ({ success: true, data }));
   }
   @Post("leads/:id/convert") convertLead(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: LeadConversionDto,
   ) {
-    return this.crm
-      .convertLead(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.convertLead(p, id, dto).then((data) => ({ success: true, data }));
   }
-  @Get("accounts") accounts(
-    @CurrentPrincipal() p: Principal,
-    @Query() q: AccountQueryDto,
-  ) {
-    return this.crm
-      .listAccounts(p, q)
-      .then((result) => ({ success: true, ...result }));
+  @Get("accounts") accounts(@CurrentPrincipal() p: Principal, @Query() q: AccountQueryDto) {
+    return this.crm.listAccounts(p, q).then((result) => ({ success: true, ...result }));
   }
-  @Post("accounts") createAccount(
-    @CurrentPrincipal() p: Principal,
-    @Body() dto: AccountDto,
-  ) {
-    return this.crm
-      .createAccount(p, dto)
-      .then((data) => ({ success: true, data }));
+  @Post("accounts") createAccount(@CurrentPrincipal() p: Principal, @Body() dto: AccountDto) {
+    return this.crm.createAccount(p, dto).then((data) => ({ success: true, data }));
   }
   @Get("accounts/:id") account(
     @CurrentPrincipal() p: Principal,
@@ -114,25 +85,13 @@ export class CrmController {
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: AccountDto,
   ) {
-    return this.crm
-      .updateAccount(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.updateAccount(p, id, dto).then((data) => ({ success: true, data }));
   }
-  @Get("contacts") contacts(
-    @CurrentPrincipal() p: Principal,
-    @Query() q: ContactQueryDto,
-  ) {
-    return this.crm
-      .listContacts(p, q)
-      .then((result) => ({ success: true, ...result }));
+  @Get("contacts") contacts(@CurrentPrincipal() p: Principal, @Query() q: ContactQueryDto) {
+    return this.crm.listContacts(p, q).then((result) => ({ success: true, ...result }));
   }
-  @Post("contacts") createContact(
-    @CurrentPrincipal() p: Principal,
-    @Body() dto: ContactDto,
-  ) {
-    return this.crm
-      .createContact(p, dto)
-      .then((data) => ({ success: true, data }));
+  @Post("contacts") createContact(@CurrentPrincipal() p: Principal, @Body() dto: ContactDto) {
+    return this.crm.createContact(p, dto).then((data) => ({ success: true, data }));
   }
   @Get("contacts/:id") contact(
     @CurrentPrincipal() p: Principal,
@@ -145,74 +104,50 @@ export class CrmController {
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: ContactDto,
   ) {
-    return this.crm
-      .updateContact(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.updateContact(p, id, dto).then((data) => ({ success: true, data }));
   }
   @Get("opportunities") opportunities(
     @CurrentPrincipal() p: Principal,
     @Query() q: OpportunityQueryDto,
   ) {
-    return this.crm
-      .listOpportunities(p, q)
-      .then((result) => ({ success: true, ...result }));
+    return this.crm.listOpportunities(p, q).then((result) => ({ success: true, ...result }));
   }
   @Post("opportunities") createOpportunity(
     @CurrentPrincipal() p: Principal,
     @Body() dto: OpportunityDto,
   ) {
-    return this.crm
-      .createOpportunity(p, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.createOpportunity(p, dto).then((data) => ({ success: true, data }));
   }
   @Get("opportunities/:id") opportunity(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
   ) {
-    return this.crm
-      .getOpportunity(p, id)
-      .then((data) => ({ success: true, data }));
+    return this.crm.getOpportunity(p, id).then((data) => ({ success: true, data }));
   }
   @Patch("opportunities/:id") updateOpportunity(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: OpportunityDto,
   ) {
-    return this.crm
-      .updateOpportunity(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.updateOpportunity(p, id, dto).then((data) => ({ success: true, data }));
   }
-  @Get("activities") activities(
-    @CurrentPrincipal() p: Principal,
-    @Query() q: ActivityQueryDto,
-  ) {
-    return this.crm
-      .listActivities(p, q)
-      .then((result) => ({ success: true, ...result }));
+  @Get("activities") activities(@CurrentPrincipal() p: Principal, @Query() q: ActivityQueryDto) {
+    return this.crm.listActivities(p, q).then((result) => ({ success: true, ...result }));
   }
-  @Post("activities") createActivity(
-    @CurrentPrincipal() p: Principal,
-    @Body() dto: ActivityDto,
-  ) {
-    return this.crm
-      .createActivity(p, dto)
-      .then((data) => ({ success: true, data }));
+  @Post("activities") createActivity(@CurrentPrincipal() p: Principal, @Body() dto: ActivityDto) {
+    return this.crm.createActivity(p, dto).then((data) => ({ success: true, data }));
   }
   @Patch("activities/:id") updateActivity(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: ActivityDto,
   ) {
-    return this.crm
-      .updateActivity(p, id, dto)
-      .then((data) => ({ success: true, data }));
+    return this.crm.updateActivity(p, id, dto).then((data) => ({ success: true, data }));
   }
   @Post("activities/:id/complete") completeActivity(
     @CurrentPrincipal() p: Principal,
     @Param("id", ParseUUIDPipe) id: string,
   ) {
-    return this.crm
-      .completeActivity(p, id)
-      .then((data) => ({ success: true, data }));
+    return this.crm.completeActivity(p, id).then((data) => ({ success: true, data }));
   }
 }

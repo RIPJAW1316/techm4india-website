@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import { apiFetchV2, ApiError } from "@/lib/api/client";
@@ -68,13 +62,7 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-function ErrorNotice({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
+function ErrorNotice({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <div className="erp-error" role="alert">
       <p>{message}</p>
@@ -99,9 +87,7 @@ function TaskRow({
       <div>
         <div className="founder-task-title">
           <strong>{task.title}</strong>
-          <span
-            className={`erp-priority priority-${task.priority.toLowerCase()}`}
-          >
+          <span className={`erp-priority priority-${task.priority.toLowerCase()}`}>
             {priorityLabels[task.priority]}
           </span>
         </div>
@@ -111,9 +97,7 @@ function TaskRow({
         <span>
           {statusLabels[task.status]} ·{" "}
           {task.dueDate ? `Due ${formatDate(task.dueDate)}` : "No deadline"}
-          {task.completedAt
-            ? ` · Completed ${formatDate(task.completedAt)}`
-            : ""}
+          {task.completedAt ? ` · Completed ${formatDate(task.completedAt)}` : ""}
         </span>
       </div>
       <div className="founder-task-actions">
@@ -140,9 +124,7 @@ function FounderDashboardContent() {
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
   const [employees, setEmployees] = useState<ExecutiveEmployee[]>([]);
   const [projects, setProjects] = useState<ExecutiveProject[]>([]);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
-    null,
-  );
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ExecutiveWorkDetail | null>(null);
   const [search, setSearch] = useState("");
   const [divisionFilter, setDivisionFilter] = useState("ALL");
@@ -197,16 +179,11 @@ function FounderDashboardContent() {
       if (!silent) setLoading(true);
       setError(null);
       try {
-        const [summaryResponse, employeesResponse, projectsResponse] =
-          await Promise.all([
-            apiFetchV2<ApiResponse<ExecutiveSummary>>(
-              "/executive/workforce/summary",
-            ),
-            apiFetchV2<ApiResponse<ExecutiveEmployee[]>>(
-              "/executive/employees?limit=100",
-            ),
-            apiFetchV2<ApiResponse<ExecutiveProject[]>>("/executive/projects"),
-          ]);
+        const [summaryResponse, employeesResponse, projectsResponse] = await Promise.all([
+          apiFetchV2<ApiResponse<ExecutiveSummary>>("/executive/workforce/summary"),
+          apiFetchV2<ApiResponse<ExecutiveEmployee[]>>("/executive/employees?limit=100"),
+          apiFetchV2<ApiResponse<ExecutiveProject[]>>("/executive/projects"),
+        ]);
         setSummary(summaryResponse.data);
         setEmployees(employeesResponse.data);
         setProjects(projectsResponse.data);
@@ -235,9 +212,7 @@ function FounderDashboardContent() {
     return () => window.clearTimeout(timer);
   }, [loadAll]);
   useEffect(() => {
-    const employeeId = new URLSearchParams(window.location.search).get(
-      "employee",
-    );
+    const employeeId = new URLSearchParams(window.location.search).get("employee");
     if (!employeeId) return;
     const timer = window.setTimeout(() => setSelectedEmployeeId(employeeId), 0);
     return () => window.clearTimeout(timer);
@@ -252,12 +227,7 @@ function FounderDashboardContent() {
   const divisions = useMemo(
     () =>
       Array.from(
-        new Map(
-          employees.map((employee) => [
-            employee.division.id,
-            employee.division,
-          ]),
-        ).values(),
+        new Map(employees.map((employee) => [employee.division.id, employee.division])).values(),
       ),
     [employees],
   );
@@ -267,13 +237,9 @@ function FounderDashboardContent() {
         new Map(
           employees
             .filter(
-              (employee) =>
-                divisionFilter === "ALL" ||
-                employee.division.id === divisionFilter,
+              (employee) => divisionFilter === "ALL" || employee.division.id === divisionFilter,
             )
-            .flatMap((employee) =>
-              employee.department ? [employee.department] : [],
-            )
+            .flatMap((employee) => (employee.department ? [employee.department] : []))
             .map((department) => [department.id, department]),
         ).values(),
       ),
@@ -286,10 +252,8 @@ function FounderDashboardContent() {
           `${employee.name} ${employee.employeeCode} ${employee.designation ?? ""}`.toLowerCase();
         return (
           (!search.trim() || haystack.includes(search.trim().toLowerCase())) &&
-          (divisionFilter === "ALL" ||
-            employee.division.id === divisionFilter) &&
-          (departmentFilter === "ALL" ||
-            employee.department?.id === departmentFilter)
+          (divisionFilter === "ALL" || employee.division.id === divisionFilter) &&
+          (departmentFilter === "ALL" || employee.department?.id === departmentFilter)
         );
       }),
     [employees, search, divisionFilter, departmentFilter],
@@ -327,8 +291,7 @@ function FounderDashboardContent() {
 
   async function submitAssign(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!taskForm.employeeId || !taskForm.projectId || !taskForm.title.trim())
-      return;
+    if (!taskForm.employeeId || !taskForm.projectId || !taskForm.title.trim()) return;
     setBusy(true);
     setError(null);
     try {
@@ -345,16 +308,10 @@ function FounderDashboardContent() {
         }),
       });
       setSelectedEmployeeId(taskForm.employeeId);
-      await refreshAfterMutation(
-        "Task assigned. The employee has been notified.",
-      );
+      await refreshAfterMutation("Task assigned. The employee has been notified.");
       await loadDetail(taskForm.employeeId);
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "The task could not be assigned.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "The task could not be assigned.");
     } finally {
       setBusy(false);
     }
@@ -381,11 +338,7 @@ function FounderDashboardContent() {
       });
       await refreshAfterMutation("Task updated. Workforce data is refreshing.");
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "The task could not be updated.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "The task could not be updated.");
     } finally {
       setBusy(false);
     }
@@ -399,15 +352,9 @@ function FounderDashboardContent() {
       await apiFetchV2(`/executive/tasks/${modal.task.id}/cancel`, {
         method: "POST",
       });
-      await refreshAfterMutation(
-        "Task cancelled. Its history has been preserved.",
-      );
+      await refreshAfterMutation("Task cancelled. Its history has been preserved.");
     } catch (reason) {
-      setError(
-        reason instanceof ApiError
-          ? reason.message
-          : "The task could not be cancelled.",
-      );
+      setError(reason instanceof ApiError ? reason.message : "The task could not be cancelled.");
     } finally {
       setBusy(false);
     }
@@ -418,19 +365,13 @@ function FounderDashboardContent() {
     router.replace("/login");
   }
 
-  if (loading && !summary)
-    return <ErpLoading label="Loading Founder Control Centre" />;
+  if (loading && !summary) return <ErpLoading label="Loading Founder Control Centre" />;
   const founderName = context?.employee?.firstName ?? "Founder";
-  const employeeForTask = employees.find(
-    (employee) => employee.id === taskForm.employeeId,
-  );
+  const employeeForTask = employees.find((employee) => employee.id === taskForm.employeeId);
 
   return (
     <div className="erp-app-shell founder-shell">
-      <aside
-        className="erp-sidebar founder-sidebar"
-        aria-label="Founder workspace navigation"
-      >
+      <aside className="erp-sidebar founder-sidebar" aria-label="Founder workspace navigation">
         <div className="erp-sidebar-head">
           <a className="erp-sidebar-brand" href="#founder-top">
             <span className="erp-mini-mark" aria-hidden="true">
@@ -474,11 +415,7 @@ function FounderDashboardContent() {
             <a href="/erp/founder/delivery">Delivery ↗</a>
             <a href="/erp/founder/analytics">Analytics ↗</a>
           </nav>
-          <button
-            className="erp-sidebar-logout"
-            type="button"
-            onClick={() => void signOut()}
-          >
+          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
             Log out <span aria-hidden="true">↗</span>
           </button>
         </div>
@@ -487,9 +424,7 @@ function FounderDashboardContent() {
         <header className="erp-topbar">
           <div>
             <span className="erp-topbar-label">Founder Control Centre</span>
-            <span className="erp-topbar-path">
-              TechM4India Innovations Pvt. Ltd. / Operations
-            </span>
+            <span className="erp-topbar-path">TechM4India Innovations Pvt. Ltd. / Operations</span>
           </div>
           <div className="erp-user-chip">
             <span>
@@ -515,8 +450,8 @@ function FounderDashboardContent() {
                 Founder Control <em>Centre</em>
               </h1>
               <p>
-                One operating picture across people, divisions and the work
-                moving TechM4India forward.
+                One operating picture across people, divisions and the work moving TechM4India
+                forward.
               </p>
             </div>
             <button
@@ -527,18 +462,13 @@ function FounderDashboardContent() {
               Assign task <span aria-hidden="true">↗</span>
             </button>
           </section>
-          {error && (
-            <ErrorNotice message={error} onRetry={() => void loadAll()} />
-          )}
+          {error && <ErrorNotice message={error} onRetry={() => void loadAll()} />}
           {notice && (
             <p className="erp-success" role="status">
               {notice}
             </p>
           )}
-          <section
-            className="erp-kpi-grid founder-kpi-grid"
-            aria-label="Executive summary"
-          >
+          <section className="erp-kpi-grid founder-kpi-grid" aria-label="Executive summary">
             <article>
               <span>Employees</span>
               <strong>{summary?.employeesActive ?? "—"}</strong>
@@ -570,9 +500,7 @@ function FounderDashboardContent() {
                 <p className="erp-kicker">People and progress</p>
                 <h2 id="workforce-title">Workforce overview</h2>
               </div>
-              <span className="erp-section-count">
-                Updated every 12 seconds
-              </span>
+              <span className="erp-section-count">Updated every 12 seconds</span>
             </div>
             <div className="founder-filters">
               <label>
@@ -666,11 +594,7 @@ function FounderDashboardContent() {
                         </td>
                         <td data-label="Overdue">
                           <strong
-                            className={
-                              employee.workSummary.overdue > 0
-                                ? "founder-overdue"
-                                : ""
-                            }
+                            className={employee.workSummary.overdue > 0 ? "founder-overdue" : ""}
                           >
                             {employee.workSummary.overdue}
                           </strong>
@@ -712,9 +636,7 @@ function FounderDashboardContent() {
               <div className="erp-section-heading">
                 <div>
                   <p className="erp-kicker">Employee work detail</p>
-                  <h2 id="work-detail-title">
-                    {detail?.employee.name ?? "Loading work"}
-                  </h2>
+                  <h2 id="work-detail-title">{detail?.employee.name ?? "Loading work"}</h2>
                 </div>
                 <button
                   className="erp-text-button"
@@ -742,15 +664,11 @@ function FounderDashboardContent() {
                     </div>
                     <div>
                       <span>Department</span>
-                      <strong>
-                        {detail.employee.department?.name ?? "Not assigned"}
-                      </strong>
+                      <strong>{detail.employee.department?.name ?? "Not assigned"}</strong>
                     </div>
                     <div>
                       <span>Designation</span>
-                      <strong>
-                        {detail.employee.designation ?? "Not set"}
-                      </strong>
+                      <strong>{detail.employee.designation ?? "Not set"}</strong>
                     </div>
                   </div>
                   <div className="founder-detail-kpis">
@@ -854,10 +772,7 @@ function FounderDashboardContent() {
                 Close ×
               </button>
             </div>
-            <form
-              onSubmit={(event) => void submitAssign(event)}
-              className="founder-form"
-            >
+            <form onSubmit={(event) => void submitAssign(event)} className="founder-form">
               <label>
                 <span>Employee</span>
                 <select
@@ -963,16 +878,12 @@ function FounderDashboardContent() {
               </div>
               {employeeForTask && (
                 <p className="founder-form-note">
-                  This task will be assigned to {employeeForTask.name} and a
-                  notification will be created.
+                  This task will be assigned to {employeeForTask.name} and a notification will be
+                  created.
                 </p>
               )}
               <div className="founder-dialog-actions">
-                <button
-                  className="erp-text-button"
-                  type="button"
-                  onClick={() => setModal(null)}
-                >
+                <button className="erp-text-button" type="button" onClick={() => setModal(null)}>
                   Cancel
                 </button>
                 <button
@@ -1009,10 +920,7 @@ function FounderDashboardContent() {
                 Close ×
               </button>
             </div>
-            <form
-              onSubmit={(event) => void submitEdit(event)}
-              className="founder-form"
-            >
+            <form onSubmit={(event) => void submitEdit(event)} className="founder-form">
               <label>
                 <span>Title</span>
                 <input
@@ -1114,18 +1022,10 @@ function FounderDashboardContent() {
                 />
               </label>
               <div className="founder-dialog-actions">
-                <button
-                  className="erp-text-button"
-                  type="button"
-                  onClick={() => setModal(null)}
-                >
+                <button className="erp-text-button" type="button" onClick={() => setModal(null)}>
                   Cancel
                 </button>
-                <button
-                  className="erp-button erp-button-primary"
-                  type="submit"
-                  disabled={busy}
-                >
+                <button className="erp-button erp-button-primary" type="submit" disabled={busy}>
                   {busy ? "Saving…" : "Save changes ↗"}
                 </button>
               </div>
@@ -1156,15 +1056,11 @@ function FounderDashboardContent() {
               </button>
             </div>
             <p className="founder-confirm-copy">
-              “{modal.task.title}” will remain in the project history and move
-              to Cancelled. It will not be hard-deleted.
+              “{modal.task.title}” will remain in the project history and move to Cancelled. It will
+              not be hard-deleted.
             </p>
             <div className="founder-dialog-actions">
-              <button
-                className="erp-text-button"
-                type="button"
-                onClick={() => setModal(null)}
-              >
+              <button className="erp-text-button" type="button" onClick={() => setModal(null)}>
                 Keep task
               </button>
               <button

@@ -73,10 +73,7 @@ export class PayrollController {
   }
   @Get("salary-structures/:id")
   @RequirePermissions("payroll.structures.read")
-  structure(
-    @CurrentPrincipal() p: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  structure(@CurrentPrincipal() p: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.payroll.structure(p, id));
   }
   @Post("salary-structures")
@@ -100,10 +97,7 @@ export class PayrollController {
   }
   @Get("compensations")
   @RequirePermissions("payroll.compensation.read")
-  compensations(
-    @CurrentPrincipal() p: Principal,
-    @Query("employeeId") employeeId?: string,
-  ) {
+  compensations(@CurrentPrincipal() p: Principal, @Query("employeeId") employeeId?: string) {
     return this.ok(this.payroll.compensations(p, employeeId));
   }
   @Get("employees/:employeeId/compensation")
@@ -122,9 +116,7 @@ export class PayrollController {
     @Body() dto: CreateCompensationDto,
     @Req() r: Request,
   ) {
-    return this.ok(
-      this.payroll.createCompensation(p, employeeId, dto, this.meta(r)),
-    );
+    return this.ok(this.payroll.createCompensation(p, employeeId, dto, this.meta(r)));
   }
   @Patch("compensations/:id")
   @RequirePermissions("payroll.compensation.manage")
@@ -157,9 +149,7 @@ export class PayrollController {
   ) {
     return this.ok(this.payroll.updatePeriod(p, id, dto));
   }
-  @Get("runs") @RequirePermissions("payroll.runs.read") runs(
-    @CurrentPrincipal() p: Principal,
-  ) {
+  @Get("runs") @RequirePermissions("payroll.runs.read") runs(@CurrentPrincipal() p: Principal) {
     return this.ok(this.payroll.runs(p));
   }
   @Get("runs/:id") @RequirePermissions("payroll.runs.read") run(
@@ -226,9 +216,7 @@ export class PayrollController {
     @Body() dto: OverrideResultDto,
     @Req() r: Request,
   ) {
-    return this.ok(
-      this.payroll.override(p, runId, resultId, dto, this.meta(r)),
-    );
+    return this.ok(this.payroll.override(p, runId, resultId, dto, this.meta(r)));
   }
   @Get("me/payslips")
   @RequirePermissions("payroll.payslip.read_self")
@@ -237,10 +225,7 @@ export class PayrollController {
   }
   @Get("me/payslips/:id")
   @RequirePermissions("payroll.payslip.read_self")
-  myPayslip(
-    @CurrentPrincipal() p: Principal,
-    @Param("id", ParseUUIDPipe) id: string,
-  ) {
+  myPayslip(@CurrentPrincipal() p: Principal, @Param("id", ParseUUIDPipe) id: string) {
     return this.ok(this.payroll.myPayslip(p, id));
   }
   private ok<T>(data: Promise<T> | T) {

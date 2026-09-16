@@ -23,11 +23,7 @@ const divisions = [
   {
     name: "TechM4Engineering",
     slug: "engineering",
-    departments: [
-      "Civil Engineering",
-      "Mechanical Engineering",
-      "Software Engineering",
-    ],
+    departments: ["Civil Engineering", "Mechanical Engineering", "Software Engineering"],
   },
   {
     name: "TechM4Solutions",
@@ -235,24 +231,14 @@ const companyManagePermissionKeys = [
   "cost_centres.manage",
 ] as const;
 
-const hrReadPermissionKeys = [
-  "hr.employees.read",
-  "hr.employment_history.read",
-] as const;
+const hrReadPermissionKeys = ["hr.employees.read", "hr.employment_history.read"] as const;
 const hrManagePermissionKeys = [
   "hr.employees.manage",
   "hr.employees.read_private",
   "hr.employment_history.manage",
 ] as const;
-const attendanceEmployeeKeys = [
-  "attendance.self.read",
-  "attendance.self.checkin",
-] as const;
-const leaveEmployeeKeys = [
-  "leave.self.read",
-  "leave.self.apply",
-  "holidays.read",
-] as const;
+const attendanceEmployeeKeys = ["attendance.self.read", "attendance.self.checkin"] as const;
+const leaveEmployeeKeys = ["leave.self.read", "leave.self.apply", "holidays.read"] as const;
 const crmReadPermissionKeys = [
   "crm.leads.read",
   "crm.accounts.read",
@@ -333,19 +319,10 @@ const supplyChainManagePermissionKeys = [
   "inventory.manage",
   "assets.manage",
 ] as const;
-const supportBasePermissionKeys = [
-  "support.tickets.read",
-  "support.tickets.manage",
-] as const;
-const supportAgentPermissionKeys = [
-  "support.dashboard.read",
-  "support.tickets.resolve",
-] as const;
+const supportBasePermissionKeys = ["support.tickets.read", "support.tickets.manage"] as const;
+const supportAgentPermissionKeys = ["support.dashboard.read", "support.tickets.resolve"] as const;
 const cmsReadPermissionKeys = ["cms.dashboard.read", "cms.content.read"] as const;
-const complianceReadPermissionKeys = [
-  "compliance.dashboard.read",
-  "compliance.read",
-] as const;
+const complianceReadPermissionKeys = ["compliance.dashboard.read", "compliance.read"] as const;
 
 async function main(): Promise<void> {
   const organization = await prisma.organization.upsert({
@@ -713,110 +690,107 @@ async function main(): Promise<void> {
                           "finance.gst.read",
                         ]
                       : name === "SALES_MANAGER"
-                    ? [
-                        "notifications.read_self",
-                        "organization.read_all",
-                        "crm.dashboard.read",
-                        ...crmReadPermissionKeys,
-                        ...crmManagePermissionKeys,
-                        "institutions.dashboard.read",
-                        ...institutionReadPermissionKeys,
-                        ...institutionManagePermissionKeys,
-                      ]
-                    : name === "SALES_EXECUTIVE"
-                      ? [
-                          "notifications.read_self",
-                          "organization.read_self",
-                          ...crmReadPermissionKeys,
-                          "crm.leads.manage",
-                          "crm.leads.convert",
-                          "crm.accounts.manage",
-                          "crm.contacts.manage",
-                          "crm.opportunities.manage",
-                          "crm.activities.manage",
-                          "institutions.dashboard.read",
-                          ...institutionReadPermissionKeys,
-                          "institutions.manage",
-                          "institutions.contacts.manage",
-                          "institutions.engagements.manage",
-                        ]
-                      : name === "PROJECT_MANAGER"
                         ? [
-                            "projects.read_assigned",
-                            "projects.read_division",
-                            "projects.manage",
-                            "tasks.read_assigned",
-                            "tasks.read_project",
-                            "tasks.manage",
-                            "task_comments.read",
-                            "task_comments.create",
                             "notifications.read_self",
-                            "organization.read_self",
-                            "performance.reviews.read",
-                            "performance.reviews.manage",
-                            ...performanceSelfPermissionKeys,
-                            "projects.delivery.read",
-                            "projects.delivery.manage",
-                            "projects.timelog.manage",
+                            "organization.read_all",
+                            "crm.dashboard.read",
+                            ...crmReadPermissionKeys,
+                            ...crmManagePermissionKeys,
+                            "institutions.dashboard.read",
+                            ...institutionReadPermissionKeys,
+                            ...institutionManagePermissionKeys,
                           ]
-                        : name === "IT_ADMIN"
-                          ? [
-                              "notifications.read_self",
-                              "organization.read_all",
-                              ...attendanceEmployeeKeys,
-                              ...leaveEmployeeKeys,
-                              ...supportBasePermissionKeys,
-                              ...supportAgentPermissionKeys,
-                            ]
-                        : name === "CONTENT_MANAGER"
+                        : name === "SALES_EXECUTIVE"
                           ? [
                               "notifications.read_self",
                               "organization.read_self",
-                              ...attendanceEmployeeKeys,
-                              ...leaveEmployeeKeys,
-                              ...cmsReadPermissionKeys,
-                              "cms.content.manage",
-                              ...supportBasePermissionKeys,
+                              ...crmReadPermissionKeys,
+                              "crm.leads.manage",
+                              "crm.leads.convert",
+                              "crm.accounts.manage",
+                              "crm.contacts.manage",
+                              "crm.opportunities.manage",
+                              "crm.activities.manage",
+                              "institutions.dashboard.read",
+                              ...institutionReadPermissionKeys,
+                              "institutions.manage",
+                              "institutions.contacts.manage",
+                              "institutions.engagements.manage",
                             ]
-                        : name === "FACULTY_TRAINER"
-                          ? [
-                              "notifications.read_self",
-                              "organization.read_self",
-                              ...attendanceEmployeeKeys,
-                              ...leaveEmployeeKeys,
-                              "payroll.payslip.read_self",
-                              ...programsReadPermissionKeys,
-                              "students.read",
-                              ...programsDeliveryPermissionKeys,
-                              "performance.reviews.read",
-                              ...performanceSelfPermissionKeys,
-                              ...supportBasePermissionKeys,
-                              "cms.content.read",
-                            ]
-                        : name === "EMPLOYEE"
-                          ? [
-                              "employees.read_self",
-                              "projects.read_assigned",
-                              "tasks.read_assigned",
-                              "tasks.update_assigned",
-                              "task_comments.read",
-                              "task_comments.create",
-                              "notifications.read_self",
-                              "organization.read_self",
-                              ...attendanceEmployeeKeys,
-                              ...leaveEmployeeKeys,
-                              "payroll.payslip.read_self",
-                              "performance.reviews.read",
-                              ...performanceSelfPermissionKeys,
-                              ...supportBasePermissionKeys,
-                              "cms.content.read",
-                              "projects.delivery.read",
-                              "projects.timelog.manage",
-                            ]
-                          : [
-                              "notifications.read_self",
-                              "organization.read_self",
-                            ];
+                          : name === "PROJECT_MANAGER"
+                            ? [
+                                "projects.read_assigned",
+                                "projects.read_division",
+                                "projects.manage",
+                                "tasks.read_assigned",
+                                "tasks.read_project",
+                                "tasks.manage",
+                                "task_comments.read",
+                                "task_comments.create",
+                                "notifications.read_self",
+                                "organization.read_self",
+                                "performance.reviews.read",
+                                "performance.reviews.manage",
+                                ...performanceSelfPermissionKeys,
+                                "projects.delivery.read",
+                                "projects.delivery.manage",
+                                "projects.timelog.manage",
+                              ]
+                            : name === "IT_ADMIN"
+                              ? [
+                                  "notifications.read_self",
+                                  "organization.read_all",
+                                  ...attendanceEmployeeKeys,
+                                  ...leaveEmployeeKeys,
+                                  ...supportBasePermissionKeys,
+                                  ...supportAgentPermissionKeys,
+                                ]
+                              : name === "CONTENT_MANAGER"
+                                ? [
+                                    "notifications.read_self",
+                                    "organization.read_self",
+                                    ...attendanceEmployeeKeys,
+                                    ...leaveEmployeeKeys,
+                                    ...cmsReadPermissionKeys,
+                                    "cms.content.manage",
+                                    ...supportBasePermissionKeys,
+                                  ]
+                                : name === "FACULTY_TRAINER"
+                                  ? [
+                                      "notifications.read_self",
+                                      "organization.read_self",
+                                      ...attendanceEmployeeKeys,
+                                      ...leaveEmployeeKeys,
+                                      "payroll.payslip.read_self",
+                                      ...programsReadPermissionKeys,
+                                      "students.read",
+                                      ...programsDeliveryPermissionKeys,
+                                      "performance.reviews.read",
+                                      ...performanceSelfPermissionKeys,
+                                      ...supportBasePermissionKeys,
+                                      "cms.content.read",
+                                    ]
+                                  : name === "EMPLOYEE"
+                                    ? [
+                                        "employees.read_self",
+                                        "projects.read_assigned",
+                                        "tasks.read_assigned",
+                                        "tasks.update_assigned",
+                                        "task_comments.read",
+                                        "task_comments.create",
+                                        "notifications.read_self",
+                                        "organization.read_self",
+                                        ...attendanceEmployeeKeys,
+                                        ...leaveEmployeeKeys,
+                                        "payroll.payslip.read_self",
+                                        "performance.reviews.read",
+                                        ...performanceSelfPermissionKeys,
+                                        ...supportBasePermissionKeys,
+                                        "cms.content.read",
+                                        "projects.delivery.read",
+                                        "projects.timelog.manage",
+                                      ]
+                                    : ["notifications.read_self", "organization.read_self"];
     for (const key of keys) {
       const permission = permissions.get(key);
       if (!permission) continue;
@@ -834,13 +808,10 @@ async function main(): Promise<void> {
   // Email/password are overridable via DEMO_FOUNDER_EMAIL / DEMO_FOUNDER_PASSWORD;
   // otherwise a known demo credential is used so the deployed site is accessible.
   {
-    const demoFounderEmail = (
-      process.env.DEMO_FOUNDER_EMAIL || "founder@techm4india.com"
-    )
+    const demoFounderEmail = (process.env.DEMO_FOUNDER_EMAIL || "founder@techm4india.com")
       .trim()
       .toLowerCase();
-    const demoFounderPassword =
-      process.env.DEMO_FOUNDER_PASSWORD || "TechM4India!2026";
+    const demoFounderPassword = process.env.DEMO_FOUNDER_PASSWORD || "TechM4India!2026";
     const demoFounderRole = roles.get("FOUNDER_CEO");
     const demoEngineering = divisionRecords.get("engineering");
     if (demoFounderRole && demoEngineering) {
@@ -882,17 +853,11 @@ async function main(): Promise<void> {
   }
 
   const bootstrapFounderEnabled =
-    process.env.NODE_ENV === "production" &&
-    process.env.BOOTSTRAP_FOUNDER_ENABLED === "true";
-  const bootstrapFounderEmail = process.env.BOOTSTRAP_FOUNDER_EMAIL
-    ?.trim()
-    .toLowerCase();
+    process.env.NODE_ENV === "production" && process.env.BOOTSTRAP_FOUNDER_ENABLED === "true";
+  const bootstrapFounderEmail = process.env.BOOTSTRAP_FOUNDER_EMAIL?.trim().toLowerCase();
   const bootstrapFounderPassword = process.env.BOOTSTRAP_FOUNDER_PASSWORD;
 
-  if (
-    bootstrapFounderEnabled &&
-    (!bootstrapFounderEmail || !bootstrapFounderPassword)
-  ) {
+  if (bootstrapFounderEnabled && (!bootstrapFounderEmail || !bootstrapFounderPassword)) {
     throw new Error(
       "BOOTSTRAP_FOUNDER_EMAIL and BOOTSTRAP_FOUNDER_PASSWORD are required when production founder bootstrap is enabled",
     );
@@ -978,8 +943,7 @@ async function main(): Promise<void> {
 
   const seedPassword = process.env.SEED_DEMO_PASSWORD;
   const passwordHash = seedPassword ? await hashPassword(seedPassword) : undefined;
-  const seedDemoData =
-    process.env.NODE_ENV !== "production" && Boolean(passwordHash);
+  const seedDemoData = process.env.NODE_ENV !== "production" && Boolean(passwordHash);
   if (!seedDemoData) {
     console.log(
       `Seeded ${organization.legalName}, ${divisions.length} divisions, ${roleNames.length} roles; demo employees skipped (development opt-in required).`,
@@ -996,9 +960,7 @@ async function main(): Promise<void> {
     where: { email: "aryan@techm4india.com" },
   });
   if (!existingUser && !passwordHash) {
-    throw new Error(
-      "SEED_DEMO_PASSWORD is required when creating the demo account",
-    );
+    throw new Error("SEED_DEMO_PASSWORD is required when creating the demo account");
   }
   const user = existingUser
     ? await prisma.user.update({
@@ -1094,8 +1056,7 @@ async function main(): Promise<void> {
     },
     update: {
       name: "TechM4Engineering Portal",
-      description:
-        "Development-only project for the TechM4Engineering employee work portal.",
+      description: "Development-only project for the TechM4Engineering employee work portal.",
       projectManagerId: employee.id,
       progress: 65,
       status: ProjectStatus.ACTIVE,
@@ -1106,8 +1067,7 @@ async function main(): Promise<void> {
       divisionId: engineering.id,
       code: "TM4-FOUNDATION",
       name: "TechM4Engineering Portal",
-      description:
-        "Development-only project for the TechM4Engineering employee work portal.",
+      description: "Development-only project for the TechM4Engineering employee work portal.",
       projectManagerId: employee.id,
       createdByUserId: user.id,
       priority: Priority.HIGH,
@@ -1126,8 +1086,7 @@ async function main(): Promise<void> {
     where: { id: "00000000-0000-0000-0000-000000000001" },
     update: {
       title: "Build employee login integration",
-      description:
-        "Validate the authenticated employee flow for the engineering portal.",
+      description: "Validate the authenticated employee flow for the engineering portal.",
       status: TaskStatus.COMPLETED,
       assigneeId: employee.id,
       completedAt: new Date("2026-08-25T00:00:00.000Z"),
@@ -1136,8 +1095,7 @@ async function main(): Promise<void> {
       id: "00000000-0000-0000-0000-000000000001",
       projectId: project.id,
       title: "Build employee login integration",
-      description:
-        "Validate the authenticated employee flow for the engineering portal.",
+      description: "Validate the authenticated employee flow for the engineering portal.",
       assigneeId: employee.id,
       createdByUserId: user.id,
       createdByEmployeeId: employee.id,
@@ -1212,8 +1170,7 @@ async function main(): Promise<void> {
       projectDescription: "Development-only Solutions workspace project.",
       taskId: "00000000-0000-0000-0000-000000000011",
       taskTitle: "Review solutions lab brief",
-      taskDescription:
-        "Development-only task for cross-division workspace testing.",
+      taskDescription: "Development-only task for cross-division workspace testing.",
       taskStatus: TaskStatus.IN_PROGRESS,
       taskPriority: Priority.HIGH,
       notificationId: "10000000-0000-0000-0000-000000000002",
@@ -1231,8 +1188,7 @@ async function main(): Promise<void> {
       projectDescription: "Development-only Schools workspace project.",
       taskId: "00000000-0000-0000-0000-000000000021",
       taskTitle: "Prepare maker session outline",
-      taskDescription:
-        "Development-only task for cross-division workspace testing.",
+      taskDescription: "Development-only task for cross-division workspace testing.",
       taskStatus: TaskStatus.TODO,
       taskPriority: Priority.MEDIUM,
       notificationId: "10000000-0000-0000-0000-000000000003",
@@ -1250,8 +1206,7 @@ async function main(): Promise<void> {
       projectDescription: "Development-only Space workspace project.",
       taskId: "00000000-0000-0000-0000-000000000031",
       taskTitle: "Inspect propulsion test notes",
-      taskDescription:
-        "Development-only task for cross-division workspace testing.",
+      taskDescription: "Development-only task for cross-division workspace testing.",
       taskStatus: TaskStatus.REVIEW,
       taskPriority: Priority.HIGH,
       notificationId: "10000000-0000-0000-0000-000000000004",
@@ -1268,9 +1223,7 @@ async function main(): Promise<void> {
       where: { email: demo.email },
     });
     if (!existingDemoUser && !passwordHash)
-      throw new Error(
-        `SEED_DEMO_PASSWORD is required when creating ${demo.email}`,
-      );
+      throw new Error(`SEED_DEMO_PASSWORD is required when creating ${demo.email}`);
     const demoUser = existingDemoUser
       ? await prisma.user.update({
           where: { id: existingDemoUser.id },

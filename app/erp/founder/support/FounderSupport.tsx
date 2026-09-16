@@ -131,45 +131,141 @@ function FounderSupportContent() {
               Support <em>desk</em>
             </h1>
             <p>
-              Raise tickets with automatic SLA targets, triage and assign them to agents, and
-              move each request through resolution to closure with a full comment trail.
+              Raise tickets with automatic SLA targets, triage and assign them to agents, and move
+              each request through resolution to closure with a full comment trail.
             </p>
           </div>
           <div className="erp-welcome-code">
             <span>Open tickets</span>
-            <strong>{tickets.filter((item) => !["RESOLVED", "CLOSED"].includes(item.status)).length}</strong>
+            <strong>
+              {tickets.filter((item) => !["RESOLVED", "CLOSED"].includes(item.status)).length}
+            </strong>
           </div>
         </section>
 
-        {error ? <div className="erp-error" role="alert">{error}</div> : null}
-        {notice ? <div className="erp-success" role="status">{notice}</div> : null}
+        {error ? (
+          <div className="erp-error" role="alert">
+            {error}
+          </div>
+        ) : null}
+        {notice ? (
+          <div className="erp-success" role="status">
+            {notice}
+          </div>
+        ) : null}
 
         <section className="erp-section">
-          <div className="erp-section-heading"><div><p className="erp-kicker">New request</p><h2>Raise ticket</h2></div></div>
+          <div className="erp-section-heading">
+            <div>
+              <p className="erp-kicker">New request</p>
+              <h2>Raise ticket</h2>
+            </div>
+          </div>
           <form className="founder-form" onSubmit={(event) => void raiseTicket(event)}>
             <div className="founder-form-grid">
-              <label><span>Category</span><select value={ticketForm.category} onChange={(event) => setTicketForm({ ...ticketForm, category: event.target.value })}>{["TECHNICAL", "ACCESS", "HR", "FINANCE", "FACILITIES", "OTHER"].map((item) => <option key={item} value={item}>{pretty(item)}</option>)}</select></label>
-              <label><span>Priority</span><select value={ticketForm.priority} onChange={(event) => setTicketForm({ ...ticketForm, priority: event.target.value })}>{["LOW", "MEDIUM", "HIGH", "URGENT"].map((item) => <option key={item} value={item}>{pretty(item)}</option>)}</select></label>
-              <label className="founder-form-wide"><span>Subject</span><input required value={ticketForm.subject} onChange={(event) => setTicketForm({ ...ticketForm, subject: event.target.value })} /></label>
-              <label className="founder-form-wide"><span>Description</span><textarea required minLength={5} value={ticketForm.description} onChange={(event) => setTicketForm({ ...ticketForm, description: event.target.value })} /></label>
+              <label>
+                <span>Category</span>
+                <select
+                  value={ticketForm.category}
+                  onChange={(event) =>
+                    setTicketForm({ ...ticketForm, category: event.target.value })
+                  }
+                >
+                  {["TECHNICAL", "ACCESS", "HR", "FINANCE", "FACILITIES", "OTHER"].map((item) => (
+                    <option key={item} value={item}>
+                      {pretty(item)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Priority</span>
+                <select
+                  value={ticketForm.priority}
+                  onChange={(event) =>
+                    setTicketForm({ ...ticketForm, priority: event.target.value })
+                  }
+                >
+                  {["LOW", "MEDIUM", "HIGH", "URGENT"].map((item) => (
+                    <option key={item} value={item}>
+                      {pretty(item)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="founder-form-wide">
+                <span>Subject</span>
+                <input
+                  required
+                  value={ticketForm.subject}
+                  onChange={(event) =>
+                    setTicketForm({ ...ticketForm, subject: event.target.value })
+                  }
+                />
+              </label>
+              <label className="founder-form-wide">
+                <span>Description</span>
+                <textarea
+                  required
+                  minLength={5}
+                  value={ticketForm.description}
+                  onChange={(event) =>
+                    setTicketForm({ ...ticketForm, description: event.target.value })
+                  }
+                />
+              </label>
             </div>
-            <button className="erp-button erp-button-primary" disabled={busy}>Raise ticket ↗</button>
+            <button className="erp-button erp-button-primary" disabled={busy}>
+              Raise ticket ↗
+            </button>
           </form>
         </section>
 
         {loading ? (
-          <div className="erp-state" role="status"><span className="erp-loader" aria-hidden="true" /><p>Loading helpdesk</p></div>
+          <div className="erp-state" role="status">
+            <span className="erp-loader" aria-hidden="true" />
+            <p>Loading helpdesk</p>
+          </div>
         ) : null}
 
         {!loading ? (
           <section className="erp-section">
-            <div className="erp-section-heading"><div><p className="erp-kicker">Queue</p><h2>Tickets</h2></div></div>
-            {tickets.length === 0 ? <div className="erp-empty"><strong>No tickets yet.</strong><span>Raise a ticket to start the queue.</span></div> : (
+            <div className="erp-section-heading">
+              <div>
+                <p className="erp-kicker">Queue</p>
+                <h2>Tickets</h2>
+              </div>
+            </div>
+            {tickets.length === 0 ? (
+              <div className="erp-empty">
+                <strong>No tickets yet.</strong>
+                <span>Raise a ticket to start the queue.</span>
+              </div>
+            ) : (
               <div className="erp-notification-list">
                 {tickets.map((item) => (
                   <article className="erp-notification" key={item.id}>
-                    <div><span className="founder-org-code">{item.code}</span><h3>{item.subject}</h3><p>{pretty(item.category)} · {pretty(item.priority)}{item.assignee ? ` · ${item.assignee.firstName} ${item.assignee.lastName}` : " · unassigned"}</p><small>{item.slaDueAt ? `SLA due ${dateTime(item.slaDueAt)}` : ""}</small></div>
-                    <div className="founder-org-row-actions"><strong className="founder-status">{pretty(item.status)}</strong><button type="button" className="erp-text-button" onClick={() => void openTicket(item.id)}>Open</button></div>
+                    <div>
+                      <span className="founder-org-code">{item.code}</span>
+                      <h3>{item.subject}</h3>
+                      <p>
+                        {pretty(item.category)} · {pretty(item.priority)}
+                        {item.assignee
+                          ? ` · ${item.assignee.firstName} ${item.assignee.lastName}`
+                          : " · unassigned"}
+                      </p>
+                      <small>{item.slaDueAt ? `SLA due ${dateTime(item.slaDueAt)}` : ""}</small>
+                    </div>
+                    <div className="founder-org-row-actions">
+                      <strong className="founder-status">{pretty(item.status)}</strong>
+                      <button
+                        type="button"
+                        className="erp-text-button"
+                        onClick={() => void openTicket(item.id)}
+                      >
+                        Open
+                      </button>
+                    </div>
                   </article>
                 ))}
               </div>
@@ -179,7 +275,15 @@ function FounderSupportContent() {
 
         {selected ? (
           <section className="erp-section">
-            <div className="erp-section-heading"><div><p className="erp-kicker">Ticket · {pretty(selected.status)}</p><h2>{selected.subject}</h2><p>{selected.code} · {pretty(selected.category)} · {pretty(selected.priority)}</p></div></div>
+            <div className="erp-section-heading">
+              <div>
+                <p className="erp-kicker">Ticket · {pretty(selected.status)}</p>
+                <h2>{selected.subject}</h2>
+                <p>
+                  {selected.code} · {pretty(selected.category)} · {pretty(selected.priority)}
+                </p>
+              </div>
+            </div>
             <p className="founder-form-note">{selected.description}</p>
 
             {canResolve ? (
@@ -191,34 +295,139 @@ function FounderSupportContent() {
                       event.preventDefault();
                       const data = new FormData(event.currentTarget);
                       const employeeId = String(data.get("employeeId") ?? "");
-                      if (employeeId) void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/assign`, { method: "POST", body: JSON.stringify({ assigneeEmployeeId: employeeId }) }), "Ticket assigned.");
+                      if (employeeId)
+                        void runAction(
+                          () =>
+                            apiFetchV2(`/support/tickets/${selected.id}/assign`, {
+                              method: "POST",
+                              body: JSON.stringify({ assigneeEmployeeId: employeeId }),
+                            }),
+                          "Ticket assigned.",
+                        );
                     }}
                   >
-                    <select name="employeeId" defaultValue=""><option value="">Assign to…</option>{employees.map((employee) => <option key={employee.id} value={employee.id}>{employee.firstName} {employee.lastName}</option>)}</select>
-                    <button type="submit" className="erp-text-button" disabled={busy}>Assign</button>
+                    <select name="employeeId" defaultValue="">
+                      <option value="">Assign to…</option>
+                      {employees.map((employee) => (
+                        <option key={employee.id} value={employee.id}>
+                          {employee.firstName} {employee.lastName}
+                        </option>
+                      ))}
+                    </select>
+                    <button type="submit" className="erp-text-button" disabled={busy}>
+                      Assign
+                    </button>
                   </form>
                 ) : null}
-                {selected.status === "IN_PROGRESS" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/hold`, { method: "POST" }), "Ticket on hold.")}>Hold</button> : null}
-                {selected.status === "PENDING" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/resume`, { method: "POST" }), "Ticket resumed.")}>Resume</button> : null}
-                {["IN_PROGRESS", "PENDING"].includes(selected.status) ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/resolve`, { method: "POST" }), "Ticket resolved.")}>Resolve</button> : null}
-                {selected.status === "RESOLVED" ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/close`, { method: "POST" }), "Ticket closed.")}>Close</button> : null}
-                {["RESOLVED", "CLOSED"].includes(selected.status) ? <button type="button" className="erp-text-button" disabled={busy} onClick={() => void runAction(() => apiFetchV2(`/support/tickets/${selected.id}/reopen`, { method: "POST" }), "Ticket reopened.")}>Reopen</button> : null}
+                {selected.status === "IN_PROGRESS" ? (
+                  <button
+                    type="button"
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(
+                        () =>
+                          apiFetchV2(`/support/tickets/${selected.id}/hold`, { method: "POST" }),
+                        "Ticket on hold.",
+                      )
+                    }
+                  >
+                    Hold
+                  </button>
+                ) : null}
+                {selected.status === "PENDING" ? (
+                  <button
+                    type="button"
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(
+                        () =>
+                          apiFetchV2(`/support/tickets/${selected.id}/resume`, { method: "POST" }),
+                        "Ticket resumed.",
+                      )
+                    }
+                  >
+                    Resume
+                  </button>
+                ) : null}
+                {["IN_PROGRESS", "PENDING"].includes(selected.status) ? (
+                  <button
+                    type="button"
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(
+                        () =>
+                          apiFetchV2(`/support/tickets/${selected.id}/resolve`, { method: "POST" }),
+                        "Ticket resolved.",
+                      )
+                    }
+                  >
+                    Resolve
+                  </button>
+                ) : null}
+                {selected.status === "RESOLVED" ? (
+                  <button
+                    type="button"
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(
+                        () =>
+                          apiFetchV2(`/support/tickets/${selected.id}/close`, { method: "POST" }),
+                        "Ticket closed.",
+                      )
+                    }
+                  >
+                    Close
+                  </button>
+                ) : null}
+                {["RESOLVED", "CLOSED"].includes(selected.status) ? (
+                  <button
+                    type="button"
+                    className="erp-text-button"
+                    disabled={busy}
+                    onClick={() =>
+                      void runAction(
+                        () =>
+                          apiFetchV2(`/support/tickets/${selected.id}/reopen`, { method: "POST" }),
+                        "Ticket reopened.",
+                      )
+                    }
+                  >
+                    Reopen
+                  </button>
+                ) : null}
               </div>
             ) : null}
 
             <div className="erp-notification-list">
               {(selected.comments ?? []).map((item) => (
                 <article className="erp-notification" key={item.id}>
-                  <div><h3>{item.isInternal ? "Internal note" : "Reply"}</h3><p>{item.body}</p><small>{dateTime(item.createdAt)}</small></div>
+                  <div>
+                    <h3>{item.isInternal ? "Internal note" : "Reply"}</h3>
+                    <p>{item.body}</p>
+                    <small>{dateTime(item.createdAt)}</small>
+                  </div>
                 </article>
               ))}
             </div>
 
             <form className="founder-form" onSubmit={(event) => void addComment(event)}>
               <div className="founder-form-grid">
-                <label className="founder-form-wide"><span>Add comment</span><textarea required value={comment} onChange={(event) => setComment(event.target.value)} /></label>
+                <label className="founder-form-wide">
+                  <span>Add comment</span>
+                  <textarea
+                    required
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                  />
+                </label>
               </div>
-              <button className="erp-button erp-button-primary" disabled={busy}>Add comment ↗</button>
+              <button className="erp-button erp-button-primary" disabled={busy}>
+                Add comment ↗
+              </button>
             </form>
           </section>
         ) : null}
