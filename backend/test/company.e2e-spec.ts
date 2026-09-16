@@ -170,7 +170,10 @@ describe("Company and organization V2", () => {
       .set("Authorization", founderAuth)
       .expect(200);
     expect(initial.body.data.legalName).toBe("TechM4India");
-    expect(initial.body.data.identifiers.gstin).toBeNull();
+    // The seed records statutory identity because the GST module needs the
+    // supplier's state code to classify a supply. It must be exposed here.
+    expect(initial.body.data.identifiers).toHaveProperty("gstin");
+    expect(initial.body.data.identifiers.gstin).toMatch(/^\d{2}[A-Z0-9]+$/);
     const updated = await request(app.getHttpServer())
       .patch("/api/v2/company/profile")
       .set("Authorization", founderAuth)

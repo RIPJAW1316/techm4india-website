@@ -24,6 +24,7 @@ import { InstitutionsModule } from "./institutions/institutions.module";
 import { AdminModule } from "./admin/admin.module";
 import { PayrollModule } from "./payroll/payroll.module";
 import { FinanceModule } from "./finance/finance.module";
+import { GstModule } from "./gst/gst.module";
 import { RecruitmentModule } from "./recruitment/recruitment.module";
 import { ProgramsModule } from "./programs/programs.module";
 import { PerformanceModule } from "./performance/performance.module";
@@ -62,6 +63,7 @@ import { AnalyticsModule } from "./analytics/analytics.module";
     AdminModule,
     PayrollModule,
     FinanceModule,
+    GstModule,
     RecruitmentModule,
     ProgramsModule,
     PerformanceModule,

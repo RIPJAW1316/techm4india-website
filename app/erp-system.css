@@ -1167,7 +1167,6 @@
   color: var(--erp-text-muted);
 }
 
-.erp-route .erp-welcome-code,
 .erp-route .founder-org-code {
   display: inline-flex;
   align-items: center;
@@ -1178,6 +1177,34 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 11.5px;
   color: var(--erp-text-muted);
+}
+
+/* A labelled value sitting beside the page title (currency, period, code). */
+.erp-route .erp-welcome-code {
+  min-width: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--erp-border);
+  border-left: 3px solid var(--tm-orange, #e85d34);
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-surface);
+}
+
+.erp-route .erp-welcome-code span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-welcome-code strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--erp-text);
 }
 
 .erp-route .erp-section-count {

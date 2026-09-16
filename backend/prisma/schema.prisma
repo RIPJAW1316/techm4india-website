@@ -689,6 +689,7 @@ model Organization {
   payrollRuns                PayrollRun[]
   financeParties             FinanceParty[]
   financeTaxRates            FinanceTaxRate[]
+  hsnSacCodes                HsnSacCode[]
   financeInvoices            FinanceInvoice[]
   financePayments            FinancePayment[]
   financeExpenses            FinanceExpense[]
@@ -1874,6 +1875,31 @@ model FinanceParty {
   @@index([organizationId, archivedAt])
   @@index([organizationId, crmAccountId])
   @@index([organizationId, institutionId])
+}
+
+/// HSN (goods) / SAC (services) classification master required for GSTR-1's
+/// rate-wise and code-wise summaries. Codes are organization-scoped because the
+/// applicable rate for a given service can differ by registration.
+enum HsnSacKind {
+  HSN
+  SAC
+}
+
+model HsnSacCode {
+  id                 String     @id @default(uuid()) @db.Uuid
+  organizationId     String     @db.Uuid
+  code               String
+  kind               HsnSacKind
+  description        String
+  defaultRatePercent Decimal    @db.Decimal(7, 4)
+  isActive           Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, code])
+  @@index([organizationId, kind, isActive])
 }
 
 model FinanceTaxRate {

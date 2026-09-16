@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { ApiError, apiFetchV2 } from "@/lib/api/client";
 import { ErpLoading, ProtectedErp } from "@/app/erp/components/ProtectedErp";
 import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
+import { GstPanel } from "./GstPanel";
 
 type Row = Record<string, any>;
 type Tab = "overview" | "invoices" | "parties" | "expenses" | "payments" | "gst" | "ledger";
@@ -26,6 +27,30 @@ const money = (value: unknown, code = "INR") =>
 const date = (value?: string) => (value ? new Date(value).toLocaleDateString("en-IN") : "—");
 const today = () => new Date().toISOString().slice(0, 10);
 
+/**
+ * The dashboard returns GST buckets keyed by tax head. Label them explicitly
+ * rather than printing the object keys, so the screen never shows a reader a
+ * field name like `taxableValue`.
+ */
+const GST_SUMMARY_LABELS: Array<[string, string]> = [
+  ["taxableValue", "Taxable value"],
+  ["GST", "GST (unsplit)"],
+  ["CGST", "Central tax (CGST)"],
+  ["SGST", "State tax (SGST)"],
+  ["IGST", "Integrated tax (IGST)"],
+  ["CESS", "Cess"],
+  ["OTHER", "Other"],
+];
+
+function gstSummaryRows(summary: Row | null | undefined) {
+  if (!summary) return [];
+  return GST_SUMMARY_LABELS.filter(([key]) => key in summary).map(([key, label]) => ({
+    key,
+    label,
+    value: summary[key],
+  }));
+}
+
 function FounderFinanceContent() {
   const [tab, setTab] = useState<Tab>("overview");
   const [loading, setLoading] = useState(true);
@@ -39,7 +64,6 @@ function FounderFinanceContent() {
   const [payments, setPayments] = useState<Row[]>([]);
   const [receivables, setReceivables] = useState<Row[]>([]);
   const [payables, setPayables] = useState<Row[]>([]);
-  const [register, setRegister] = useState<Row[]>([]);
   const [accounts, setAccounts] = useState<Row[]>([]);
   const [journals, setJournals] = useState<Row[]>([]);
   const [partyForm, setPartyForm] = useState({
@@ -48,14 +72,6 @@ function FounderFinanceContent() {
     email: "",
     gstin: "",
     isActive: true,
-  });
-  const [taxForm, setTaxForm] = useState({
-    code: "",
-    name: "",
-    taxType: "GST",
-    rate: "",
-    effectiveFrom: "",
-    effectiveTo: "",
   });
   const [invoiceForm, setInvoiceForm] = useState({
     invoiceNumber: "",
@@ -104,7 +120,7 @@ function FounderFinanceContent() {
     setLoading(true);
     setError(null);
     try {
-      const [d, pa, ta, inv, exp, pay, ar, ap, reg, acc, jou] = await Promise.all([
+      const [d, pa, ta, inv, exp, pay, ar, ap, acc, jou] = await Promise.all([
         apiFetchV2<{ data: Row }>("/finance/dashboard"),
         apiFetchV2<{ data: Row[] }>("/finance/parties?limit=100"),
         apiFetchV2<{ data: Row[] }>("/finance/tax-rates"),
@@ -113,7 +129,6 @@ function FounderFinanceContent() {
         apiFetchV2<{ data: Row[] }>("/finance/payments?limit=100"),
         apiFetchV2<{ data: Row[] }>("/finance/receivables"),
         apiFetchV2<{ data: Row[] }>("/finance/payables"),
-        apiFetchV2<{ data: Row[] }>("/finance/gst/register"),
         apiFetchV2<{ data: Row[] }>("/finance/ledger/accounts"),
         apiFetchV2<{ data: Row[] }>("/finance/journals"),
       ]);
@@ -125,7 +140,6 @@ function FounderFinanceContent() {
       setPayments(pay.data);
       setReceivables(ar.data);
       setPayables(ap.data);
-      setRegister(reg.data);
       setAccounts(acc.data);
       setJournals(jou.data);
     } catch (reason) {
@@ -302,10 +316,10 @@ function FounderFinanceContent() {
                   </div>
                 </div>
                 <div className="erp-notification-list">
-                  {Object.entries(dashboard?.gst ?? {}).map(([key, value]) => (
-                    <article className="erp-notification" key={key}>
-                      <span>{key.replaceAll("_", " ")}</span>
-                      <strong>{money(value)}</strong>
+                  {gstSummaryRows(dashboard?.gst).map((row) => (
+                    <article className="erp-notification" key={row.key}>
+                      <span>{row.label}</span>
+                      <strong>{money(row.value)}</strong>
                     </article>
                   ))}
                 </div>
@@ -923,124 +937,7 @@ function FounderFinanceContent() {
             />
           </section>
         )}
-        {tab === "gst" && (
-          <section className="erp-section">
-            <SectionHead
-              kicker="Review only"
-              title="GST configuration & register"
-              count={`${taxes.length} tax configurations`}
-            />
-            <form
-              className="founder-form"
-              onSubmit={(e: FormEvent) => {
-                e.preventDefault();
-                void submit(
-                  "/finance/tax-rates",
-                  {
-                    ...taxForm,
-                    rate: Number(taxForm.rate),
-                    effectiveFrom: taxForm.effectiveFrom || undefined,
-                    effectiveTo: taxForm.effectiveTo || undefined,
-                  },
-                  () =>
-                    setTaxForm({
-                      code: "",
-                      name: "",
-                      taxType: "GST",
-                      rate: "",
-                      effectiveFrom: "",
-                      effectiveTo: "",
-                    }),
-                );
-              }}
-            >
-              <div className="founder-form-grid">
-                <label>
-                  <span>Code</span>
-                  <input
-                    required
-                    value={taxForm.code}
-                    onChange={(e) => setTaxForm({ ...taxForm, code: e.target.value })}
-                  />
-                </label>
-                <label>
-                  <span>Name</span>
-                  <input
-                    required
-                    value={taxForm.name}
-                    onChange={(e) => setTaxForm({ ...taxForm, name: e.target.value })}
-                  />
-                </label>
-                <label>
-                  <span>Tax type</span>
-                  <select
-                    value={taxForm.taxType}
-                    onChange={(e) => setTaxForm({ ...taxForm, taxType: e.target.value })}
-                  >
-                    {["GST", "CGST", "SGST", "IGST", "CESS", "OTHER"].map((value) => (
-                      <option key={value}>{value}</option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span>Configured rate (%)</span>
-                  <input
-                    required
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.0001"
-                    value={taxForm.rate}
-                    onChange={(e) => setTaxForm({ ...taxForm, rate: e.target.value })}
-                  />
-                </label>
-              </div>
-              <button className="erp-button erp-button-primary" disabled={busy}>
-                Add tax configuration ↗
-              </button>
-            </form>
-            <div className="founder-detail-columns">
-              <div>
-                <RecordList
-                  rows={taxes}
-                  empty="No configured taxes."
-                  render={(row) => (
-                    <>
-                      <div>
-                        <h3>
-                          {row.code} · {row.name}
-                        </h3>
-                        <p>
-                          {row.taxType} · {row.isActive ? "Active" : "Inactive"}
-                        </p>
-                      </div>
-                      <strong>{row.rate}%</strong>
-                    </>
-                  )}
-                />
-              </div>
-              <div>
-                <RecordList
-                  rows={register}
-                  empty="No issued invoices in this GST register."
-                  render={(row) => (
-                    <>
-                      <div>
-                        <h3>
-                          {row.invoiceNumber} · {row.party?.name}
-                        </h3>
-                        <p>
-                          {date(row.invoiceDate)} · taxable {money(row.subtotal, row.currency)}
-                        </p>
-                      </div>
-                      <strong>{money(row.taxTotal, row.currency)}</strong>
-                    </>
-                  )}
-                />
-              </div>
-            </div>
-          </section>
-        )}
+        {tab === "gst" && <GstPanel />}
         {tab === "ledger" && (
           <section className="erp-section">
             <SectionHead

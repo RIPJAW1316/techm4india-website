@@ -205,6 +205,8 @@ const permissionKeys = [
   "analytics.read",
 ] as const;
 
+type PermissionKey = (typeof permissionKeys)[number];
+
 const founderPermissionKeys = [
   "executive.dashboard.read",
   "employees.read_all",
@@ -546,7 +548,9 @@ async function main(): Promise<void> {
                   ...cmsReadPermissionKeys,
                   "cms.content.publish",
                   ...complianceReadPermissionKeys,
-                ])
+                  // Spreading readonly tuples widens the literal union to
+                  // `string`, so restate it for `concat`.
+                ] as PermissionKey[])
             : name === "DIVISION_HEAD"
               ? [
                   "employees.read_self",
@@ -850,6 +854,121 @@ async function main(): Promise<void> {
       });
       console.log(`Demo founder account ready: ${demoFounderEmail}`);
     }
+  }
+
+  // Statutory identity and GST configuration.
+  //
+  // A registered business always has these on file, and the GST module cannot
+  // classify a supply without them: the GSTIN's state code is what decides
+  // whether a supply attracts CGST + SGST or IGST. Values are placeholders for
+  // this demo deployment and are overridable through the environment.
+  {
+    await prisma.organization.update({
+      where: { id: organization.id },
+      data: {
+        gstin: process.env.ORGANIZATION_GSTIN || "29AABCT1332L1ZU",
+        pan: process.env.ORGANIZATION_PAN || "AABCT1332L",
+        registeredState: "Karnataka",
+        registeredCity: "Bengaluru",
+        registeredCountry: "India",
+      },
+    });
+
+    // Rate master. GST is levied at notified slabs; these are the ones that
+    // apply to the services and equipment this business supplies.
+    const taxRates = [
+      { code: "GST5", name: "GST 5%", rate: 5 },
+      { code: "GST12", name: "GST 12%", rate: 12 },
+      { code: "GST18", name: "GST 18%", rate: 18 },
+      { code: "GST28", name: "GST 28%", rate: 28 },
+    ];
+    for (const taxRate of taxRates) {
+      await prisma.financeTaxRate.upsert({
+        where: {
+          organizationId_code: { organizationId: organization.id, code: taxRate.code },
+        },
+        update: { name: taxRate.name, rate: taxRate.rate },
+        create: {
+          organizationId: organization.id,
+          code: taxRate.code,
+          name: taxRate.name,
+          rate: taxRate.rate,
+          taxType: "GST",
+          effectiveFrom: new Date("2020-01-01"),
+        },
+      });
+    }
+
+    // HSN classifies goods, SAC classifies services. GSTR-1 requires a
+    // code-wise summary, so every line an invoice can carry needs a code here.
+    const classifications = [
+      {
+        code: "998313",
+        kind: "SAC" as const,
+        description: "Information technology consulting and support services",
+        rate: 18,
+      },
+      {
+        code: "998311",
+        kind: "SAC" as const,
+        description: "Management consulting and advisory services",
+        rate: 18,
+      },
+      {
+        code: "999293",
+        kind: "SAC" as const,
+        description: "Commercial training and coaching services",
+        rate: 18,
+      },
+      {
+        code: "999299",
+        kind: "SAC" as const,
+        description: "Other education and training support services",
+        rate: 18,
+      },
+      {
+        code: "998316",
+        kind: "SAC" as const,
+        description: "Information technology infrastructure and network management",
+        rate: 18,
+      },
+      {
+        code: "8471",
+        kind: "HSN" as const,
+        description: "Automatic data processing machines and units thereof",
+        rate: 18,
+      },
+      {
+        code: "8543",
+        kind: "HSN" as const,
+        description: "Electrical machines and apparatus with individual functions",
+        rate: 18,
+      },
+      {
+        code: "9023",
+        kind: "HSN" as const,
+        description: "Instruments and models for demonstrational use",
+        rate: 12,
+      },
+    ];
+    for (const entry of classifications) {
+      await prisma.hsnSacCode.upsert({
+        where: {
+          organizationId_code: { organizationId: organization.id, code: entry.code },
+        },
+        update: { description: entry.description, defaultRatePercent: entry.rate },
+        create: {
+          organizationId: organization.id,
+          code: entry.code,
+          kind: entry.kind,
+          description: entry.description,
+          defaultRatePercent: entry.rate,
+        },
+      });
+    }
+    console.log(
+      `GST configuration ready: ${taxRates.length} rates, ${classifications.length} HSN/SAC codes.`,
+    );
   }
 
   const bootstrapFounderEnabled =
