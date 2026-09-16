@@ -340,7 +340,7 @@ function FounderUsersContent() {
             <div>
               <p className="erp-kicker">Administrative identity</p>
               <h1>
-                Access, <em>made accountable.</em>
+                Users &amp; <em>roles</em>
               </h1>
               <p>
                 Inspect employee-linked accounts, manage official roles, and understand the

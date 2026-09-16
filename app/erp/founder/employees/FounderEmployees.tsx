@@ -280,7 +280,7 @@ function FounderEmployeesContent() {
             <div>
               <p className="erp-kicker">Employee master</p>
               <h1>
-                People, <em>clearly recorded.</em>
+                Employee <em>master</em>
               </h1>
               <p>
                 A safe operational directory for the people, structure and employment changes that
