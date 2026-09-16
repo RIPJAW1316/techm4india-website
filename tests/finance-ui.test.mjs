@@ -9,7 +9,10 @@ const finance = await readFile(
 
 test("Founder Finance workspace uses the protected live Finance API", () => {
   assert.match(finance, /ProtectedErp requiredFinance/);
-  assert.match(finance, /GST configuration and reports are based on organization-entered tax settings/);
+  assert.match(
+    finance,
+    /GST configuration and reports are based on organization-entered tax settings/,
+  );
   for (const endpoint of [
     "/finance/dashboard",
     "/finance/invoices",
@@ -19,7 +22,8 @@ test("Founder Finance workspace uses the protected live Finance API", () => {
     "/finance/gst/register",
     "/finance/ledger/accounts",
     "/finance/journals",
-  ]) assert.match(finance, new RegExp(endpoint));
+  ])
+    assert.match(finance, new RegExp(endpoint));
   assert.match(finance, /Create balanced journal/);
   assert.doesNotMatch(finance, /GSTR-1|GSTR-3B|file GST/i);
 });

@@ -6,10 +6,7 @@ const source = await readFile(
   new URL("../app/erp/founder/analytics/FounderAnalytics.tsx", import.meta.url),
   "utf8",
 );
-const navigation = await readFile(
-  new URL("../app/erp/components/FounderModuleNavigation.tsx", import.meta.url),
-  "utf8",
-);
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("Founder analytics is permission protected and uses the V2 overview endpoint", () => {
   assert.match(source, /ProtectedErp requiredAnalytics/);

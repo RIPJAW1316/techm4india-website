@@ -5,6 +5,8 @@ import { MotionController } from "./components/MotionController";
 import { SiteHeader } from "./components/SiteHeader";
 import { StructuredData } from "./components/StructuredData";
 import "./globals.css";
+// Loaded after globals so the workspace design system wins inside `.erp-route`.
+import "./erp-system.css";
 
 const manrope = Manrope({
   variable: "--font-sans",

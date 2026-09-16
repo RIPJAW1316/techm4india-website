@@ -6,10 +6,7 @@ const source = await readFile(
   new URL("../app/erp/founder/supply-chain/FounderSupplyChain.tsx", import.meta.url),
   "utf8",
 );
-const navigation = await readFile(
-  new URL("../app/erp/components/FounderModuleNavigation.tsx", import.meta.url),
-  "utf8",
-);
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("Founder supply chain is permission protected and uses only V2 endpoints", () => {
   assert.match(source, /ProtectedErp requiredSupplyChain/);

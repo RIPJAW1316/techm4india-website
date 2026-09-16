@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 import { apiFetch, apiFetchV2, ApiError } from "@/lib/api/client";
 import type {
@@ -14,7 +13,7 @@ import type {
   CompanyTeam,
   CompanyTeamMember,
 } from "@/lib/api/types";
-import { useErpAuth } from "../../components/AuthProvider";
+import { ErpShell } from "../../components/ErpShell";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
 
 type DirectoryEmployee = {
@@ -135,8 +134,6 @@ function Field({ label, value }: { label: string; value: string | null | undefin
 }
 
 function FounderOrganizationContent() {
-  const { context, logout } = useErpAuth();
-  const router = useRouter();
   const [profile, setProfile] = useState<CompanyProfile | null>(null);
   const [divisions, setDivisions] = useState<CompanyDivision[]>([]);
   const [departments, setDepartments] = useState<CompanyDepartment[]>([]);
@@ -397,10 +394,6 @@ function FounderOrganizationContent() {
       setBusy(false);
     }
   }
-  async function signOut() {
-    await logout();
-    router.replace("/login");
-  }
 
   if (loading && !profile) return <ErpLoading label="Loading organization workspace" />;
   const field = (key: keyof typeof profileForm, label: string) => (
@@ -414,70 +407,9 @@ function FounderOrganizationContent() {
   );
 
   return (
-    <div className="erp-app-shell founder-shell founder-org-shell">
-      <aside className="erp-sidebar founder-sidebar" aria-label="Founder workspace navigation">
-        <div className="erp-sidebar-head">
-          <a className="erp-sidebar-brand" href="/erp/founder/dashboard">
-            <span className="erp-mini-mark" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>
-              TECHM4<span>INDIA</span>
-            </span>
-          </a>
-        </div>
-        <div className="erp-sidebar-panel">
-          <div className="erp-sidebar-division">
-            <span>Executive workspace</span>
-            <strong>Founder / CEO</strong>
-            <small>Organization-wide view</small>
-          </div>
-          <nav className="erp-sidebar-nav">
-            <a href="/erp/founder/dashboard">Dashboard</a>
-            <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
-            <a href="/erp/founder/employees">Employees ↗</a>
-            <a href="/erp/founder/recruitment">Recruitment ↗</a>
-            <a href="/erp/founder/users">Users &amp; Roles ↗</a>
-            <a className="is-active" href="#organization-top">
-              Organization
-            </a>
-            <a href="/erp/founder/attendance">Attendance ↗</a>
-            <a href="/erp/founder/leave">Leave ↗</a>
-            <a href="/erp/founder/payroll">Payroll ↗</a>
-            <a href="/erp/founder/finance">Finance ↗</a>
-            <a href="/erp/founder/crm">CRM ↗</a>
-            <a href="/erp/founder/institutions">Institutions ↗</a>
-          </nav>
-          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
-            Log out <span aria-hidden="true">↗</span>
-          </button>
-        </div>
-      </aside>
+    <>
+      <ErpShell active="organization" />
       <main className="erp-main" id="organization-top">
-        <header className="erp-topbar">
-          <div>
-            <span className="erp-topbar-label">Founder Organization</span>
-            <span className="erp-topbar-path">TechM4India Innovations Pvt. Ltd. / Structure</span>
-          </div>
-          <div className="erp-user-chip">
-            <span>
-              {context?.employee
-                ? `${context.employee.firstName[0]}${context.employee.lastName[0]}`
-                : "FC"}
-            </span>
-            <div>
-              <strong>
-                {context?.employee
-                  ? `${context.employee.firstName} ${context.employee.lastName}`
-                  : "Founder"}
-              </strong>
-              <small>Founder / CEO</small>
-            </div>
-          </div>
-        </header>
         <div className="erp-content founder-content founder-org-content">
           <section className="founder-welcome">
             <div>
@@ -1220,7 +1152,7 @@ function FounderOrganizationContent() {
           </section>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

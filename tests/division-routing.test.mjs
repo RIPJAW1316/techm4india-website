@@ -1,12 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { resolveDashboardPath, canAccessDivisionWorkspace, canAccessExecutiveWorkspace } = await import("../lib/erp/divisions.ts");
+const { resolveDashboardPath, canAccessDivisionWorkspace, canAccessExecutiveWorkspace } =
+  await import("../lib/erp/divisions.ts");
 
 function context(slug, roles = ["EMPLOYEE"], permissions = ["organization.read_self"]) {
   return {
     user: { id: "user", email: "employee@techm4india.com", roles },
-    employee: { id: "employee", employeeCode: "EMP-TEST", firstName: "Test", lastName: "Employee", designation: "Employee", division: slug ? { id: slug, slug, name: slug } : null, department: null },
+    employee: {
+      id: "employee",
+      employeeCode: "EMP-TEST",
+      firstName: "Test",
+      lastName: "Employee",
+      designation: "Employee",
+      division: slug ? { id: slug, slug, name: slug } : null,
+      department: null,
+    },
     permissions,
   };
 }
@@ -29,7 +38,11 @@ test("organization-wide context resolves to the workspace selector", () => {
 });
 
 test("founder resolves to the executive control centre", () => {
-  const founder = context("engineering", ["FOUNDER_CEO"], ["organization.read_all", "executive.dashboard.read"]);
+  const founder = context(
+    "engineering",
+    ["FOUNDER_CEO"],
+    ["organization.read_all", "executive.dashboard.read"],
+  );
   assert.equal(resolveDashboardPath(founder), "/erp/founder/dashboard");
   assert.equal(canAccessExecutiveWorkspace(founder), true);
 });

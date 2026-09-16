@@ -21,7 +21,8 @@ test("Founder payroll workspace keeps statutory values configured and exposes th
     "/payroll/runs",
     "submit-review",
     "finalize",
-  ]) assert.match(payroll, new RegExp(endpoint));
+  ])
+    assert.match(payroll, new RegExp(endpoint));
   assert.match(payroll, /Finalized payslips are immutable/);
 });
 

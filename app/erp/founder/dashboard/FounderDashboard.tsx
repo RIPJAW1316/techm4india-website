@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 import { apiFetchV2, ApiError } from "@/lib/api/client";
 import type {
@@ -12,7 +11,7 @@ import type {
   ExecutiveTask,
   ExecutiveWorkDetail,
 } from "@/lib/api/types";
-import { useErpAuth } from "../../components/AuthProvider";
+import { ErpShell } from "../../components/ErpShell";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
 
 const statusLabels: Record<ExecutiveTask["status"], string> = {
@@ -119,8 +118,6 @@ function TaskRow({
 }
 
 function FounderDashboardContent() {
-  const { context, logout } = useErpAuth();
-  const router = useRouter();
   const [summary, setSummary] = useState<ExecutiveSummary | null>(null);
   const [employees, setEmployees] = useState<ExecutiveEmployee[]>([]);
   const [projects, setProjects] = useState<ExecutiveProject[]>([]);
@@ -360,88 +357,13 @@ function FounderDashboardContent() {
     }
   }
 
-  async function signOut() {
-    await logout();
-    router.replace("/login");
-  }
-
   if (loading && !summary) return <ErpLoading label="Loading Founder Control Centre" />;
-  const founderName = context?.employee?.firstName ?? "Founder";
   const employeeForTask = employees.find((employee) => employee.id === taskForm.employeeId);
 
   return (
-    <div className="erp-app-shell founder-shell">
-      <aside className="erp-sidebar founder-sidebar" aria-label="Founder workspace navigation">
-        <div className="erp-sidebar-head">
-          <a className="erp-sidebar-brand" href="#founder-top">
-            <span className="erp-mini-mark" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>
-              TECHM4<span>INDIA</span>
-            </span>
-          </a>
-        </div>
-        <div className="erp-sidebar-panel">
-          <div className="erp-sidebar-division">
-            <span>Executive workspace</span>
-            <strong>Founder / CEO</strong>
-            <small>Organization-wide view</small>
-          </div>
-          <nav className="erp-sidebar-nav">
-            <a className="is-active" href="#founder-top">
-              Dashboard
-            </a>
-            <a href="#workforce">Tasks / Work</a>
-            <a href="/erp/founder/employees">Employees ↗</a>
-            <a href="/erp/founder/recruitment">Recruitment ↗</a>
-            <a href="/erp/founder/users">Users &amp; Roles ↗</a>
-            <a href="/erp/founder/organization">Organization ↗</a>
-            <a href="/erp/founder/attendance">Attendance ↗</a>
-            <a href="/erp/founder/leave">Leave ↗</a>
-            <a href="/erp/founder/payroll">Payroll ↗</a>
-            <a href="/erp/founder/finance">Finance ↗</a>
-            <a href="/erp/founder/crm">CRM ↗</a>
-            <a href="/erp/founder/institutions">Institutions ↗</a>
-            <a href="/erp/founder/programs">Programs ↗</a>
-            <a href="/erp/founder/performance">Performance ↗</a>
-            <a href="/erp/founder/supply-chain">Supply Chain ↗</a>
-            <a href="/erp/founder/support">Helpdesk ↗</a>
-            <a href="/erp/founder/cms">Content ↗</a>
-            <a href="/erp/founder/compliance">Compliance ↗</a>
-            <a href="/erp/founder/delivery">Delivery ↗</a>
-            <a href="/erp/founder/analytics">Analytics ↗</a>
-          </nav>
-          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
-            Log out <span aria-hidden="true">↗</span>
-          </button>
-        </div>
-      </aside>
+    <>
+      <ErpShell active="dashboard" />
       <main className="erp-main" id="founder-top">
-        <header className="erp-topbar">
-          <div>
-            <span className="erp-topbar-label">Founder Control Centre</span>
-            <span className="erp-topbar-path">TechM4India Innovations Pvt. Ltd. / Operations</span>
-          </div>
-          <div className="erp-user-chip">
-            <span>
-              {context?.employee
-                ? `${context.employee.firstName[0]}${context.employee.lastName[0]}`
-                : "FC"}
-            </span>
-            <div>
-              <strong>
-                {context?.employee
-                  ? `${context.employee.firstName} ${context.employee.lastName}`
-                  : founderName}
-              </strong>
-              <small>Founder / CEO</small>
-            </div>
-          </div>
-        </header>
         <div className="erp-content founder-content">
           <section className="founder-welcome">
             <div>
@@ -1075,7 +997,7 @@ function FounderDashboardContent() {
           </section>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

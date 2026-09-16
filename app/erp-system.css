@@ -1,0 +1,1729 @@
+/* ==========================================================================
+   TechM4India ERP — workspace design system
+   --------------------------------------------------------------------------
+   The public website is editorial: large serif headlines, generous whitespace,
+   full-bleed imagery. The ERP is not. It is an operator's tool where density,
+   scannability and consistent controls matter more than expression.
+
+   Everything here is scoped to `.erp-route` (set on the ERP layout) so the
+   marketing pages keep their editorial treatment untouched.
+
+   Contents
+     1.  Tokens
+     2.  Shell — rail, context bar, main column
+     3.  Page header
+     4.  Sections and cards
+     5.  Statistics
+     6.  Data tables
+     7.  Form controls
+     8.  Toolbars and filters
+     9.  Buttons
+     10. Badges and status
+     11. States — loading, empty, error
+     12. Tabs
+     13. Responsive
+   ========================================================================== */
+
+/* -- 1. Tokens ----------------------------------------------------------- */
+
+.erp-route {
+  --erp-rail-width: 258px;
+  --erp-topbar-height: 56px;
+
+  --erp-surface: #ffffff;
+  --erp-surface-sunken: #f4f5f7;
+  --erp-canvas: #f0f1f4;
+  --erp-rail-bg: #161d33;
+  --erp-rail-bg-soft: #1d2540;
+
+  --erp-border: #dcdfe6;
+  --erp-border-strong: #c3c8d4;
+  --erp-text: #1b2233;
+  --erp-text-muted: #616b80;
+  --erp-text-faint: #8a93a6;
+  --erp-accent: #252e4a;
+  --erp-accent-contrast: #ffffff;
+  --erp-danger: #b3261e;
+  --erp-warning: #9a5b00;
+  --erp-success: #1c6c46;
+  --erp-info: #1f4f8f;
+
+  --erp-radius: 10px;
+  --erp-radius-sm: 7px;
+  --erp-control-height: 36px;
+  --erp-focus: 0 0 0 3px rgba(37, 46, 74, 0.18);
+
+  background: var(--erp-canvas);
+  color: var(--erp-text);
+  font-family: var(--tm-sans, system-ui, sans-serif);
+}
+
+.erp-route .erp-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.erp-route .erp-skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 60;
+  padding: 9px 14px;
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-accent);
+  color: var(--erp-accent-contrast);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 0.15s ease;
+}
+
+.erp-route .erp-skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.erp-route .erp-icon {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+/* -- 2. Shell ------------------------------------------------------------ */
+
+.erp-route .erp-rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  width: var(--erp-rail-width);
+  background: var(--erp-rail-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.erp-route .erp-rail-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--erp-topbar-height);
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex: none;
+}
+
+.erp-route .erp-rail-mark {
+  display: grid;
+  grid-template-columns: repeat(2, 7px);
+  gap: 2px;
+  transform: rotate(45deg);
+  flex: none;
+}
+
+.erp-route .erp-rail-mark i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: var(--tm-red, #c62d37);
+}
+
+.erp-route .erp-rail-mark i:nth-child(2),
+.erp-route .erp-rail-mark i:nth-child(3) {
+  background: var(--tm-orange, #e85d34);
+}
+
+.erp-route .erp-rail-wordmark {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+
+.erp-route .erp-rail-wordmark b {
+  color: var(--tm-orange, #e85d34);
+  font-weight: 700;
+}
+
+.erp-route .erp-rail-identity {
+  padding: 15px 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex: none;
+}
+
+.erp-route .erp-rail-identity span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #7e88a0;
+}
+
+.erp-route .erp-rail-identity strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 650;
+  color: #fff;
+}
+
+.erp-route .erp-rail-identity small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #8f98ae;
+}
+
+.erp-route .erp-rail-search {
+  padding: 13px 14px 6px;
+  flex: none;
+}
+
+.erp-route .erp-rail-search input {
+  width: 100%;
+  height: 32px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--erp-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  outline: none;
+}
+
+.erp-route .erp-rail-search input::placeholder {
+  color: #7e88a0;
+}
+
+.erp-route .erp-rail-search input:focus-visible {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.erp-route .erp-rail-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  padding: 6px 10px 14px;
+}
+
+.erp-route .erp-rail-nav::-webkit-scrollbar {
+  width: 8px;
+}
+
+.erp-route .erp-rail-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 99px;
+}
+
+.erp-route .erp-rail-group + .erp-rail-group {
+  margin-top: 14px;
+}
+
+.erp-route .erp-rail-group-label {
+  margin: 0 0 5px;
+  padding: 0 9px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #6d7691;
+}
+
+.erp-route .erp-rail-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 9px;
+  border-radius: var(--erp-radius-sm);
+  color: #c2c8d6;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.erp-route .erp-rail-nav a:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.erp-route .erp-rail-nav a .erp-icon {
+  color: #7e88a0;
+  transition: color 0.12s ease;
+}
+
+.erp-route .erp-rail-nav a:hover .erp-icon {
+  color: #c2c8d6;
+}
+
+.erp-route .erp-rail-nav a.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--tm-red, #c62d37);
+}
+
+.erp-route .erp-rail-nav a.is-active .erp-icon {
+  color: var(--tm-orange, #e85d34);
+}
+
+.erp-route .erp-rail-empty {
+  margin: 10px 9px;
+  font-size: 12.5px;
+  color: #7e88a0;
+}
+
+.erp-route .erp-rail-signout {
+  flex: none;
+  margin: 0;
+  padding: 13px 18px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: #b6bccb;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.erp-route .erp-rail-signout:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.erp-route .erp-rail-scrim {
+  display: none;
+}
+
+/* Context bar */
+
+.erp-route .erp-topbar-shell {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--erp-rail-width);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--erp-topbar-height);
+  padding: 0 22px;
+  background: var(--erp-surface);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .erp-topbar-menu {
+  display: none;
+}
+
+.erp-route .erp-breadcrumb {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.erp-route .erp-breadcrumb ol {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  color: var(--erp-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.erp-route .erp-breadcrumb li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.erp-route .erp-breadcrumb li + li::before {
+  content: "/";
+  margin-right: 8px;
+  color: var(--erp-border-strong);
+}
+
+.erp-route .erp-breadcrumb li[aria-current="page"] {
+  color: var(--erp-text);
+  font-weight: 600;
+}
+
+.erp-route .erp-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+}
+
+.erp-route .erp-avatar {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  background: var(--erp-accent);
+  color: var(--erp-accent-contrast);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.erp-route .erp-topbar-user-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.erp-route .erp-topbar-user-text strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-topbar-user-text small {
+  font-size: 11px;
+  color: var(--erp-text-faint);
+}
+
+/* Main column */
+
+.erp-route .erp-main {
+  min-height: 100vh;
+  margin: 0;
+  padding: calc(var(--erp-topbar-height) + 24px) 26px 56px calc(var(--erp-rail-width) + 26px);
+  background: var(--erp-canvas);
+}
+
+.erp-route .erp-content {
+  width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* The pill bar the module pages used before the rail existed. */
+.erp-route .founder-module-nav {
+  display: none;
+}
+
+/* -- 3. Page header ------------------------------------------------------ */
+
+.erp-route .erp-welcome {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--erp-border);
+  background: none;
+  box-shadow: none;
+}
+
+.erp-route .erp-welcome > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 76ch;
+}
+
+.erp-route .erp-welcome > :not(:first-child) {
+  margin-left: auto;
+  flex: none;
+}
+
+.erp-route .erp-welcome h1 {
+  margin: 0;
+  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-welcome h1 em {
+  font-style: normal;
+  font-weight: 650;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-welcome p {
+  margin: 7px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--erp-text-muted);
+}
+
+.erp-route .erp-kicker {
+  margin: 0 0 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--tm-red, #c62d37);
+}
+
+/* -- 4. Sections and cards ----------------------------------------------- */
+
+.erp-route .erp-section {
+  margin: 0;
+  padding: 0;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  box-shadow: 0 1px 2px rgba(20, 27, 49, 0.04);
+  overflow: hidden;
+}
+
+.erp-route .erp-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--erp-border);
+  background: var(--erp-surface);
+}
+
+.erp-route .erp-section-heading .erp-kicker {
+  margin-bottom: 3px;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-section-heading h2 {
+  margin: 0;
+  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-section-heading p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--erp-text-muted);
+}
+
+.erp-route .erp-section > :not(.erp-section-heading):not(table):not(.erp-table-scroll) {
+  padding-inline: 18px;
+}
+
+.erp-route .erp-section > :not(.erp-section-heading):first-child {
+  padding-top: 16px;
+}
+
+.erp-route .erp-section > :last-child:not(.erp-table-scroll):not(table) {
+  padding-bottom: 16px;
+}
+
+/* -- 5. Statistics ------------------------------------------------------- */
+
+.erp-route .erp-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0 !important;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  overflow: hidden;
+}
+
+.erp-route .erp-stat-grid article {
+  padding: 15px 18px;
+  border-right: 1px solid var(--erp-border);
+  background: var(--erp-surface);
+}
+
+.erp-route .erp-stat-grid article:last-child {
+  border-right: 0;
+}
+
+.erp-route .erp-stat-grid article span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-stat-grid article strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 24px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-stat-grid article small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--erp-text-muted);
+}
+
+/* -- 6. Data tables ------------------------------------------------------ */
+
+.erp-route .erp-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.erp-route table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.erp-route thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 9px 14px;
+  background: var(--erp-surface-sunken);
+  border-bottom: 1px solid var(--erp-border);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--erp-text-muted);
+}
+
+.erp-route tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--erp-border);
+  vertical-align: middle;
+  color: var(--erp-text);
+}
+
+.erp-route tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.erp-route tbody tr:hover td {
+  background: #f8f9fb;
+}
+
+/* Numeric columns read as a column of figures, not as prose. */
+.erp-route td.is-numeric,
+.erp-route th.is-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.erp-route tbody td strong {
+  font-weight: 600;
+}
+
+.erp-route tbody td small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--erp-text-faint);
+}
+
+/* -- 7. Form controls ---------------------------------------------------- */
+
+.erp-route input[type="text"],
+.erp-route input[type="email"],
+.erp-route input[type="password"],
+.erp-route input[type="number"],
+.erp-route input[type="date"],
+.erp-route input[type="time"],
+.erp-route input[type="search"],
+.erp-route input[type="url"],
+.erp-route input[type="tel"],
+.erp-route select,
+.erp-route textarea {
+  width: 100%;
+  min-height: var(--erp-control-height);
+  padding: 7px 11px;
+  border: 1px solid var(--erp-border-strong);
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-surface);
+  color: var(--erp-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.erp-route textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.erp-route input::placeholder,
+.erp-route textarea::placeholder {
+  color: var(--erp-text-faint);
+}
+
+.erp-route input:focus-visible,
+.erp-route select:focus-visible,
+.erp-route textarea:focus-visible {
+  outline: none;
+  border-color: var(--erp-accent);
+  box-shadow: var(--erp-focus);
+}
+
+.erp-route input:disabled,
+.erp-route select:disabled,
+.erp-route textarea:disabled {
+  background: var(--erp-surface-sunken);
+  color: var(--erp-text-faint);
+  cursor: not-allowed;
+}
+
+/* A bare <select> is the single strongest "unstyled form" signal, so it gets
+   its own chevron and matches the height of every other control. */
+.erp-route select {
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%23616b80' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+}
+
+/* Most forms here are written as `<label><span>Caption</span><input/></label>`,
+   so the caption styling belongs on the span and must not cascade into the
+   control — an inherited `text-transform: uppercase` would otherwise shout
+   whatever the user types. */
+.erp-route label {
+  display: block;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--erp-text-muted);
+}
+
+.erp-route label > span:first-child {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.erp-route label > input,
+.erp-route label > select,
+.erp-route label > textarea {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  color: var(--erp-text);
+}
+
+.erp-route input[type="checkbox"],
+.erp-route input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  min-height: 0;
+  accent-color: var(--erp-accent);
+}
+
+/* Form layouts used across the module pages. */
+.erp-route .founder-form-wide,
+.erp-route .founder-inline-form,
+.erp-route .founder-form-inline,
+.erp-route .erp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 13px 16px;
+  align-items: end;
+  margin: 0;
+  padding: 16px 18px;
+  background: var(--erp-surface-sunken);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .founder-form-wide > label,
+.erp-route .founder-inline-form > label,
+.erp-route .founder-form-inline > label,
+.erp-route .erp-form-grid > label {
+  margin-bottom: 0;
+}
+
+.erp-route .founder-form-wide button,
+.erp-route .founder-inline-form button,
+.erp-route .founder-form-inline button,
+.erp-route .erp-form-grid button {
+  height: var(--erp-control-height);
+}
+
+/* -- 8. Toolbars and filters --------------------------------------------- */
+
+.erp-route .erp-toolbar,
+.erp-route .erp-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 13px 18px;
+  background: var(--erp-surface);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .erp-toolbar > *,
+.erp-route .erp-filters > * {
+  flex: 1 1 190px;
+  min-width: 0;
+}
+
+.erp-route .erp-toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+/* -- 9. Buttons ---------------------------------------------------------- */
+
+.erp-route .erp-button,
+.erp-route .erp-button-primary,
+.erp-route .erp-button-secondary,
+.erp-route button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: var(--erp-control-height);
+  padding: 0 15px;
+  border: 1px solid var(--erp-accent);
+  border-radius: var(--erp-radius-sm);
+  background: var(--erp-accent);
+  color: var(--erp-accent-contrast);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.erp-route .erp-button:hover,
+.erp-route .erp-button-primary:hover,
+.erp-route button[type="submit"]:hover {
+  background: #1b2238;
+  border-color: #1b2238;
+}
+
+.erp-route .erp-button-secondary,
+.erp-route .erp-text-button {
+  background: var(--erp-surface);
+  color: var(--erp-text);
+  border-color: var(--erp-border-strong);
+}
+
+.erp-route .erp-button-secondary:hover,
+.erp-route .erp-text-button:hover {
+  background: var(--erp-surface-sunken);
+  border-color: var(--erp-accent);
+}
+
+.erp-route .erp-text-button {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: var(--erp-radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.erp-route .erp-button:focus-visible,
+.erp-route .erp-button-primary:focus-visible,
+.erp-route .erp-button-secondary:focus-visible,
+.erp-route .erp-text-button:focus-visible,
+.erp-route button[type="submit"]:focus-visible {
+  outline: none;
+  box-shadow: var(--erp-focus);
+}
+
+.erp-route button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* -- 10. Badges and status ----------------------------------------------- */
+
+.erp-route .erp-badge,
+.erp-route .erp-status,
+.erp-route .erp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border: 1px solid var(--erp-border-strong);
+  border-radius: 99px;
+  background: var(--erp-surface-sunken);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--erp-text-muted);
+  white-space: nowrap;
+}
+
+.erp-route .erp-badge.is-success,
+.erp-route .erp-status.is-success {
+  border-color: #b4d8c4;
+  background: #eaf5ef;
+  color: var(--erp-success);
+}
+
+.erp-route .erp-badge.is-warning,
+.erp-route .erp-status.is-warning {
+  border-color: #e4cfa4;
+  background: #fbf3e3;
+  color: var(--erp-warning);
+}
+
+.erp-route .erp-badge.is-danger,
+.erp-route .erp-status.is-danger {
+  border-color: #e7bdba;
+  background: #fbeceb;
+  color: var(--erp-danger);
+}
+
+.erp-route .erp-badge.is-info,
+.erp-route .erp-status.is-info {
+  border-color: #b9cce6;
+  background: #eaf1fa;
+  color: var(--erp-info);
+}
+
+/* -- 11. States ---------------------------------------------------------- */
+
+.erp-route .erp-state,
+.erp-route .erp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 42px 18px;
+  text-align: center;
+  color: var(--erp-text-muted);
+  font-size: 13px;
+}
+
+.erp-route .erp-state p,
+.erp-route .erp-empty p {
+  margin: 0;
+}
+
+.erp-route .erp-loader {
+  width: 19px;
+  height: 19px;
+  border: 2px solid var(--erp-border-strong);
+  border-top-color: var(--erp-accent);
+  border-radius: 50%;
+  animation: erp-spin 0.7s linear infinite;
+}
+
+@keyframes erp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .erp-route .erp-loader {
+    animation-duration: 2.4s;
+  }
+}
+
+.erp-route .erp-error {
+  margin: 0;
+  padding: 11px 15px;
+  border: 1px solid #e7bdba;
+  border-radius: var(--erp-radius-sm);
+  background: #fbeceb;
+  color: var(--erp-danger);
+  font-size: 13px;
+}
+
+.erp-route .erp-notice {
+  margin: 0;
+  padding: 11px 15px;
+  border: 1px solid var(--erp-border);
+  border-left: 3px solid var(--erp-info);
+  border-radius: var(--erp-radius-sm);
+  background: #f3f7fc;
+  color: var(--erp-text-muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* -- 12. Tabs ------------------------------------------------------------ */
+
+.erp-route .founder-tabs {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0 18px !important;
+  background: var(--erp-surface);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .founder-tabs button {
+  height: 40px;
+  padding: 0 13px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--erp-text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.erp-route .founder-tabs button:hover {
+  color: var(--erp-text);
+}
+
+.erp-route .founder-tabs button.is-active,
+.erp-route .founder-tabs button[aria-selected="true"] {
+  color: var(--erp-text);
+  border-bottom-color: var(--tm-red, #c62d37);
+}
+
+/* -- 13. Responsive ------------------------------------------------------ */
+
+@media (max-width: 1080px) {
+  .erp-route .erp-rail {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 0 0 40px rgba(20, 27, 49, 0.3);
+  }
+
+  .erp-route .erp-rail.is-open {
+    transform: translateX(0);
+  }
+
+  .erp-route .erp-topbar-shell {
+    left: 0;
+  }
+
+  .erp-route .erp-topbar-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--erp-border-strong);
+    border-radius: var(--erp-radius-sm);
+    background: var(--erp-surface);
+    color: var(--erp-text);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    flex: none;
+  }
+
+  .erp-route .erp-topbar-menu span {
+    display: block;
+    width: 14px;
+    height: 9px;
+    border-top: 1.6px solid currentColor;
+    border-bottom: 1.6px solid currentColor;
+  }
+
+  .erp-route .erp-rail-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    border: 0;
+    padding: 0;
+    background: rgba(20, 27, 49, 0.45);
+    cursor: pointer;
+  }
+
+  .erp-route .erp-main {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .erp-route .erp-topbar-user-text {
+    display: none;
+  }
+
+  .erp-route .erp-stat-grid article {
+    border-right: 0;
+    border-bottom: 1px solid var(--erp-border);
+  }
+
+  .erp-route .erp-stat-grid article:last-child {
+    border-bottom: 0;
+  }
+
+  .erp-route .erp-welcome h1,
+  .erp-route .founder-welcome h1 {
+    font-size: 21px;
+  }
+}
+
+/* ==========================================================================
+   14. Module-page classes
+   --------------------------------------------------------------------------
+   The module pages were written before this system existed and carry their own
+   `founder-*` class names. Rather than rewrite twenty pages of markup, those
+   names are mapped onto the same primitives here, so every page picks up the
+   workspace treatment and the two vocabularies stay visually identical.
+   ========================================================================== */
+
+/* Page header ------------------------------------------------------------ */
+
+.erp-route .founder-welcome {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--erp-border);
+  background: none;
+  box-shadow: none;
+}
+
+/* The title block claims the row and any trailing action is pushed to the
+   far edge, so a header reads the same whether or not it has actions and
+   whether or not the row wraps. */
+.erp-route .founder-welcome > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 76ch;
+}
+
+.erp-route .founder-welcome > :not(:first-child) {
+  margin-left: auto;
+  flex: none;
+}
+
+.erp-route .founder-welcome h1 {
+  margin: 0;
+  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--erp-text);
+}
+
+.erp-route .founder-welcome h1 em {
+  font-style: normal;
+  font-weight: 650;
+  color: var(--erp-text);
+}
+
+.erp-route .founder-welcome p {
+  margin: 7px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--erp-text-muted);
+}
+
+.erp-route .erp-welcome-code,
+.erp-route .founder-org-code {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 1px solid var(--erp-border);
+  border-radius: 5px;
+  background: var(--erp-surface-sunken);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--erp-text-muted);
+}
+
+.erp-route .erp-section-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 1px solid var(--erp-border);
+  border-radius: 99px;
+  background: var(--erp-surface-sunken);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--erp-text-muted);
+}
+
+/* Statistics ------------------------------------------------------------- */
+
+.erp-route .erp-kpi-grid,
+.erp-route .founder-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  overflow: hidden;
+}
+
+.erp-route .erp-kpi-grid article,
+.erp-route .founder-kpi-grid article {
+  padding: 15px 18px;
+  border-right: 1px solid var(--erp-border);
+  background: var(--erp-surface);
+}
+
+.erp-route .erp-kpi-grid article:last-child,
+.erp-route .founder-kpi-grid article:last-child {
+  border-right: 0;
+}
+
+.erp-route .erp-kpi-grid article span,
+.erp-route .founder-kpi-grid article span {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-kpi-grid article strong,
+.erp-route .founder-kpi-grid article strong {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-size: 24px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-kpi-grid article small,
+.erp-route .founder-kpi-grid article small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--erp-text-muted);
+}
+
+/* Forms ------------------------------------------------------------------ */
+
+.erp-route .founder-form,
+.erp-route .founder-form-grid,
+.erp-route .founder-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 13px 16px;
+  align-items: end;
+}
+
+.erp-route .founder-form {
+  margin: 0;
+  padding: 16px 18px;
+  background: var(--erp-surface-sunken);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .founder-form-grid {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.erp-route .founder-filters {
+  padding: 13px 18px;
+  background: var(--erp-surface);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .founder-form-note,
+.erp-route .founder-hr-muted {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--erp-text-muted);
+}
+
+.erp-route .founder-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--erp-text);
+}
+
+.erp-route .founder-checkbox > span:first-child {
+  margin-bottom: 0;
+}
+
+/* Row actions ------------------------------------------------------------ */
+
+.erp-route .founder-row-actions,
+.erp-route .founder-org-row-actions,
+.erp-route .founder-dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.erp-route .founder-dialog-actions {
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.erp-route .founder-danger-button {
+  border-color: var(--erp-danger);
+  background: var(--erp-danger);
+  color: #fff;
+}
+
+.erp-route .founder-danger-button:hover {
+  background: #98201a;
+  border-color: #98201a;
+}
+
+/* Lists ------------------------------------------------------------------ */
+
+.erp-route .erp-notification-list,
+.erp-route .founder-plain-list,
+.erp-route .founder-org-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.erp-route .erp-notification,
+.erp-route .founder-org-list > li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--erp-border);
+  font-size: 13px;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-notification:last-child,
+.erp-route .founder-org-list > li:last-child {
+  border-bottom: 0;
+}
+
+.erp-route .erp-notification:hover,
+.erp-route .founder-org-list > li:hover {
+  background: #f8f9fb;
+}
+
+.erp-route .erp-notification small {
+  font-size: 11.5px;
+  color: var(--erp-text-faint);
+}
+
+/* Status ----------------------------------------------------------------- */
+
+.erp-route .founder-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border: 1px solid var(--erp-border-strong);
+  border-radius: 99px;
+  background: var(--erp-surface-sunken);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--erp-text-muted);
+  white-space: nowrap;
+}
+
+.erp-route .founder-status.is-active,
+.erp-route .founder-status.is-approved,
+.erp-route .founder-status.is-paid,
+.erp-route .founder-status.is-published,
+.erp-route .founder-status.is-completed {
+  border-color: #b4d8c4;
+  background: #eaf5ef;
+  color: var(--erp-success);
+}
+
+.erp-route .founder-status.is-pending,
+.erp-route .founder-status.is-draft,
+.erp-route .founder-status.is-review {
+  border-color: #e4cfa4;
+  background: #fbf3e3;
+  color: var(--erp-warning);
+}
+
+.erp-route .founder-status.is-overdue,
+.erp-route .founder-status.is-cancelled,
+.erp-route .founder-status.is-rejected,
+.erp-route .founder-status.is-suspended {
+  border-color: #e7bdba;
+  background: #fbeceb;
+  color: var(--erp-danger);
+}
+
+.erp-route .erp-success {
+  display: block;
+  margin: 0;
+  padding: 11px 15px;
+  border: 1px solid #b4d8c4;
+  border-radius: var(--erp-radius-sm);
+  background: #eaf5ef;
+  color: var(--erp-success);
+  font-size: 13px;
+}
+
+/* Table wrappers --------------------------------------------------------- */
+
+.erp-route .founder-hr-table-wrap,
+.erp-route .founder-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.erp-route .founder-hr-line {
+  border: 0;
+  border-top: 1px solid var(--erp-border);
+  margin: 0;
+}
+
+.erp-route .founder-detail-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* Dialogs ---------------------------------------------------------------- */
+
+.erp-route .founder-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 27, 49, 0.5);
+  overflow-y: auto;
+}
+
+.erp-route .founder-dialog {
+  width: min(660px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 22px;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: var(--erp-radius);
+  box-shadow: 0 18px 48px rgba(20, 27, 49, 0.24);
+}
+
+.erp-route .founder-dialog-head {
+  margin-bottom: 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .founder-dialog-head h2,
+.erp-route .founder-dialog-head h3 {
+  margin: 0;
+  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--erp-text);
+}
+
+.erp-route .founder-dialog-head p {
+  margin: 5px 0 0;
+  font-size: 12.5px;
+  color: var(--erp-text-muted);
+}
+
+/* ==========================================================================
+   15. Division workspace
+   --------------------------------------------------------------------------
+   The division pages (`/erp/engineering`, `/erp/schools`, …) are employee
+   self-service, so their rail is scoped to that person rather than to the
+   founder module list and they keep their own `.erp-app-shell` grid. They are
+   restyled to match the founder rail exactly, so moving between the two does
+   not feel like moving between two different products.
+   ========================================================================== */
+
+.erp-route .erp-app-shell {
+  grid-template-columns: var(--erp-rail-width) minmax(0, 1fr);
+  background: var(--erp-canvas);
+}
+
+/* This rail participates in the grid, so it must not also be offset for the
+   fixed one. */
+.erp-route .erp-app-shell .erp-main {
+  padding: 0 0 48px;
+}
+
+.erp-route .erp-sidebar {
+  padding: 0;
+  background: var(--erp-rail-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.erp-route .erp-sidebar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: var(--erp-topbar-height);
+  padding: 0 18px;
+  margin: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex: none;
+}
+
+.erp-route .erp-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-decoration: none;
+}
+
+.erp-route .erp-sidebar-brand > span:last-child > span {
+  color: var(--tm-orange, #e85d34);
+}
+
+.erp-route .erp-sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.erp-route .erp-sidebar-division {
+  margin: 0;
+  padding: 15px 18px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  background: none;
+  flex: none;
+}
+
+.erp-route .erp-sidebar-division span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #7e88a0;
+}
+
+.erp-route .erp-sidebar-division strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 650;
+  color: #fff;
+}
+
+.erp-route .erp-sidebar-division small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #8f98ae;
+}
+
+.erp-route .erp-sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.erp-route .erp-sidebar-nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 0;
+  padding: 8px 9px;
+  border-radius: var(--erp-radius-sm);
+  color: #c2c8d6;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
+}
+
+.erp-route .erp-sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.erp-route .erp-sidebar-nav a.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--tm-red, #c62d37);
+}
+
+/* Unread badge on the notifications link. */
+.erp-route .erp-sidebar-nav a b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--tm-red, #c62d37);
+  color: #fff;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.erp-route .erp-sidebar-logout {
+  flex: none;
+  margin: 0;
+  padding: 13px 18px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: #b6bccb;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.erp-route .erp-sidebar-logout:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+/* Static context bar inside the grid, matching the fixed one. */
+.erp-route .erp-app-shell .erp-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--erp-topbar-height);
+  margin: 0;
+  padding: 0 26px;
+  background: var(--erp-surface);
+  border-bottom: 1px solid var(--erp-border);
+}
+
+.erp-route .erp-topbar-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-topbar-path {
+  display: block;
+  font-size: 11.5px;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.erp-route .erp-user-chip > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  background: var(--erp-accent);
+  color: var(--erp-accent-contrast);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.erp-route .erp-user-chip strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--erp-text);
+}
+
+.erp-route .erp-user-chip small {
+  display: block;
+  font-size: 11px;
+  color: var(--erp-text-faint);
+}
+
+.erp-route .erp-app-shell .erp-content {
+  padding: 24px 26px 0;
+}

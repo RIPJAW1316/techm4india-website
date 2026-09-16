@@ -3,20 +3,14 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const source = await readFile(
-  new URL(
-    "../app/erp/founder/institutions/FounderInstitutions.tsx",
-    import.meta.url,
-  ),
+  new URL("../app/erp/founder/institutions/FounderInstitutions.tsx", import.meta.url),
   "utf8",
 );
-const founder = await readFile(
-  new URL("../app/erp/founder/dashboard/FounderDashboard.tsx", import.meta.url),
-  "utf8",
-);
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("institution list exposes a detail action and Founder navigation", () => {
   assert.match(source, /View details/);
-  assert.match(founder, /\/erp\/founder\/institutions/);
+  assert.match(navigation, /\/erp\/founder\/institutions/);
 });
 
 test("institution detail exposes only the required V2-6 sections", () => {

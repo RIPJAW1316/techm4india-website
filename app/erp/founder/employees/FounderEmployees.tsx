@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 import { ApiError, apiFetchV2 } from "@/lib/api/client";
 import type {
@@ -12,8 +11,8 @@ import type {
   HrEmployeeDetail,
   HrEmployeeSummary,
 } from "@/lib/api/types";
+import { ErpShell } from "../../components/ErpShell";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
-import { useErpAuth } from "../../components/AuthProvider";
 
 type FormState = {
   officialEmail: string;
@@ -93,8 +92,6 @@ function Notice({
 }
 
 function FounderEmployeesContent() {
-  const { context, logout } = useErpAuth();
-  const router = useRouter();
   const [employees, setEmployees] = useState<HrEmployeeSummary[]>([]);
   const [divisions, setDivisions] = useState<CompanyDivision[]>([]);
   const [departments, setDepartments] = useState<CompanyDepartment[]>([]);
@@ -273,78 +270,11 @@ function FounderEmployeesContent() {
     }
   }
 
-  async function signOut() {
-    await logout();
-    router.replace("/login");
-  }
   if (loading && employees.length === 0) return <ErpLoading label="Loading employee master" />;
   return (
-    <div className="erp-app-shell founder-shell founder-hr-shell">
-      <aside className="erp-sidebar founder-sidebar" aria-label="HR workspace navigation">
-        <div className="erp-sidebar-head">
-          <a className="erp-sidebar-brand" href="/erp/founder/dashboard">
-            <span className="erp-mini-mark" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>
-              TECHM4<span>INDIA</span>
-            </span>
-          </a>
-        </div>
-        <div className="erp-sidebar-panel">
-          <div className="erp-sidebar-division">
-            <span>People operations</span>
-            <strong>
-              {context?.user.roles.includes("FOUNDER_CEO") ? "Founder / CEO" : "HR workspace"}
-            </strong>
-            <small>Safe employee master</small>
-          </div>
-          <nav className="erp-sidebar-nav">
-            <a href="/erp/founder/dashboard">Control centre</a>
-            <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
-            <a className="is-active" href="#employees-top">
-              Employees
-            </a>
-            <a href="/erp/founder/recruitment">Recruitment ↗</a>
-            <a href="/erp/founder/users">Users &amp; Roles ↗</a>
-            <a href="/erp/founder/organization">Organization ↗</a>
-            <a href="/erp/founder/attendance">Attendance ↗</a>
-            <a href="/erp/founder/leave">Leave ↗</a>
-            <a href="/erp/founder/payroll">Payroll ↗</a>
-            <a href="/erp/founder/finance">Finance ↗</a>
-            <a href="/erp/founder/crm">CRM ↗</a>
-            <a href="/erp/founder/institutions">Institutions ↗</a>
-          </nav>
-          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
-            Log out <span aria-hidden="true">↗</span>
-          </button>
-        </div>
-      </aside>
+    <>
+      <ErpShell active="employees" />
       <main className="erp-main" id="employees-top">
-        <header className="erp-topbar">
-          <div>
-            <span className="erp-topbar-label">Founder Employees</span>
-            <span className="erp-topbar-path">TechM4India / People and employment</span>
-          </div>
-          <div className="erp-user-chip">
-            <span>
-              {context?.employee
-                ? `${context.employee.firstName[0]}${context.employee.lastName[0]}`
-                : "HR"}
-            </span>
-            <div>
-              <strong>
-                {context?.employee
-                  ? `${context.employee.firstName} ${context.employee.lastName}`
-                  : "Authorized HR"}
-              </strong>
-              <small>{context?.user.roles.join(" · ")}</small>
-            </div>
-          </div>
-        </header>
         <div className="erp-content founder-content founder-hr-content">
           <section className="founder-welcome">
             <div>
@@ -895,7 +825,7 @@ function FounderEmployeesContent() {
           </section>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

@@ -6,18 +6,11 @@ const source = await readFile(
   new URL("../app/erp/founder/performance/FounderPerformance.tsx", import.meta.url),
   "utf8",
 );
-const navigation = await readFile(
-  new URL("../app/erp/components/FounderModuleNavigation.tsx", import.meta.url),
-  "utf8",
-);
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("Founder performance is permission protected and uses only V2 endpoints", () => {
   assert.match(source, /ProtectedErp requiredPerformance/);
-  for (const endpoint of [
-    "/performance/cycles",
-    "/performance/goals",
-    "/performance/reviews",
-  ]) {
+  for (const endpoint of ["/performance/cycles", "/performance/goals", "/performance/reviews"]) {
     assert.match(source, new RegExp(endpoint));
   }
   assert.doesNotMatch(source, /localhost:3001/);

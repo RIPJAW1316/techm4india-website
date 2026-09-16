@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { ApiError, apiFetchV2 } from "@/lib/api/client";
+import { ErpShell } from "../../components/ErpShell";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
-import { useErpAuth } from "../../components/AuthProvider";
 
 type Named = { id: string; name: string };
 type Role = {
@@ -187,8 +186,6 @@ function TaskRows({ title, tasks, empty }: { title: string; tasks: WorkTask[]; e
 }
 
 function FounderUsersContent() {
-  const { context, logout } = useErpAuth();
-  const router = useRouter();
   const [view, setView] = useState<View>("users");
   const [users, setUsers] = useState<UserRow[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -331,78 +328,13 @@ function FounderUsersContent() {
     }
   }
 
-  async function signOut() {
-    await logout();
-    router.replace("/login");
-  }
   if (loading && users.length === 0 && roles.length === 0)
     return <ErpLoading label="Loading Users & Roles" />;
 
   return (
-    <div className="erp-app-shell founder-shell admin-users-shell">
-      <aside className="erp-sidebar founder-sidebar" aria-label="Founder administration navigation">
-        <div className="erp-sidebar-head">
-          <a className="erp-sidebar-brand" href="/erp/founder/dashboard">
-            <span className="erp-mini-mark" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>
-              TECHM4<span>INDIA</span>
-            </span>
-          </a>
-        </div>
-        <div className="erp-sidebar-panel">
-          <div className="erp-sidebar-division">
-            <span>Administrative control</span>
-            <strong>Users & Roles</strong>
-            <small>Explicit RBAC visibility</small>
-          </div>
-          <nav className="erp-sidebar-nav">
-            <a href="/erp/founder/dashboard">Dashboard</a>
-            <a href="/erp/founder/dashboard#workforce">Tasks / Work ↗</a>
-            <a href="/erp/founder/employees">Employees ↗</a>
-            <a href="/erp/founder/recruitment">Recruitment ↗</a>
-            <a className="is-active" href="#users-top">
-              Users & Roles
-            </a>
-            <a href="/erp/founder/organization">Organization ↗</a>
-            <a href="/erp/founder/attendance">Attendance ↗</a>
-            <a href="/erp/founder/leave">Leave ↗</a>
-            <a href="/erp/founder/payroll">Payroll ↗</a>
-            <a href="/erp/founder/finance">Finance ↗</a>
-            <a href="/erp/founder/crm">CRM ↗</a>
-            <a href="/erp/founder/institutions">Institutions ↗</a>
-          </nav>
-          <button className="erp-sidebar-logout" type="button" onClick={() => void signOut()}>
-            Log out <span aria-hidden="true">↗</span>
-          </button>
-        </div>
-      </aside>
+    <>
+      <ErpShell active="users" />
       <main className="erp-main" id="users-top">
-        <header className="erp-topbar">
-          <div>
-            <span className="erp-topbar-label">Founder Administration</span>
-            <span className="erp-topbar-path">TechM4India / Identity and access</span>
-          </div>
-          <div className="erp-user-chip">
-            <span>
-              {context?.employee
-                ? `${context.employee.firstName[0]}${context.employee.lastName[0]}`
-                : "AD"}
-            </span>
-            <div>
-              <strong>
-                {context?.employee
-                  ? `${context.employee.firstName} ${context.employee.lastName}`
-                  : "Authorized administrator"}
-              </strong>
-              <small>{context?.user.roles.join(" · ")}</small>
-            </div>
-          </div>
-        </header>
         <div className="erp-content founder-content admin-users-content">
           <section className="founder-welcome">
             <div>
@@ -980,7 +912,7 @@ function FounderUsersContent() {
           )}
         </div>
       </main>
-    </div>
+    </>
   );
 }
 

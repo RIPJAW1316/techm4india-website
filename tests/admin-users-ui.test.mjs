@@ -14,6 +14,9 @@ const employees = await readFile(
   new URL("../app/erp/founder/employees/FounderEmployees.tsx", import.meta.url),
   "utf8",
 );
+// Workspace navigation is declared once in the module registry and rendered by
+// ErpShell, rather than hand-copied into each page.
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("Founder Users & Roles route exposes the protected administration workspace", () => {
   assert.match(source, /ProtectedErp requiredAdmin/);
@@ -41,11 +44,13 @@ test("admin UI includes safe account, role and employee-work controls", () => {
 });
 
 test("Founder navigation and task-control handoff remain available", () => {
-  assert.match(dashboard, /\/erp\/founder\/users/);
+  assert.match(navigation, /\/erp\/founder\/users/);
   assert.match(dashboard, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(dashboard, /Cancelled work/);
   assert.match(dashboard, /cancelledTasks/);
-  assert.match(employees, /\/erp\/founder\/users/);
+  // Both pages mount the shared shell instead of carrying their own sidebar.
+  assert.match(dashboard, /<ErpShell active="dashboard" \/>/);
+  assert.match(employees, /<ErpShell active="employees" \/>/);
   for (const path of [
     "/erp/founder/attendance",
     "/erp/founder/leave",
@@ -53,5 +58,6 @@ test("Founder navigation and task-control handoff remain available", () => {
     "/erp/founder/finance",
     "/erp/founder/crm",
     "/erp/founder/institutions",
-  ]) assert.match(dashboard, new RegExp(path));
+  ])
+    assert.match(navigation, new RegExp(path));
 });

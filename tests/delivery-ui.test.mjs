@@ -6,10 +6,7 @@ const source = await readFile(
   new URL("../app/erp/founder/delivery/FounderDelivery.tsx", import.meta.url),
   "utf8",
 );
-const navigation = await readFile(
-  new URL("../app/erp/components/FounderModuleNavigation.tsx", import.meta.url),
-  "utf8",
-);
+const navigation = await readFile(new URL("../lib/erp/modules.ts", import.meta.url), "utf8");
 
 test("Founder delivery is permission protected and uses only V2 delivery endpoints", () => {
   assert.match(source, /ProtectedErp requiredDelivery/);

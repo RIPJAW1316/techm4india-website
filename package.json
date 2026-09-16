@@ -9,7 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/division-routing.test.mjs tests/api-client.test.mjs tests/institutions-ui.test.mjs tests/admin-users-ui.test.mjs tests/payroll-ui.test.mjs tests/finance-ui.test.mjs tests/recruitment-ui.test.mjs tests/programs-ui.test.mjs tests/performance-ui.test.mjs tests/supply-chain-ui.test.mjs tests/support-ui.test.mjs tests/cms-ui.test.mjs tests/compliance-ui.test.mjs tests/delivery-ui.test.mjs tests/analytics-ui.test.mjs",
+    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/erp-shell.test.mjs tests/division-routing.test.mjs tests/api-client.test.mjs tests/institutions-ui.test.mjs tests/admin-users-ui.test.mjs tests/payroll-ui.test.mjs tests/finance-ui.test.mjs tests/recruitment-ui.test.mjs tests/programs-ui.test.mjs tests/performance-ui.test.mjs tests/supply-chain-ui.test.mjs tests/support-ui.test.mjs tests/cms-ui.test.mjs tests/compliance-ui.test.mjs tests/delivery-ui.test.mjs tests/analytics-ui.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
