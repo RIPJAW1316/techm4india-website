@@ -6,11 +6,17 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
+    "dev": "node scripts/dev-db.mjs && concurrently -k -n api,web -c magenta,cyan --handle-input \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "vinext dev",
+    "dev:api": "npm --prefix backend run start:dev",
+    "dev:db": "node scripts/dev-db.mjs",
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/erp-shell.test.mjs tests/division-routing.test.mjs tests/api-client.test.mjs tests/institutions-ui.test.mjs tests/admin-users-ui.test.mjs tests/payroll-ui.test.mjs tests/finance-ui.test.mjs tests/recruitment-ui.test.mjs tests/programs-ui.test.mjs tests/performance-ui.test.mjs tests/supply-chain-ui.test.mjs tests/support-ui.test.mjs tests/cms-ui.test.mjs tests/compliance-ui.test.mjs tests/delivery-ui.test.mjs tests/analytics-ui.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "test:api": "npm --prefix backend test",
+    "test:all": "npm run test && npm run test:api",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "lint:api": "npm --prefix backend run lint"
   },
   "dependencies": {
     "nitro": "^3.0.260610-beta",
@@ -28,6 +34,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
+    "concurrently": "^10.0.5",
     "eslint": "9.39.4",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
