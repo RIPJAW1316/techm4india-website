@@ -8,6 +8,8 @@
   },
   "scripts": {
     "build": "nest build",
+    "render:build": "npm ci && prisma generate && npm run build",
+    "render:start": "prisma migrate deploy && node dist/src/main.js",
     "start": "prisma migrate deploy && node dist/src/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

@@ -70,6 +70,17 @@ async function waitUntilHealthy() {
 }
 
 async function main() {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl && !dbUrl.includes("localhost") && !dbUrl.includes("127.0.0.1")) {
+    log("External DATABASE_URL detected (e.g. Render / Cloud Postgres) — skipping local Docker.");
+    log("applying pending migrations…");
+    const migrate = run("npm", ["--prefix", "backend", "run", "prisma:migrate:deploy"], {
+      stdio: "inherit",
+    });
+    if (migrate.status !== 0) log("migrations failed — see the output above.");
+    return;
+  }
+
   if (run("docker", ["--version"]).status !== 0) {
     log("Docker is not available — skipping. Start Postgres yourself, or set DATABASE_URL.");
     return;
