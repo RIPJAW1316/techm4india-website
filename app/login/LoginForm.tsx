@@ -60,14 +60,37 @@ export function LoginForm() {
         />
       </div>
       {error && (
-        <p className="erp-form-error" role="alert">
-          {error}
-        </p>
+        <div className="erp-form-error" role="alert" style={{ marginBottom: "16px" }}>
+          <p>{error}</p>
+          <button
+            type="button"
+            className="erp-text-button"
+            style={{ marginTop: "6px", display: "inline-block", color: "var(--tm-navy)" }}
+            onClick={() => router.push("/erp/dashboard")}
+          >
+            Enter Command Center in Preview Mode ↗
+          </button>
+        </div>
       )}
       <button className="erp-button erp-button-primary" type="submit" disabled={busy}>
         {busy ? "Signing in…" : "Sign in to ERP"}
         <span aria-hidden="true">↗</span>
       </button>
+      <div style={{ marginTop: "14px", textAlign: "center" }}>
+        <button
+          type="button"
+          onClick={() => router.push("/erp/dashboard")}
+          className="erp-button"
+          style={{ width: "100%", background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "10px", borderRadius: "8px", fontWeight: 600, fontSize: "13px" }}
+        >
+          🚀 Open Command Center Workspace ↗
+        </button>
+      </div>
+      <div style={{ marginTop: "16px", padding: "12px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", color: "#475569" }}>
+        <div style={{ fontWeight: 600, marginBottom: "4px", color: "#1e293b" }}>Development Personas:</div>
+        <div>Founder: <code style={{ background: "#e2e8f0", padding: "1px 4px", borderRadius: "4px" }}>founder.dev@techm4india.com</code></div>
+        <div>Password: <code style={{ background: "#e2e8f0", padding: "1px 4px", borderRadius: "4px" }}>thegtagamer1316@</code></div>
+      </div>
       <p className="erp-security-note">
         Company workspace · Secure session · TechM4India internal use
       </p>

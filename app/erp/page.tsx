@@ -122,12 +122,34 @@ function ErpLandingContent() {
             </button>
           </div>
         ) : visibleConfigs.length === 0 ? (
-          <div className="erp-empty">
-            <strong>No ERP workspaces are available.</strong>
-            <span>Please contact your administrator for access.</span>
+          <div className="erp-workspace-grid">
+            <button
+              className="erp-workspace-option"
+              type="button"
+              style={{ borderColor: "hsl(var(--primary))", background: "hsl(var(--card))" }}
+              onClick={() => router.push("/erp/dashboard")}
+            >
+              <span>Command Center</span>
+              <strong>TechM4India Command Center</strong>
+              <small>
+                Executive ERP overview &amp; registers <span aria-hidden="true">↗</span>
+              </small>
+            </button>
           </div>
         ) : (
           <div className="erp-workspace-grid">
+            <button
+              className="erp-workspace-option"
+              type="button"
+              style={{ borderColor: "hsl(var(--primary))", background: "hsl(var(--card))" }}
+              onClick={() => router.push("/erp/dashboard")}
+            >
+              <span>Command Center</span>
+              <strong>TechM4India Command Center</strong>
+              <small>
+                Executive ERP overview &amp; registers <span aria-hidden="true">↗</span>
+              </small>
+            </button>
             {visibleConfigs.map((division) => (
               <button
                 className="erp-workspace-option"

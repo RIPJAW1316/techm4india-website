@@ -53,10 +53,153 @@
   --erp-control-height: 36px;
   --erp-focus: 0 0 0 3px rgba(37, 46, 74, 0.18);
 
-  background: var(--erp-canvas);
-  color: var(--erp-text);
+  /* Replit ERP Theme Variables */
+  --background: 220 30% 95%;
+  --foreground: 220 32% 17%;
+  --border: 220 20% 86%;
+  --card: 42 100% 99%;
+  --card-foreground: 220 32% 17%;
+  --card-border: 220 20% 87%;
+  --sidebar: 220 34% 14%;
+  --sidebar-foreground: 210 28% 88%;
+  --sidebar-border: 220 25% 25%;
+  --sidebar-primary: 178 62% 45%;
+  --sidebar-primary-foreground: 220 34% 12%;
+  --sidebar-accent: 220 28% 21%;
+  --sidebar-accent-foreground: 210 30% 94%;
+  --sidebar-ring: 178 62% 45%;
+  --popover: 42 100% 99%;
+  --popover-foreground: 220 32% 17%;
+  --popover-border: 220 20% 87%;
+  --primary: 178 62% 35%;
+  --primary-foreground: 42 100% 99%;
+  --secondary: 220 25% 91%;
+  --secondary-foreground: 220 32% 22%;
+  --muted: 220 23% 91%;
+  --muted-foreground: 220 14% 45%;
+  --accent: 37 94% 55%;
+  --accent-foreground: 220 34% 14%;
+  --destructive: 2 72% 52%;
+  --destructive-foreground: 42 100% 99%;
+  --input: 220 20% 82%;
+  --ring: 178 62% 35%;
+  --chart-1: 178 62% 35%;
+  --chart-2: 37 94% 55%;
+  --chart-3: 220 58% 56%;
+  --chart-4: 155 48% 42%;
+  --chart-5: 2 72% 52%;
+  --app-font-mono: 'IBM Plex Mono', 'Space Mono', monospace;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #eef2f6 !important;
+  color: hsl(var(--foreground));
   font-family: var(--tm-sans, system-ui, sans-serif);
 }
+
+html:has(.erp-route),
+body:has(.erp-route),
+.erp-route .bg-background {
+  background-color: #eef2f6 !important;
+}
+
+.erp-route .font-mono-ui {
+  font-family: var(--app-font-mono);
+}
+
+/* ==========================================================================
+   ERP Command Center Sidebar Navigation & Contrast
+   ========================================================================== */
+.erp-route aside {
+  color: #e2e8f0;
+}
+
+.erp-route aside nav a,
+.erp-route aside .nav-item-link {
+  color: #cbd5e1 !important;
+  text-decoration: none;
+}
+
+.erp-route aside nav a:hover,
+.erp-route aside .nav-item-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.erp-route aside nav a[data-active="true"],
+.erp-route aside nav a.is-active,
+.erp-route aside .nav-item-link[data-active="true"] {
+  color: #ffffff !important;
+  background-color: #273144 !important;
+  font-weight: 600 !important;
+}
+
+.erp-route aside nav a svg,
+.erp-route aside .nav-item-link svg {
+  color: #94a3b8;
+  transition: color 0.15s ease;
+}
+
+.erp-route aside nav a:hover svg,
+.erp-route aside .nav-item-link:hover svg {
+  color: #2dd4bf;
+}
+
+.erp-route aside nav a[data-active="true"] svg,
+.erp-route aside nav a.is-active svg,
+.erp-route aside .nav-item-link[data-active="true"] svg {
+  color: #2dd4bf !important;
+}
+
+.erp-route aside .bottom-nav-action {
+  color: #cbd5e1 !important;
+}
+
+.erp-route aside .bottom-nav-action:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.erp-route aside .bottom-nav-action svg {
+  color: #94a3b8;
+}
+
+.erp-route aside .bottom-nav-action:hover svg {
+  color: #2dd4bf;
+}
+
+.erp-route .scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.erp-route .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
+
+.erp-route .skeleton {
+  background: linear-gradient(100deg, hsl(var(--muted)) 25%, hsl(var(--card)) 45%, hsl(var(--muted)) 65%);
+  background-size: 200% 100%;
+  animation: erp-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes erp-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes erp-rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.erp-route .page-enter {
+  animation: erp-rise-in .35s ease-out both;
+}
+.erp-route .page-enter-delay-1 { animation-delay: .05s; }
+.erp-route .page-enter-delay-2 { animation-delay: .1s; }
+.erp-route .page-enter-delay-3 { animation-delay: .15s; }
 
 .erp-route .erp-visually-hidden {
   position: absolute;
@@ -722,7 +865,7 @@
    so the caption styling belongs on the span and must not cascade into the
    control — an inherited `text-transform: uppercase` would otherwise shout
    whatever the user types. */
-.erp-route label {
+.erp-route label:not([class*="flex"]):not([class*="items-"]):not(.cursor-pointer) {
   display: block;
   font-size: 11px;
   font-weight: 650;
@@ -731,9 +874,26 @@
   color: var(--erp-text-muted);
 }
 
-.erp-route label > span:first-child {
+.erp-route label:not([class*="flex"]):not([class*="items-"]):not(.cursor-pointer) > span:first-child {
   display: block;
   margin-bottom: 5px;
+}
+
+.erp-route label.flex,
+.erp-route label[class*="flex"],
+.erp-route label.cursor-pointer {
+  display: flex !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  color: inherit !important;
+}
+
+.erp-route label.flex > span,
+.erp-route label[class*="flex"] > span,
+.erp-route label.cursor-pointer > span {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin-bottom: 0 !important;
 }
 
 .erp-route label > input,
@@ -745,12 +905,31 @@
   color: var(--erp-text);
 }
 
+/* Embedded transparent inputs & dropdowns inside modern search / filter wrappers */
+.erp-route input.bg-transparent,
+.erp-route select.bg-transparent,
+.erp-route label > input.bg-transparent,
+.erp-route label > select.bg-transparent {
+  border: 0 !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  min-height: auto !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.erp-route select.bg-transparent {
+  padding-right: 22px !important;
+  background-position: right 2px center !important;
+}
+
 .erp-route input[type="checkbox"],
 .erp-route input[type="radio"] {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   min-height: 0;
-  accent-color: var(--erp-accent);
+  accent-color: hsl(var(--primary));
+  cursor: pointer;
 }
 
 /* Form layouts used across the module pages. */
