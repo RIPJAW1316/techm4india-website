@@ -5,7 +5,7 @@ services:
   - type: web
     name: techm4india-erp-api
     runtime: node
-    plan: starter
+    plan: free
     region: singapore
     buildCommand: npm run render:build
     startCommand: npm run render:start
@@ -42,6 +42,6 @@ databases:
   - name: techm4india-erp-db
     databaseName: techm4india_erp
     user: techm4india
-    plan: starter
+    plan: free
     region: singapore
     postgresMajorVersion: 16

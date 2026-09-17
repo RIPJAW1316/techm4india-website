@@ -6,7 +6,7 @@ services:
   - type: web
     name: techm4india-erp-api
     runtime: node
-    plan: starter # Change to 'free' if evaluating on Render free tier
+    plan: free # Change to 'free' if evaluating on Render free tier
     region: singapore # Closest region to India (Asia/Kolkata)
     rootDir: backend
     buildCommand: npm run render:build
@@ -45,6 +45,6 @@ databases:
   - name: techm4india-erp-db
     databaseName: techm4india_erp
     user: techm4india
-    plan: starter # Change to 'free' if evaluating (note: Render free DBs expire after 30 days)
+    plan: free # Change to 'free' if evaluating (note: Render free DBs expire after 30 days)
     region: singapore
     postgresMajorVersion: 16
