@@ -2,5 +2,15 @@
   "buildCommand": "npx vinext build",
   "outputDirectory": "dist/client",
   "cleanUrls": true,
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/api/v1/:match*",
+      "destination": "https://techm4india-erp-api.onrender.com/api/v1/:match*"
+    },
+    {
+      "source": "/api/v2/:match*",
+      "destination": "https://techm4india-erp-api.onrender.com/api/v2/:match*"
+    }
+  ]
 }

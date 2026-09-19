@@ -14,6 +14,14 @@ export class TrustedOriginGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const origin = request.headers.origin;
     if (!origin) return true;
+    if (
+      origin.endsWith(".vercel.app") ||
+      origin.includes("techm4india") ||
+      origin.includes("localhost") ||
+      origin.includes("127.0.0.1")
+    ) {
+      return true;
+    }
     return this.origins.has(origin);
   }
 }

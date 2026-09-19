@@ -29,7 +29,20 @@ export async function createConfiguredApp(): Promise<INestApplication> {
   app.use(urlencoded({ extended: true, limit: "1mb" }));
   app.enableCors({
     credentials: true,
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("techm4india") ||
+        origin.includes("localhost") ||
+        origin.includes("127.0.0.1") ||
+        corsOrigins.includes(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
   });
   app.useGlobalPipes(
     new ValidationPipe({

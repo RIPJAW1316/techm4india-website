@@ -36,7 +36,7 @@ services:
       - key: BUSINESS_TIMEZONE
         value: Asia/Kolkata
       - key: CORS_ORIGINS
-        value: https://techm4india.com,https://www.techm4india.com,http://localhost:3000
+        value: https://techm4india.com,https://www.techm4india.com,https://techm4india-website.vercel.app,http://localhost:3000
 
 databases:
   - name: techm4india-erp-db

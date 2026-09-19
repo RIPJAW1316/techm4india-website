@@ -3,7 +3,7 @@ export default () => ({
   businessTimeZone: process.env.BUSINESS_TIMEZONE ?? "Asia/Kolkata",
   port: Number.parseInt(process.env.PORT ?? "3001", 10),
   databaseUrl: process.env.DATABASE_URL,
-  corsOrigins: (process.env.CORS_ORIGINS ?? "http://localhost:3000")
+  corsOrigins: (process.env.CORS_ORIGINS ?? "http://localhost:3000,https://techm4india-website.vercel.app,https://techm4india.com,https://www.techm4india.com")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
