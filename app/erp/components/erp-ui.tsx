@@ -13,16 +13,16 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
       <div>
-        <div className="mb-2 flex items-center gap-2 font-mono-ui text-[10px] uppercase tracking-[.18em] text-primary">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-teal-500/20 bg-teal-50 px-2.5 py-0.5 font-mono-ui text-[10px] font-semibold uppercase tracking-[.16em] text-teal-800">
+          <span className="h-1.5 w-1.5 rounded-full bg-teal-600 erp-pulse-dot" />
           {eyebrow}
         </div>
-        <h2 className="text-2xl font-bold tracking-[-.03em] text-foreground sm:text-[28px]">{title}</h2>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{description}</p>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px]">{title}</h2>
+        <p className="mt-1 max-w-2xl text-sm text-slate-500">{description}</p>
       </div>
-      {action}
+      {action && <div className="flex items-center gap-2.5 shrink-0">{action}</div>}
     </div>
   );
 }
@@ -39,10 +39,10 @@ export function Panel({
   action?: ReactNode;
 }) {
   return (
-    <section className={`rounded-xl border border-card-border bg-card shadow-[0_2px_12px_hsl(var(--foreground)/.03)] ${className}`}>
+    <section className={`rounded-xl border border-slate-200/80 bg-white shadow-xs transition-shadow hover:shadow-sm ${className}`}>
       {(title || action) && (
-        <div className="flex items-center justify-between border-b border-border/75 px-5 py-4">
-          <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+          <h3 className="text-sm font-semibold tracking-tight text-slate-900">{title}</h3>
           {action}
         </div>
       )}
@@ -61,15 +61,25 @@ export function SearchField({
   placeholder?: string;
 }) {
   return (
-    <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg border border-input bg-card px-3 text-muted-foreground focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 sm:max-w-[310px]">
-      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+    <div className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-slate-400 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-600/15 sm:max-w-[320px] transition-all">
+      <Search className="h-4 w-4 shrink-0 text-slate-400" />
       <input
         data-testid="input-search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/70"
+        className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
       />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          className="rounded p-0.5 text-slate-400 hover:text-slate-600"
+          aria-label="Clear search"
+        >
+          <span className="text-xs">✕</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -111,19 +121,19 @@ export function StatusBadge({
       : "blue");
 
   const colors = {
-    green: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
-    amber: "bg-amber-500/10 text-amber-700 border-amber-500/20",
-    blue: "bg-sky-500/10 text-sky-700 border-sky-500/20",
-    red: "bg-red-500/10 text-red-700 border-red-500/20",
-    slate: "bg-muted text-muted-foreground border-border",
+    green: "bg-emerald-50 text-emerald-700 border-emerald-200/90",
+    amber: "bg-amber-50 text-amber-700 border-amber-200/90",
+    blue: "bg-sky-50 text-sky-700 border-sky-200/90",
+    red: "bg-rose-50 text-rose-700 border-rose-200/90",
+    slate: "bg-slate-100 text-slate-700 border-slate-200",
   };
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 font-mono-ui text-[10px] font-medium uppercase tracking-wide ${colors[resolved]}`}
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 font-mono-ui text-[10px] font-semibold uppercase tracking-wider ${colors[resolved]}`}
       data-testid={`status-${value.toLowerCase().replaceAll(" ", "-")}`}
     >
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-70" />
+      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-80" />
       {value}
     </span>
   );

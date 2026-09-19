@@ -176,7 +176,7 @@ export function ErpShell({ children }: { children: ReactNode }) {
       )}
 
       <div className="md:pl-[248px] flex-1 flex flex-col min-h-screen bg-background">
-        <header className="sticky top-0 z-20 flex h-[68px] items-center justify-between border-b border-border/80 bg-background/90 px-4 backdrop-blur-md sm:px-7">
+        <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-border/80 bg-card/85 px-4 backdrop-blur-md sm:px-7">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -188,18 +188,23 @@ export function ErpShell({ children }: { children: ReactNode }) {
               <Menu className="h-5 w-5" />
             </button>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5 font-mono-ui text-[10px] uppercase tracking-[.18em] text-muted-foreground">
-                <span className="truncate">TechM4India Innovations</span>
-                <span>/</span>
-                <span className="truncate text-primary">{title}</span>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                <span className="hover:text-foreground transition-colors cursor-default">TechM4India</span>
+                <span className="text-muted-foreground/40">/</span>
+                <span className="text-foreground font-semibold flex items-center gap-1.5 truncate">
+                  {title}
+                </span>
               </div>
-              <h1 className="truncate text-base font-bold tracking-tight sm:text-lg">{title}</h1>
+              <h1 className="truncate text-base font-bold tracking-tight text-foreground sm:text-lg">{title}</h1>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary sm:flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Live workspace
+            <div className="hidden items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700 sm:flex shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>Render Cloud DB • Singapore</span>
             </div>
             <button
               type="button"
@@ -208,12 +213,18 @@ export function ErpShell({ children }: { children: ReactNode }) {
                   router.push("/login");
                 }
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/20 text-xs font-bold text-accent-foreground border border-accent/30 hover:opacity-90"
+              className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 hover:bg-muted/70 transition-colors border border-border/60 bg-card"
               data-testid="avatar-current-user"
               aria-label="Sign out"
               title="Arjun Rao (Executive Administrator) - Click to sign out"
             >
-              AR
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white shadow-xs ring-2 ring-primary/30">
+                AR
+              </div>
+              <div className="hidden text-left sm:block">
+                <div className="text-xs font-semibold text-foreground leading-tight">Arjun Rao</div>
+                <div className="text-[10px] font-medium text-primary leading-tight">Founder &amp; CEO</div>
+              </div>
             </button>
           </div>
         </header>
