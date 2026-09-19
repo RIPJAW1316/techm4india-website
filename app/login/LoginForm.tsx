@@ -26,11 +26,22 @@ export function LoginForm() {
       setPassword("");
       router.replace(resolveDashboardPath(auth));
     } catch (reason) {
-      setError(
-        reason instanceof ApiError && reason.status === 401
-          ? "The email or password was not recognised."
-          : "We could not reach the ERP service. Please verify your connection and try again.",
-      );
+      console.error("Authentication error:", reason);
+      if (reason instanceof ApiError) {
+        if (reason.status === 401) {
+          setError("The email or password was not recognised.");
+        } else if (reason.status === 429) {
+          setError("Too many login attempts. Please wait a minute and try again.");
+        } else if (reason.message) {
+          setError(reason.message);
+        } else {
+          setError(`ERP service error (${reason.status}). Please try again.`);
+        }
+      } else if (reason instanceof Error && reason.message) {
+        setError(reason.message);
+      } else {
+        setError("We could not reach the ERP service. Please verify your connection and try again.");
+      }
     } finally {
       setBusy(false);
     }

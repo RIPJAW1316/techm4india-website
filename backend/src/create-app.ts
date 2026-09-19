@@ -29,7 +29,10 @@ export async function createConfiguredApp(): Promise<INestApplication> {
   app.use(urlencoded({ extended: true, limit: "1mb" }));
   app.enableCors({
     credentials: true,
-    origin: (origin, callback) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       if (
         !origin ||
         origin.endsWith(".vercel.app") ||

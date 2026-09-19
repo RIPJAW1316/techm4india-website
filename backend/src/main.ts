@@ -12,4 +12,7 @@ async function bootstrap(): Promise<void> {
   await app.listen(port, "0.0.0.0");
 }
 
-void bootstrap();
+void bootstrap().catch((err) => {
+  console.error("BOOTSTRAP FAILED:", err);
+  process.exit(1);
+});

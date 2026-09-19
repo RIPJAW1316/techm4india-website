@@ -21,9 +21,21 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
-    server: isCodexSeatbeltSandbox
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
+    server: {
+      watch: isCodexSeatbeltSandbox
+        ? { useFsEvents: false, usePolling: true }
+        : undefined,
+      proxy: {
+        "/api/v1": {
+          target: process.env.VITE_BACKEND_TARGET || "http://localhost:3001",
+          changeOrigin: true,
+        },
+        "/api/v2": {
+          target: process.env.VITE_BACKEND_TARGET || "http://localhost:3001",
+          changeOrigin: true,
+        },
+      },
+    },
     plugins: [
       vinext(),
       sites(),

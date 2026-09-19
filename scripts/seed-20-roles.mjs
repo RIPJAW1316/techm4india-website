@@ -45,6 +45,16 @@ const DEMO_PERSONAS = [
   },
   {
     roleName: "FOUNDER_CEO",
+    email: "ceo@techm4india.com",
+    firstName: "Arjun",
+    lastName: "Rao",
+    designation: "Founder & Chief Executive Officer",
+    employeeCode: "EMP-CEO-000",
+    divisionSlug: "engineering",
+    phone: "+91 98220 22000",
+  },
+  {
+    roleName: "FOUNDER_CEO",
     email: "founder@techm4india.com",
     firstName: "Arjun",
     lastName: "Rao",

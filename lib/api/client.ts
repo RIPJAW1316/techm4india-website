@@ -1,16 +1,22 @@
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
-const browserHost = typeof window === "undefined" ? "" : window.location.hostname;
-const defaultApiBaseUrl =
-  browserHost === "localhost" || browserHost === "127.0.0.1"
-    ? "http://localhost:3001/api/v1"
-    : typeof window !== "undefined"
-      ? "/api/v1"
-      : "https://techm4india-erp-api.onrender.com/api/v1";
-const envUrl =
-  env?.VITE_API_BASE_URL && !env.VITE_API_BASE_URL.includes("railway")
-    ? env.VITE_API_BASE_URL
-    : undefined;
-export const API_BASE_URL = (envUrl || defaultApiBaseUrl).replace(/\/$/, "");
+const isBrowser = typeof window !== "undefined";
+
+export const API_BASE_URL = (() => {
+  if (isBrowser) {
+    // In any browser (localhost dev or deployed production), always route via /api/v1
+    // Local Vite dev server proxies /api/v1 to local NestJS (or Render)
+    // Vercel edge proxies /api/v1 to Render API
+    // This ensures same-origin requests everywhere and completely eliminates CORS failures.
+    return "/api/v1";
+  }
+  // Server-side rendering / prerendering (Node.js)
+  const envUrl =
+    env?.VITE_API_BASE_URL && !env.VITE_API_BASE_URL.includes("railway")
+      ? env.VITE_API_BASE_URL
+      : undefined;
+  return (envUrl || "https://techm4india-erp-api.onrender.com/api/v1").replace(/\/$/, "");
+})();
+
 export const API_V2_BASE_URL = API_BASE_URL.replace(/\/v1$/, "/v2");
 
 let accessToken: string | null = null;

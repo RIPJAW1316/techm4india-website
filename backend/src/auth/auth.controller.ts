@@ -17,7 +17,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
-  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @UseGuards(TrustedOriginGuard)
   @ApiOperation({ summary: "Authenticate with company email and password" })
   @ApiResponse({ status: 200, description: "Authenticated successfully" })
