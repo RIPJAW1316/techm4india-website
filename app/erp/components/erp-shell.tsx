@@ -28,7 +28,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useErpAuth } from "./AuthProvider";
-import { ROLE_PERSONAS, type RolePersona } from "@/app/login/LoginForm";
+import { ROLE_PERSONAS, type RolePersona } from "@/lib/erp/roles";
 
 export const navItems = [
   { href: "/erp/dashboard", label: "Overview", icon: LayoutDashboard },

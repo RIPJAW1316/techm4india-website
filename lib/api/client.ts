@@ -6,7 +6,11 @@ const defaultApiBaseUrl =
     : typeof window !== "undefined"
       ? "/api/v1"
       : "https://techm4india-erp-api.onrender.com/api/v1";
-export const API_BASE_URL = (env?.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/$/, "");
+const envUrl =
+  env?.VITE_API_BASE_URL && !env.VITE_API_BASE_URL.includes("railway")
+    ? env.VITE_API_BASE_URL
+    : undefined;
+export const API_BASE_URL = (envUrl || defaultApiBaseUrl).replace(/\/$/, "");
 export const API_V2_BASE_URL = API_BASE_URL.replace(/\/v1$/, "/v2");
 
 let accessToken: string | null = null;
