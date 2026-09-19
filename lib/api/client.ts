@@ -3,7 +3,7 @@ const browserHost = typeof window === "undefined" ? "" : window.location.hostnam
 const defaultApiBaseUrl =
   browserHost === "localhost" || browserHost === "127.0.0.1"
     ? "http://localhost:3001/api/v1"
-    : "https://techm4india-erp-api.vercel.app/api/v1";
+    : "https://techm4india-erp-api.onrender.com/api/v1";
 export const API_BASE_URL = (env?.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/$/, "");
 export const API_V2_BASE_URL = API_BASE_URL.replace(/\/v1$/, "/v2");
 
