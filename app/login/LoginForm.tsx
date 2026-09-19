@@ -89,7 +89,7 @@ export function LoginForm() {
       <div style={{ marginTop: "16px", padding: "12px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "12px", color: "#475569" }}>
         <div style={{ fontWeight: 600, marginBottom: "4px", color: "#1e293b" }}>Development Personas:</div>
         <div>Founder: <code style={{ background: "#e2e8f0", padding: "1px 4px", borderRadius: "4px" }}>founder.dev@techm4india.com</code></div>
-        <div>Password: <code style={{ background: "#e2e8f0", padding: "1px 4px", borderRadius: "4px" }}>thegtagamer1316@</code></div>
+        <div>Password: <code style={{ background: "#e2e8f0", padding: "1px 4px", borderRadius: "4px" }}>TechM4India!2026</code></div>
       </div>
       <p className="erp-security-note">
         Company workspace · Secure session · TechM4India internal use
