@@ -1,326 +1,463 @@
-import {
-  ArrowLink,
-  EditorialList,
-  PageHero,
-  PartnershipCTA,
-  PeopleGrid,
-  SectionHeading,
-  StatRow,
-} from "../components/Shared";
+import type { CSSProperties } from "react";
+import { Btn, ClosingPaths, Figures, Kicker, Plate, SectionHead, SmartLink } from "../components/xp/Primitives";
+import { WorkIndex } from "../components/xp/solutions/WorkIndex";
 import { StructuredData } from "../components/StructuredData";
+import {
+  capabilities,
+  closing,
+  ctaBand,
+  edge,
+  featured,
+  hero,
+  industries,
+  labs,
+  process,
+  record,
+  services,
+  stageLabels,
+  techGroups,
+  work,
+  workSection,
+  workStages,
+} from "@/lib/content/solutions";
+import { contact } from "@/lib/site-data";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "TechM4Solutions | Technology Solutions",
+  title: "TechM4Solutions | Software, apps, AI and computer labs",
   description:
-    "TechM4Solutions delivers enterprise software, AI integration, and digital transformation services for global organizations.",
+    "TechM4Solutions designs and builds software products, web and mobile apps, AI solutions and enterprise systems, and offers pay-per-use access to high-performance computer labs.",
   path: "/solutions",
 });
 
-const services = [
-  {
-    title: "AI & agentic AI solutions",
-    text: "Intelligent systems that help teams see patterns, make decisions and act with more context.",
-  },
-  {
-    title: "Software development",
-    text: "Reliable web platforms and product systems designed around the people who use them.",
-  },
-  {
-    title: "Mobile app development",
-    text: "Useful, focused mobile experiences that turn a service into a habit.",
-  },
-  {
-    title: "ERP & enterprise systems",
-    text: "Connect the operations that make an organization move.",
-  },
-  {
-    title: "Cloud & DevOps",
-    text: "Infrastructure and delivery practices that let good software keep getting better.",
-  },
-  {
-    title: "Data & analytics",
-    text: "Turn scattered information into a clearer view of the next decision.",
-  },
-];
-
-const industries = [
-  "Education",
-  "Healthcare",
-  "Agriculture",
-  "Manufacturing",
-  "Retail & ecommerce",
-  "Finance",
-  "Logistics",
-  "Government",
-  "Aerospace & defence",
-];
-
-const caseStudies = [
-  {
-    label: "Learning systems",
-    value: "LMS",
-    text: "connected learning, administration and progress visibility",
-  },
-  {
-    label: "Enterprise resource planning",
-    value: "ERP",
-    text: "clearer operations across people, processes and information",
-  },
-  {
-    label: "AI support",
-    value: "AI",
-    text: "focused assistance shaped around a real service context",
-  },
-  {
-    label: "Workflow automation",
-    value: "Ops",
-    text: "repeatable pathways from a request to a useful result",
-  },
-];
-
-const products = [
-  {
-    title: "Agriculture intelligence",
-    image: "/images/editorial/workshop-mentor.jpeg",
-    alt: "Mentor guiding a student through a practical technology project",
-    text: "Products that make field decisions more visible and actionable.",
-    href: "/contact",
-  },
-  {
-    title: "AI support platforms",
-    image: "/images/editorial/workshop-crowd.jpeg",
-    alt: "Students collaborating during a TechM4India workshop",
-    text: "Calmer, faster experiences for people who need answers.",
-    href: "/contact",
-  },
-  {
-    title: "Company management ERP V1",
-    image: "/images/editorial/workshop-lab.jpeg",
-    alt: "Students working together in a computer lab",
-    text: "One operating system for people, leads, institutions, projects and content.",
-    href: "/solutions/erp",
-  },
-  {
-    title: "Learning management",
-    image: "/images/editorial/workshop-student.jpeg",
-    alt: "Student presenting work to a workshop group",
-    text: "Digital learning systems that keep people moving.",
-    href: "/contact",
-  },
-  {
-    title: "Workflow systems",
-    image: "/images/editorial/workshop-pair.jpeg",
-    alt: "Mentor and students discussing a prototype",
-    text: "Less friction between a request and a result.",
-    href: "/contact",
-  },
-];
+const pad = (n: number) => String(n).padStart(2, "0");
+const delay = (ms: number) => ({ "--delay": ms + "ms" }) as CSSProperties;
 
 export default function SolutionsPage() {
   return (
-    <main className="inner-page solutions-page">
-      <PageHero
-        eyebrow="TechM4Solutions · Digital engineering"
-        title={
-          <>
-            Engineering the future through <em>AI, software & digital innovation.</em>
-          </>
-        }
-        description="We partner with startups, enterprises, educational institutions, industries and public organizations to design, develop and scale intelligent digital solutions—including the operational systems that keep a growing company moving."
-        image="/images/solutions/hero.jpeg"
-        imageAlt="Two women collaborating around a laptop in a technology workspace"
-      />
-
-      <section className="solutions-intro section shell">
-        <SectionHeading
-          eyebrow="01 / The point of view"
-          title={
-            <>
-              Technology should make the <em>next step clearer.</em>
-            </>
-          }
-          text="The best digital work is both ambitious and legible. It respects the complexity of an organization, then gives people a simpler way to move through it."
-        />
-        <StatRow
-          items={[
-            { value: "6", label: "Service disciplines" },
-            { value: "9", label: "Industry contexts" },
-            { value: "5", label: "Featured product systems" },
-            { value: "4", label: "Research lab directions" },
-          ]}
-        />
-      </section>
-
-      <section className="services-section section">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="02 / What we do"
-            title={
-              <>
-                A technology partner for the <em>whole journey.</em>
-              </>
-            }
-            text="From a first prototype to an operational system, our services are shaped around outcomes rather than fashionable tools."
-          />
-          <EditorialList items={services} />
-        </div>
-      </section>
-
-      <section className="industry-section section shell">
-        <div className="industry-intro" data-reveal>
-          <p className="section-kicker">
-            <span>03 / Where it matters</span>
-          </p>
-          <h2>
-            Different contexts. <em>Same care.</em>
-          </h2>
-          <p>We listen for the constraints of the industry before we recommend the technology.</p>
-        </div>
-        <div className="industry-list">
-          {industries.map((industry, index) => (
-            <span key={industry} data-reveal>
-              <b>{String(index + 1).padStart(2, "0")}</b>
-              {industry}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <section className="product-showcase section">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="04 / Featured products"
-            title={
-              <>
-                Real systems for <em>real conditions.</em>
-              </>
-            }
-            text="A glimpse at the product thinking moving through TechM4Solutions, including the Company Management ERP V1 blueprint."
-          />
-          <div className="product-showcase-grid">
-            {products.map((product, index) => (
-              <article
-                className={"showcase-card showcase-card-" + index}
-                key={product.title}
-                data-reveal
-              >
-                <div className="showcase-image">
-                  <img src={product.image} alt={product.alt} loading="lazy" />
-                </div>
-                <p>0{index + 1} / Product direction</p>
-                <h3>{product.title}</h3>
-                <p>{product.text}</p>
-                <ArrowLink href={product.href}>
-                  {product.href === "/solutions/erp" ? "Explore the ERP" : "Discuss a build"}
-                </ArrowLink>
-              </article>
-            ))}
+    <main className="xp xp-solutions">
+      {/* Hero: the promise on the left, the delivery sheet on the right */}
+      <section className="xp-section xp-tone-ink xo-hero" aria-labelledby="xo-hero-title">
+        <div className="xp-shell xo-hero-grid">
+          <div className="xo-hero-copy">
+            <Kicker index={hero.kickerIndex}>{hero.kicker}</Kicker>
+            <h1 className="xp-display xo-hero-title" id="xo-hero-title">
+              {hero.title} <em>{hero.titleAccent}</em>
+            </h1>
+            <p className="xp-lede">{hero.lede}</p>
+            <div className="xp-actions">
+              <Btn href={hero.primary.href}>{hero.primary.label}</Btn>
+              <Btn href={hero.secondary.href} variant="line">
+                {hero.secondary.label}
+              </Btn>
+            </div>
           </div>
+
+          <aside className="xo-sheet" aria-labelledby="xo-sheet-title">
+            <header className="xo-sheet-head">
+              <p className="xp-meta" id="xo-sheet-title">
+                {hero.sheet.title}
+              </p>
+              <p className="xp-meta">{hero.sheet.reference}</p>
+            </header>
+            <ol className="xo-sheet-rows">
+              {hero.sheet.rows.map((row, index) => (
+                <li key={row.code} style={delay(index * 70)}>
+                  <a href={row.href}>
+                    <span className="xo-sheet-code">{row.code}</span>
+                    <span className="xo-sheet-term">{row.term}</span>
+                    <span className="xo-sheet-detail">{row.detail}</span>
+                    <i aria-hidden="true">↘</i>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            <footer className="xo-sheet-foot">
+              <span className="xp-meta">{hero.sheet.footLabel}</span>
+              <strong>{hero.sheet.footValue}</strong>
+            </footer>
+          </aside>
         </div>
+
+        <nav className="xp-shell xo-index" aria-label="On this page">
+          <ol>
+            {hero.index.map((item, index) => (
+              <li key={item.href}>
+                <a href={item.href}>
+                  <span aria-hidden="true">{pad(index + 1)}</span>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
       </section>
 
-      <section className="case-studies-section section shell">
-        <SectionHeading
-          eyebrow="05 / Solution patterns"
-          title={
-            <>
-              The work should leave a <em>measurable trace.</em>
-            </>
-          }
-          text="These portfolio patterns show the kinds of operational change TechM4Solutions is designed to support."
-        />
-        <div className="case-study-grid">
-          {caseStudies.map((item, index) => (
-            <article key={item.label} data-reveal>
-              <span>0{index + 1}</span>
-              <p>{item.label}</p>
-              <strong>{item.value}</strong>
-              <p>{item.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="labs-section section">
-        <div className="shell labs-layout">
-          <div className="labs-copy" data-reveal>
-            <p className="section-kicker">
-              <span>06 / Research labs</span>
-            </p>
-            <h2>
-              Curiosity needs a place to <em>stay unfinished.</em>
+      {/* Delivery record */}
+      <section
+        className="xp-section xp-section--tight xo-record"
+        id="record"
+        aria-labelledby="xo-record-title"
+      >
+        <div className="xp-shell xo-record-grid">
+          <div className="xo-record-head" data-reveal>
+            <Kicker index="01">{record.label}</Kicker>
+            <h2 className="xp-title" id="xo-record-title">
+              {record.title} <em>{record.titleAccent}</em>
             </h2>
-            <p>
-              Our labs keep space for exploration alongside delivery: test an idea, challenge the
-              assumption, learn what the system is telling you.
-            </p>
-            <ArrowLink href="/contact">Talk to the solutions team</ArrowLink>
+            <p className="xp-body">{record.lede}</p>
           </div>
-          <div className="labs-list">
-            {[
-              "AI lab",
-              "Enterprise innovation lab",
-              "Future technologies lab",
-              "Space technology lab",
-            ].map((lab, index) => (
-              <div key={lab} data-reveal>
-                <span>0{index + 1}</span>
-                <h3>{lab}</h3>
-                <i aria-hidden="true">↗</i>
+          <div className="xo-record-figures">
+            <Figures items={record.figures} />
+            <p className="xo-record-note">{record.note}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured build: the one system whose code is in this repository */}
+      <section
+        className="xp-section xp-tone-white xo-featured"
+        id="featured"
+        aria-labelledby="xo-featured-title"
+      >
+        <div className="xp-shell">
+          <SectionHead
+            index="02"
+            label={featured.label}
+            id="xo-featured-title"
+            title={
+              <>
+                {featured.title} <em>{featured.titleAccent}</em>
+              </>
+            }
+            lede={featured.lede}
+          />
+          <div className="xo-featured-grid">
+            <div className="xo-console" data-reveal>
+              <div className="xo-console-bar" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+                <span>{featured.name}</span>
               </div>
+              <div className="xo-console-body">
+                <p className="xp-meta">{featured.layersTitle}</p>
+                <ol className="xo-layers">
+                  {featured.layers.map((layer) => (
+                    <li key={layer.code}>
+                      <span className="xo-layer-code">{layer.code}</span>
+                      <strong>{layer.term}</strong>
+                      <span>{layer.detail}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+            <div className="xo-modules" data-reveal>
+              <h3 className="xp-meta" id="xo-modules-title">
+                {featured.modulesTitle}
+              </h3>
+              <ul aria-labelledby="xo-modules-title">
+                {featured.modules.map((module, index) => (
+                  <li key={module}>
+                    <span aria-hidden="true">{pad(index + 1)}</span>
+                    {module}
+                  </li>
+                ))}
+              </ul>
+              <p className="xp-body">{featured.divisionsNote}</p>
+              <Btn href={featured.cta.href}>{featured.cta.label}</Btn>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Selected work */}
+      <section className="xp-section xo-work-section" id="work" aria-labelledby="xo-work-title">
+        <div className="xp-shell">
+          <SectionHead
+            index="03"
+            label={workSection.label}
+            id="xo-work-title"
+            title={
+              <>
+                {workSection.title} <em>{workSection.titleAccent}</em>
+              </>
+            }
+            lede={workSection.lede}
+          />
+          <WorkIndex items={work} stages={workStages} stageLabels={stageLabels} labels={workSection} />
+          <p className="xo-work-note">{workSection.note}</p>
+        </div>
+      </section>
+
+      {/* Accent band: a mid-page way out */}
+      <section className="xo-band" aria-labelledby="xo-band-title">
+        <div className="xp-shell xo-band-inner">
+          <div>
+            <h2 className="xo-band-title" id="xo-band-title">
+              {ctaBand.title}
+            </h2>
+            <p>{ctaBand.text}</p>
+          </div>
+          <div className="xo-band-actions">
+            <Btn href={ctaBand.action.href} variant="light">
+              {ctaBand.action.label}
+            </Btn>
+            <a className="xo-band-mail" href={contact.partnershipsHref}>
+              {contact.partnerships}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Capabilities and the stack */}
+      <section
+        className="xp-section xp-tone-navy xo-cap"
+        id="capabilities"
+        aria-labelledby="xo-cap-title"
+      >
+        <div className="xp-shell">
+          <SectionHead
+            index="04"
+            label={capabilities.label}
+            id="xo-cap-title"
+            title={
+              <>
+                {capabilities.title} <em>{capabilities.titleAccent}</em>
+              </>
+            }
+            lede={capabilities.lede}
+          />
+          <ol className="xo-services">
+            {services.map((service, index) => (
+              <li key={service.title} data-reveal style={delay((index % 2) * 80)}>
+                <span className="xo-service-no" aria-hidden="true">
+                  {pad(index + 1)}
+                </span>
+                <div>
+                  <h3>{service.title}</h3>
+                  <p>{service.text}</p>
+                  <ul aria-label={"Includes, for " + service.title}>
+                    {service.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
             ))}
+          </ol>
+
+          <div className="xo-stack">
+            <div className="xo-stack-head" data-reveal>
+              <h3 className="xp-subtitle" id="xo-stack-title">
+                {capabilities.stackTitle}
+              </h3>
+              <p>{capabilities.stackLede}</p>
+            </div>
+            <table className="xo-stack-table" aria-labelledby="xo-stack-title">
+              <thead>
+                <tr>
+                  <th scope="col">{capabilities.columns.layer}</th>
+                  <th scope="col">{capabilities.columns.items}</th>
+                  <th scope="col">{capabilities.columns.basis}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {techGroups.map((group) => (
+                  <tr key={group.layer}>
+                    <th scope="row">{group.layer}</th>
+                    <td>
+                      <ul className="xo-chips">
+                        {group.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>{group.basis}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      <section className="delivery-section section shell">
-        <SectionHeading
-          eyebrow="07 / Global delivery model"
-          title={
-            <>
-              Close enough to understand. <em>Wide enough to deliver.</em>
-            </>
-          }
-        />
-        <div className="delivery-map">
-          {["North America", "Europe", "Middle East", "India · HQ", "Southeast Asia"].map(
-            (region, index) => (
-              <div key={region} data-reveal>
-                <span>0{index + 1}</span>
-                <h3>{region}</h3>
-                <p>
-                  {index === 3
-                    ? "The context that keeps the work grounded."
-                    : "A partner horizon for thoughtful delivery."}
-                </p>
-              </div>
-            ),
-          )}
+      {/* Industries and the edge */}
+      <section className="xp-section xo-industries" id="industries" aria-labelledby="xo-industries-title">
+        <div className="xp-shell">
+          <SectionHead
+            index="05"
+            label={industries.label}
+            id="xo-industries-title"
+            title={
+              <>
+                {industries.title} <em>{industries.titleAccent}</em>
+              </>
+            }
+            lede={industries.lede}
+          />
+          <ul className="xo-industry-grid">
+            {industries.items.map((industry, index) => (
+              <li key={industry.name} data-reveal style={delay((index % 3) * 60)}>
+                <span aria-hidden="true">{pad(index + 1)}</span>
+                <h3>{industry.name}</h3>
+                <p>{industry.builds.join(" · ")}</p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="xo-edge">
+            <h3 className="xp-meta" id="xo-edge-title">
+              {edge.label}
+            </h3>
+            <ol className="xo-edge-list" aria-labelledby="xo-edge-title">
+              {edge.items.map((item) => (
+                <li key={item.title} data-reveal>
+                  <strong>{item.title}</strong>
+                  <span>{item.text}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
-      <section className="solutions-team section shell">
-        <SectionHeading
-          eyebrow="08 / The shared team"
-          title={
-            <>
-              Technical depth with a <em>human edge.</em>
-            </>
-          }
-        />
-        <PeopleGrid compact />
+      {/* Process */}
+      <section className="xp-section xp-tone-tint xo-process" id="process" aria-labelledby="xo-process-title">
+        <div className="xp-shell">
+          <SectionHead
+            index="06"
+            label={process.label}
+            id="xo-process-title"
+            title={
+              <>
+                {process.title} <em>{process.titleAccent}</em>
+              </>
+            }
+            lede={process.lede}
+          />
+          <ol className="xo-steps">
+            {process.steps.map((step, index) => (
+              <li key={step.name} data-reveal style={delay(index * 80)}>
+                <span className="xo-step-no" aria-hidden="true">
+                  {pad(index + 1)}
+                </span>
+                <h3>{step.name}</h3>
+                <p>{step.text}</p>
+                <div className="xo-step-receive">
+                  <p className="xp-meta">{process.receiveLabel}</p>
+                  <p>{step.receive}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
-      <PartnershipCTA
-        eyebrow="Technology partnerships"
+      {/* Pay-and-use computer labs */}
+      <section className="xp-section xp-tone-navy xo-labs" id="labs" aria-labelledby="xo-labs-title">
+        <div className="xp-shell">
+          <div className="xo-labs-grid">
+            <div className="xo-labs-copy" data-reveal>
+              <Kicker index="07">{labs.label}</Kicker>
+              <h2 className="xp-title" id="xo-labs-title">
+                {labs.title} <em>{labs.titleAccent}</em>
+              </h2>
+              <p className="xp-lede">{labs.lede}</p>
+              <ul className="xo-offers">
+                {labs.offers.map((offer, index) => (
+                  <li key={offer.title}>
+                    <span aria-hidden="true">{pad(index + 1)}</span>
+                    <div>
+                      <h3>{offer.title}</h3>
+                      <p>{offer.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="xo-labs-side">
+              <Plate
+                src={labs.image.src}
+                alt={labs.image.alt}
+                caption={labs.image.caption}
+                note={labs.image.note}
+                ratio="4x3"
+                sizes="(max-width: 900px) 100vw, 44vw"
+              />
+              <div className="xo-labs-who" data-reveal>
+                <p className="xp-meta">{labs.whoTitle}</p>
+                <ul>
+                  {labs.who.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="xo-lab-steps">
+            <h3 className="xp-meta" id="xo-lab-steps-title">
+              {labs.stepsTitle}
+            </h3>
+            <ol aria-labelledby="xo-lab-steps-title">
+              {labs.steps.map((step, index) => (
+                <li key={step.name} data-reveal style={delay(index * 80)}>
+                  <span aria-hidden="true">{pad(index + 1)}</span>
+                  <strong>{step.name}</strong>
+                  <p>{step.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="xo-labs-work">
+            <h3 className="xp-meta" id="xo-labs-work-title">
+              {labs.workTitle}
+            </h3>
+            <ul aria-labelledby="xo-labs-work-title">
+              {labs.work.map((item) => (
+                <li key={item.title} data-reveal>
+                  <h4>{item.title}</h4>
+                  <p>{item.text}</p>
+                  <ul className="xo-chips" aria-label={"Software for " + item.title}>
+                    {item.tools.map((tool) => (
+                      <li key={tool}>{tool}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+            <div className="xo-labs-cta">
+              <p>{labs.note}</p>
+              <Btn href={labs.cta.href} variant="light">
+                {labs.cta.label}
+              </Btn>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ClosingPaths
+        label={closing.label}
         title={
           <>
-            Bring us the hard problem. <em>Let&apos;s build.</em>
+            {closing.title} <em>{closing.titleAccent}</em>
           </>
         }
-        text="Start with a conversation about the people, constraints and outcome. The right technology follows."
+        lede={
+          <>
+            {closing.lede}{" "}
+            <SmartLink className="xo-inline-link" href={contact.partnershipsHref}>
+              {contact.partnerships}
+            </SmartLink>
+            .
+          </>
+        }
+        paths={closing.paths}
       />
+
       <StructuredData
         data={breadcrumbSchema([
           { name: "Home", path: "/" },

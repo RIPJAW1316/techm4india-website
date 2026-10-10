@@ -29,9 +29,8 @@ export function ErpShell({ active }: { active: ErpModuleId }) {
   const [query, setQuery] = useState("");
 
   const current = erpModule(active);
-  const permissions = context?.permissions ?? [];
-
   const groups = useMemo(() => {
+    const permissions = context?.permissions ?? [];
     const visible = visibleModuleGroups(permissions);
     const needle = query.trim().toLowerCase();
     if (!needle) return visible;
@@ -41,7 +40,7 @@ export function ErpShell({ active }: { active: ErpModuleId }) {
         modules: group.modules.filter((module) => module.label.toLowerCase().includes(needle)),
       }))
       .filter((group) => group.modules.length > 0);
-  }, [permissions, query]);
+  }, [context?.permissions, query]);
 
   const employee = context?.employee ?? null;
   const displayName = employee ? `${employee.firstName} ${employee.lastName}` : "Signed in";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import {
   Employee,
   Lead,
@@ -32,10 +32,22 @@ const STORAGE_KEYS = {
   SETTINGS: "techm4india_erp_settings",
 };
 
-function getStorageItem<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
+const STORAGE_CHANGE_EVENT = "techm4india:erp-storage-change";
+const memoryStorage = new Map<string, string>();
+
+function getRawStorageItem(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  if (memoryStorage.has(key)) return memoryStorage.get(key) ?? null;
   try {
-    const item = window.localStorage.getItem(key);
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function getStorageItem<T>(key: string, fallback: T): T {
+  try {
+    const item = getRawStorageItem(key);
     return item ? (JSON.parse(item) as T) : fallback;
   } catch {
     return fallback;
@@ -45,18 +57,42 @@ function getStorageItem<T>(key: string, fallback: T): T {
 function setStorageItem<T>(key: string, value: T): void {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    const serialized = JSON.stringify(value);
+    try {
+      window.localStorage.setItem(key, serialized);
+      memoryStorage.delete(key);
+    } catch {
+      memoryStorage.set(key, serialized);
+    }
+    window.dispatchEvent(new Event(STORAGE_CHANGE_EVENT));
   } catch {
-    /* ignore storage write failures */
+    /* ignore values that cannot be serialized */
   }
 }
 
-export function useEmployeesData(filters?: { search?: string; department?: string }) {
-  const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
-
-  useEffect(() => {
-    setEmployees(getStorageItem(STORAGE_KEYS.EMPLOYEES, INITIAL_EMPLOYEES));
+function useStoredData<T>(key: string, fallback: T): T {
+  const subscribe = useCallback((notify: () => void) => {
+    window.addEventListener("storage", notify);
+    window.addEventListener(STORAGE_CHANGE_EVENT, notify);
+    return () => {
+      window.removeEventListener("storage", notify);
+      window.removeEventListener(STORAGE_CHANGE_EVENT, notify);
+    };
   }, []);
+  const getSnapshot = useCallback(() => getRawStorageItem(key), [key]);
+  const raw = useSyncExternalStore(subscribe, getSnapshot, () => null);
+  return useMemo(() => {
+    if (raw === null) return fallback;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return fallback;
+    }
+  }, [raw, fallback]);
+}
+
+export function useEmployeesData(filters?: { search?: string; department?: string }) {
+  const employees = useStoredData<Employee[]>(STORAGE_KEYS.EMPLOYEES, INITIAL_EMPLOYEES);
 
   const addEmployee = useCallback((newEmp: Omit<Employee, "id" | "initials" | "joinedAt">) => {
     const initials = newEmp.name
@@ -72,11 +108,8 @@ export function useEmployeesData(filters?: { search?: string; department?: strin
       joinedAt: new Date().toISOString().slice(0, 10),
     };
 
-    setEmployees((current) => {
-      const updated = [employee, ...current];
-      setStorageItem(STORAGE_KEYS.EMPLOYEES, updated);
-      return updated;
-    });
+    const current = getStorageItem(STORAGE_KEYS.EMPLOYEES, INITIAL_EMPLOYEES);
+    setStorageItem(STORAGE_KEYS.EMPLOYEES, [employee, ...current]);
 
     return employee;
   }, []);
@@ -96,11 +129,7 @@ export function useEmployeesData(filters?: { search?: string; department?: strin
 }
 
 export function useLeadsData(filters?: { search?: string; stage?: string }) {
-  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
-
-  useEffect(() => {
-    setLeads(getStorageItem(STORAGE_KEYS.LEADS, INITIAL_LEADS));
-  }, []);
+  const leads = useStoredData<Lead[]>(STORAGE_KEYS.LEADS, INITIAL_LEADS);
 
   const addLead = useCallback((newLead: Omit<Lead, "id" | "initials" | "lastContact">) => {
     const initials = newLead.organization
@@ -116,11 +145,8 @@ export function useLeadsData(filters?: { search?: string; stage?: string }) {
       lastContact: "Just now",
     };
 
-    setLeads((current) => {
-      const updated = [lead, ...current];
-      setStorageItem(STORAGE_KEYS.LEADS, updated);
-      return updated;
-    });
+    const current = getStorageItem(STORAGE_KEYS.LEADS, INITIAL_LEADS);
+    setStorageItem(STORAGE_KEYS.LEADS, [lead, ...current]);
 
     return lead;
   }, []);
@@ -144,11 +170,7 @@ export function useLeadsData(filters?: { search?: string; stage?: string }) {
 }
 
 export function useInstitutionsData(filters?: { search?: string }) {
-  const [institutions, setInstitutions] = useState<Institution[]>(INITIAL_INSTITUTIONS);
-
-  useEffect(() => {
-    setInstitutions(getStorageItem(STORAGE_KEYS.INSTITUTIONS, INITIAL_INSTITUTIONS));
-  }, []);
+  const institutions = useStoredData<Institution[]>(STORAGE_KEYS.INSTITUTIONS, INITIAL_INSTITUTIONS);
 
   const filtered = institutions.filter((inst) => {
     if (filters?.search) {
@@ -166,28 +188,18 @@ export function useInstitutionsData(filters?: { search?: string }) {
 }
 
 export function useProjectsData() {
-  const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
-
-  useEffect(() => {
-    setProjects(getStorageItem(STORAGE_KEYS.PROJECTS, INITIAL_PROJECTS));
-  }, []);
+  const projects = useStoredData<Project[]>(STORAGE_KEYS.PROJECTS, INITIAL_PROJECTS);
 
   return { projects, isLoading: false, isError: false };
 }
 
 export function useTasksData(filters?: { status?: string }) {
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
-
-  useEffect(() => {
-    setTasks(getStorageItem(STORAGE_KEYS.TASKS, INITIAL_TASKS));
-  }, []);
+  const tasks = useStoredData<Task[]>(STORAGE_KEYS.TASKS, INITIAL_TASKS);
 
   const updateTaskStatus = useCallback((id: number, nextStatus: string) => {
-    setTasks((current) => {
-      const updated = current.map((task) => (task.id === id ? { ...task, status: nextStatus } : task));
-      setStorageItem(STORAGE_KEYS.TASKS, updated);
-      return updated;
-    });
+    const current = getStorageItem(STORAGE_KEYS.TASKS, INITIAL_TASKS);
+    const updated = current.map((task) => (task.id === id ? { ...task, status: nextStatus } : task));
+    setStorageItem(STORAGE_KEYS.TASKS, updated);
   }, []);
 
   const filtered = tasks.filter((task) => {
@@ -201,24 +213,15 @@ export function useTasksData(filters?: { status?: string }) {
 }
 
 export function useDashboardData() {
-  const [summary, setSummary] = useState<DashboardSummary>(INITIAL_SUMMARY);
-  const [activities, setActivities] = useState<Activity[]>(INITIAL_ACTIVITIES);
-
-  useEffect(() => {
-    setSummary(getStorageItem(STORAGE_KEYS.SETTINGS + "_summary", INITIAL_SUMMARY));
-    setActivities(getStorageItem(STORAGE_KEYS.ACTIVITIES, INITIAL_ACTIVITIES));
-  }, []);
+  const summary = useStoredData<DashboardSummary>(STORAGE_KEYS.SETTINGS + "_summary", INITIAL_SUMMARY);
+  const activities = useStoredData<Activity[]>(STORAGE_KEYS.ACTIVITIES, INITIAL_ACTIVITIES);
 
   return { summary, activities, isLoading: false, isError: false };
 }
 
 export function useModuleRecordsData(moduleName: string) {
-  const [records, setRecords] = useState<ModuleRecord[]>(INITIAL_MODULE_RECORDS);
-
-  useEffect(() => {
-    const all = getStorageItem(STORAGE_KEYS.MODULE_RECORDS, INITIAL_MODULE_RECORDS);
-    setRecords(all.filter((rec) => rec.module === moduleName));
-  }, [moduleName]);
+  const allRecords = useStoredData<ModuleRecord[]>(STORAGE_KEYS.MODULE_RECORDS, INITIAL_MODULE_RECORDS);
+  const records = useMemo(() => allRecords.filter((rec) => rec.module === moduleName), [allRecords, moduleName]);
 
   const addRecord = useCallback(
     (input: ModuleRecordInput) => {
@@ -238,7 +241,6 @@ export function useModuleRecordsData(moduleName: string) {
       const all = getStorageItem(STORAGE_KEYS.MODULE_RECORDS, INITIAL_MODULE_RECORDS);
       const updatedAll = [record, ...all];
       setStorageItem(STORAGE_KEYS.MODULE_RECORDS, updatedAll);
-      setRecords((current) => [record, ...current]);
       return record;
     },
     [moduleName]

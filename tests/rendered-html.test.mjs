@@ -18,13 +18,14 @@ async function render(path = "/") {
 }
 
 for (const [path, heading] of [
-  ["/", "Most Ambitious"],
+  ["/", "Engineering imagination"],
   ["/about", "We&#x27;re building India&#x27;s largest"],
   ["/engineering", "Industrial Future"],
-  ["/solutions", "Engineering the future through"],
+  ["/solutions", "We build the software"],
   ["/solutions/erp", "One operating system for a more"],
-  ["/schools", "Transforming education through"],
+  ["/schools", "From curiosity to capability"],
   ["/space", "Build Real Satellites"],
+  ["/institutes", "A partner that stays for"],
   ["/contact", "Let&#x27;s build India&#x27;s"],
   ["/login", "Company Management ERP"],
   ["/erp", "Restoring your workspace"],

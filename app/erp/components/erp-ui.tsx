@@ -246,3 +246,161 @@ export function formatDate(value: string) {
     year: "numeric",
   }).format(date);
 }
+
+export function KpiCard({
+  label,
+  value,
+  change,
+  caption,
+  icon: Icon,
+  accent = "teal",
+  trendLabel = "vs last month",
+}: {
+  label: string;
+  value: string;
+  change?: number;
+  caption?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent?: "teal" | "blue" | "amber" | "rose" | "purple";
+  trendLabel?: string;
+}) {
+  const positive = (change ?? 0) >= 0;
+  const accentStyles = {
+    teal: "bg-teal-50 text-teal-700 border-teal-200/80",
+    blue: "bg-sky-50 text-sky-700 border-sky-200/80",
+    amber: "bg-amber-50 text-amber-700 border-amber-200/80",
+    rose: "bg-rose-50 text-rose-700 border-rose-200/80",
+    purple: "bg-indigo-50 text-indigo-700 border-indigo-200/80",
+  };
+
+  return (
+    <div className="group rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:shadow-md hover:-translate-y-0.5">
+      <div className="mb-4 flex items-start justify-between">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl border shadow-xs ${accentStyles[accent]}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+        {change !== undefined && (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono-ui text-[11px] font-semibold ${
+              positive
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
+                : "bg-rose-50 text-rose-700 border border-rose-200/80"
+            }`}
+          >
+            {positive ? "↑ +" : "↓ "}{Math.abs(change)}%
+          </span>
+        )}
+      </div>
+      <div className="font-mono-ui text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
+      <div className="mt-1 font-mono-ui text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        {value}
+      </div>
+      {caption && (
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+          <span>{caption}</span>
+          {change !== undefined && <span className="text-slate-400">· {trendLabel}</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function SlideOverDrawer({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  footer?: ReactNode;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="erp-drawer-backdrop">
+      <button type="button" className="absolute inset-0 cursor-default" onClick={onClose} aria-label="Close drawer" />
+      <div
+        className="erp-drawer-panel relative z-10"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-title"
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+          <div>
+            <h2 id="drawer-title" className="text-lg font-bold tracking-tight text-slate-900">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-0.5 text-xs text-slate-500 font-mono-ui">{subtitle}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-700 transition-colors"
+            aria-label="Close drawer"
+          >
+            <span className="text-base leading-none">✕</span>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          {children}
+        </div>
+        {footer && (
+          <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-4">
+            {footer}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function AttentionBanner({
+  title = "Executive Attention Required",
+  items,
+}: {
+  title?: string;
+  items: Array<{ label: string; count: number | string; href?: string }>;
+}) {
+  if (!items.length) return null;
+
+  return (
+    <div className="mb-6 rounded-xl border border-amber-200/90 bg-gradient-to-r from-amber-50/90 via-orange-50/60 to-amber-50/90 p-4 shadow-xs">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white font-bold text-xs shadow-xs">
+            !
+          </div>
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-amber-900">
+              {title}
+            </div>
+            <div className="text-xs text-amber-800/90">
+              Key operational items requiring authorization or review across your scope
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {items.map((item, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/80 bg-white/80 px-3 py-1 text-xs font-medium text-amber-950 shadow-xs"
+            >
+              <span className="font-mono-ui font-bold text-amber-700">{item.count}</span>
+              <span>{item.label}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

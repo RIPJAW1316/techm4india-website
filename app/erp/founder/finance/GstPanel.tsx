@@ -48,6 +48,8 @@ type Gstr1 = {
 type Gstr3b = {
   outwardTaxableSupplies: Split & { taxableValue: string };
   eligibleItc: Split & { taxableValue: string };
+  blockedItc?: Split & { taxableValue: string };
+  closingItcBalance?: Split;
   netTaxPayable: Split;
 };
 
@@ -60,6 +62,8 @@ type ItcRow = Split & {
   description: string;
   taxableValue: string;
   ratePercent: string;
+  isBlocked?: boolean;
+  blockedReason?: string | null;
 };
 
 type HsnCode = {
@@ -467,6 +471,28 @@ export function GstPanel() {
                   <TaxHeadCells row={gstr3b.eligibleItc} />
                   <td className="is-numeric">{inr(gstr3b.eligibleItc.total)}</td>
                 </tr>
+                {gstr3b.blockedItc ? (
+                  <tr>
+                    <td>
+                      <strong>4(B)(1) Ineligible / Blocked credit</strong>
+                      <small>Section 17(5) blocked supplies (catering, club, personal vehicles)</small>
+                    </td>
+                    <td className="is-numeric">{inr(gstr3b.blockedItc.taxableValue)}</td>
+                    <TaxHeadCells row={gstr3b.blockedItc} />
+                    <td className="is-numeric" style={{ color: "#d97706" }}>{inr(gstr3b.blockedItc.total)}</td>
+                  </tr>
+                ) : null}
+                {gstr3b.closingItcBalance ? (
+                  <tr>
+                    <td>
+                      <strong>Closing ITC balance</strong>
+                      <small>Unutilized credit carried forward to next period</small>
+                    </td>
+                    <td className="is-numeric">—</td>
+                    <TaxHeadCells row={gstr3b.closingItcBalance} />
+                    <td className="is-numeric" style={{ color: "#16a34a" }}>{inr(gstr3b.closingItcBalance.total)}</td>
+                  </tr>
+                ) : null}
                 <tr>
                   <td>
                     <strong>Net tax payable</strong>
@@ -504,6 +530,7 @@ export function GstPanel() {
                     <th>Vendor</th>
                     <th>Vendor GSTIN</th>
                     <th>HSN / SAC</th>
+                    <th>Eligibility</th>
                     <th className="is-numeric">Rate</th>
                     <th className="is-numeric">Taxable value</th>
                     <TaxHeadHeadings />
@@ -519,6 +546,17 @@ export function GstPanel() {
                       <td>{row.vendorName}</td>
                       <td>{row.vendorGstin ?? "Unregistered"}</td>
                       <td>{row.hsnSacCode}</td>
+                      <td>
+                        {row.isBlocked ? (
+                          <span style={{ color: "#b45309", fontSize: "0.75rem", fontWeight: 600 }}>
+                            Blocked s.17(5)
+                          </span>
+                        ) : (
+                          <span style={{ color: "#15803d", fontSize: "0.75rem", fontWeight: 600 }}>
+                            Eligible
+                          </span>
+                        )}
+                      </td>
                       <td className="is-numeric">{percent(row.ratePercent)}</td>
                       <td className="is-numeric">{inr(row.taxableValue)}</td>
                       <TaxHeadCells row={row} />

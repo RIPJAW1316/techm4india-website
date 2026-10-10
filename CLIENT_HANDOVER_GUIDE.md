@@ -10,7 +10,7 @@ Welcome to the **TechM4India Enterprise ERP Workspace**. This document is design
 | :--- | :--- |
 | **Live ERP Portal** | [https://techm4india-website.vercel.app/login](https://techm4india-website.vercel.app/login) |
 | **Public Website** | [https://techm4india-website.vercel.app](https://techm4india-website.vercel.app) |
-| **Universal Demo Password** | `TechM4India!2026` |
+| **ERP account access** | Ask the administrator for an individual test account and password. |
 | **Recommended Browser** | Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari |
 
 > **Pro Tip**: If you have opened the website previously, press `Ctrl + Shift + R` (Windows) or `Cmd + Shift + R` (Mac) once on the login page to ensure your browser has the newest update.
@@ -21,7 +21,7 @@ Welcome to the **TechM4India Enterprise ERP Workspace**. This document is design
 
 1. Open **[https://techm4india-website.vercel.app/login](https://techm4india-website.vercel.app/login)** in your browser.
 2. Enter any demo email from the table below (for example, `admin@techm4india.com` or `ceo@techm4india.com`).
-3. Enter the password: **`TechM4India!2026`** and click **"Sign In to ERP"**.
+3. Enter the password supplied for that account and click **"Sign In to ERP"**.
 
 You will be redirected straight to your role's personalized dashboard.
 
@@ -81,7 +81,7 @@ Here are the 5 most important workflows to try:
 
 ## 5. Complete Demo Accounts Directory
 
-Every account uses the password: **`TechM4India!2026`**
+These account examples are for test environments. The administrator manages their passwords and availability.
 
 | Scope | Role Title | Demo Email | Name & Designation |
 | :--- | :--- | :--- | :--- |

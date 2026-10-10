@@ -10,10 +10,12 @@ import {
   PageHeader,
   Panel,
   SearchField,
+  SlideOverDrawer,
   StatusBadge,
   ToastMessage,
 } from "../components/erp-ui";
 import { useLeadsData } from "@/lib/erp/replit-store";
+import type { Lead } from "@/lib/erp/replit-data";
 
 const stages = ["New", "Qualified", "Proposal", "Negotiation", "Won"];
 const emptyForm = { name: "", organization: "", source: "Referral", value: "", owner: "" };
@@ -48,11 +50,13 @@ function LeadDialog({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity erp-modal-backdrop"
-      onClick={onClose}
     >
+      <button type="button" className="absolute inset-0 cursor-default" onClick={onClose} aria-label="Close dialog" />
       <div
-        className="w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white shadow-2xl erp-modal-box overflow-hidden"
-        onClick={(event) => event.stopPropagation()}
+        className="relative z-10 w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white shadow-2xl erp-modal-box overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add lead"
       >
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
@@ -220,6 +224,7 @@ export default function Leads() {
   const [search, setSearch] = useState("");
   const [stage, setStage] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [toast, setToast] = useState("");
 
   const { leads, addLead } = useLeadsData({
@@ -331,7 +336,12 @@ export default function Leads() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {leads.map((lead) => (
-                    <tr key={lead.id} data-testid={`row-lead-${lead.id}`} className="group">
+                    <tr
+                      key={lead.id}
+                      data-testid={`row-lead-${lead.id}`}
+                      onClick={() => setSelectedLead(lead)}
+                      className="group erp-table-clickable cursor-pointer hover:bg-teal-50/40 transition-colors"
+                    >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <Avatar initials={lead.initials} className="h-9 w-9 rounded-xl shadow-xs" />
@@ -373,6 +383,148 @@ export default function Leads() {
             onAdd={addLead}
           />
         )}
+        <SlideOverDrawer
+          isOpen={!!selectedLead}
+          onClose={() => setSelectedLead(null)}
+          title={selectedLead?.organization ?? "Opportunity Inspector"}
+          subtitle={`Key Contact: ${selectedLead?.name ?? ""} · Owner: ${selectedLead?.owner ?? ""}`}
+          footer={
+            <div className="flex items-center justify-between">
+              <span className="font-mono-ui text-xs text-slate-500">DEAL-00{selectedLead?.id}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setToast(`Opportunity for ${selectedLead?.organization} updated.`);
+                  setSelectedLead(null);
+                }}
+                className="rounded-lg bg-teal-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-teal-700 shadow-xs transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          }
+        >
+          {selectedLead && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                <Avatar initials={selectedLead.initials} className="h-14 w-14 text-base rounded-2xl shadow-xs" />
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{selectedLead.organization}</h3>
+                  <p className="text-xs text-slate-500">{selectedLead.name}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <StatusBadge value={selectedLead.stage} />
+                    <span className="rounded bg-slate-200/70 px-2 py-0.5 font-mono-ui text-[10px] font-semibold text-slate-700">
+                      {selectedLead.source}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deal Value Banner */}
+              <div className="rounded-xl border border-teal-200/80 bg-gradient-to-br from-teal-50/70 to-white p-4 shadow-xs">
+                <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-teal-800">
+                  Estimated Contract Value
+                </span>
+                <div className="mt-1 font-mono-ui text-2xl font-bold tracking-tight text-teal-900">
+                  {formatCurrency(selectedLead.value)}
+                </div>
+                <div className="mt-1 text-xs text-teal-700">
+                  Commercial engagement scheduled with {selectedLead.owner}
+                </div>
+              </div>
+
+              {/* Pipeline Stage Tracker */}
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Deal Progression
+                  </span>
+                  <span className="font-mono-ui text-xs font-bold text-slate-700">
+                    Stage: {selectedLead.stage}
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-1.5 text-center">
+                  {stages.map((st, idx) => {
+                    const currentIdx = stages.indexOf(selectedLead.stage);
+                    const isPast = idx <= currentIdx;
+                    const isCurrent = idx === currentIdx;
+                    return (
+                      <div key={st} className="flex flex-col items-center">
+                        <div
+                          className={`h-2 w-full rounded-full transition-all ${
+                            isCurrent
+                              ? "bg-teal-600 ring-2 ring-teal-600/30"
+                              : isPast
+                              ? "bg-teal-500"
+                              : "bg-slate-100"
+                          }`}
+                        />
+                        <span
+                          className={`mt-1.5 text-[10px] truncate w-full ${
+                            isCurrent
+                              ? "font-bold text-teal-800 font-mono-ui"
+                              : isPast
+                              ? "font-medium text-slate-700"
+                              : "text-slate-400"
+                          }`}
+                        >
+                          {st}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Meta Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Account Owner</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">{selectedLead.owner}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Acquisition Channel</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">{selectedLead.source}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Last Touchpoint</span>
+                  <div className="mt-1 font-mono-ui text-sm font-semibold text-slate-900">{selectedLead.lastContact}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">CRM Health</span>
+                  <div className="mt-1 text-sm font-semibold text-emerald-600">High Engagement</div>
+                </div>
+              </div>
+
+              {/* Fast Action Links */}
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono-ui mb-3">
+                  Account Actions
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToast(`Meeting request draft generated for ${selectedLead.name}.`);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
+                  >
+                    Schedule Meeting
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToast(`Proposal document initiated for ${selectedLead.organization}.`);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-semibold text-teal-700 hover:bg-teal-100/70 transition-colors shadow-xs"
+                  >
+                    Generate Proposal
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SlideOverDrawer>
         {toast && <ToastMessage message={toast} onDismiss={() => setToast("")} />}
       </div>
     </ErpShell>

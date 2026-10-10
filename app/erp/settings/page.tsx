@@ -77,14 +77,14 @@ export default function Settings() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">Render Cloud API Service</span>
+                      <span className="text-xs font-bold text-slate-900">Railway ERP API Service</span>
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 erp-pulse-dot" />
-                        Healthy
+                        Configured
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-600 font-mono-ui">
-                      https://techm4india-erp-api.onrender.com/api/v1
+                      https://techm4india-website-production.up.railway.app/api/v1
                     </p>
                   </div>
                 </div>
@@ -96,10 +96,10 @@ export default function Settings() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">Managed PostgreSQL 16</span>
-                      <span className="text-[10px] font-semibold font-mono-ui text-slate-500">Singapore (ap-southeast-1)</span>
+                      <span className="text-[10px] font-semibold font-mono-ui text-slate-500">Railway production</span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">
-                      SSL/TLS 1.3 enforced · Multi-tenant separation · Automated daily backups
+                      Database availability is checked by the ERP API health endpoint
                     </p>
                   </div>
                 </div>
@@ -135,6 +135,7 @@ export default function Settings() {
             <Panel title="Notification &amp; Digest Rules">
               <div className="divide-y divide-slate-100">
                 <label className="flex cursor-pointer items-center justify-between gap-4 p-5 hover:bg-slate-50/50 transition-colors">
+                  <span className="sr-only">Operational Notifications</span>
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600 border border-teal-100">
                       <Bell className="h-4 w-4" />
@@ -153,6 +154,7 @@ export default function Settings() {
                   />
                 </label>
                 <label className="flex cursor-pointer items-center justify-between gap-4 p-5 hover:bg-slate-50/50 transition-colors">
+                  <span className="sr-only">Executive Weekly Briefing</span>
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600 border border-teal-100">
                       <MonitorCog className="h-4 w-4" />

@@ -1,9 +1,10 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { apiFetch, apiFetchV2, ApiError } from "@/lib/api/client";
 import { ErpLoading, ProtectedErp } from "@/app/erp/components/ProtectedErp";
 import { FounderModuleNavigation } from "@/app/erp/components/FounderModuleNavigation";
+import { computePayrollResult } from "@/lib/erp/payroll.rules";
 
 type AnyRecord = Record<string, any>;
 function FounderPayrollContent() {
@@ -43,6 +44,27 @@ function FounderPayrollContent() {
     startDate: "",
     endDate: "",
   });
+  const [simBasic, setSimBasic] = useState("35000");
+  const [simHra, setSimHra] = useState("14000");
+  const [simSpecial, setSimSpecial] = useState("11000");
+  const [simLop, setSimLop] = useState("0");
+  const [simWorkingDays, setSimWorkingDays] = useState("30");
+  const [simPriorTds, setSimPriorTds] = useState("0");
+  const [simMonthsRemaining, setSimMonthsRemaining] = useState("12");
+
+  const simResult = useMemo(() => {
+    return computePayrollResult({
+      basic: Number(simBasic) || 0,
+      hra: Number(simHra) || 0,
+      specialAllowance: Number(simSpecial) || 0,
+      lopDays: Number(simLop) || 0,
+      workingDays: Number(simWorkingDays) || 30,
+      priorTdsPaidInFY: Number(simPriorTds) || 0,
+      monthsRemainingInFY: Number(simMonthsRemaining) || 12,
+      stateCode: "TG",
+    });
+  }, [simBasic, simHra, simSpecial, simLop, simWorkingDays, simPriorTds, simMonthsRemaining]);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -666,6 +688,173 @@ function FounderPayrollContent() {
               )}
             </div>
           )}
+        </section>
+
+        <section className="erp-section" aria-label="Statutory compliance engine">
+          <div className="erp-section-heading">
+            <div>
+              <p className="erp-kicker">Indian Statutory Compliance Engine · FY 2026-27</p>
+              <h2>Payroll Statutory Inspector &amp; Proration Calculator</h2>
+              <p>
+                Real-time statutory engine verifying EPF/EPS ceiling splits (₹15,000 ceiling, ₹1,250 EPS cap),
+                ESI semi-annual rules, Telangana Professional Tax slabs, and Section 192 TDS New Tax Regime.
+              </p>
+            </div>
+            <span className="erp-section-count">Live Statutory Engine</span>
+          </div>
+
+          <div className="erp-form-grid" style={{ marginBottom: "1.5rem" }}>
+            <label>
+              <span>Basic salary (monthly)</span>
+              <input
+                type="number"
+                min="0"
+                step="500"
+                value={simBasic}
+                onChange={(e) => setSimBasic(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>HRA (monthly)</span>
+              <input
+                type="number"
+                min="0"
+                step="500"
+                value={simHra}
+                onChange={(e) => setSimHra(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Special allowance (monthly)</span>
+              <input
+                type="number"
+                min="0"
+                step="500"
+                value={simSpecial}
+                onChange={(e) => setSimSpecial(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Loss of pay (LOP) days</span>
+              <input
+                type="number"
+                min="0"
+                max="31"
+                value={simLop}
+                onChange={(e) => setSimLop(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Calendar days in month</span>
+              <input
+                type="number"
+                min="28"
+                max="31"
+                value={simWorkingDays}
+                onChange={(e) => setSimWorkingDays(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Prior TDS paid in FY</span>
+              <input
+                type="number"
+                min="0"
+                step="500"
+                value={simPriorTds}
+                onChange={(e) => setSimPriorTds(e.target.value)}
+              />
+            </label>
+            <label>
+              <span>Remaining months in FY</span>
+              <input
+                type="number"
+                min="1"
+                max="12"
+                value={simMonthsRemaining}
+                onChange={(e) => setSimMonthsRemaining(e.target.value)}
+              />
+            </label>
+          </div>
+
+          <div className="erp-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Statutory Head</th>
+                  <th>Calculation Rule / Statutory Basis</th>
+                  <th className="is-numeric">Employee Share (Deduction)</th>
+                  <th className="is-numeric">Employer Share (CTC Cost)</th>
+                  <th className="is-numeric">Total Remittance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Prorated Earnings</strong>
+                    <small>LOP Factor: {(simResult.prorationFactor * 100).toFixed(1)}% ({simResult.payableDays}/{simResult.workingDays} days)</small>
+                  </td>
+                  <td>Basic: ₹{simResult.basic.toLocaleString("en-IN")} + HRA: ₹{simResult.hra.toLocaleString("en-IN")} + Allowances: ₹{simResult.specialAllowance.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">—</td>
+                  <td className="is-numeric">—</td>
+                  <td className="is-numeric"><strong>₹{simResult.grossEarnings.toLocaleString("en-IN")}</strong></td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Employees Provident Fund (EPF &amp; EPS)</strong>
+                    <small>EPFO Act 1952 · ₹15,000 wage ceiling</small>
+                  </td>
+                  <td>
+                    Employee 12% (₹{simResult.epf.employeePf.toLocaleString("en-IN")}) | EPS 8.33% capped at ₹{simResult.epf.eps.toLocaleString("en-IN")} + EPF balance ₹{simResult.epf.employerEpf.toLocaleString("en-IN")}
+                  </td>
+                  <td className="is-numeric">₹{simResult.epf.employeePf.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">₹{(simResult.epf.employerEpf + simResult.epf.eps).toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">₹{(simResult.epf.employeePf + simResult.epf.employerEpf + simResult.epf.eps).toLocaleString("en-IN")}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Employees State Insurance (ESIC)</strong>
+                    <small>ESIC Act 1948 · ₹21,000 gross ceiling</small>
+                  </td>
+                  <td>{simResult.esi.isCovered ? "0.75% employee + 3.25% employer" : "Exempt (Gross > ₹21,000 threshold)"}</td>
+                  <td className="is-numeric">₹{simResult.esi.employeeEsi.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">₹{simResult.esi.employerEsi.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">₹{(simResult.esi.employeeEsi + simResult.esi.employerEsi).toLocaleString("en-IN")}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Telangana Professional Tax (PT)</strong>
+                    <small>Telangana PT Act 1987 Slabs</small>
+                  </td>
+                  <td>Gross &gt; ₹20k: ₹200/mo | ₹15k-₹20k: ₹150/mo | &le; ₹15k: Nil</td>
+                  <td className="is-numeric">₹{simResult.professionalTax.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">—</td>
+                  <td className="is-numeric">₹{simResult.professionalTax.toLocaleString("en-IN")}</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Income Tax TDS (Section 192)</strong>
+                    <small>New Tax Regime FY 2026-27 (Standard Deduction ₹75k)</small>
+                  </td>
+                  <td>
+                    Taxable: ₹{simResult.tds.taxableIncome.toLocaleString("en-IN")} | Rebate u/s 87A: ₹{simResult.tds.rebate87A.toLocaleString("en-IN")} | Cess: ₹{simResult.tds.cess.toLocaleString("en-IN")}
+                  </td>
+                  <td className="is-numeric">₹{simResult.tds.monthlyTds.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric">—</td>
+                  <td className="is-numeric">₹{simResult.tds.monthlyTds.toLocaleString("en-IN")}</td>
+                </tr>
+                <tr style={{ background: "rgba(0, 0, 0, 0.03)", fontWeight: "bold" }}>
+                  <td>
+                    <strong>Net Payout &amp; Total CTC Cost</strong>
+                    <small>Total Deductions: ₹{simResult.totalDeductions.toLocaleString("en-IN")}</small>
+                  </td>
+                  <td>Take-home: ₹{simResult.netPay.toLocaleString("en-IN")} | Employer Contribution: ₹{simResult.totalEmployerContribution.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric" style={{ color: "#d97706" }}>₹{simResult.totalDeductions.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric" style={{ color: "#2563eb" }}>₹{simResult.totalEmployerContribution.toLocaleString("en-IN")}</td>
+                  <td className="is-numeric" style={{ color: "#16a34a" }}>₹{simResult.netPay.toLocaleString("en-IN")} (Net Pay)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </main>

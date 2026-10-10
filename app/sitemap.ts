@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: siteUrl + "/solutions/erp", priority: 0.85, changeFrequency: "monthly" },
     { url: siteUrl + "/schools", priority: 0.9, changeFrequency: "monthly" },
     { url: siteUrl + "/space", priority: 0.9, changeFrequency: "monthly" },
+    { url: siteUrl + "/institutes", priority: 0.9, changeFrequency: "monthly" },
     { url: siteUrl + "/contact", priority: 0.8, changeFrequency: "monthly" },
   ];
 }

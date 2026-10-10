@@ -7,6 +7,12 @@ import { StructuredData } from "./components/StructuredData";
 import "./globals.css";
 // Loaded after globals so the workspace design system wins inside `.erp-route`.
 import "./erp-system.css";
+// Landing, Schools, Solutions and Institutes. Namespaced under `.xp`, so order is not load-bearing.
+import "./styles/xp-foundation.css";
+import "./styles/xp-home.css";
+import "./styles/xp-schools.css";
+import "./styles/xp-solutions.css";
+import "./styles/xp-institutes.css";
 
 const manrope = Manrope({
   variable: "--font-sans",
@@ -23,11 +29,11 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.techm4india.com"),
   title: {
-    default: "TechM4India | Innovation Across Engineering, Schools, Solutions & Space",
+    default: "TechM4India | Innovation Across Schools, Engineering, Solutions, Space & Institutes",
     template: "%s | TechM4India",
   },
   description:
-    "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, and TechM4Space.",
+    "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, TechM4Space and TechM4Institutes.",
   keywords: [
     "TechM4India",
     "engineering innovation",
@@ -40,9 +46,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     siteName: "TechM4India",
-    title: "TechM4India | Innovation Across Engineering, Schools, Solutions & Space",
+    title: "TechM4India | Innovation Across Schools, Engineering, Solutions, Space & Institutes",
     description:
-      "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, and TechM4Space.",
+      "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, TechM4Space and TechM4Institutes.",
     url: "https://www.techm4india.com/",
     images: [
       {
@@ -55,9 +61,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TechM4India | Innovation Across Engineering, Schools, Solutions & Space",
+    title: "TechM4India | Innovation Across Schools, Engineering, Solutions, Space & Institutes",
     description:
-      "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, and TechM4Space.",
+      "Discover TechM4India, a leading innovation ecosystem spanning TechM4Engineering, TechM4Solutions, TechM4Schools, TechM4Space and TechM4Institutes.",
     images: ["/og.png"],
   },
   icons: {
@@ -136,6 +142,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                     "@type": "Organization",
                     name: "TechM4Space",
                     url: "https://www.techm4india.com/space",
+                  },
+                  {
+                    "@type": "Organization",
+                    name: "TechM4Institutes",
+                    url: "https://www.techm4india.com/institutes",
                   },
                 ],
               },

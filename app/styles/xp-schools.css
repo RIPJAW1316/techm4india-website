@@ -1,0 +1,1550 @@
+/* ==========================================================================
+   xp-schools: TechM4Schools page (/schools)
+   --------------------------------------------------------------------------
+   Foundation lives in xp-foundation.css. Every selector here is prefixed
+   "xs-" and scoped under .xp-schools, and uses the --xp-* tone variables so
+   each block works on ink and on paper.
+   ========================================================================== */
+
+.xp-schools sup {
+  position: relative;
+  top: -0.55em;
+  color: var(--xp-accent);
+  font-size: 0.42em;
+  letter-spacing: 0;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+/* A. Hero ---------------------------------------------------------------- */
+.xp-schools .xs-hero {
+  padding-top: clamp(170px, 20vh, 230px);
+  padding-bottom: 0;
+}
+.xp-schools .xs-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: end;
+}
+.xp-schools .xs-hero-copy {
+  display: grid;
+  gap: clamp(22px, 2.6vw, 34px);
+  padding-bottom: clamp(0px, 2vw, 28px);
+}
+.xp-schools .xs-hero-title {
+  font-size: clamp(42px, 6.4vw, 96px);
+  line-height: 0.96;
+}
+.xp-schools .xs-hero-copy .xp-lede {
+  color: var(--xp-fg-muted);
+}
+.xp-schools .xs-hero-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 7fr) auto;
+  gap: 20px clamp(24px, 4vw, 64px);
+  align-items: center;
+  margin-top: clamp(44px, 6vw, 88px);
+  padding-block: clamp(22px, 2.6vw, 34px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-hero-strip > ul {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px clamp(20px, 3vw, 44px);
+}
+.xp-schools .xs-hero-strip li {
+  min-width: 0;
+}
+.xp-schools .xs-hero-strip li > a {
+  display: flex;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  color: inherit;
+}
+.xp-schools .xs-hero-strip li > a:hover strong,
+.xp-schools .xs-hero-strip li > a:focus-visible strong {
+  color: var(--xp-accent);
+}
+.xp-schools .xs-hero-strip strong {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(38px, 4vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 0.2s var(--xp-ease);
+}
+.xp-schools .xs-hero-strip li span {
+  max-width: 16ch;
+  color: var(--xp-fg-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* B. Innovate Bharath ---------------------------------------------------- */
+.xp-schools .xs-ib-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(40px, 6vw, 104px);
+  align-items: start;
+}
+.xp-schools .xs-ib-copy {
+  display: grid;
+  gap: clamp(20px, 2.4vw, 30px);
+}
+.xp-schools .xs-note {
+  display: grid;
+  gap: 10px;
+  margin-top: clamp(8px, 1.4vw, 20px);
+  padding: 22px 0 6px 22px;
+  border-left: 2px solid var(--xp-accent);
+}
+.xp-schools .xs-note > p:not(.xp-meta) {
+  max-width: 46ch;
+  color: var(--xp-fg);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+.xp-schools .xs-ib-figures {
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-ib-figures > div {
+  display: flex;
+  flex-flow: row-reverse wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-block: clamp(18px, 2.4vw, 34px);
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-ib-figures dt {
+  max-width: 17ch;
+  color: var(--xp-fg);
+  font-size: clamp(15px, 1.3vw, 18px);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: right;
+}
+.xp-schools .xs-ib-figures dd {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(64px, 11vw, 168px);
+  letter-spacing: -0.055em;
+  line-height: 0.86;
+  white-space: nowrap;
+}
+/* The three steps as a funnel: each bar narrows, because fewer ideas pass
+   each stage. Deliberately unnumbered: the shape carries no figures. */
+.xp-schools .xs-ib-steps {
+  display: grid;
+  gap: 0;
+  margin-top: clamp(28px, 3.6vw, 52px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-ib-steps li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-areas:
+    "no title"
+    "no text"
+    "no bar";
+  column-gap: 18px;
+  row-gap: 6px;
+  padding-block: clamp(20px, 2.4vw, 30px);
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-ib-steps li::after {
+  content: "";
+  grid-area: bar;
+  width: var(--xs-funnel, 100%);
+  height: 6px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, var(--xp-accent), var(--xp-orange));
+  transform-origin: left;
+  transition: transform 1s var(--xp-ease) 0.2s;
+}
+.xp-schools .xs-ib-steps li:nth-child(2) {
+  --xs-funnel: 58%;
+}
+.xp-schools .xs-ib-steps li:nth-child(3) {
+  --xs-funnel: 24%;
+}
+.xp-schools .xs-ib-steps li[data-reveal]:not(.is-visible)::after {
+  transform: scaleX(0);
+}
+.xp-schools .xs-ib-steps span {
+  grid-area: no;
+  color: var(--xp-accent);
+  font-family: var(--xp-serif);
+  font-size: clamp(34px, 3.4vw, 48px);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.xp-schools .xs-ib-steps h3 {
+  grid-area: title;
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 2.3vw, 32px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.xp-schools .xs-ib-steps p {
+  grid-area: text;
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* C1. Platforms: two specification rows ---------------------------------- */
+.xp-schools .xs-platform-list {
+  border-bottom: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-platform {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 4fr);
+  gap: 24px clamp(24px, 4vw, 72px);
+  align-items: start;
+  padding-block: clamp(30px, 4vw, 56px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-platform > header {
+  display: grid;
+  gap: 14px;
+}
+.xp-schools .xs-platform h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(36px, 4.4vw, 62px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+.xp-schools .xs-platform-features {
+  display: grid;
+  gap: 10px;
+}
+.xp-schools .xs-platform-features li {
+  padding: 11px 0;
+  border-top: 1px solid var(--xp-rule);
+  color: var(--xp-fg);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* C2. Composite Skill Lab: explorer -------------------------------------- */
+.xp-schools .xs-labs {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(28px, 5vw, 88px);
+  align-items: start;
+}
+.xp-schools .xs-labs-nav {
+  display: grid;
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-labs-tab {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 14px 12px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--xp-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--xp-fg-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.25s var(--xp-ease),
+    color 0.25s var(--xp-ease),
+    box-shadow 0.25s var(--xp-ease);
+}
+.xp-schools .xs-labs-tab > span {
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+.xp-schools .xs-labs-tab > strong {
+  font-family: var(--xp-serif);
+  font-size: clamp(19px, 1.7vw, 23px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.xp-schools .xs-labs-tab:hover {
+  color: var(--xp-fg-strong);
+}
+.xp-schools .xs-labs-tab[aria-selected="true"] {
+  background: rgba(244, 242, 235, 0.07);
+  box-shadow: inset 3px 0 0 var(--xp-accent);
+  color: var(--xp-fg-strong);
+}
+.xp-schools .xs-labs-tab[aria-selected="true"] > span {
+  color: var(--xp-accent);
+}
+.xp-schools .xs-labs-tab:focus-visible {
+  outline-offset: -3px;
+}
+.xp-schools .xs-lab {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.xp-schools .xs-lab[hidden] {
+  display: none;
+}
+.xp-schools .xs-labs.is-tabs .xs-lab {
+  min-height: 420px;
+  animation: xs-lab-in 0.4s var(--xp-ease);
+}
+.xp-schools .xs-labs:not(.is-tabs) .xs-lab + .xs-lab {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid var(--xp-rule);
+}
+@keyframes xs-lab-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.xp-schools .xs-lab-name {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(32px, 4vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+}
+.xp-schools .xs-lab-line {
+  max-width: 44ch;
+  color: var(--xp-accent);
+  font-family: var(--xp-serif);
+  font-size: clamp(19px, 1.8vw, 24px);
+  font-style: italic;
+  line-height: 1.3;
+}
+.xp-schools .xs-lab .xp-body {
+  color: var(--xp-fg);
+}
+.xp-schools .xs-lab-do {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-lab-do ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(20px, 3vw, 48px);
+}
+.xp-schools .xs-lab-do li {
+  position: relative;
+  padding: 13px 0 13px 22px;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg-strong);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.xp-schools .xs-lab-do li::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--xp-accent);
+}
+
+.xp-schools .xs-room {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(28px, 5vw, 88px);
+  align-items: center;
+  margin-top: clamp(56px, 7vw, 112px);
+  padding-top: clamp(40px, 5vw, 72px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-room-copy {
+  display: grid;
+  gap: 20px;
+}
+.xp-schools .xs-room-copy ul {
+  border-top: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-room-copy li {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg);
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+.xp-schools .xs-room-note {
+  max-width: 52ch;
+  color: var(--xp-fg-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* C3. Kits ---------------------------------------------------------------- */
+.xp-schools .xs-kits-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  gap: clamp(32px, 6vw, 104px);
+  align-items: center;
+}
+.xp-schools .xs-kits-copy {
+  display: grid;
+  gap: clamp(24px, 3vw, 40px);
+}
+.xp-schools .xs-kits-head {
+  display: grid;
+  gap: 20px;
+}
+.xp-schools .xs-kit-list {
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-kit-list li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 4fr) minmax(0, 6fr);
+  gap: 6px 20px;
+  align-items: baseline;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-kit-list span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+.xp-schools .xs-kit-list h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(20px, 1.8vw, 25px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.xp-schools .xs-kit-list p {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-schools .xs-kits-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 28px;
+}
+.xp-schools .xs-kits-foot > p {
+  color: var(--xp-fg);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* D. Student journey ------------------------------------------------------
+   Mobile first: a vertical timeline. From 1240px it becomes a rising
+   staircase of six steps, drawn with each step's top rule and a short riser.
+   ------------------------------------------------------------------------ */
+.xp-schools .xs-journey {
+  --xs-node: 44px;
+  display: grid;
+}
+.xp-schools .xs-stage {
+  position: relative;
+  padding: 0 0 clamp(36px, 6vw, 56px) calc(var(--xs-node) + clamp(16px, 3vw, 32px));
+}
+.xp-schools .xs-stage::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--xs-node) / 2);
+  width: 1px;
+  background: var(--xp-rule-strong);
+}
+.xp-schools .xs-stage--final {
+  padding-bottom: 0;
+}
+.xp-schools .xs-stage--final::before {
+  bottom: auto;
+  height: var(--xs-node);
+}
+.xp-schools .xs-stage-node {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: var(--xs-node);
+  height: var(--xs-node);
+  place-items: center;
+  border: 1px solid var(--xp-accent);
+  background: var(--xp-bg);
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.xp-schools .xs-stage--final .xs-stage-node {
+  background: var(--xp-accent);
+  color: var(--xp-bg);
+}
+.xp-schools .xs-stage-body {
+  display: grid;
+  gap: 20px;
+  padding-top: 4px;
+}
+.xp-schools .xs-stage-main {
+  display: grid;
+  gap: 10px;
+}
+.xp-schools .xs-stage h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 3.4vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.xp-schools .xs-stage-text {
+  max-width: 56ch;
+  color: var(--xp-fg);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.xp-schools .xs-stage-support {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+.xp-schools .xs-stage-support li {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg-strong);
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* The four outcome roles branch off a trunk. */
+.xp-schools .xs-roles {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+}
+.xp-schools .xs-roles ul {
+  border-left: 1px solid var(--xp-accent);
+}
+.xp-schools .xs-roles li {
+  position: relative;
+  padding: 9px 0 9px 38px;
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.xp-schools .xs-roles li::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 24px;
+  height: 1px;
+  background: var(--xp-accent);
+}
+.xp-schools .xs-roles li::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 3px);
+  left: 21px;
+  width: 7px;
+  height: 7px;
+  background: var(--xp-accent);
+}
+.xp-schools .xs-roles-note {
+  color: var(--xp-fg-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+@media (min-width: 700px) and (max-width: 1239.98px) {
+  .xp-schools .xs-stage-body {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    column-gap: clamp(28px, 5vw, 64px);
+  }
+  .xp-schools .xs-roles {
+    grid-column: 1 / -1;
+    margin-top: 14px;
+  }
+  /* The trunk turns horizontal and the four roles hang from it. */
+  .xp-schools .xs-roles ul {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid var(--xp-accent);
+    border-left: 0;
+  }
+  .xp-schools .xs-roles li {
+    padding: 34px 14px 0 0;
+  }
+  .xp-schools .xs-roles li::before {
+    top: 0;
+    width: 1px;
+    height: 22px;
+  }
+  .xp-schools .xs-roles li::after {
+    top: 19px;
+    left: -3px;
+  }
+}
+
+@media (min-width: 1240px) {
+  .xp-schools .xs-journey {
+    --xs-node: 36px;
+    --xs-step: 30px;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.3fr);
+    align-items: start;
+  }
+  .xp-schools .xs-stage {
+    margin-top: calc((6 - var(--i)) * var(--xs-step));
+    padding: 48px 22px 0 0;
+    border-top: 1px solid var(--xp-rule-strong);
+  }
+  /* The riser: joins this step's rule to the previous, lower one. */
+  .xp-schools .xs-stage::before,
+  .xp-schools .xs-stage--final::before {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    height: var(--xs-step);
+  }
+  .xp-schools .xs-stage:first-child::before {
+    display: none;
+  }
+  .xp-schools .xs-stage--final {
+    padding-right: 0;
+    border-top-color: var(--xp-accent);
+  }
+  .xp-schools .xs-stage-node {
+    top: calc(var(--xs-node) / -2);
+  }
+  .xp-schools .xs-stage-body {
+    gap: 22px;
+    padding-top: 0;
+  }
+  .xp-schools .xs-stage h3 {
+    font-size: 22px;
+    line-height: 1.12;
+  }
+  .xp-schools .xs-stage-text {
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .xp-schools .xs-stage-support li {
+    font-size: 13.5px;
+  }
+  .xp-schools .xs-roles li {
+    font-size: 23px;
+  }
+}
+
+/* E. Partnerships and validation ----------------------------------------- */
+.xp-schools .xs-partners-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(36px, 6vw, 104px);
+  align-items: start;
+}
+.xp-schools .xs-pillars {
+  border-bottom: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-pillars > li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 8px 12px;
+  align-items: baseline;
+  padding-block: clamp(22px, 2.6vw, 34px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-pillars > li > span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+.xp-schools .xs-pillars > li > div {
+  display: grid;
+  gap: 10px;
+}
+.xp-schools .xs-pillars h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.xp-schools .xs-pillars p {
+  max-width: 58ch;
+  color: var(--xp-fg-muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.xp-schools .xs-impl {
+  display: grid;
+  gap: 18px;
+}
+.xp-schools .xs-impl > h3 {
+  margin-top: 8px;
+  color: var(--xp-accent);
+}
+.xp-schools .xs-impl > ul {
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-impl li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.xp-schools .xs-nep {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  gap: 12px clamp(24px, 4vw, 64px);
+  align-items: baseline;
+  margin-top: clamp(48px, 7vw, 104px);
+  padding-block: clamp(26px, 3.4vw, 44px);
+  border-block: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-nep > h3 {
+  color: var(--xp-accent);
+}
+.xp-schools .xs-nep > p {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 3vw, 42px);
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.xp-schools .xs-ledger {
+  display: grid;
+  gap: clamp(20px, 2.6vw, 32px);
+  margin-top: clamp(40px, 5vw, 72px);
+  padding: clamp(22px, 3.4vw, 48px);
+  border: 1px solid var(--xp-rule-strong);
+  background: #fff;
+}
+.xp-schools .xs-ledger > header {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 12px clamp(24px, 4vw, 64px);
+  align-items: end;
+}
+.xp-schools .xs-ledger > header > p {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.xp-schools .xs-ledger > ul {
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-ledger li {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+  gap: 8px clamp(16px, 3vw, 40px);
+  align-items: center;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-ledger li > strong {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(26px, 2.8vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+.xp-schools .xs-ledger li > span:not(.xp-tag) {
+  color: var(--xp-fg);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Shown instead of the ledger until the client confirms any validation. */
+.xp-schools .xs-references {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  margin-top: clamp(28px, 3.4vw, 44px);
+}
+.xp-schools .xs-references > p {
+  max-width: 62ch;
+  color: var(--xp-fg);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Programme team: credit strip ------------------------------------------- */
+.xp-schools .xs-team-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
+}
+.xp-schools .xs-team-grid > div {
+  display: grid;
+  gap: 16px;
+}
+.xp-schools .xs-credits {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-credits li {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 20px 16px 4px 0;
+}
+.xp-schools .xs-credits li + li {
+  padding-left: 16px;
+  border-left: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-credits img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  object-position: center top;
+  background: var(--xp-bone);
+}
+.xp-schools .xs-credits div {
+  display: grid;
+  gap: 4px;
+}
+.xp-schools .xs-credits strong {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.xp-schools .xs-credits span {
+  color: var(--xp-fg-muted);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+/* F. Audience routes ------------------------------------------------------ */
+.xp-schools .xs-close .xp-head {
+  margin-bottom: 0;
+}
+.xp-schools .xs-audiences {
+  border-top: 1px solid var(--xp-line-ink-strong);
+}
+.xp-schools .xs-audience {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 6fr) minmax(0, 3fr);
+  gap: 10px clamp(16px, 3vw, 48px);
+  align-items: center;
+  min-height: 44px;
+  padding: clamp(20px, 2.4vw, 30px) 0;
+  border-bottom: 1px solid var(--xp-line-ink);
+  color: var(--xp-on-ink);
+  transition:
+    background 0.3s var(--xp-ease),
+    padding 0.3s var(--xp-ease);
+}
+.xp-schools .xs-audience:hover,
+.xp-schools .xs-audience:focus-visible {
+  padding-inline: 14px;
+  background: rgba(244, 242, 235, 0.06);
+}
+.xp-schools .xs-audience-who {
+  color: var(--xp-amber);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.xp-schools .xs-audience-what {
+  display: grid;
+  gap: 6px;
+}
+.xp-schools .xs-audience-what > strong {
+  color: #fff;
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.xp-schools .xs-audience-what > small {
+  max-width: 60ch;
+  color: var(--xp-on-ink-muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+.xp-schools .xs-audience-go {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.xp-schools .xs-audience-go > i {
+  flex: none;
+  color: var(--xp-amber);
+  font-style: normal;
+  font-variant-emoji: text;
+  transition: transform 0.25s var(--xp-ease);
+}
+.xp-schools .xs-audience:hover .xs-audience-go > i,
+.xp-schools .xs-audience:focus-visible .xs-audience-go > i {
+  transform: translate(3px, -3px);
+}
+
+/* Responsive -------------------------------------------------------------- */
+@media (max-width: 1000px) {
+  .xp-schools .xs-team-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-schools .xs-credits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .xp-schools .xs-credits li:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-schools .xs-credits li:nth-child(n + 3) {
+    border-top: 1px solid var(--xp-rule);
+  }
+  .xp-schools .xs-platform {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .xp-schools .xs-platform > header {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-schools .xs-hero-grid,
+  .xp-schools .xs-ib-grid,
+  .xp-schools .xs-labs,
+  .xp-schools .xs-room,
+  .xp-schools .xs-kits-grid,
+  .xp-schools .xs-partners-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-schools .xs-hero-plate,
+  .xp-schools .xs-kits-plate {
+    aspect-ratio: 3 / 2;
+  }
+  .xp-schools .xs-hero-strip {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  .xp-schools .xs-labs.is-tabs .xs-lab {
+    min-height: 0;
+  }
+  .xp-schools .xs-audience {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-schools .xs-audience-go {
+    justify-content: flex-start;
+    min-height: 28px;
+    text-align: left;
+  }
+}
+
+@media (max-width: 620px) {
+  .xp-schools .xs-hero-strip > ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .xp-schools .xs-ib-steps,
+  .xp-schools .xs-platform,
+  .xp-schools .xs-lab-do ul,
+  .xp-schools .xs-nep,
+  .xp-schools .xs-ledger > header,
+  .xp-schools .xs-ledger li,
+  .xp-schools .xs-credits {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-schools .xs-ib-steps li {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .xp-schools .xs-ib-figures dt {
+    text-align: left;
+  }
+  .xp-schools .xs-kit-list li {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+  .xp-schools .xs-kit-list p {
+    grid-column: 2;
+  }
+  .xp-schools .xs-pillars > li {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+  .xp-schools .xs-credits li,
+  .xp-schools .xs-credits li + li {
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    padding: 16px 0;
+    border-left: 0;
+    border-top: 1px solid var(--xp-rule);
+  }
+  .xp-schools .xs-credits li:first-child {
+    border-top: 0;
+  }
+  .xp-schools .xs-journey {
+    --xs-node: 40px;
+  }
+  .xp-schools .xs-stage {
+    padding-left: calc(var(--xs-node) + 16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-schools .xs-labs.is-tabs .xs-lab {
+    animation: none;
+  }
+  .xp-schools .xs-audience {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+   Additions: transformation, programmes and outcomes, mind map
+   ========================================================================== */
+
+/* B. Transformation: a before / with table beside a photograph ------------- */
+.xp-schools .xs-shift-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+}
+.xp-schools .xs-shift-plate {
+  position: sticky;
+  top: 28px;
+}
+.xp-schools .xs-shift-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid var(--xp-rule-strong);
+  text-align: left;
+}
+.xp-schools .xs-shift-table thead th {
+  padding: 14px 16px 14px 0;
+  color: var(--xp-fg-muted);
+  font-family: var(--xp-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.xp-schools .xs-shift-table thead th:last-child {
+  color: var(--xp-red);
+}
+.xp-schools .xs-shift-table tbody tr {
+  border-top: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-shift-table tbody th {
+  width: 26%;
+  padding: 20px 16px 20px 0;
+  color: var(--xp-fg-muted);
+  font-size: 14px;
+  font-weight: 600;
+  vertical-align: top;
+}
+.xp-schools .xs-shift-table td {
+  padding: 18px 16px 18px 0;
+  vertical-align: top;
+}
+.xp-schools .xs-shift-before {
+  width: 32%;
+  color: var(--xp-fg-muted);
+  font-size: 16px;
+  text-decoration: line-through;
+  text-decoration-color: rgba(198, 45, 55, 0.45);
+  text-decoration-thickness: 1px;
+}
+.xp-schools .xs-shift-after {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(20px, 1.9vw, 26px);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.xp-schools .xs-shift-after::before {
+  content: "→";
+  margin-right: 10px;
+  color: var(--xp-red);
+  font-family: var(--xp-sans);
+  font-size: 0.8em;
+}
+
+/* C4. Programmes: a three-column ledger, then outcomes ---------------------- */
+.xp-schools .xs-programme-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-schools .xs-programme-list > li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: clamp(24px, 3vw, 36px) clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 36px) 0;
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-programme-list > li:not(:nth-child(3n + 1)) {
+  padding-left: clamp(18px, 2.4vw, 32px);
+  border-left: 1px solid var(--xp-rule);
+}
+.xp-schools .xs-programme-no {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(40px, 4vw, 56px);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  opacity: 0.18;
+}
+.xp-schools .xs-programme-rhythm {
+  color: var(--xp-red);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.xp-schools .xs-programme-list h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(23px, 2.1vw, 30px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.xp-schools .xs-programme-list li > p:not(.xs-programme-rhythm) {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-schools .xs-outcomes {
+  display: grid;
+  gap: clamp(22px, 3vw, 36px);
+  margin-top: clamp(56px, 7vw, 104px);
+  padding: clamp(24px, 3.4vw, 48px);
+  background: var(--xp-ink);
+  color: var(--xp-on-ink);
+}
+.xp-schools .xs-outcomes-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 32px;
+}
+.xp-schools .xs-outcomes-head .xp-subtitle {
+  color: #fff;
+}
+.xp-schools .xs-outcomes-head p {
+  color: var(--xp-on-ink-muted);
+  font-size: 14.5px;
+}
+.xp-schools .xs-outcome-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 clamp(20px, 3vw, 44px);
+}
+.xp-schools .xs-outcome-list li {
+  display: grid;
+  gap: 6px;
+  padding-block: 18px;
+  border-top: 1px solid var(--xp-line-ink-strong);
+}
+.xp-schools .xs-outcome-list strong {
+  color: var(--xp-amber);
+  font-family: var(--xp-serif);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.xp-schools .xs-outcome-list span {
+  color: var(--xp-on-ink-muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* The journey's last stage now points at the map. */
+.xp-schools .xs-roles {
+  margin-top: 6px;
+}
+
+/* D2. Mind map ---------------------------------------------------------------- */
+.xp-schools .xs-map {
+  display: grid;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+}
+.xp-schools .xs-map-canvas {
+  position: relative;
+  height: clamp(460px, 44vw, 600px);
+}
+.xp-schools .xs-map-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.xp-schools .xs-map-lines path {
+  fill: none;
+  stroke: var(--xp-line-ink-strong);
+  stroke-width: 1.5;
+  transition:
+    stroke 0.35s var(--xp-ease),
+    stroke-width 0.35s var(--xp-ease);
+}
+.xp-schools .xs-map-lines g.is-active path {
+  stroke: var(--xp-amber);
+  stroke-width: 3;
+}
+.xp-schools .xs-map-center {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: grid;
+  gap: 6px;
+  width: 25%;
+  padding: 18px 16px;
+  border: 2px solid var(--xp-amber);
+  background: var(--xp-ink);
+  transform: translateY(-50%);
+}
+.xp-schools .xs-map-center .xp-meta {
+  color: var(--xp-amber);
+}
+.xp-schools .xs-map-center strong {
+  color: #fff;
+  font-family: var(--xp-serif);
+  font-size: clamp(18px, 1.7vw, 24px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.xp-schools .xs-map-rows {
+  position: absolute;
+  inset: 0;
+}
+.xp-schools .xs-map-row {
+  position: absolute;
+  top: var(--y);
+  right: 0;
+  left: 38%;
+  display: grid;
+  grid-template-columns: minmax(0, 20fr) minmax(0, 18fr) minmax(0, 24fr);
+  align-items: center;
+  transform: translateY(-50%);
+}
+.xp-schools .xs-map-branch {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--xp-line-ink-strong);
+  background: var(--xp-ink-3);
+  transition:
+    border-color 0.3s var(--xp-ease),
+    background 0.3s var(--xp-ease);
+}
+.xp-schools .xs-map-branch strong {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.xp-schools .xs-map-branch span {
+  color: var(--xp-on-ink-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+/* Columns are pinned: the arrow is hidden on desktop and must not shift
+   the outcome into the middle column. */
+.xp-schools .xs-map-branch {
+  grid-column: 1;
+}
+.xp-schools .xs-map-arrow {
+  display: none;
+  grid-column: 2;
+}
+.xp-schools .xs-map-outcome {
+  grid-column: 3;
+}
+.xp-schools .xs-map-outcome {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--xp-line-ink-strong);
+  background: transparent;
+  color: var(--xp-on-ink);
+  font-family: var(--xp-serif);
+  font-size: clamp(19px, 1.8vw, 26px);
+  letter-spacing: -0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.3s var(--xp-ease),
+    color 0.3s var(--xp-ease),
+    border-color 0.3s var(--xp-ease);
+}
+.xp-schools .xs-map-outcome:hover {
+  border-color: var(--xp-amber);
+}
+.xp-schools .xs-map-row.is-active .xs-map-branch {
+  border-color: var(--xp-amber);
+  background: var(--xp-ink);
+}
+.xp-schools .xs-map-row.is-active .xs-map-outcome {
+  border-color: var(--xp-amber);
+  background: var(--xp-amber);
+  color: var(--xp-ink);
+}
+.xp-schools .xs-map-detail {
+  display: grid;
+  gap: 14px;
+  padding: clamp(22px, 2.6vw, 34px);
+  border: 1px solid var(--xp-line-ink-strong);
+  background: var(--xp-ink);
+}
+.xp-schools .xs-map-detail .xp-meta {
+  color: var(--xp-amber);
+}
+.xp-schools .xs-map-detail h3 {
+  color: #fff;
+  font-family: var(--xp-serif);
+  font-size: clamp(28px, 2.8vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+.xp-schools .xs-map-detail h3 em {
+  color: var(--xp-amber);
+}
+.xp-schools .xs-map-detail ol {
+  display: grid;
+  border-top: 1px solid var(--xp-line-ink-strong);
+}
+.xp-schools .xs-map-detail li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  padding-block: 11px;
+  border-bottom: 1px solid var(--xp-line-ink);
+  color: var(--xp-on-ink);
+  font-size: 14.5px;
+  line-height: 1.5;
+  animation: xs-step-in 0.45s var(--xp-ease) both;
+}
+.xp-schools .xs-map-detail li:nth-child(2) {
+  animation-delay: 60ms;
+}
+.xp-schools .xs-map-detail li:nth-child(3) {
+  animation-delay: 120ms;
+}
+.xp-schools .xs-map-detail li:nth-child(4) {
+  animation-delay: 180ms;
+}
+.xp-schools .xs-map-detail li:nth-child(5) {
+  animation-delay: 240ms;
+}
+@keyframes xs-step-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+.xp-schools .xs-map-detail li > span {
+  color: var(--xp-amber);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  padding-top: 3px;
+}
+.xp-schools .xs-map-detail li.is-outcome {
+  color: #fff;
+  font-family: var(--xp-serif);
+  font-size: 22px;
+}
+.xp-schools .xs-map-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-top: clamp(32px, 4vw, 52px);
+  padding-top: 24px;
+  border-top: 1px solid var(--xp-line-ink-strong);
+}
+.xp-schools .xs-map-foot p {
+  color: var(--xp-on-ink-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 1100px) {
+  .xp-schools .xs-map {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-schools .xs-shift-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Relative, not static: the caption is positioned against the plate. */
+  .xp-schools .xs-shift-plate {
+    position: relative;
+    top: 0;
+    max-width: 420px;
+    aspect-ratio: 3 / 2;
+  }
+  .xp-schools .xs-programme-list,
+  .xp-schools .xs-outcome-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .xp-schools .xs-programme-list > li:not(:nth-child(3n + 1)) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-schools .xs-programme-list > li:nth-child(even) {
+    padding-left: 22px;
+    border-left: 1px solid var(--xp-rule);
+  }
+  /* The map becomes a stacked list: start, then branch to direction rows. */
+  .xp-schools .xs-map-canvas {
+    height: auto;
+  }
+  .xp-schools .xs-map-lines {
+    display: none;
+  }
+  .xp-schools .xs-map-center {
+    position: static;
+    width: auto;
+    margin-bottom: 18px;
+    transform: none;
+  }
+  .xp-schools .xs-map-rows {
+    position: static;
+    display: grid;
+    gap: 10px;
+  }
+  .xp-schools .xs-map-row {
+    position: static;
+    grid-template-columns: minmax(0, 1fr) 28px minmax(0, 0.8fr);
+    transform: none;
+  }
+  .xp-schools .xs-map-arrow {
+    display: block;
+    justify-self: center;
+    width: 10px;
+    height: 10px;
+    border-top: 1.5px solid var(--xp-line-ink-strong);
+    border-right: 1.5px solid var(--xp-line-ink-strong);
+    transform: rotate(45deg);
+  }
+  .xp-schools .xs-map-row.is-active .xs-map-arrow {
+    border-color: var(--xp-amber);
+  }
+}
+
+@media (max-width: 620px) {
+  .xp-schools .xs-shift-table thead {
+    display: none;
+  }
+  .xp-schools .xs-shift-table,
+  .xp-schools .xs-shift-table tbody,
+  .xp-schools .xs-shift-table tr,
+  .xp-schools .xs-shift-table th,
+  .xp-schools .xs-shift-table td {
+    display: block;
+    width: auto !important;
+  }
+  .xp-schools .xs-shift-table tbody tr {
+    display: grid;
+    gap: 6px;
+    padding-block: 16px;
+  }
+  .xp-schools .xs-shift-table tbody th,
+  .xp-schools .xs-shift-table td {
+    padding: 0;
+  }
+  /* Stacked, the strike-through loses its column header, so say it. */
+  .xp-schools .xs-shift-before {
+    text-decoration: none;
+  }
+  .xp-schools .xs-shift-before::before {
+    content: "Before: ";
+  }
+  .xp-schools .xs-programme-list,
+  .xp-schools .xs-outcome-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-schools .xs-programme-list > li:nth-child(even) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-schools .xs-map-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .xp-schools .xs-map-branch,
+  .xp-schools .xs-map-outcome {
+    grid-column: auto;
+  }
+  .xp-schools .xs-map-arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-schools .xs-map-detail li {
+    animation: none;
+  }
+}

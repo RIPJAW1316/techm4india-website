@@ -327,6 +327,8 @@ const cmsReadPermissionKeys = ["cms.dashboard.read", "cms.content.read"] as cons
 const complianceReadPermissionKeys = ["compliance.dashboard.read", "compliance.read"] as const;
 
 async function main(): Promise<void> {
+  const isDevelopmentSeed =
+    process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
   const organization = await prisma.organization.upsert({
     where: { slug: "techm4india" },
     update: { legalName: "TechM4India" },
@@ -808,14 +810,16 @@ async function main(): Promise<void> {
     }
   }
 
-  // Hosted demo founder account for this demo deployment (idempotent upsert).
-  // Email/password are overridable via DEMO_FOUNDER_EMAIL / DEMO_FOUNDER_PASSWORD;
-  // otherwise a known demo credential is used so the deployed site is accessible.
-  {
+  // A demo Founder is available only in development when a password is supplied.
+  // Seed runs never change the password or status of an existing account.
+  if (isDevelopmentSeed && process.env.DEMO_FOUNDER_PASSWORD) {
     const demoFounderEmail = (process.env.DEMO_FOUNDER_EMAIL || "founder@techm4india.com")
       .trim()
       .toLowerCase();
-    const demoFounderPassword = process.env.DEMO_FOUNDER_PASSWORD || "TechM4India!2026";
+    const demoFounderPassword = process.env.DEMO_FOUNDER_PASSWORD;
+    if (demoFounderPassword.length < 12) {
+      throw new Error("DEMO_FOUNDER_PASSWORD must be at least 12 characters");
+    }
     const demoFounderRole = roles.get("FOUNDER_CEO");
     const demoEngineering = divisionRecords.get("engineering");
     if (demoFounderRole && demoEngineering) {
@@ -825,7 +829,7 @@ async function main(): Promise<void> {
       });
       const demoUser = await prisma.user.upsert({
         where: { email: demoFounderEmail },
-        update: { status: UserStatus.ACTIVE, passwordHash: demoFounderHash },
+        update: {},
         create: {
           email: demoFounderEmail,
           passwordHash: demoFounderHash,
@@ -1003,19 +1007,15 @@ async function main(): Promise<void> {
       );
     }
 
-    const founderPasswordHash = await hashPassword(bootstrapFounderPassword as string);
     const existingUser = await prisma.user.findUnique({
       where: { email: bootstrapFounderEmail },
     });
     const founderUser = existingUser
-      ? await prisma.user.update({
-          where: { id: existingUser.id },
-          data: { status: UserStatus.ACTIVE, passwordHash: founderPasswordHash },
-        })
+      ? existingUser
       : await prisma.user.create({
           data: {
             email: bootstrapFounderEmail as string,
-            passwordHash: founderPasswordHash,
+            passwordHash: await hashPassword(bootstrapFounderPassword as string),
             status: UserStatus.ACTIVE,
           },
         });
@@ -1062,7 +1062,7 @@ async function main(): Promise<void> {
 
   const seedPassword = process.env.SEED_DEMO_PASSWORD;
   const passwordHash = seedPassword ? await hashPassword(seedPassword) : undefined;
-  const seedDemoData = process.env.NODE_ENV !== "production" && Boolean(passwordHash);
+  const seedDemoData = isDevelopmentSeed && Boolean(passwordHash);
   if (!seedDemoData) {
     console.log(
       `Seeded ${organization.legalName}, ${divisions.length} divisions, ${roleNames.length} roles; demo employees skipped (development opt-in required).`,
@@ -1082,10 +1082,7 @@ async function main(): Promise<void> {
     throw new Error("SEED_DEMO_PASSWORD is required when creating the demo account");
   }
   const user = existingUser
-    ? await prisma.user.update({
-        where: { id: existingUser.id },
-        data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
-      })
+    ? existingUser
     : await prisma.user.create({
         data: {
           email: "aryan@techm4india.com",
@@ -1102,10 +1099,7 @@ async function main(): Promise<void> {
     where: { email: "founder.dev@techm4india.com" },
   });
   const founderUser = existingFounderUser
-    ? await prisma.user.update({
-        where: { id: existingFounderUser.id },
-        data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
-      })
+    ? existingFounderUser
     : await prisma.user.create({
         data: {
           email: "founder.dev@techm4india.com",
@@ -1344,10 +1338,7 @@ async function main(): Promise<void> {
     if (!existingDemoUser && !passwordHash)
       throw new Error(`SEED_DEMO_PASSWORD is required when creating ${demo.email}`);
     const demoUser = existingDemoUser
-      ? await prisma.user.update({
-          where: { id: existingDemoUser.id },
-          data: { status: UserStatus.ACTIVE, passwordHash: passwordHash as string },
-        })
+      ? existingDemoUser
       : await prisma.user.create({
           data: {
             email: demo.email,

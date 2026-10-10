@@ -6,19 +6,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const backendDir = path.resolve(__dirname, "../backend");
 const require = createRequire(path.join(backendDir, "package.json"));
 
-const RENDER_DATABASE_URL =
-  "postgresql://techm4india:afIpu6rFsozv9N4ZdCs3OVaXNHznMtBH@dpg-dam2lflbedkc73aemnkg-a.singapore-postgres.render.com/techm4india_erp?sslmode=require";
-
-process.env.DATABASE_URL = RENDER_DATABASE_URL;
+const databaseUrl = process.env.DATABASE_URL;
+const demoPassword = process.env.SEED_DEMO_PASSWORD;
+if (!databaseUrl || !demoPassword || demoPassword.length < 12) {
+  throw new Error("Set DATABASE_URL and a SEED_DEMO_PASSWORD of at least 12 characters before seeding demo accounts.");
+}
 
 const { PrismaClient } = require("@prisma/client");
 const argon2 = require("argon2");
 
-const DEMO_PASSWORD = "TechM4India!2026";
-
 const prisma = new PrismaClient({
   datasources: {
-    db: { url: RENDER_DATABASE_URL },
+    db: { url: databaseUrl },
   },
 });
 
@@ -256,8 +255,8 @@ const DEMO_PERSONAS = [
 ];
 
 async function seed() {
-  console.log("Connecting to PostgreSQL on Render...");
-  const passwordHash = await argon2.hash(DEMO_PASSWORD, {
+  console.log("Connecting to configured PostgreSQL...");
+  const passwordHash = await argon2.hash(demoPassword, {
     memoryCost: 19456,
     parallelism: 1,
     timeCost: 2,
@@ -287,10 +286,7 @@ async function seed() {
     // 1. Upsert User
     const user = await prisma.user.upsert({
       where: { email: persona.email },
-      update: {
-        status: "ACTIVE",
-        passwordHash,
-      },
+      update: {},
       create: {
         email: persona.email,
         passwordHash,

@@ -3,7 +3,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   Calendar,
-  Check,
   ClipboardList,
   FileCheck,
   FilePlus2,
@@ -26,6 +25,7 @@ import {
   formatDate,
   PageHeader,
   Panel,
+  SlideOverDrawer,
   StatusBadge,
   ToastMessage,
 } from "./erp-ui";
@@ -84,11 +84,13 @@ function CreateModuleRecord({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto"
-      onClick={onClose}
     >
+      <button type="button" className="absolute inset-0 cursor-default" onClick={onClose} aria-label="Close dialog" />
       <div
-        className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden erp-modal-box my-6"
-        onClick={(event) => event.stopPropagation()}
+        className="relative z-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden erp-modal-box my-6"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Create New ${config.singular}`}
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 bg-slate-50/70">
@@ -109,6 +111,7 @@ function CreateModuleRecord({
             type="button"
             data-testid="button-close-module-dialog"
             onClick={onClose}
+            aria-label="Close dialog"
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/60 hover:text-slate-700 transition-colors"
           >
             <X className="h-4 w-4" />
@@ -124,12 +127,13 @@ function CreateModuleRecord({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                <label htmlFor="module-kind" className="mb-1.5 block text-xs font-semibold text-slate-700">
                   Record Type <span className="text-teal-600">*</span>
                 </label>
                 <div className="relative">
                   <Tag className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-kind"
                     data-testid="input-module-kind"
                     required
                     value={form.kind}
@@ -141,12 +145,13 @@ function CreateModuleRecord({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                <label htmlFor="module-reference" className="mb-1.5 block text-xs font-semibold text-slate-700">
                   Reference ID <span className="text-teal-600">*</span>
                 </label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-reference"
                     data-testid="input-module-reference"
                     required
                     value={form.reference}
@@ -158,12 +163,13 @@ function CreateModuleRecord({
               </div>
 
               <div className="sm:col-span-2">
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                <label htmlFor="module-name" className="mb-1.5 block text-xs font-semibold text-slate-700">
                   Record Title / Name <span className="text-teal-600">*</span>
                 </label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-name"
                     data-testid="input-module-name"
                     required
                     value={form.name}
@@ -183,12 +189,13 @@ function CreateModuleRecord({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                <label htmlFor="module-owner" className="mb-1.5 block text-xs font-semibold text-slate-700">
                   Assignee / Owner <span className="text-teal-600">*</span>
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-owner"
                     data-testid="input-module-owner"
                     required
                     value={form.owner}
@@ -200,12 +207,13 @@ function CreateModuleRecord({
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+                <label htmlFor="module-due-date" className="mb-1.5 block text-xs font-semibold text-slate-700">
                   Target Due Date <span className="text-teal-600">*</span>
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-due-date"
                     data-testid="input-module-dueDate"
                     required
                     type="date"
@@ -225,8 +233,9 @@ function CreateModuleRecord({
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-slate-700">Status</label>
+                <label htmlFor="module-status" className="mb-1.5 block text-xs font-semibold text-slate-700">Status</label>
                 <select
+                  id="module-status"
                   data-testid="select-module-status"
                   value={form.status}
                   onChange={(event) => update("status", event.target.value)}
@@ -239,13 +248,14 @@ function CreateModuleRecord({
               </div>
 
               <div>
-                <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-slate-700">
+                <label htmlFor="module-amount" className="mb-1.5 flex items-center justify-between text-xs font-semibold text-slate-700">
                   <span>Tracked Value</span>
                   <span className="text-[10px] text-slate-400">INR</span>
                 </label>
                 <div className="relative">
                   <IndianRupee className="absolute left-3 top-3 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
                   <input
+                    id="module-amount"
                     data-testid="input-module-amount"
                     type="number"
                     min="0"
@@ -257,11 +267,12 @@ function CreateModuleRecord({
               </div>
 
               <div>
-                <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-slate-700">
+                <label htmlFor="module-progress" className="mb-1.5 flex items-center justify-between text-xs font-semibold text-slate-700">
                   <span>Progress</span>
                   <span className="font-mono-ui text-[10px] text-teal-700 font-semibold">{form.progress}%</span>
                 </label>
                 <input
+                  id="module-progress"
                   data-testid="input-module-progress"
                   type="number"
                   min="0"
@@ -276,10 +287,11 @@ function CreateModuleRecord({
 
           {/* Section 4: Description */}
           <div>
-            <label className="mb-1.5 block text-xs font-semibold text-slate-700">
+            <label htmlFor="module-description" className="mb-1.5 block text-xs font-semibold text-slate-700">
               Description &amp; Operational Context <span className="text-teal-600">*</span>
             </label>
             <textarea
+              id="module-description"
               data-testid="input-module-description"
               rows={3}
               value={form.description}
@@ -319,14 +331,18 @@ function CreateModuleRecord({
   );
 }
 
-function RecordRow({ record }: { record: ModuleRecord }) {
+function RecordRow({ record, onSelect }: { record: ModuleRecord; onSelect?: () => void }) {
   return (
-    <tr data-testid={`row-module-record-${record.id}`} className="group hover:bg-slate-50/80 transition-colors">
+    <tr
+      data-testid={`row-module-record-${record.id}`}
+      onClick={onSelect}
+      className="group hover:bg-slate-50/80 transition-colors erp-table-clickable cursor-pointer"
+    >
       <td className="px-5 py-4">
         <div className="flex items-start gap-3">
           <Avatar initials={record.initials || record.name.slice(0, 2).toUpperCase()} className="mt-0.5 h-8 w-8" />
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-slate-900">{record.name}</div>
+            <div className="truncate text-sm font-semibold text-slate-900 group-hover:text-teal-700 transition-colors">{record.name}</div>
             <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500">
               <span className="font-medium text-slate-600">{record.kind}</span>
               <span className="text-slate-300">/</span>
@@ -369,6 +385,7 @@ export function ModuleOperations({ config }: { config: ModuleViewConfig }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<ModuleRecord | null>(null);
   const [toast, setToast] = useState("");
 
   const { records, addRecord } = useModuleRecordsData(config.module);
@@ -524,13 +541,95 @@ export function ModuleOperations({ config }: { config: ModuleViewConfig }) {
                 </thead>
                 <tbody>
                   {visibleRecords.map((record) => (
-                    <RecordRow key={record.id} record={record} />
+                    <RecordRow
+                      key={record.id}
+                      record={record}
+                      onSelect={() => setSelectedRecord(record)}
+                    />
                   ))}
                 </tbody>
               </table>
             </div>
           )}
         </Panel>
+
+        <SlideOverDrawer
+          isOpen={!!selectedRecord}
+          onClose={() => setSelectedRecord(null)}
+          title={selectedRecord?.name ?? "Record Inspector"}
+          subtitle={`${selectedRecord?.kind ?? ""} · Ref: ${selectedRecord?.reference ?? ""}`}
+          footer={
+            <div className="flex items-center justify-between">
+              <span className="font-mono-ui text-xs text-slate-500">ID: {selectedRecord?.reference}</span>
+              <button
+                type="button"
+                onClick={() => setSelectedRecord(null)}
+                className="rounded-lg bg-teal-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-teal-700 shadow-xs transition-colors"
+              >
+                Close Record
+              </button>
+            </div>
+          }
+        >
+          {selectedRecord && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                <Avatar initials={selectedRecord.initials || selectedRecord.name.slice(0, 2).toUpperCase()} className="h-12 w-12 rounded-xl shadow-xs" />
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{selectedRecord.name}</h3>
+                  <div className="mt-1 flex items-center gap-2">
+                    <StatusBadge value={selectedRecord.status} />
+                    <span className="rounded bg-slate-200/70 px-2 py-0.5 font-mono-ui text-[10px] font-semibold text-slate-700">
+                      {selectedRecord.kind}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress & Value */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Execution Progress</span>
+                  <div className="mt-1 flex items-center gap-2">
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-teal-600"
+                        style={{ width: `${Math.min(100, Math.max(0, selectedRecord.progress || 0))}%` }}
+                      />
+                    </div>
+                    <span className="font-mono-ui text-sm font-bold text-slate-800">{selectedRecord.progress || 0}%</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Tracked Value</span>
+                  <div className="mt-1 font-mono-ui text-sm font-bold text-slate-900">
+                    {selectedRecord.amount ? formatCurrency(selectedRecord.amount) : "Not monetary"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Ownership & Timeline */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Owner</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">{selectedRecord.owner}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Target Due Date</span>
+                  <div className="mt-1 font-mono-ui text-sm font-semibold text-slate-900">{formatDate(selectedRecord.dueDate)}</div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono-ui mb-2">
+                  Operating Context &amp; Deliverables
+                </h4>
+                <p className="text-sm leading-relaxed text-slate-700">{selectedRecord.description}</p>
+              </div>
+            </div>
+          )}
+        </SlideOverDrawer>
       </div>
       {dialogOpen && (
         <CreateModuleRecord

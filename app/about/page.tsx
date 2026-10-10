@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import Link from "next/link";
 import {
   ArrowLink,
@@ -15,7 +16,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "About TechM4India | Transforming India Through Technology",
   description:
-    "Learn about TechM4India's mission to build India's innovation ecosystem through four powerful verticals: Engineering, Solutions, Space Technology, and Schools.",
+    "Learn about TechM4India's mission to build India's innovation ecosystem through five divisions: Engineering, Solutions, Space Technology, Schools and Institutes.",
   path: "/about",
 });
 
@@ -43,7 +44,7 @@ const timeline = [
   {
     date: "Today",
     title: "A wider ambition",
-    text: "AI, digital infrastructure and four connected divisions now shape the next chapter of the work.",
+    text: "AI, digital infrastructure and five connected divisions now shape the next chapter of the work.",
   },
 ];
 
@@ -84,7 +85,7 @@ export default function AboutPage() {
             We&apos;re building India&apos;s largest <em>tech ecosystem for every student.</em>
           </>
         }
-        description="From a single classroom in Telangana to four connected divisions shaping engineers, innovators, space scientists and future-ready school students."
+        description="From a single classroom in Telangana to five connected divisions shaping engineers, innovators, space scientists, institutions and future-ready school students."
         image="/images/about/hero.jpeg"
         imageAlt="Indian students collaborating on a technology project"
       />
@@ -132,7 +133,7 @@ export default function AboutPage() {
           />
           <StatRow
             items={[
-              { value: "4", label: "Connected divisions" },
+              { value: "5", label: "Connected divisions" },
               { value: "7", label: "Engineering disciplines" },
               { value: "6", label: "Aerospace lab formats" },
               { value: "5", label: "School innovation labs" },
@@ -171,7 +172,7 @@ export default function AboutPage() {
       <section className="verticals-section section">
         <div className="shell">
           <SectionHeading
-            eyebrow="04 / Four divisions"
+            eyebrow="04 / Five divisions"
             title={
               <>
                 Different disciplines. <em>One ecosystem.</em>

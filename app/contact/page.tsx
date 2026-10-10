@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import Link from "next/link";
 import { ContactForm } from "../components/ContactForm";
 import { PageHero, SectionHeading } from "../components/Shared";

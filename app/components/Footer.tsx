@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import Link from "next/link";
 import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";
 
@@ -11,7 +12,7 @@ export function Footer() {
         <i />
       </div>
       <div className="shell footer-intro">
-        <p className="footer-kicker">One ecosystem. Four powerful divisions.</p>
+        <p className="footer-kicker">One ecosystem. Five divisions.</p>
         <h2>
           Engineering a more <em>inventive India.</em>
         </h2>
@@ -29,7 +30,7 @@ export function Footer() {
           </Link>
           <p>
             Building India&apos;s next-generation technology and innovation ecosystem across
-            schools, engineering, solutions and space.
+            schools, engineering, solutions, space and institutes.
           </p>
           <a href={contact.generalPhoneHref}>{contact.generalPhone}</a>
           <a href={contact.emailHref}>{contact.email}</a>

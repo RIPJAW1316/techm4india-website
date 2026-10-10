@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 const PROD_URL = 'https://techm4india-website.vercel.app';
-const PASSWORD = 'TechM4India!2026';
+const PASSWORD = process.env.ERP_TEST_PASSWORD;
 
 const ROLES_TO_VERIFY = [
   { email: 'admin@techm4india.com', role: 'SUPER_ADMIN' },
@@ -14,6 +14,7 @@ const ROLES_TO_VERIFY = [
 ];
 
 async function runProductionTests() {
+  if (!PASSWORD) throw new Error('Set ERP_TEST_PASSWORD for an authorized test account before running this script.');
   console.log('=== VERIFYING LIVE VERCEL PRODUCTION DEPLOYMENT ===\n');
   console.log(`Target URL: ${PROD_URL}\n`);
 

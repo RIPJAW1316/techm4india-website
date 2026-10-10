@@ -5,6 +5,7 @@ export const navigation = [
   { href: "/solutions", label: "Solutions" },
   { href: "/schools", label: "Schools" },
   { href: "/space", label: "Space" },
+  { href: "/institutes", label: "Institutes" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -49,10 +50,20 @@ export const divisions = [
     description:
       "Future-ready school ecosystems where students code, build robots, explore AI and learn by making.",
   },
+  {
+    number: "05",
+    verb: "Partner",
+    name: "TechM4Institutes",
+    shortName: "Institutes",
+    href: "/institutes",
+    image: "/images/editorial/workshop-crowd.jpeg",
+    description:
+      "Long-term programmes for colleges and universities: credit-bearing courses, faculty development, lab set-up and a path from first semester to placement.",
+  },
 ];
 
 export const impactStats = [
-  { value: "4", label: "Technology innovation verticals" },
+  { value: "5", label: "Technology innovation verticals" },
   { value: "7", label: "Engineering disciplines" },
   { value: "6", label: "Aerospace lab formats" },
   { value: "5", label: "School innovation labs" },

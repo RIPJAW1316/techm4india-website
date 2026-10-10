@@ -9,10 +9,12 @@ import {
   PageHeader,
   Panel,
   SearchField,
+  SlideOverDrawer,
   StatusBadge,
   ToastMessage,
 } from "../components/erp-ui";
 import { useEmployeesData } from "@/lib/erp/replit-store";
+import type { Employee } from "@/lib/erp/replit-data";
 
 const emptyForm = { name: "", email: "", role: "", department: "", location: "" };
 
@@ -46,11 +48,13 @@ function EmployeeDialog({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity erp-modal-backdrop"
-      onClick={onClose}
     >
+      <button type="button" className="absolute inset-0 cursor-default" onClick={onClose} aria-label="Close dialog" />
       <div
-        className="w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white shadow-2xl erp-modal-box overflow-hidden"
-        onClick={(event) => event.stopPropagation()}
+        className="relative z-10 w-full max-w-xl rounded-2xl border border-slate-200/80 bg-white shadow-2xl erp-modal-box overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add employee"
       >
         {/* Modal Header */}
         <div className="flex items-start justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5">
@@ -210,6 +214,7 @@ export default function Employees() {
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [toast, setToast] = useState("");
 
   const { employees, addEmployee } = useEmployeesData({
@@ -281,7 +286,7 @@ export default function Employees() {
             />
           ) : (
             <div className="scrollbar-thin overflow-x-auto">
-              <table className="erp-table-modern w-full min-w-[760px] text-left">
+              <table className="erp-table-modern erp-table-clickable w-full min-w-[760px] text-left">
                 <thead>
                   <tr>
                     <th className="px-5 py-3">Team Member</th>
@@ -294,7 +299,12 @@ export default function Employees() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {employees.map((employee) => (
-                    <tr key={employee.id} data-testid={`row-employee-${employee.id}`} className="group">
+                    <tr
+                      key={employee.id}
+                      data-testid={`row-employee-${employee.id}`}
+                      onClick={() => setSelectedEmployee(employee)}
+                      className="group cursor-pointer hover:bg-slate-50/80 transition-colors"
+                    >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
                           <Avatar initials={employee.initials} className="h-9 w-9 rounded-xl shadow-xs" />
@@ -338,6 +348,84 @@ export default function Employees() {
             onAdd={addEmployee}
           />
         )}
+        <SlideOverDrawer
+          isOpen={!!selectedEmployee}
+          onClose={() => setSelectedEmployee(null)}
+          title={selectedEmployee?.name ?? "Employee Profile"}
+          subtitle={`${selectedEmployee?.role ?? ""} · ${selectedEmployee?.department ?? ""}`}
+          footer={
+            <div className="flex items-center justify-between">
+              <span className="font-mono-ui text-xs text-slate-500">ID: EMP-00{selectedEmployee?.id}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setToast(`Profile for ${selectedEmployee?.name} synchronized.`);
+                  setSelectedEmployee(null);
+                }}
+                className="rounded-lg bg-teal-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-teal-700 shadow-xs transition-colors"
+              >
+                Close Inspector
+              </button>
+            </div>
+          }
+        >
+          {selectedEmployee && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                <Avatar initials={selectedEmployee.initials} className="h-14 w-14 text-base rounded-2xl shadow-xs" />
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{selectedEmployee.name}</h3>
+                  <p className="text-xs text-slate-500 font-mono-ui">{selectedEmployee.email}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <StatusBadge value={selectedEmployee.status} />
+                    <span className="rounded bg-slate-200/70 px-2 py-0.5 font-mono-ui text-[10px] font-semibold text-slate-700">
+                      {selectedEmployee.department}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Designation</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">{selectedEmployee.role}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Location</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">{selectedEmployee.location}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Joined Date</span>
+                  <div className="mt-1 font-mono-ui text-sm font-semibold text-slate-900">{selectedEmployee.joinedAt}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Workstation</span>
+                  <div className="mt-1 text-sm font-semibold text-slate-900">Hyderabad Hub</div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono-ui mb-3">
+                  Operational Responsibilities
+                </h4>
+                <ul className="space-y-2 text-xs text-slate-600">
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+                    <span>Authorized for division milestone approvals</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+                    <span>Synchronized with central HR attendance & payroll</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+                    <span>Standard enterprise SLA response coverage</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </SlideOverDrawer>
         {toast && <ToastMessage message={toast} onDismiss={() => setToast("")} />}
       </div>
     </ErpShell>

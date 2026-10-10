@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ErpShell } from "../components/erp-shell";
-import { formatCurrency, PageHeader, Panel, StatusBadge } from "../components/erp-ui";
+import { AttentionBanner, formatCurrency, PageHeader, Panel, StatusBadge } from "../components/erp-ui";
+import { useErpAuth } from "../components/AuthProvider";
 import { useDashboardData } from "@/lib/erp/replit-store";
 import type { Activity, DashboardSummary } from "@/lib/erp/replit-data";
 
@@ -47,7 +48,7 @@ function MetricCard({
         </span>
       </div>
       <div className="font-mono-ui text-[11px] font-semibold uppercase tracking-[.12em] text-slate-500">{label}</div>
-      <div className="mt-1.5 text-[26px] font-bold tracking-tight text-slate-900">{value}</div>
+      <div className="mt-1.5 font-mono-ui text-[26px] font-bold tracking-tight text-slate-900">{value}</div>
       <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
         <span>vs. previous quarter</span>
       </div>
@@ -165,13 +166,20 @@ function ActivityFeed({ activities }: { activities: Activity[] }) {
 
 export default function Dashboard() {
   const { summary, activities } = useDashboardData();
+  const { context } = useErpAuth();
+
+  const employeeName = context?.employee
+    ? context.employee.firstName
+    : context?.user?.email
+    ? context.user.email.split("@")[0].replace(".", " ")
+    : "Operator";
 
   return (
     <ErpShell>
       <div className="page-enter">
         <PageHeader
           eyebrow="Executive View / IST Operational Mode"
-          title="Good morning, Arjun."
+          title={`Good day, ${employeeName}.`}
           description="Consolidated company overview, division KPIs, and live pipeline status."
           action={
             <div className="hidden rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-right sm:block shadow-xs">
@@ -180,6 +188,15 @@ export default function Dashboard() {
             </div>
           }
         />
+
+        <AttentionBanner
+          items={[
+            { label: "Open Requisitions", count: summary.openPositions },
+            { label: "Active Deals", count: summary.pipelineByStage.reduce((acc, curr) => acc + curr.count, 0) },
+            { label: "Partner Institutions", count: summary.partnerInstitutions },
+          ]}
+        />
+
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 page-enter-delay-1">
           <MetricCard
             label="Revenue"

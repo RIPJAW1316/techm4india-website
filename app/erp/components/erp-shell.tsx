@@ -22,7 +22,6 @@ import {
   ReceiptIndianRupee,
   Settings2,
   ShieldCheck,
-  UserCheck,
   UsersRound,
   X,
   Zap,
@@ -187,7 +186,7 @@ function NavContent({
         <button
           type="button"
           data-testid="button-help"
-          onClick={() => window.alert("TechM4India Command Center: Multi-Role RBAC is active. Use 'Switch Persona' to simulate any of the 20 enterprise roles.")}
+          onClick={() => window.alert("TechM4India Command Center: Multi-Role RBAC is active. Use 'Switch Persona' to sign in to another account with its password.")}
           className="bottom-nav-action flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium text-slate-300 hover:bg-white/[0.08] hover:!text-white transition-colors"
         >
           <CircleHelp className="h-[17px] w-[17px] text-slate-400" strokeWidth={1.8} />
@@ -205,11 +204,12 @@ function PersonaSwitcherModal({
   isSwitching,
 }: {
   onClose: () => void;
-  onSwitch: (email: string) => Promise<void>;
+  onSwitch: (email: string, password: string) => Promise<void>;
   currentEmail: string | undefined;
   isSwitching: boolean;
 }) {
   const [filter, setFilter] = useState<"all" | "leadership" | "finance_ops" | "sales_growth" | "specialized">("all");
+  const [password, setPassword] = useState("");
 
   const filtered = filter === "all"
     ? ROLE_PERSONAS
@@ -218,11 +218,10 @@ function PersonaSwitcherModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity erp-modal-backdrop"
-      onClick={onClose}
     >
+      <button type="button" className="absolute inset-0 cursor-default" onClick={onClose} aria-label="Close role switcher" />
       <div
-        className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl erp-modal-box overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+        className="relative z-10 w-full max-w-2xl rounded-2xl border border-slate-200 bg-white shadow-2xl erp-modal-box overflow-hidden"
       >
         <div className="flex items-start justify-between border-b border-slate-100 bg-slate-50/70 px-6 py-5">
           <div className="flex items-center gap-3">
@@ -231,10 +230,10 @@ function PersonaSwitcherModal({
             </div>
             <div>
               <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-[.18em] text-teal-700">
-                Persona Simulator · 20 Enterprise Roles
+                Company Accounts · 20 Enterprise Roles
               </span>
               <h3 className="text-lg font-bold tracking-tight text-slate-900">
-                Switch Active Role &amp; Access Scope
+                Sign in to another role
               </h3>
             </div>
           </div>
@@ -249,8 +248,20 @@ function PersonaSwitcherModal({
 
         <div className="p-6">
           <p className="mb-4 text-xs text-slate-500">
-            Select any role to immediately switch your identity in the live workspace and verify that role&apos;s visibility, navigation, and permissions:
+            Enter the password for the account you want to use, then select its role.
           </p>
+
+          <label className="mb-4 block text-xs font-semibold text-slate-700" htmlFor="switch-account-password">
+            Account password
+            <input
+              id="switch-account-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+            />
+          </label>
 
           <div className="mb-4 flex flex-wrap gap-1 border-b border-slate-200 pb-2">
             {[
@@ -311,15 +322,15 @@ function PersonaSwitcherModal({
 
                   <button
                     type="button"
-                    disabled={isCurrent || isSwitching}
-                    onClick={() => onSwitch(persona.email)}
+                    disabled={isCurrent || isSwitching || !password}
+                    onClick={() => onSwitch(persona.email, password)}
                     className={`shrink-0 rounded-lg px-3 py-1.5 font-mono-ui text-xs font-semibold transition-colors ${
                       isCurrent
                         ? "cursor-default opacity-50 bg-slate-100 text-slate-400"
                         : "bg-teal-600 text-white hover:bg-teal-700 shadow-xs"
                     }`}
                   >
-                    {isSwitching ? "Switching…" : isCurrent ? "Active" : "Switch to Role ↗"}
+                    {isSwitching ? "Signing in…" : isCurrent ? "Active" : "Sign in ↗"}
                   </button>
                 </div>
               );
@@ -337,7 +348,7 @@ export function ErpShell({ children }: { children: ReactNode }) {
   const [switching, setSwitching] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { context, login } = useErpAuth();
+  const { context, login, logout } = useErpAuth();
 
   const userEmail = context?.user?.email;
   const userRoles = context?.user?.roles || ["SUPER_ADMIN"];
@@ -364,13 +375,13 @@ export function ErpShell({ children }: { children: ReactNode }) {
         .toUpperCase()
     : "T4";
 
-  async function handleSwitchPersona(email: string) {
+  async function handleSwitchPersona(email: string, password: string) {
     setSwitching(true);
     try {
-      await login(email, "TechM4India!2026");
+      await login(email, password);
       setSwitcherOpen(false);
     } catch {
-      window.alert(`Could not sign in as ${email}. You can also use the login page selector.`);
+      window.alert(`Could not sign in as ${email}. Check that account's password and try again.`);
     } finally {
       setSwitching(false);
     }
@@ -399,10 +410,10 @@ export function ErpShell({ children }: { children: ReactNode }) {
       </aside>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-foreground/35 md:hidden" onClick={() => setMobileOpen(false)}>
+        <div className="fixed inset-0 z-40 bg-foreground/35 md:hidden">
+          <button type="button" className="absolute inset-0 cursor-default" onClick={() => setMobileOpen(false)} aria-label="Close mobile navigation" />
           <aside
-            className="flex h-full w-[282px] flex-col bg-sidebar text-sidebar-foreground shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
+            className="relative z-10 flex h-full w-[282px] flex-col bg-sidebar text-sidebar-foreground shadow-2xl"
           >
             <div className="flex justify-end px-4 pt-4">
               <button
@@ -471,7 +482,7 @@ export function ErpShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setSwitcherOpen(true)}
               className="flex items-center gap-1.5 rounded-lg border border-teal-600/30 bg-teal-50 px-2.5 py-1.5 font-mono-ui text-xs font-semibold text-teal-800 hover:bg-teal-600 hover:text-white transition-colors shadow-xs"
-              title="Click to simulate any of the 20 enterprise roles"
+              title="Sign in to another company account"
             >
               <Zap className="h-3.5 w-3.5 text-amber-500" />
               <span>Switch Persona</span>
@@ -483,15 +494,20 @@ export function ErpShell({ children }: { children: ReactNode }) {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span>Render Cloud DB • Singapore</span>
+              <span>Railway ERP API</span>
             </div>
 
             {/* Current User Avatar with Sign out */}
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 if (window.confirm("Do you want to sign out of TechM4India Command Center?")) {
-                  router.push("/login");
+                  try {
+                    await logout();
+                    router.push("/login");
+                  } catch {
+                    window.alert("Could not sign out. Please try again.");
+                  }
                 }
               }}
               className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 hover:bg-muted/70 transition-colors border border-border/60 bg-card"

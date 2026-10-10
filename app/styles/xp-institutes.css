@@ -1,0 +1,602 @@
+/* ==========================================================================
+   xp-institutes: TechM4Institutes page (/institutes)
+   --------------------------------------------------------------------------
+   Foundation lives in xp-foundation.css. Every selector here is prefixed
+   "xi-" and scoped under .xp-institutes, and uses the --xp-* tone variables.
+   The register leans academic: credit ledgers, a year-by-year timeline and a
+   syllabus-like list of semester programmes.
+   ========================================================================== */
+
+/* Hero ------------------------------------------------------------------- */
+.xp-institutes .xi-hero {
+  padding-top: clamp(170px, 20vh, 230px);
+  padding-bottom: 0;
+}
+.xp-institutes .xi-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: end;
+}
+.xp-institutes .xi-hero-copy {
+  display: grid;
+  gap: clamp(22px, 2.6vw, 34px);
+  padding-bottom: clamp(0px, 2vw, 28px);
+}
+.xp-institutes .xi-hero-title {
+  font-size: clamp(42px, 6.4vw, 100px);
+  line-height: 0.96;
+}
+.xp-institutes .xi-hero-copy .xp-lede {
+  color: var(--xp-fg-muted);
+}
+.xp-institutes .xi-index {
+  margin-top: clamp(44px, 6vw, 88px);
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-institutes .xi-index ol {
+  display: flex;
+  flex-wrap: wrap;
+}
+.xp-institutes .xi-index li {
+  flex: 1 1 0;
+  min-width: max-content;
+}
+.xp-institutes .xi-index a {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 12px;
+  padding-right: 20px;
+  color: var(--xp-fg);
+  font-size: 14px;
+  font-weight: 600;
+}
+.xp-institutes .xi-index a > span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+}
+.xp-institutes .xi-index a:hover {
+  color: #fff;
+}
+
+/* Offer: six numbered commitments in a three-column ledger --------------- */
+.xp-institutes .xi-offer-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-institutes .xi-offer-list > li {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: clamp(24px, 3vw, 38px) clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 38px) 0;
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-offer-list > li:not(:nth-child(3n + 1)) {
+  padding-left: clamp(18px, 2.4vw, 32px);
+  border-left: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-offer-list span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+.xp-institutes .xi-offer-list h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(23px, 2.1vw, 30px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.xp-institutes .xi-offer-list p {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Credit programmes -------------------------------------------------------- */
+.xp-institutes .xi-credit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 28px);
+}
+.xp-institutes .xi-credit {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 14px;
+  padding: clamp(24px, 2.6vw, 34px);
+  border: 1px solid var(--xp-rule-strong);
+  border-top: 4px solid var(--xp-red);
+  background: var(--xp-paper);
+}
+.xp-institutes .xi-credit header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.xp-institutes .xi-credit-code {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(40px, 4.4vw, 64px);
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+}
+.xp-institutes .xi-credit-value {
+  color: var(--xp-red);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: right;
+  text-transform: uppercase;
+}
+.xp-institutes .xi-credit h3 {
+  color: var(--xp-fg-strong);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.xp-institutes .xi-credit p {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-institutes .xi-credit ul {
+  display: grid;
+  border-top: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-credit ul li {
+  padding-block: 9px;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* N-STEP -------------------------------------------------------------------- */
+.xp-institutes .xi-nstep-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(36px, 6vw, 96px);
+  align-items: start;
+}
+.xp-institutes .xi-nstep-copy {
+  position: sticky;
+  top: 32px;
+  display: grid;
+  gap: clamp(20px, 2.4vw, 30px);
+}
+.xp-institutes .xi-nstep-copy .xp-lede {
+  color: var(--xp-fg-muted);
+}
+.xp-institutes .xi-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-institutes .xi-facts > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  padding: 18px 12px 0 0;
+}
+.xp-institutes .xi-facts > div + div {
+  padding-left: 14px;
+  border-left: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-facts dt {
+  color: var(--xp-fg-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.xp-institutes .xi-facts dd {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(44px, 4.4vw, 64px);
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+}
+.xp-institutes .xi-tracks {
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-institutes .xi-tracks > li {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: baseline;
+  padding-block: clamp(22px, 2.6vw, 32px);
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-tracks > li > span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 12px;
+}
+.xp-institutes .xi-tracks h3 {
+  color: #fff;
+  font-family: var(--xp-serif);
+  font-size: clamp(25px, 2.4vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.xp-institutes .xi-tracks p {
+  margin-top: 8px;
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-institutes .xi-tracks small {
+  color: var(--xp-on-ink-muted);
+  font-family: var(--xp-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Four-year pathway: four columns on one rail -------------------------------- */
+.xp-institutes .xi-years {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(18px, 2.4vw, 36px);
+}
+.xp-institutes .xi-years::before {
+  content: "";
+  position: absolute;
+  top: 27px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--xp-red), var(--xp-orange), var(--xp-amber));
+}
+.xp-institutes .xi-years > li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.xp-institutes .xi-year-node {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  margin-bottom: 10px;
+  border: 2px solid var(--xp-red);
+  background: var(--xp-bg);
+  color: var(--xp-red);
+  font-family: var(--xp-serif);
+  font-size: 26px;
+}
+.xp-institutes .xi-years > li:last-child .xi-year-node {
+  background: var(--xp-red);
+  color: #fff;
+}
+.xp-institutes .xi-years h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(24px, 2.3vw, 32px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.xp-institutes .xi-years ul {
+  display: grid;
+  border-top: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-years ul li {
+  padding-block: 9px;
+  border-bottom: 1px solid var(--xp-rule);
+  color: var(--xp-fg);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.xp-institutes .xi-semesters {
+  display: grid;
+  gap: clamp(22px, 3vw, 36px);
+  justify-items: start;
+  margin-top: clamp(64px, 8vw, 120px);
+}
+.xp-institutes .xi-semesters-head {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 14px clamp(24px, 5vw, 80px);
+  align-items: end;
+  width: 100%;
+}
+.xp-institutes .xi-semesters-head p {
+  max-width: 56ch;
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-institutes .xi-semester-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  border-top: 1px solid var(--xp-rule-strong);
+}
+.xp-institutes .xi-semester-list > li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 24px 24px 24px 0;
+  border-bottom: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-semester-list > li + li {
+  padding-left: 24px;
+  border-left: 1px solid var(--xp-rule);
+}
+.xp-institutes .xi-semester-list h4 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.xp-institutes .xi-semester-list li > p:not(.xp-meta) {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.xp-institutes .xi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.xp-institutes .xi-chips li {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid var(--xp-rule-strong);
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-mono);
+  font-size: 11.5px;
+}
+
+/* Bootcamps --------------------------------------------------------------------- */
+.xp-institutes .xi-camps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.6vw, 22px);
+}
+.xp-institutes .xi-camps > li {
+  display: grid;
+  padding: clamp(22px, 2.4vw, 30px);
+  border: 1px solid var(--xp-rule-strong);
+  background: var(--xp-paper);
+}
+.xp-institutes .xi-camp-copy {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  align-content: start;
+  gap: 12px;
+  justify-items: start;
+}
+/* The featured bootcamp spans the row, with its poster beside the copy. */
+.xp-institutes .xi-camps > li.is-featured {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  border-color: var(--xp-ink);
+  background: var(--xp-ink);
+  color: var(--xp-on-ink);
+}
+.xp-institutes .xi-camp-poster {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #fff;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+}
+.xp-institutes .xi-camp-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 8%;
+}
+.xp-institutes .xi-camp-length {
+  color: var(--xp-red);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.xp-institutes .is-featured .xi-camp-length,
+.xp-institutes .is-featured .xp-link {
+  color: var(--xp-amber);
+}
+.xp-institutes .xi-camps h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: clamp(23px, 2.1vw, 30px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.xp-institutes .is-featured h3 {
+  color: #fff;
+  font-size: clamp(30px, 3.4vw, 50px);
+}
+.xp-institutes .xi-camp-copy > p:not(.xi-camp-length) {
+  color: var(--xp-fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.xp-institutes .is-featured .xi-camp-copy > p:not(.xi-camp-length) {
+  max-width: 52ch;
+  color: var(--xp-on-ink-muted);
+  font-size: 16px;
+}
+.xp-institutes .xi-camp-copy > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.xp-institutes .xi-camp-copy > ul li {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid var(--xp-rule-strong);
+  color: var(--xp-fg);
+  font-family: var(--xp-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.xp-institutes .is-featured .xi-camp-copy > ul li {
+  border-color: var(--xp-line-ink-strong);
+  color: var(--xp-on-ink);
+}
+
+/* How a partnership starts -------------------------------------------------------- */
+.xp-institutes .xi-start h2 {
+  margin-bottom: clamp(28px, 3.4vw, 44px);
+}
+.xp-institutes .xi-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 28px);
+  counter-reset: none;
+}
+.xp-institutes .xi-steps > li {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding-top: 18px;
+  border-top: 2px solid var(--xp-fg-strong);
+}
+.xp-institutes .xi-steps > li:first-child {
+  border-top-color: var(--xp-red);
+}
+.xp-institutes .xi-steps span {
+  color: var(--xp-accent);
+  font-family: var(--xp-mono);
+  font-size: 11px;
+}
+.xp-institutes .xi-steps h3 {
+  color: var(--xp-fg-strong);
+  font-family: var(--xp-serif);
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.xp-institutes .xi-steps p {
+  color: var(--xp-fg-muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* Responsive ------------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .xp-institutes .xi-camps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .xp-institutes .xi-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .xp-institutes .xi-hero-grid,
+  .xp-institutes .xi-nstep-grid,
+  .xp-institutes .xi-semesters-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-institutes .xi-hero-plate {
+    aspect-ratio: 3 / 2;
+  }
+  .xp-institutes .xi-nstep-copy {
+    position: static;
+  }
+  .xp-institutes .xi-offer-list,
+  .xp-institutes .xi-credit-grid,
+  .xp-institutes .xi-semester-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .xp-institutes .xi-offer-list > li:not(:nth-child(3n + 1)) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-institutes .xi-offer-list > li:nth-child(even) {
+    padding-left: 22px;
+    border-left: 1px solid var(--xp-rule);
+  }
+  .xp-institutes .xi-semester-list > li + li {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-institutes .xi-years {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 40px;
+  }
+  .xp-institutes .xi-years::before {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .xp-institutes .xi-hero {
+    padding-top: 150px;
+  }
+  .xp-institutes .xi-index li {
+    flex: 1 1 50%;
+    min-width: 0;
+  }
+  .xp-institutes .xi-index a {
+    min-height: 52px;
+    border-bottom: 1px solid var(--xp-rule);
+  }
+  .xp-institutes .xi-offer-list,
+  .xp-institutes .xi-credit-grid,
+  .xp-institutes .xi-semester-list,
+  .xp-institutes .xi-camps,
+  .xp-institutes .xi-years,
+  .xp-institutes .xi-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-institutes .xi-offer-list > li:nth-child(even) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .xp-institutes .xi-camps > li.is-featured {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .xp-institutes .xi-tracks > li {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+  .xp-institutes .xi-tracks small {
+    grid-column: 2;
+  }
+  /* The year rail turns vertical. */
+  .xp-institutes .xi-years > li {
+    padding-left: 72px;
+  }
+  .xp-institutes .xi-year-node {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .xp-institutes .xi-years > li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 56px;
+    bottom: -40px;
+    left: 27px;
+    width: 2px;
+    background: var(--xp-rule-strong);
+  }
+}

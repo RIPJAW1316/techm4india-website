@@ -3,18 +3,15 @@ const isBrowser = typeof window !== "undefined";
 
 export const API_BASE_URL = (() => {
   if (isBrowser) {
-    // In any browser (localhost dev or deployed production), always route via /api/v1
-    // Local Vite dev server proxies /api/v1 to local NestJS (or Render)
-    // Vercel edge proxies /api/v1 to Render API
-    // This ensures same-origin requests everywhere and completely eliminates CORS failures.
+    // Keep browser requests on the website origin. Vite and Vercel proxy the API.
     return "/api/v1";
   }
-  // Server-side rendering / prerendering (Node.js)
-  const envUrl =
-    env?.VITE_API_BASE_URL && !env.VITE_API_BASE_URL.includes("railway")
-      ? env.VITE_API_BASE_URL
-      : undefined;
-  return (envUrl || "https://techm4india-erp-api.onrender.com/api/v1").replace(/\/$/, "");
+  // Server-side rendering needs an absolute URL. Keep the override available
+  // for local development while defaulting deployed builds to Railway.
+  return (
+    env?.VITE_API_BASE_URL ||
+    "https://techm4india-website-production.up.railway.app/api/v1"
+  ).replace(/\/$/, "");
 })();
 
 export const API_V2_BASE_URL = API_BASE_URL.replace(/\/v1$/, "/v2");

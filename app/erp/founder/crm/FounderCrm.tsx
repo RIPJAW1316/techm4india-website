@@ -13,6 +13,11 @@ import type {
   CrmOpportunity,
   ExecutiveEmployee,
 } from "@/lib/api/types";
+import {
+  calculateLeadScore,
+  calculatePipelineForecast,
+  generateContractMilestones,
+} from "@/lib/erp/crm.rules";
 import { ErpLoading, ProtectedErp } from "../../components/ProtectedErp";
 
 type Tab = "overview" | "leads" | "pipeline" | "accounts" | "activities";
@@ -126,6 +131,19 @@ function FounderCrmContent() {
     () => employees.filter((employee) => employee.status === "ACTIVE"),
     [employees],
   );
+  const pipelineForecast = useMemo(() => {
+    return calculatePipelineForecast(
+      opportunities.map((opp) => ({
+        id: opp.id,
+        name: opp.name,
+        stage: opp.stage,
+        value: Number(opp.estimatedValue || 0),
+        closeDate: opp.expectedCloseDate,
+      })),
+      dashboard?.wonCount ?? 0,
+      dashboard?.lostCount ?? 0,
+    );
+  }, [opportunities, dashboard?.wonCount, dashboard?.lostCount]);
   async function mutate(action: () => Promise<unknown>, message: string) {
     setBusy(true);
     setError(null);
@@ -545,23 +563,100 @@ function FounderCrmContent() {
             </section>
             <section className="erp-section">
               <div className="crm-list">
-                {leads.map((lead) => (
-                  <article key={lead.id} className="crm-row">
-                    <div>
-                      <h3>
-                        {lead.firstName} {lead.lastName}
-                      </h3>
-                      <p>
-                        {lead.companyName ?? "Independent contact"} · {lead.source} ·{" "}
-                        {lead.owner
-                          ? `${lead.owner.firstName} ${lead.owner.lastName}`
-                          : "Unassigned"}
-                      </p>
-                      <small>
-                        {money(lead.estimatedValue, lead.currency)} · Follow up{" "}
-                        {date(lead.nextFollowUpAt)}
-                      </small>
-                    </div>
+                {leads.map((lead) => {
+                  const score = calculateLeadScore({
+                    institutionCategory: lead.companyName,
+                    decisionMakerRole: lead.designation,
+                    estimatedValue: Number(lead.estimatedValue || 0),
+                    activities: activities
+                      .filter((activity) => activity.lead?.id === lead.id)
+                      .map((activity) => ({
+                        type: activity.type,
+                        occurredAt: activity.completedAt ?? activity.createdAt,
+                      })),
+                  });
+                  const scoreSignals = score.breakdown
+                    .filter(({ pointsAwarded, maxPoints }) => pointsAwarded > maxPoints / 2)
+                    .map(({ name, reason }) => `${name}: ${reason}`);
+
+                  return (
+                    <article key={lead.id} className="crm-row">
+                      <div>
+                        <h3>
+                          {lead.firstName} {lead.lastName}
+                        </h3>
+                        <p>
+                          {lead.companyName ?? "Independent contact"} · {lead.source} ·{" "}
+                          {lead.owner
+                            ? `${lead.owner.firstName} ${lead.owner.lastName}`
+                            : "Unassigned"}
+                        </p>
+                        <small>
+                          {money(lead.estimatedValue, lead.currency)} · Follow up{" "}
+                          {date(lead.nextFollowUpAt)}
+                        </small>
+                        <div
+                          style={{
+                            marginTop: "0.5rem",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          <span
+                            className="erp-badge"
+                            style={{
+                              backgroundColor:
+                                score.quadrant === "HOT_LEAD"
+                                  ? "rgba(16, 185, 129, 0.15)"
+                                  : score.quadrant === "NURTURE"
+                                  ? "rgba(59, 130, 246, 0.15)"
+                                  : score.quadrant === "EVALUATE"
+                                  ? "rgba(245, 158, 11, 0.15)"
+                                  : "rgba(100, 116, 139, 0.15)",
+                              color:
+                                score.quadrant === "HOT_LEAD"
+                                  ? "#059669"
+                                  : score.quadrant === "NURTURE"
+                                  ? "#2563eb"
+                                  : score.quadrant === "EVALUATE"
+                                  ? "#d97706"
+                                  : "#64748b",
+                              fontWeight: 600,
+                              fontSize: "0.72rem",
+                              padding: "2px 8px",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            {score.quadrant === "HOT_LEAD" && "🔥 HOT LEAD"}
+                            {score.quadrant === "NURTURE" && "🌱 NURTURE"}
+                            {score.quadrant === "EVALUATE" && "⚖️ EVALUATE"}
+                            {score.quadrant === "COLD" && "❄️ COLD"}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "var(--color-text-muted, #64748b)",
+                            }}
+                          >
+                            Fit: <strong>{score.fitScore}</strong>/100 · Engagement:{" "}
+                            <strong>{score.engagementScore}</strong>/100
+                          </span>
+                        </div>
+                        {scoreSignals.length > 0 && (
+                          <small
+                            style={{
+                              display: "block",
+                              color: "var(--color-text-muted, #888)",
+                              fontSize: "0.7rem",
+                              marginTop: "3px",
+                            }}
+                          >
+                            Signals: {scoreSignals.join(" · ")}
+                          </small>
+                        )}
+                      </div>
                     <div className="crm-row-actions">
                       <select
                         value={lead.status}
@@ -635,7 +730,8 @@ function FounderCrmContent() {
                       </button>
                     </div>
                   </article>
-                ))}
+                );
+              })}
               </div>
             </section>
           </>
@@ -646,6 +742,107 @@ function FounderCrmContent() {
               <div>
                 <p className="erp-kicker">Opportunity pipeline</p>
                 <h2>Pipeline by stage</h2>
+              </div>
+            </div>
+            <div
+              style={{
+                marginBottom: "1.5rem",
+                padding: "1.25rem",
+                borderRadius: "8px",
+                backgroundColor: "var(--color-surface, #ffffff)",
+                border: "1px solid var(--color-border, #e2e8f0)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                <div>
+                  <p className="erp-kicker" style={{ margin: 0 }}>
+                    Commercial Intelligence
+                  </p>
+                  <h3 style={{ margin: "0.25rem 0 0", fontSize: "1.1rem" }}>
+                    Weighted Pipeline & Sales Velocity
+                  </h3>
+                  <small style={{ color: "var(--color-text-muted, #64748b)" }}>
+                    Calibrated stage probabilities: Prospecting 10% · Qualification 25% · Proposal
+                    50% · Negotiation 75% · Won 100%
+                  </small>
+                </div>
+                <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
+                  <div>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted, #64748b)",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Unweighted Pipeline
+                    </span>
+                    <strong style={{ fontSize: "1.15rem", color: "#0f172a" }}>
+                      {money(pipelineForecast.totalUnweightedValue, "INR")}
+                    </strong>
+                  </div>
+                  <div>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted, #64748b)",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Weighted Expected Value
+                    </span>
+                    <strong style={{ fontSize: "1.15rem", color: "#2563eb" }}>
+                      {money(pipelineForecast.totalWeightedValue, "INR")}
+                    </strong>
+                  </div>
+                  <div>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted, #64748b)",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Sales Velocity
+                    </span>
+                    <strong style={{ fontSize: "1.15rem", color: "#059669" }}>
+                      {money(pipelineForecast.salesVelocity.expectedRevenuePerMonth, "INR")}
+                      <span style={{ fontSize: "0.75rem", fontWeight: 400 }}> / mo</span>
+                    </strong>
+                  </div>
+                  <div>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.72rem",
+                        color: "var(--color-text-muted, #64748b)",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Win Rate
+                    </span>
+                    <strong style={{ fontSize: "1.15rem", color: "#d97706" }}>
+                      {pipelineForecast.salesVelocity.winRatePercent}%
+                    </strong>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="crm-pipeline">
@@ -695,6 +892,60 @@ function FounderCrmContent() {
                               <option key={value}>{value}</option>
                             ))}
                           </select>
+                          {item.stage === "WON" && (
+                            <div
+                              style={{
+                                marginTop: "0.5rem",
+                                padding: "0.5rem",
+                                borderRadius: "6px",
+                                backgroundColor: "rgba(16, 185, 129, 0.08)",
+                                border: "1px solid rgba(16, 185, 129, 0.25)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  marginBottom: "0.25rem",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: "0.72rem",
+                                    fontWeight: 700,
+                                    color: "#059669",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.03em",
+                                  }}
+                                >
+                                  Contract Milestones (SAC 999293)
+                                </span>
+                                <span style={{ fontSize: "0.68rem", color: "#059669" }}>
+                                  3 Phases
+                                </span>
+                              </div>
+                              {generateContractMilestones(Number(item.estimatedValue || 0)).map((m) => (
+                                <div
+                                  key={m.milestoneNumber}
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    fontSize: "0.7rem",
+                                    padding: "2px 0",
+                                    borderBottom: "1px dashed rgba(16, 185, 129, 0.15)",
+                                  }}
+                                >
+                                  <span style={{ color: "#334155" }}>
+                                    {m.milestoneNumber}. {m.title} ({m.percentage}%)
+                                  </span>
+                                  <strong style={{ color: "#0f172a" }}>
+                                    {money(m.amount, item.currency)}
+                                  </strong>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </article>
                       ))}
                     {!opportunities.some((item) => item.stage === stage) && (

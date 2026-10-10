@@ -94,7 +94,7 @@
   min-height: 100dvh;
   background-color: #f8fafc !important;
   color: hsl(var(--foreground));
-  font-family: var(--tm-sans, system-ui, sans-serif);
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
 html:has(.erp-route),
@@ -103,8 +103,29 @@ body:has(.erp-route),
   background-color: #f8fafc !important;
 }
 
-.erp-route .font-mono-ui {
-  font-family: var(--app-font-mono);
+.erp-route,
+.erp-route h1,
+.erp-route h2,
+.erp-route h3,
+.erp-route h4,
+.erp-route h5,
+.erp-route h6,
+.erp-route p,
+.erp-route span,
+.erp-route strong,
+.erp-route a,
+.erp-route button,
+.erp-route input,
+.erp-route select,
+.erp-route textarea {
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.erp-route .font-mono-ui,
+.erp-route .tabular-nums,
+.erp-route .erp-tabular {
+  font-family: var(--app-font-mono, 'IBM Plex Mono', 'Space Mono', monospace) !important;
+  font-variant-numeric: tabular-nums !important;
 }
 
 /* ==========================================================================
@@ -1202,9 +1223,68 @@ body:has(.erp-route),
 
 .erp-route .founder-tabs button.is-active,
 .erp-route .founder-tabs button[aria-selected="true"] {
-  color: var(--erp-text);
-  border-bottom-color: var(--tm-red, #c62d37);
+  color: #0f172a;
+  border-bottom-color: #0d9488;
+  font-weight: 700;
 }
+
+/* Founder & Finance Record Notifications as High-Density Row Cards */
+.erp-route .erp-notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.erp-route .erp-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.erp-route .erp-notification:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.erp-route .erp-notification h3 {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #0f172a;
+  margin: 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.erp-route .erp-notification p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 3px 0 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.erp-route .founder-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.erp-route .founder-row-actions strong {
+  font-family: var(--app-font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 
 /* -- 13. Responsive ------------------------------------------------------ */
 
@@ -2018,3 +2098,62 @@ body:has(.erp-route),
   animation: pulseDot 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Slide-Over Drawer Inspector */
+@keyframes erpDrawerSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.erp-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.erp-drawer-panel {
+  width: 100%;
+  max-width: 520px;
+  height: 100vh;
+  height: 100dvh;
+  background-color: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -12px 0 36px -4px rgba(15, 23, 42, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: erpDrawerSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* High-Density Table Alignment Utilities */
+.erp-route .erp-table-modern th.is-right,
+.erp-route .erp-table-modern td.is-right,
+.erp-route .erp-table-modern th.text-right,
+.erp-route .erp-table-modern td.text-right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.erp-route .erp-table-modern th.is-center,
+.erp-route .erp-table-modern td.is-center,
+.erp-route .erp-table-modern th.text-center,
+.erp-route .erp-table-modern td.text-center {
+  text-align: center;
+}
+
+/* Interactive table rows */
+.erp-route .erp-table-clickable tbody tr {
+  cursor: pointer;
+}
+
+.erp-route .erp-table-clickable tbody tr:hover td {
+  background-color: #f1f5f9;
+}

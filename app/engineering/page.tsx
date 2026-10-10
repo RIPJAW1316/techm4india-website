@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import {
   ArrowLink,
   EditorialList,

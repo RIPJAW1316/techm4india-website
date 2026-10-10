@@ -15,11 +15,12 @@ import {
 } from "./dto/gst.dto";
 import {
   addSplit,
+  calculateRule88AOffset,
   decimal,
   effectiveRate,
   emptySplit,
   isIntraState,
-  netPayable,
+  isSection17_5Blocked,
   serialiseSplit,
   splitTax,
   splitTotal,
@@ -299,18 +300,23 @@ export class GstService extends V2ServiceBase {
       const intraState = isIntraState(gstin, vendorGstin, vendorGstin);
       return expense.lines
         .filter((line) => !line.taxAmount.isZero())
-        .map((line) => ({
-          expenseId: expense.id,
-          expenseNumber: expense.expenseNumber,
-          expenseDate: expense.expenseDate,
-          vendorName: expense.vendor?.name ?? "—",
-          vendorGstin,
-          hsnSacCode: line.hsnSacCode ?? "—",
-          description: line.description,
-          taxableValue: line.amount,
-          ratePercent: line.taxRate?.rate ?? ZERO,
-          split: splitTax(line.taxAmount, line.taxRate?.taxType, intraState),
-        }));
+        .map((line) => {
+          const blockedCheck = isSection17_5Blocked(line.hsnSacCode, expense.category);
+          return {
+            expenseId: expense.id,
+            expenseNumber: expense.expenseNumber,
+            expenseDate: expense.expenseDate,
+            vendorName: expense.vendor?.name ?? "—",
+            vendorGstin,
+            hsnSacCode: line.hsnSacCode ?? "—",
+            description: line.description,
+            taxableValue: line.amount,
+            ratePercent: line.taxRate?.rate ?? ZERO,
+            split: splitTax(line.taxAmount, line.taxRate?.taxType, intraState),
+            isBlocked: blockedCheck.blocked,
+            blockedReason: blockedCheck.reason,
+          };
+        });
     });
   }
 
@@ -329,6 +335,8 @@ export class GstService extends V2ServiceBase {
         description: line.description,
         taxableValue: line.taxableValue.toFixed(2),
         ratePercent: line.ratePercent.toFixed(2),
+        isBlocked: line.isBlocked,
+        blockedReason: line.blockedReason ?? null,
         ...serialiseSplit(line.split),
       })),
       meta: { page, limit, total: lines.length },
@@ -339,7 +347,8 @@ export class GstService extends V2ServiceBase {
 
   /**
    * Summary return: output tax on outward supplies, credit on inward supplies,
-   * and the tax actually payable after head-wise set-off.
+   * Section 17(5) blocked credit segregation, and the tax actually payable after
+   * Rule 88A head-wise set-off.
    */
   async gstr3b(principal: Principal, range: GstPeriodDto) {
     const [outward, inward] = await Promise.all([
@@ -355,13 +364,21 @@ export class GstService extends V2ServiceBase {
     }
 
     let inwardTaxable = ZERO;
-    let credit = emptySplit();
+    let eligibleCredit = emptySplit();
+    let blockedTaxable = ZERO;
+    let blockedCredit = emptySplit();
+
     for (const line of inward) {
-      inwardTaxable = inwardTaxable.plus(line.taxableValue);
-      credit = addSplit(credit, line.split);
+      if (line.isBlocked) {
+        blockedTaxable = blockedTaxable.plus(line.taxableValue);
+        blockedCredit = addSplit(blockedCredit, line.split);
+      } else {
+        inwardTaxable = inwardTaxable.plus(line.taxableValue);
+        eligibleCredit = addSplit(eligibleCredit, line.split);
+      }
     }
 
-    const payable = netPayable(outputTax, credit);
+    const offsetResult = calculateRule88AOffset(outputTax, eligibleCredit);
     return {
       period: { from: range.from ?? null, to: range.to ?? null },
       outwardTaxableSupplies: {
@@ -370,9 +387,14 @@ export class GstService extends V2ServiceBase {
       },
       eligibleItc: {
         taxableValue: inwardTaxable.toFixed(2),
-        ...serialiseSplit(credit),
+        ...serialiseSplit(eligibleCredit),
       },
-      netTaxPayable: serialiseSplit(payable),
+      blockedItc: {
+        taxableValue: blockedTaxable.toFixed(2),
+        ...serialiseSplit(blockedCredit),
+      },
+      closingItcBalance: serialiseSplit(offsetResult.closingItcBalance),
+      netTaxPayable: serialiseSplit(offsetResult.totalCashPayable),
     };
   }
 }

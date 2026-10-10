@@ -1385,23 +1385,24 @@ button {
 }
 .founder-detail-kpis strong {
   color: var(--tm-navy-deep);
-  font-family: var(--tm-serif);
-  font-size: 28px;
-  font-weight: 400;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 .founder-detail-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 52px;
-  margin-top: 29px;
+  gap: 32px;
+  margin-top: 24px;
 }
 .founder-detail-columns h3 {
   margin: 0 0 12px;
   color: var(--tm-navy-deep);
-  font-family: var(--tm-serif);
-  font-size: 29px;
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 .founder-task-row {
   display: flex;
@@ -1450,9 +1451,11 @@ button {
   width: min(100%, 520px);
   max-height: min(90svh, 760px);
   overflow: auto;
-  padding: 31px;
-  background: var(--tm-paper);
-  box-shadow: 0 24px 80px rgba(12, 19, 37, 0.22);
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px -15px rgba(15, 23, 42, 0.3);
 }
 .founder-confirm-dialog {
   width: min(100%, 460px);

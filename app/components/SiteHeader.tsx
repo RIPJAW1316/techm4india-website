@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
+
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";

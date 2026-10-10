@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 
 const BASE_URL = 'http://localhost:3000';
-const PASSWORD = 'TechM4India!2026';
+const PASSWORD = process.env.ERP_TEST_PASSWORD;
 
 const ROLES_TO_TEST = [
   { email: 'admin@techm4india.com', expectedRole: 'SUPER_ADMIN' },
@@ -29,6 +29,7 @@ const ROLES_TO_TEST = [
 ];
 
 async function runTests() {
+  if (!PASSWORD) throw new Error('Set ERP_TEST_PASSWORD for a local test account before running this script.');
   console.log('=== STARTING LOCAL END-TO-END VERIFICATION ===\n');
 
   // Test 1: Check login page renders

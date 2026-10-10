@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Calendar, ChevronRight, GraduationCap, MapPin, Users } from "lucide-react";
+import { Building2, Calendar, GraduationCap, MapPin, Users } from "lucide-react";
 import { ErpShell } from "../components/erp-shell";
 import {
   Avatar,
@@ -10,13 +10,23 @@ import {
   PageHeader,
   Panel,
   SearchField,
+  SlideOverDrawer,
   StatusBadge,
+  ToastMessage,
 } from "../components/erp-ui";
 import { useInstitutionsData } from "@/lib/erp/replit-store";
+import type { Institution } from "@/lib/erp/replit-data";
 
 export default function Institutions() {
   const [search, setSearch] = useState("");
+  const [selectedInstitution, setSelectedInstitution] = useState<Institution | null>(null);
+  const [toast, setToast] = useState("");
   const { institutions } = useInstitutionsData({ search: search || undefined });
+
+  const totalLearners = institutions.reduce((acc, i) => acc + (i.learners || 0), 0);
+  const avgHealth = institutions.length > 0
+    ? Math.round(institutions.reduce((acc, i) => acc + (i.health || 0), 0) / institutions.length)
+    : 0;
 
   return (
     <ErpShell>
@@ -34,6 +44,35 @@ export default function Institutions() {
             </div>
           }
         />
+
+        {/* Institution Stats */}
+        <div className="mb-6 grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Active Institutional Partners
+            </div>
+            <div className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+              {institutions.length} Campuses
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Enrolled Student Beneficiaries
+            </div>
+            <div className="mt-1 text-2xl font-bold tracking-tight text-teal-700 font-mono-ui tabular-nums">
+              {totalLearners.toLocaleString("en-IN")}
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+            <div className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              Mean Portfolio Health
+            </div>
+            <div className="mt-1 text-2xl font-bold tracking-tight text-emerald-600 font-mono-ui">
+              {avgHealth}% Operational
+            </div>
+          </div>
+        </div>
+
         <Panel>
           <div className="border-b border-slate-100 bg-slate-50/40 p-4">
             <SearchField value={search} onChange={setSearch} placeholder="Search institutions, locations, or account owners" />
@@ -53,7 +92,16 @@ export default function Institutions() {
                   <div
                     key={institution.id}
                     data-testid={`card-institution-${institution.id}`}
-                    className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-slate-300 hover:shadow-md"
+                    onClick={() => setSelectedInstitution(institution)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedInstitution(institution);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-5 shadow-xs transition-all hover:border-teal-600/40 hover:shadow-md cursor-pointer"
                   >
                     <div>
                       {/* Top bar with initials, name, and badge */}
@@ -132,6 +180,121 @@ export default function Institutions() {
             </div>
           )}
         </Panel>
+
+        <SlideOverDrawer
+          isOpen={!!selectedInstitution}
+          onClose={() => setSelectedInstitution(null)}
+          title={selectedInstitution?.name ?? "Institution Profile"}
+          subtitle={`${selectedInstitution?.type ?? ""} · ${selectedInstitution?.location ?? ""}`}
+          footer={
+            <div className="flex items-center justify-between">
+              <span className="font-mono-ui text-xs text-slate-500">INST-00{selectedInstitution?.id}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setToast(`Relationship record for ${selectedInstitution?.name} synchronized.`);
+                  setSelectedInstitution(null);
+                }}
+                className="rounded-lg bg-teal-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-teal-700 shadow-xs transition-colors"
+              >
+                Close Profile
+              </button>
+            </div>
+          }
+        >
+          {selectedInstitution && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                <Avatar initials={selectedInstitution.initials} className="h-14 w-14 text-base rounded-2xl shadow-xs" />
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">{selectedInstitution.name}</h3>
+                  <p className="text-xs text-slate-500">{selectedInstitution.location} · {selectedInstitution.type}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <StatusBadge value={selectedInstitution.healthLabel} />
+                    <span className="rounded bg-slate-200/70 px-2 py-0.5 font-mono-ui text-[10px] font-semibold text-slate-700">
+                      Managed by {selectedInstitution.owner}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Health Score Overview */}
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    Operational Health Score
+                  </span>
+                  <span className="font-mono-ui text-base font-bold text-slate-900">
+                    {selectedInstitution.health} / 100
+                  </span>
+                </div>
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      selectedInstitution.health >= 80 ? "bg-emerald-500" : selectedInstitution.health >= 60 ? "bg-amber-500" : "bg-rose-500"
+                    }`}
+                    style={{ width: `${selectedInstitution.health}%` }}
+                  />
+                </div>
+                <div className="mt-2 text-xs text-slate-500">
+                  Calculated based on attendance synchronisation, SLA fulfillment, and student learning outcomes.
+                </div>
+              </div>
+
+              {/* Programs and Learners Stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active Programs</span>
+                  <div className="mt-1 text-lg font-bold text-slate-900">{selectedInstitution.activePrograms} Curricula</div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Active Learners</span>
+                  <div className="mt-1 font-mono-ui text-lg font-bold text-teal-700 tabular-nums">
+                    {selectedInstitution.learners.toLocaleString("en-IN")}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">Renewal Horizon</span>
+                  <div className="mt-1 font-mono-ui text-sm font-semibold text-slate-900">
+                    {formatDate(selectedInstitution.renewalDate)}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-xs">
+                  <span className="font-mono-ui text-[10px] font-semibold uppercase tracking-wider text-slate-400">MoU Status</span>
+                  <div className="mt-1 text-sm font-semibold text-emerald-600">Enterprise Active</div>
+                </div>
+              </div>
+
+              {/* Engagement Controls */}
+              <div className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 font-mono-ui mb-3">
+                  Partner Governance Actions
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToast(`Governance audit scheduled with ${selectedInstitution.name}.`);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
+                  >
+                    Schedule Audit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setToast(`Contract renewal packet prepared for ${selectedInstitution.owner}.`);
+                    }}
+                    className="flex items-center justify-center gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-semibold text-teal-700 hover:bg-teal-100/70 transition-colors shadow-xs"
+                  >
+                    Prepare Renewal
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </SlideOverDrawer>
+        {toast && <ToastMessage message={toast} onDismiss={() => setToast("")} />}
       </div>
     </ErpShell>
   );
