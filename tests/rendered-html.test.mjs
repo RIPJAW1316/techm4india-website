@@ -1,20 +1,10 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render(path = "/") {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${path}`);
-  const { default: worker } = await import(workerUrl.href);
-
-  return worker.fetch(
-    new Request(`http://localhost${path}`, {
-      headers: { accept: "text/html" },
-    }),
-    {
-      ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) },
-    },
-    { waitUntil() {}, passThroughOnException() {} },
-  );
+  const output = path === "/" ? "index.html" : `${path.slice(1)}.html`;
+  return readFile(new URL(`../dist/client/${output}`, import.meta.url), "utf8");
 }
 
 for (const [path, heading] of [
@@ -65,11 +55,9 @@ for (const [path, heading] of [
   ["/erp/schools/payslips", "Restoring your workspace"],
   ["/erp/space/payslips", "Restoring your workspace"],
 ]) {
-  test(`server-renders ${path}`, async () => {
-    const response = await render(path);
-    assert.equal(response.status, 200);
-    assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
-    const html = await response.text();
+  test(`exports ${path}`, async () => {
+    const html = await render(path);
+    assert.match(html, /^<!doctype html>/i);
     assert.match(html, /TechM4India/i);
     assert.match(html, new RegExp(heading, "i"));
     assert.doesNotMatch(html, /Your site is taking shape|codex-preview/i);
