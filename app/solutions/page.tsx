@@ -40,6 +40,7 @@ import type { CSSProperties } from "react";
 import { EnquiryForm } from "../components/worlds/EnquiryForm";
 import { SolutionsFooter, SolutionsHeader } from "../components/worlds/SolutionsChrome";
 import { WorkGrid } from "../components/worlds/WorkGrid";
+import { SolutionsMotion } from "../components/worlds/SolutionsMotion";
 import { StructuredData } from "../components/StructuredData";
 import {
   ctaBand,
@@ -111,26 +112,31 @@ const enquiryFields = [
 
 export default function SolutionsPage() {
   const stackTiles = Array.from(new Set(techGroups.flatMap((group) => group.items)));
-  const [lead, ...counts] = record.figures;
+  const counts = record.figures.slice(1);
 
   return (
-    <div className="tm-world">
+    <div className="tm-world tm-world--solutions">
+      <SolutionsMotion />
       <SolutionsHeader />
+      <div className="tm-scroll-progress" aria-hidden="true"><span /></div>
 
       <main className="tm" id="top">
-        {/* Hero: the promise, and the system it ships, drawn as a diagram. */}
+        {/* A working system, drawn as a live signal map rather than stock imagery. */}
         <section className="tm-hero" aria-labelledby="tm-hero-title">
-          <div className="tm-hero-bg" aria-hidden="true">
-            <img src="/images/about/computer-lab.jpeg" alt="" fetchPriority="high" />
-          </div>
+          <span className="tm-hero-glow" aria-hidden="true" />
           <div className="tm-container">
+            <div className="tm-hero-overline" aria-hidden="true">
+              <span>TechM4Solutions / The software division</span>
+              <span><i /> Design → Engineering → Delivery</span>
+            </div>
             <div className="tm-hero-grid">
               <div className="tm-hero-copy">
-                <p className="tm-eyebrow">Software. AI. Delivered.</p>
+                <p className="tm-eyebrow">Software with real-world momentum</p>
                 <h1 className="tm-h1" id="tm-hero-title">
-                  {hero.title} <span className="tm-accent">{hero.titleAccent}</span>
+                  <span className="tm-hero-line">{hero.title}</span>
+                  <span className="tm-hero-line tm-accent">{hero.titleAccent}</span>
                 </h1>
-                <p className="tm-lead">{hero.lede}</p>
+                <p className="tm-lead">We design and build products, apps, AI and enterprise systems, then stay with the work through release and support.</p>
                 <div className="tm-actions">
                   <a className="tm-btn" href="#contact">
                     Discuss a project
@@ -138,46 +144,50 @@ export default function SolutionsPage() {
                   </a>
                   <a className="tm-btn tm-btn--ghost" href="#work">
                     See our work
+                    <ArrowRight aria-hidden="true" />
                   </a>
+                </div>
+                <div className="tm-hero-down">
+                  <span className="tm-hero-down-rule" aria-hidden="true"><span /></span>
+                  <span>Explore what we build</span>
                 </div>
               </div>
 
-              <div className="tm-hero-visual">
-                <figure className="tm-diagram" aria-labelledby="tm-diagram-title">
-                  <figcaption id="tm-diagram-title">
-                    <strong>{featured.name}</strong>
-                    <span>How it is put together</span>
-                  </figcaption>
-                  <ol className="tm-diagram-stack">
-                    {featured.layers.map((layer, index) => (
-                      <li key={layer.code} style={delay(index * 120)}>
-                        <span className="tm-diagram-code">{layer.code}</span>
-                        <span>
-                          <strong>{layer.term}</strong>
-                          <small>{layer.detail}</small>
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                  <ul className="tm-diagram-modules" aria-label="Some of its workspaces">
-                    {featured.modules.slice(0, 8).map((module) => (
-                      <li key={module}>{module}</li>
-                    ))}
-                    <li className="is-more">+{featured.modules.length - 8} more</li>
-                  </ul>
-                </figure>
-                <div className="tm-float tm-hero-float">
-                  <span className="tm-icon tm-icon--red">
-                    <BadgeCheck aria-hidden="true" />
-                  </span>
-                  <div>
-                    <strong>
-                      {lead.value}
-                      {lead.suffix}
-                    </strong>
-                    <span>companies helped</span>
+              <div className="tm-hero-visual" aria-label="The interface, services and data layers of the Company Management ERP">
+                <div className="tm-orbit tm-orbit--outer" aria-hidden="true" />
+                <div className="tm-orbit tm-orbit--middle" aria-hidden="true" />
+                <div className="tm-orbit tm-orbit--inner" aria-hidden="true" />
+                <span className="tm-orbit-point tm-orbit-point--one" aria-hidden="true" />
+                <span className="tm-orbit-point tm-orbit-point--two" aria-hidden="true" />
+                <span className="tm-orbit-label tm-orbit-label--top" aria-hidden="true">AI / intelligence</span>
+                <span className="tm-orbit-label tm-orbit-label--side" aria-hidden="true">SYS / infrastructure</span>
+                <div className="tm-system-card">
+                  <div className="tm-system-bar">
+                    <span className="tm-system-dots" aria-hidden="true"><i /><i /><i /></span>
+                    <span>techm4 / system architecture</span>
+                    <span className="tm-system-live"><i /> Live build</span>
+                  </div>
+                  <div className="tm-system-body">
+                    <div className="tm-system-intro">
+                      <span>Featured system / 01</span>
+                      <h2>{featured.name}</h2>
+                      <p>One operating system. Every division in sync.</p>
+                    </div>
+                    <ol className="tm-system-layers">
+                      {featured.layers.map((layer, index) => (
+                        <li key={layer.code} style={delay(index * 110)}>
+                          <span className="tm-system-code">{layer.code}</span>
+                          <span className="tm-system-layer-copy"><strong>{layer.term}</strong><small>{layer.detail}</small></span>
+                          <span className="tm-system-pulse" aria-hidden="true" />
+                        </li>
+                      ))}
+                    </ol>
+                    <Link href={featured.cta.href} className="tm-system-link">
+                      Explore the system <ArrowRight aria-hidden="true" />
+                    </Link>
                   </div>
                 </div>
+                <div className="tm-orbit-badge" aria-hidden="true"><span>TM4</span><small>Build in motion</small></div>
               </div>
             </div>
 
@@ -192,7 +202,7 @@ export default function SolutionsPage() {
           </div>
         </section>
 
-        {/* Ticker: the breadth of the division in one band. */}
+        {/* A restrained, continuous index of the division's disciplines. */}
         <div className="tm-ticker" aria-label="What TechM4Solutions does">
           <div className="tm-ticker-track">
             {[0, 1].map((copy) => (
@@ -200,7 +210,7 @@ export default function SolutionsPage() {
                 {ticker.map((item) => (
                   <li key={item}>
                     {item}
-                    <Sparkles aria-hidden="true" />
+                    <span aria-hidden="true">✳</span>
                   </li>
                 ))}
               </ul>
@@ -209,7 +219,7 @@ export default function SolutionsPage() {
         </div>
 
         {/* About: photographs, a floating figure and what you get. */}
-        <section className="tm-section" aria-labelledby="tm-about-title">
+        <section className="tm-section tm-about-section" aria-labelledby="tm-about-title">
           <div className="tm-container tm-split">
             <div className="tm-collage" data-reveal>
               <div className="tm-media tm-media--4x5 tm-collage-main">
@@ -239,7 +249,7 @@ export default function SolutionsPage() {
                 </div>
               </div>
             </div>
-            <div className="tm-about-copy" data-reveal>
+            <div className="tm-about-copy" data-solution-reveal>
               <p className="tm-eyebrow">About TechM4Solutions</p>
               <h2 className="tm-h2" id="tm-about-title">
                 One team, from the first brief to <span className="tm-accent">working software.</span>
@@ -271,9 +281,9 @@ export default function SolutionsPage() {
         </section>
 
         {/* Delivery record */}
-        <section className="tm-section tm-section--tight tm-bg-soft" aria-labelledby="tm-record-title">
+        <section className="tm-section tm-section--tight tm-bg-soft tm-record-section" id="record" aria-labelledby="tm-record-title">
           <div className="tm-container">
-            <div className="tm-head tm-head--center">
+            <div className="tm-head tm-head--split" data-solution-reveal>
               <p className="tm-eyebrow">{record.label}</p>
               <h2 className="tm-h2" id="tm-record-title">
                 {record.title} <span className="tm-accent">{record.titleAccent}</span>
@@ -295,10 +305,10 @@ export default function SolutionsPage() {
         </section>
 
         {/* Core services */}
-        <section className="tm-section tm-bg-soft tm-services" id="services" aria-labelledby="tm-services-title">
+        <section className="tm-section tm-services" id="services" aria-labelledby="tm-services-title">
           <div className="tm-container tm-services-grid">
-            <div className="tm-services-head">
-              <p className="tm-eyebrow">Our core services</p>
+            <div className="tm-services-head" data-solution-reveal>
+              <p className="tm-eyebrow" id="capabilities">01 / Our disciplines</p>
               <h2 className="tm-h2" id="tm-services-title">
                 Everything a product needs, <span className="tm-accent">under one roof.</span>
               </h2>
@@ -311,28 +321,34 @@ export default function SolutionsPage() {
                 <ArrowRight aria-hidden="true" />
               </a>
             </div>
-            <ul className="tm-grid tm-cols-2">
+            <ol className="tm-services-list">
               {services.map((service, index) => {
                 const Icon = SERVICE_ICONS[index] ?? Sparkles;
                 return (
-                  <li className="tm-card tm-card--hover" key={service.title} data-reveal style={delay((index % 2) * 80)}>
-                    <span className="tm-icon">
+                  <li className="tm-service-row" key={service.title} data-reveal style={delay((index % 2) * 80)}>
+                    <span className="tm-service-index">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="tm-icon" aria-hidden="true">
                       <Icon aria-hidden="true" />
                     </span>
-                    <h3 className="tm-h3">{service.title}</h3>
-                    <p className="tm-body">{service.text}</p>
-                    <p className="tm-small">{service.items.join(" · ")}</p>
+                    <div className="tm-service-content">
+                      <h3 className="tm-h3">{service.title}</h3>
+                      <p className="tm-body">{service.text}</p>
+                      <p className="tm-small">{service.items.join(" · ")}</p>
+                    </div>
+                    <a className="tm-service-arrow" href="#contact" aria-label={`Discuss ${service.title}`}>
+                      <ArrowRight aria-hidden="true" />
+                    </a>
                   </li>
                 );
               })}
-            </ul>
+            </ol>
           </div>
         </section>
 
         {/* Why us: a navy band, then the technology wall riding over its edge. */}
         <section className="tm-section tm-bg-dark tm-grid-bg tm-drivers" aria-labelledby="tm-drivers-title">
           <div className="tm-container tm-split tm-split--top">
-            <div>
+            <div data-solution-reveal>
               <p className="tm-eyebrow">{edge.label}</p>
               <h2 className="tm-h2" id="tm-drivers-title">
                 Practical engineering. <span className="tm-accent">Measurable delivery.</span>
@@ -359,7 +375,7 @@ export default function SolutionsPage() {
         <section className="tm-wall-wrap" aria-labelledby="tm-wall-title">
           <div className="tm-container">
             <div className="tm-wall">
-              <div className="tm-head tm-head--center">
+              <div className="tm-head tm-head--center" data-solution-reveal>
                 <p className="tm-eyebrow">Our technologies</p>
                 <h2 className="tm-h3" id="tm-wall-title">
                   Named in our own products, roles and repositories
@@ -375,9 +391,9 @@ export default function SolutionsPage() {
         </section>
 
         {/* Featured build and selected work */}
-        <section className="tm-section tm-bg-soft" id="work" aria-labelledby="tm-work-title">
+        <section className="tm-section tm-bg-soft tm-work-section" id="work" aria-labelledby="tm-work-title">
           <div className="tm-container">
-            <div className="tm-head tm-head--split">
+            <div className="tm-head tm-head--split" data-solution-reveal>
               <div>
                 <p className="tm-eyebrow">Portfolio</p>
                 <h2 className="tm-h2" id="tm-work-title">
@@ -387,7 +403,7 @@ export default function SolutionsPage() {
               <p className="tm-body">{workSection.lede}</p>
             </div>
 
-            <article className="tm-featured" aria-labelledby="tm-featured-title" data-reveal>
+            <article className="tm-featured" id="featured" aria-labelledby="tm-featured-title" data-reveal>
               <div className="tm-featured-copy">
                 <span className="tm-badge tm-badge--green tm-badge--dot">{featured.label}</span>
                 <h3 className="tm-h2" id="tm-featured-title">
@@ -417,9 +433,9 @@ export default function SolutionsPage() {
         </section>
 
         {/* Industries */}
-        <section className="tm-section tm-bg-dark tm-grid-bg" id="industries" aria-labelledby="tm-industries-title">
+        <section className="tm-section tm-bg-dark tm-grid-bg tm-industries-section" id="industries" aria-labelledby="tm-industries-title">
           <div className="tm-container tm-industries">
-            <div className="tm-industries-head">
+            <div className="tm-industries-head" data-solution-reveal>
               <p className="tm-eyebrow">{industries.label}</p>
               <h2 className="tm-h2" id="tm-industries-title">
                 {industries.title} <span className="tm-accent">{industries.titleAccent}</span>
@@ -444,9 +460,9 @@ export default function SolutionsPage() {
         </section>
 
         {/* Process */}
-        <section className="tm-section" id="process" aria-labelledby="tm-process-title">
+        <section className="tm-section tm-process-section" id="process" aria-labelledby="tm-process-title">
           <div className="tm-container">
-            <div className="tm-head tm-head--center">
+            <div className="tm-head tm-head--center" data-solution-reveal>
               <p className="tm-eyebrow">{process.label}</p>
               <h2 className="tm-h2" id="tm-process-title">
                 {process.title} <span className="tm-accent">{process.titleAccent}</span>
@@ -478,7 +494,7 @@ export default function SolutionsPage() {
         </section>
 
         {/* Pay-and-use labs */}
-        <section className="tm-section tm-bg-soft" id="labs" aria-labelledby="tm-labs-title">
+        <section className="tm-section tm-bg-soft tm-labs-section" id="labs" aria-labelledby="tm-labs-title">
           <div className="tm-container">
             <div className="tm-split">
               <div className="tm-labs-media" data-reveal>
@@ -495,7 +511,7 @@ export default function SolutionsPage() {
                   </div>
                 </div>
               </div>
-              <div className="tm-labs-copy" data-reveal>
+              <div className="tm-labs-copy" data-solution-reveal>
                 <p className="tm-eyebrow">{labs.label}</p>
                 <h2 className="tm-h2" id="tm-labs-title">
                   {labs.title} <span className="tm-accent">{labs.titleAccent}</span>
@@ -578,7 +594,7 @@ export default function SolutionsPage() {
         {/* CTA band */}
         <section className="tm-section tm-section--tight" aria-labelledby="tm-cta-title">
           <div className="tm-container">
-            <div className="tm-cta">
+            <div className="tm-cta" data-solution-reveal>
               <div>
                 <h2 id="tm-cta-title">{ctaBand.title}</h2>
                 <p>{ctaBand.text}</p>
@@ -605,7 +621,7 @@ export default function SolutionsPage() {
         {/* Contact */}
         <section className="tm-section tm-bg-soft tm-contact" id="contact" aria-labelledby="tm-contact-title">
           <div className="tm-container tm-split tm-split--top">
-            <div className="tm-contact-info">
+            <div className="tm-contact-info" data-solution-reveal>
               <p className="tm-eyebrow">Book a discovery call</p>
               <h2 className="tm-h2" id="tm-contact-title">
                 Tell us what you are <span className="tm-accent">trying to build.</span>

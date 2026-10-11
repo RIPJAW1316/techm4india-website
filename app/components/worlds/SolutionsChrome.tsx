@@ -48,19 +48,41 @@ export function SolutionsHeader() {
   }, []);
 
   useEffect(() => {
+    const world = document.querySelector(".tm-world--solutions");
+    const background = world?.querySelectorAll<HTMLElement>(":scope > .tm-topbar, :scope > .tm-header, :scope > .tm, :scope > .tm-footer");
+    const drawer = document.getElementById("tm-drawer");
     if (open) {
       wasOpen.current = true;
       closeButton.current?.focus();
+      background?.forEach((node) => node.setAttribute("inert", ""));
     } else if (wasOpen.current) {
+      background?.forEach((node) => node.removeAttribute("inert"));
       burger.current?.focus();
     }
     document.body.style.overflow = open ? "hidden" : "";
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (!open) return;
+      if (event.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !drawer) return;
+      const items = [...drawer.querySelectorAll<HTMLElement>("a, button")].filter((item) => !item.hasAttribute("disabled"));
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      background?.forEach((node) => node.removeAttribute("inert"));
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);

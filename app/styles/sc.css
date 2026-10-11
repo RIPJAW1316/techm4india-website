@@ -1285,6 +1285,91 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   font-weight: 700;
   line-height: 1.3;
 }
+.sc-award {
+  overflow: hidden;
+  border-top: 4px solid var(--sc-green);
+}
+.sc-award:nth-child(2) {
+  border-top-color: var(--sc-blue);
+}
+.sc-award:nth-child(3) {
+  border-top-color: var(--sc-red);
+}
+/* The organisation's own logo on a white plate, in its own colours. */
+.sc-award-logo {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 112px;
+  margin-bottom: 6px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 1px var(--sc-line),
+    0 10px 24px -18px rgba(15, 44, 99, 0.45);
+}
+.sc-award-logo img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
+  transition: transform 0.5s var(--sc-ease);
+}
+.sc-award-logo[data-shape="wide"] img {
+  height: auto;
+  max-height: 52px;
+}
+.sc-award-logo[data-shape="emblem"] img {
+  height: 92px;
+}
+/* A sheen that crosses the plate on hover. */
+.sc-award-logo::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -40% auto -40% -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+  transform: skewX(-18deg) translateX(0);
+  pointer-events: none;
+}
+.sc-award:hover .sc-award-logo img {
+  transform: scale(1.06);
+}
+.sc-award:hover .sc-award-logo::after {
+  transform: skewX(-18deg) translateX(560%);
+  transition: transform 0.9s var(--sc-ease);
+}
+.sc-award-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--sc-green-100);
+  color: var(--sc-green-700);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sc-award-seal svg {
+  width: 15px;
+  height: 15px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc-award-logo img,
+  .sc-award-logo::after {
+    transition: none !important;
+  }
+  .sc-award:hover .sc-award-logo img {
+    transform: none;
+  }
+}
 
 /* Visit / enquire --------------------------------------------------------------------------- */
 .sc-visit {
@@ -2013,4 +2098,21 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   .sc-world .xs-map-detail li {
     animation: none;
   }
+}
+
+/* The plain "Back to TechM4India" link at the end of the audience paths. */
+.sc-paths a.sc-paths-back {
+  display: inline-flex;
+  justify-self: start;
+  margin-top: 4px;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--sc-green);
+  font-weight: 600;
+}
+.sc-paths a.sc-paths-back:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Newsreader, Poppins, Sora } from "next/font/google";
+import { Inter_Tight, Manrope, Newsreader, Poppins, Sora } from "next/font/google";
 import { Footer } from "./components/Footer";
 import { MotionController } from "./components/MotionController";
 import { SiteHeader } from "./components/SiteHeader";
@@ -12,9 +12,11 @@ import "./styles/xp-foundation.css";
 import "./styles/xp-home.css";
 import "./styles/xp-institutes.css";
 // Division "worlds": each division page is its own site with its own chrome.
-// Solutions follows kodryx.ai, Schools follows pallaviinternationalschool.com.
+// Solutions follows kodryx.ai, Schools follows pallaviinternationalschool.com,
+// Engineering follows gitam.edu.
 import "./styles/tm.css";
 import "./styles/sc.css";
+import "./styles/en.css";
 
 const manrope = Manrope({
   variable: "--font-sans",
@@ -40,6 +42,13 @@ const poppins = Poppins({
   variable: "--font-school",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+// TechM4Engineering world face, close to gitam.edu's Forma DJR.
+const interTight = Inter_Tight({
+  variable: "--font-eng",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -92,7 +101,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${newsreader.variable} ${sora.variable} ${poppins.variable}`}>
+      <body className={`${manrope.variable} ${newsreader.variable} ${sora.variable} ${poppins.variable} ${interTight.variable}`}>
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>

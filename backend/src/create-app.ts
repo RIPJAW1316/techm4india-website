@@ -10,11 +10,12 @@ import helmet from "helmet";
 
 import { AppModule } from "./app.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { isTrustedOrigin } from "./common/security/trusted-origin";
 
 export async function createConfiguredApp(): Promise<INestApplication> {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const corsOrigins = configService.get<string[]>("corsOrigins") ?? [];
+  const corsOrigins = new Set(configService.get<string[]>("corsOrigins") ?? []);
   const trustProxy = configService.get<boolean>("trustProxy") ?? false;
 
   if (trustProxy) {
@@ -33,18 +34,7 @@ export async function createConfiguredApp(): Promise<INestApplication> {
       origin: string | undefined,
       callback: (err: Error | null, allow?: boolean) => void,
     ) => {
-      if (
-        !origin ||
-        origin.endsWith(".vercel.app") ||
-        origin.includes("techm4india") ||
-        origin.includes("localhost") ||
-        origin.includes("127.0.0.1") ||
-        corsOrigins.includes(origin)
-      ) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
+      callback(null, isTrustedOrigin(origin, corsOrigins));
     },
   });
   app.useGlobalPipes(

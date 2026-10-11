@@ -608,11 +608,27 @@ export default function SchoolsPage() {
                   const Icon = AWARD_ICONS[index] ?? Award;
                   return (
                     <li className="sc-card sc-award" key={entry.name} data-reveal style={delay(index * 80)}>
-                      <span className={"sc-icon" + (["", " sc-icon--green", " sc-icon--yellow"][index] ?? "")}>
-                        <Icon aria-hidden="true" />
-                      </span>
+                      {entry.logo ? (
+                        <span className="sc-award-logo" data-shape={entry.logo.shape}>
+                          <img
+                            src={entry.logo.src}
+                            alt={entry.logo.alt}
+                            width={entry.logo.width}
+                            height={entry.logo.height}
+                            loading="lazy"
+                          />
+                        </span>
+                      ) : (
+                        <span className={"sc-icon" + (["", " sc-icon--green", " sc-icon--yellow"][index] ?? "")}>
+                          <Icon aria-hidden="true" />
+                        </span>
+                      )}
                       <strong>{entry.name}</strong>
                       <p>{entry.detail}</p>
+                      <span className="sc-award-seal">
+                        <BadgeCheck aria-hidden="true" />
+                        Validated
+                      </span>
                     </li>
                   );
                 })}
@@ -696,7 +712,7 @@ export default function SchoolsPage() {
                     </a>
                   );
                 })}
-                <Link href="/" className="sc-small" style={{ marginTop: 6 }}>
+                <Link href="/" className="sc-small sc-paths-back">
                   ← Back to TechM4India
                 </Link>
               </div>

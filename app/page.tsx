@@ -3,7 +3,7 @@ import { ActivityBoard } from "./components/xp/home/ActivityBoard";
 import { DivisionExplorer } from "./components/xp/home/DivisionExplorer";
 import { HeroEcosystem } from "./components/xp/home/HeroEcosystem";
 import { UpdatesFeed } from "./components/xp/home/UpdatesFeed";
-import { Btn, ClosingPaths, Kicker, Plate, SectionHead, TextLink } from "./components/xp/Primitives";
+import { Btn, ClosingPaths, Kicker, SectionHead, TextLink } from "./components/xp/Primitives";
 import { ProfileDialog } from "./components/xp/ProfileDialog";
 import { StructuredData } from "./components/StructuredData";
 import { activities, ecosystem, leads, updates, updatesReviewedOn } from "@/lib/content/home";
@@ -43,13 +43,6 @@ export default function Home() {
         <div className="xp-shell xh-idea-grid">
           <div className="xh-idea-side" data-reveal>
             <Kicker index="01">The idea</Kicker>
-            <Plate
-              src="/images/home/mentor-students.jpeg"
-              alt="A TechM4India mentor talking with two students in a maker lab"
-              caption="Learning by making"
-              note="Hyderabad"
-              ratio="4x5"
-            />
           </div>
           <div className="xh-idea-copy" data-reveal>
             <h2 className="xh-statement" id="idea-title">

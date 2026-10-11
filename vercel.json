@@ -3,6 +3,14 @@
   "outputDirectory": "dist/client",
   "cleanUrls": true,
   "framework": null,
+  "redirects": [
+    { "source": "/careers", "destination": "/contact#contact-form", "permanent": true },
+    { "source": "/ecosystem", "destination": "/#ecosystem", "permanent": true },
+    { "source": "/impact", "destination": "/#ecosystem", "permanent": true },
+    { "source": "/programs", "destination": "/engineering", "permanent": true },
+    { "source": "/research", "destination": "/solutions", "permanent": true },
+    { "source": "/vision", "destination": "/about", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/api/v1/:match*",

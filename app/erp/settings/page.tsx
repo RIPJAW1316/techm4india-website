@@ -50,8 +50,8 @@ export default function Settings() {
                 <div className="space-y-1.5">
                   <span className="block text-xs font-semibold text-slate-700">Production Tenant Domain</span>
                   <div className="flex h-10 items-center rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-600 shadow-xs">
-                    <span className="text-slate-800 font-mono text-xs font-semibold">app.techm4india.in/</span>
-                    <span className="font-mono text-xs text-teal-700 font-bold">innovations</span>
+                    <span className="text-slate-800 font-mono text-xs font-semibold">www.techm4india.com/</span>
+                    <span className="font-mono text-xs text-teal-700 font-bold">erp</span>
                   </div>
                 </div>
 

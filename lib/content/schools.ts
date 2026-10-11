@@ -411,6 +411,8 @@ export type ValidationEntry = {
   detail: string;
   /** Set to true only when TechM4India confirms the wording and its basis. */
   confirmed: boolean;
+  /** Official logo, from the organisation's own website. */
+  logo?: { src: string; alt: string; width: number; height: number; shape: "wide" | "emblem" };
 };
 
 /**
@@ -418,23 +420,29 @@ export type ValidationEntry = {
  * at the client's instruction. "AU" is read as Anurag University: the previous
  * site names it as TechM4Schools' "Primary Academic Approval & Lab Support
  * Partner", and its Dean of Academics is one of the four leads. "Nassam" is
- * read as NASSCOM. No logos are shown. Set `confirmed` to false to hide a row.
+ * read as NASSCOM. Logos are each organisation's own file (anurag.edu.in,
+ * nitw.ac.in, nasscom.in), downloaded with the user's approval on 2026-10-11.
+ * For "NITs" the user chose NIT Warangal's emblem. Set `confirmed` to false to
+ * hide a row.
  */
 export const validationLedger: ValidationEntry[] = [
   {
     name: "Anurag University (AU)",
     detail: "Academic approval and lab support for TechM4Schools",
     confirmed: true,
+    logo: { src: "/images/partners/anurag-university.webp", alt: "Anurag University logo", width: 352, height: 76, shape: "wide" },
   },
   {
     name: "National Institutes of Technology (NITs)",
     detail: "Academic validation of the TechM4Schools programme",
     confirmed: true,
+    logo: { src: "/images/partners/nit-warangal.webp", alt: "National Institute of Technology Warangal emblem", width: 170, height: 172, shape: "emblem" },
   },
   {
     name: "NASSCOM",
     detail: "Industry validation of the TechM4Schools programme",
     confirmed: true,
+    logo: { src: "/images/partners/nasscom.svg", alt: "NASSCOM logo", width: 1000, height: 168, shape: "wide" },
   },
 ];
 

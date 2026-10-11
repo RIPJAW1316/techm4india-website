@@ -406,19 +406,103 @@
   align-content: start;
   gap: 10px;
 }
+/* The division's main points, set as numbered highlight tiles. */
 .xh-explorer-inside {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 20px;
-  border-top: 1px solid var(--xp-line-strong);
+  gap: 10px;
+  counter-reset: inside;
 }
 .xh-explorer-inside li {
-  padding-block: 9px;
-  border-bottom: 1px solid var(--xp-line);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px 14px 14px;
+  overflow: hidden;
+  border: 1px solid var(--xp-line);
+  border-left: 3px solid var(--xp-red);
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(37, 46, 74, 0.04);
   color: var(--xp-navy);
-  font-size: 14.5px;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.35;
+  counter-increment: inside;
+  transition:
+    transform 0.3s var(--xp-ease),
+    box-shadow 0.3s var(--xp-ease),
+    border-color 0.3s var(--xp-ease);
+}
+.xh-explorer-inside li::before {
+  content: counter(inside, decimal-leading-zero);
+  padding-top: 2px;
+  color: var(--xp-red);
+  font-family: var(--xp-mono);
+  font-size: 11.5px;
   font-weight: 600;
-  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+/* A wash of the accent that grows in from the left on hover. */
+.xh-explorer-inside li::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(198, 45, 55, 0.08), rgba(198, 45, 55, 0));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--xp-ease);
+}
+.xh-explorer-inside li {
+  isolation: isolate;
+}
+.xh-explorer-inside li:hover {
+  border-color: var(--xp-line-strong);
+  border-left-color: var(--xp-red);
+  box-shadow: 0 14px 28px -20px rgba(37, 46, 74, 0.55);
+  transform: translateY(-2px);
+}
+.xh-explorer-inside li:hover::after {
+  transform: scaleX(1);
+}
+/* Tiles arrive one after another when a division is opened. */
+.xh-explorer-panel[role="tabpanel"]:not([hidden]) .xh-explorer-inside li {
+  animation: xh-inside-in 0.55s var(--xp-ease) both;
+}
+.xh-explorer-inside li:nth-child(2) {
+  animation-delay: 60ms;
+}
+.xh-explorer-inside li:nth-child(3) {
+  animation-delay: 120ms;
+}
+.xh-explorer-inside li:nth-child(4) {
+  animation-delay: 180ms;
+}
+.xh-explorer-inside li:nth-child(5) {
+  animation-delay: 240ms;
+}
+.xh-explorer-inside li:nth-child(6) {
+  animation-delay: 300ms;
+}
+@keyframes xh-inside-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xh-explorer-panel[role="tabpanel"]:not([hidden]) .xh-explorer-inside li {
+    animation: none;
+  }
+  .xh-explorer-inside li,
+  .xh-explorer-inside li::after {
+    transition: none;
+  }
+  .xh-explorer-inside li:hover {
+    transform: none;
+  }
 }
 .xh-explorer-tools {
   display: flex;
