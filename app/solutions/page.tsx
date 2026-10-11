@@ -1,10 +1,47 @@
+/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
+import Link from "next/link";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Bot,
+  Brain,
+  Building2,
+  ChartColumn,
+  Clock,
+  Cloud,
+  Code,
+  Cpu,
+  Factory,
+  Gauge,
+  GraduationCap,
+  Handshake,
+  HeartPulse,
+  Landmark,
+  Layers,
+  Mail,
+  MapPin,
+  Microscope,
+  MonitorCog,
+  PenTool,
+  Phone,
+  Rocket,
+  ShieldCheck,
+  ShoppingCart,
+  Smartphone,
+  Sparkles,
+  Sprout,
+  Target,
+  Truck,
+  Wallet,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import type { CSSProperties } from "react";
-import { Btn, ClosingPaths, Figures, Kicker, Plate, SectionHead, SmartLink } from "../components/xp/Primitives";
-import { WorkIndex } from "../components/xp/solutions/WorkIndex";
+import { EnquiryForm } from "../components/worlds/EnquiryForm";
+import { SolutionsFooter, SolutionsHeader } from "../components/worlds/SolutionsChrome";
+import { WorkGrid } from "../components/worlds/WorkGrid";
 import { StructuredData } from "../components/StructuredData";
 import {
-  capabilities,
-  closing,
   ctaBand,
   edge,
   featured,
@@ -24,439 +61,603 @@ import { contact } from "@/lib/site-data";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "TechM4Solutions | Software, apps, AI and computer labs",
+  title: "TechM4Solutions | Software, apps, AI and pay-and-use computer labs",
   description:
-    "TechM4Solutions designs and builds software products, web and mobile apps, AI solutions and enterprise systems, and offers pay-per-use access to high-performance computer labs.",
+    "TechM4Solutions designs and builds software products, web and mobile apps, AI solutions and enterprise systems, with pay-and-use labs of Silicon Valley-level computer systems.",
   path: "/solutions",
 });
 
-const pad = (n: number) => String(n).padStart(2, "0");
 const delay = (ms: number) => ({ "--delay": ms + "ms" }) as CSSProperties;
 
+const SERVICE_ICONS: LucideIcon[] = [Bot, Code, Smartphone, Layers, Cloud, ChartColumn];
+const INDUSTRY_ICONS: LucideIcon[] = [GraduationCap, HeartPulse, Sprout, Factory, ShoppingCart, Wallet, Truck, Landmark, Rocket];
+const EDGE_ICONS: LucideIcon[] = [Microscope, Brain, Building2, Gauge, Handshake];
+const PROCESS_ICONS: LucideIcon[] = [Target, PenTool, Code, Rocket, ShieldCheck];
+const LAB_ICONS: LucideIcon[] = [Cpu, Zap, Clock];
+
+const ticker = [
+  "Software products",
+  "Web and mobile apps",
+  "AI and agentic AI",
+  "ERP and enterprise systems",
+  "Cloud and DevOps",
+  "Data and analytics",
+  "Pay-and-use computer labs",
+];
+
+const heroStack = ["React", "TypeScript", "NestJS", "PostgreSQL", "Python", "PyTorch", "Android"];
+
+const enquiryFields = [
+  { name: "name", label: "Your name", required: true, autoComplete: "name" },
+  { name: "email", label: "Email", type: "email" as const, required: true, autoComplete: "email" },
+  { name: "phone", label: "Phone", type: "tel" as const, autoComplete: "tel" },
+  { name: "company", label: "Company or institution", autoComplete: "organization" },
+  {
+    name: "interest",
+    label: "I'm interested in",
+    type: "select" as const,
+    options: [
+      "A software product",
+      "A web or mobile app",
+      "An AI solution",
+      "An ERP or enterprise system",
+      "Booking lab time",
+      "Something else",
+    ],
+    wide: true,
+  },
+  { name: "message", label: "Tell us about the project", type: "textarea" as const, required: true },
+];
+
 export default function SolutionsPage() {
+  const stackTiles = Array.from(new Set(techGroups.flatMap((group) => group.items)));
+  const [lead, ...counts] = record.figures;
+
   return (
-    <main className="xp xp-solutions">
-      {/* Hero: the promise on the left, the delivery sheet on the right */}
-      <section className="xp-section xp-tone-ink xo-hero" aria-labelledby="xo-hero-title">
-        <div className="xp-shell xo-hero-grid">
-          <div className="xo-hero-copy">
-            <Kicker index={hero.kickerIndex}>{hero.kicker}</Kicker>
-            <h1 className="xp-display xo-hero-title" id="xo-hero-title">
-              {hero.title} <em>{hero.titleAccent}</em>
-            </h1>
-            <p className="xp-lede">{hero.lede}</p>
-            <div className="xp-actions">
-              <Btn href={hero.primary.href}>{hero.primary.label}</Btn>
-              <Btn href={hero.secondary.href} variant="line">
-                {hero.secondary.label}
-              </Btn>
-            </div>
-          </div>
+    <div className="tm-world">
+      <SolutionsHeader />
 
-          <aside className="xo-sheet" aria-labelledby="xo-sheet-title">
-            <header className="xo-sheet-head">
-              <p className="xp-meta" id="xo-sheet-title">
-                {hero.sheet.title}
-              </p>
-              <p className="xp-meta">{hero.sheet.reference}</p>
-            </header>
-            <ol className="xo-sheet-rows">
-              {hero.sheet.rows.map((row, index) => (
-                <li key={row.code} style={delay(index * 70)}>
-                  <a href={row.href}>
-                    <span className="xo-sheet-code">{row.code}</span>
-                    <span className="xo-sheet-term">{row.term}</span>
-                    <span className="xo-sheet-detail">{row.detail}</span>
-                    <i aria-hidden="true">↘</i>
+      <main className="tm" id="top">
+        {/* Hero: the promise, and the system it ships, drawn as a diagram. */}
+        <section className="tm-hero" aria-labelledby="tm-hero-title">
+          <div className="tm-hero-bg" aria-hidden="true">
+            <img src="/images/about/computer-lab.jpeg" alt="" fetchPriority="high" />
+          </div>
+          <div className="tm-container">
+            <div className="tm-hero-grid">
+              <div className="tm-hero-copy">
+                <p className="tm-eyebrow">Software. AI. Delivered.</p>
+                <h1 className="tm-h1" id="tm-hero-title">
+                  {hero.title} <span className="tm-accent">{hero.titleAccent}</span>
+                </h1>
+                <p className="tm-lead">{hero.lede}</p>
+                <div className="tm-actions">
+                  <a className="tm-btn" href="#contact">
+                    Discuss a project
+                    <ArrowRight aria-hidden="true" />
                   </a>
-                </li>
-              ))}
-            </ol>
-            <footer className="xo-sheet-foot">
-              <span className="xp-meta">{hero.sheet.footLabel}</span>
-              <strong>{hero.sheet.footValue}</strong>
-            </footer>
-          </aside>
-        </div>
-
-        <nav className="xp-shell xo-index" aria-label="On this page">
-          <ol>
-            {hero.index.map((item, index) => (
-              <li key={item.href}>
-                <a href={item.href}>
-                  <span aria-hidden="true">{pad(index + 1)}</span>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </section>
-
-      {/* Delivery record */}
-      <section
-        className="xp-section xp-section--tight xo-record"
-        id="record"
-        aria-labelledby="xo-record-title"
-      >
-        <div className="xp-shell xo-record-grid">
-          <div className="xo-record-head" data-reveal>
-            <Kicker index="01">{record.label}</Kicker>
-            <h2 className="xp-title" id="xo-record-title">
-              {record.title} <em>{record.titleAccent}</em>
-            </h2>
-            <p className="xp-body">{record.lede}</p>
-          </div>
-          <div className="xo-record-figures">
-            <Figures items={record.figures} />
-            <p className="xo-record-note">{record.note}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured build: the one system whose code is in this repository */}
-      <section
-        className="xp-section xp-tone-white xo-featured"
-        id="featured"
-        aria-labelledby="xo-featured-title"
-      >
-        <div className="xp-shell">
-          <SectionHead
-            index="02"
-            label={featured.label}
-            id="xo-featured-title"
-            title={
-              <>
-                {featured.title} <em>{featured.titleAccent}</em>
-              </>
-            }
-            lede={featured.lede}
-          />
-          <div className="xo-featured-grid">
-            <div className="xo-console" data-reveal>
-              <div className="xo-console-bar" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-                <span>{featured.name}</span>
+                  <a className="tm-btn tm-btn--ghost" href="#work">
+                    See our work
+                  </a>
+                </div>
               </div>
-              <div className="xo-console-body">
-                <p className="xp-meta">{featured.layersTitle}</p>
-                <ol className="xo-layers">
-                  {featured.layers.map((layer) => (
-                    <li key={layer.code}>
-                      <span className="xo-layer-code">{layer.code}</span>
-                      <strong>{layer.term}</strong>
-                      <span>{layer.detail}</span>
-                    </li>
-                  ))}
-                </ol>
+
+              <div className="tm-hero-visual">
+                <figure className="tm-diagram" aria-labelledby="tm-diagram-title">
+                  <figcaption id="tm-diagram-title">
+                    <strong>{featured.name}</strong>
+                    <span>How it is put together</span>
+                  </figcaption>
+                  <ol className="tm-diagram-stack">
+                    {featured.layers.map((layer, index) => (
+                      <li key={layer.code} style={delay(index * 120)}>
+                        <span className="tm-diagram-code">{layer.code}</span>
+                        <span>
+                          <strong>{layer.term}</strong>
+                          <small>{layer.detail}</small>
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                  <ul className="tm-diagram-modules" aria-label="Some of its workspaces">
+                    {featured.modules.slice(0, 8).map((module) => (
+                      <li key={module}>{module}</li>
+                    ))}
+                    <li className="is-more">+{featured.modules.length - 8} more</li>
+                  </ul>
+                </figure>
+                <div className="tm-float tm-hero-float">
+                  <span className="tm-icon tm-icon--red">
+                    <BadgeCheck aria-hidden="true" />
+                  </span>
+                  <div>
+                    <strong>
+                      {lead.value}
+                      {lead.suffix}
+                    </strong>
+                    <span>companies helped</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="xo-modules" data-reveal>
-              <h3 className="xp-meta" id="xo-modules-title">
-                {featured.modulesTitle}
-              </h3>
-              <ul aria-labelledby="xo-modules-title">
-                {featured.modules.map((module, index) => (
-                  <li key={module}>
-                    <span aria-hidden="true">{pad(index + 1)}</span>
-                    {module}
+
+            <div className="tm-trust">
+              <span>Built with</span>
+              <ul>
+                {heroStack.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Ticker: the breadth of the division in one band. */}
+        <div className="tm-ticker" aria-label="What TechM4Solutions does">
+          <div className="tm-ticker-track">
+            {[0, 1].map((copy) => (
+              <ul key={copy} aria-hidden={copy === 1 ? true : undefined}>
+                {ticker.map((item) => (
+                  <li key={item}>
+                    {item}
+                    <Sparkles aria-hidden="true" />
                   </li>
                 ))}
               </ul>
-              <p className="xp-body">{featured.divisionsNote}</p>
-              <Btn href={featured.cta.href}>{featured.cta.label}</Btn>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
 
-      {/* Selected work */}
-      <section className="xp-section xo-work-section" id="work" aria-labelledby="xo-work-title">
-        <div className="xp-shell">
-          <SectionHead
-            index="03"
-            label={workSection.label}
-            id="xo-work-title"
-            title={
-              <>
-                {workSection.title} <em>{workSection.titleAccent}</em>
-              </>
-            }
-            lede={workSection.lede}
-          />
-          <WorkIndex items={work} stages={workStages} stageLabels={stageLabels} labels={workSection} />
-          <p className="xo-work-note">{workSection.note}</p>
-        </div>
-      </section>
-
-      {/* Accent band: a mid-page way out */}
-      <section className="xo-band" aria-labelledby="xo-band-title">
-        <div className="xp-shell xo-band-inner">
-          <div>
-            <h2 className="xo-band-title" id="xo-band-title">
-              {ctaBand.title}
-            </h2>
-            <p>{ctaBand.text}</p>
-          </div>
-          <div className="xo-band-actions">
-            <Btn href={ctaBand.action.href} variant="light">
-              {ctaBand.action.label}
-            </Btn>
-            <a className="xo-band-mail" href={contact.partnershipsHref}>
-              {contact.partnerships}
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Capabilities and the stack */}
-      <section
-        className="xp-section xp-tone-navy xo-cap"
-        id="capabilities"
-        aria-labelledby="xo-cap-title"
-      >
-        <div className="xp-shell">
-          <SectionHead
-            index="04"
-            label={capabilities.label}
-            id="xo-cap-title"
-            title={
-              <>
-                {capabilities.title} <em>{capabilities.titleAccent}</em>
-              </>
-            }
-            lede={capabilities.lede}
-          />
-          <ol className="xo-services">
-            {services.map((service, index) => (
-              <li key={service.title} data-reveal style={delay((index % 2) * 80)}>
-                <span className="xo-service-no" aria-hidden="true">
-                  {pad(index + 1)}
+        {/* About: photographs, a floating figure and what you get. */}
+        <section className="tm-section" aria-labelledby="tm-about-title">
+          <div className="tm-container tm-split">
+            <div className="tm-collage" data-reveal>
+              <div className="tm-media tm-media--4x5 tm-collage-main">
+                <img
+                  src="/images/editorial/workshop-lab.jpeg"
+                  alt="A TechM4India engineer presenting to a room of people working at rows of monitors"
+                  loading="lazy"
+                />
+              </div>
+              <div className="tm-media tm-media--4x3 tm-collage-side">
+                <img
+                  src="/images/home/hero-engineer.jpeg"
+                  alt="An engineer wiring a test panel in an electrical laboratory"
+                  loading="lazy"
+                />
+              </div>
+              <div className="tm-float tm-collage-float">
+                <span className="tm-icon">
+                  <MonitorCog aria-hidden="true" />
                 </span>
                 <div>
-                  <h3>{service.title}</h3>
-                  <p>{service.text}</p>
-                  <ul aria-label={"Includes, for " + service.title}>
-                    {service.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
+                  <strong>
+                    {counts[0].value}
+                    {counts[0].suffix} apps
+                  </strong>
+                  <span>delivered to date</span>
                 </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="xo-stack">
-            <div className="xo-stack-head" data-reveal>
-              <h3 className="xp-subtitle" id="xo-stack-title">
-                {capabilities.stackTitle}
-              </h3>
-              <p>{capabilities.stackLede}</p>
+              </div>
             </div>
-            <table className="xo-stack-table" aria-labelledby="xo-stack-title">
-              <thead>
-                <tr>
-                  <th scope="col">{capabilities.columns.layer}</th>
-                  <th scope="col">{capabilities.columns.items}</th>
-                  <th scope="col">{capabilities.columns.basis}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {techGroups.map((group) => (
-                  <tr key={group.layer}>
-                    <th scope="row">{group.layer}</th>
-                    <td>
-                      <ul className="xo-chips">
-                        {group.items.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>{group.basis}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Industries and the edge */}
-      <section className="xp-section xo-industries" id="industries" aria-labelledby="xo-industries-title">
-        <div className="xp-shell">
-          <SectionHead
-            index="05"
-            label={industries.label}
-            id="xo-industries-title"
-            title={
-              <>
-                {industries.title} <em>{industries.titleAccent}</em>
-              </>
-            }
-            lede={industries.lede}
-          />
-          <ul className="xo-industry-grid">
-            {industries.items.map((industry, index) => (
-              <li key={industry.name} data-reveal style={delay((index % 3) * 60)}>
-                <span aria-hidden="true">{pad(index + 1)}</span>
-                <h3>{industry.name}</h3>
-                <p>{industry.builds.join(" · ")}</p>
-              </li>
-            ))}
-          </ul>
-
-          <div className="xo-edge">
-            <h3 className="xp-meta" id="xo-edge-title">
-              {edge.label}
-            </h3>
-            <ol className="xo-edge-list" aria-labelledby="xo-edge-title">
-              {edge.items.map((item) => (
-                <li key={item.title} data-reveal>
-                  <strong>{item.title}</strong>
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      {/* Process */}
-      <section className="xp-section xp-tone-tint xo-process" id="process" aria-labelledby="xo-process-title">
-        <div className="xp-shell">
-          <SectionHead
-            index="06"
-            label={process.label}
-            id="xo-process-title"
-            title={
-              <>
-                {process.title} <em>{process.titleAccent}</em>
-              </>
-            }
-            lede={process.lede}
-          />
-          <ol className="xo-steps">
-            {process.steps.map((step, index) => (
-              <li key={step.name} data-reveal style={delay(index * 80)}>
-                <span className="xo-step-no" aria-hidden="true">
-                  {pad(index + 1)}
-                </span>
-                <h3>{step.name}</h3>
-                <p>{step.text}</p>
-                <div className="xo-step-receive">
-                  <p className="xp-meta">{process.receiveLabel}</p>
-                  <p>{step.receive}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Pay-and-use computer labs */}
-      <section className="xp-section xp-tone-navy xo-labs" id="labs" aria-labelledby="xo-labs-title">
-        <div className="xp-shell">
-          <div className="xo-labs-grid">
-            <div className="xo-labs-copy" data-reveal>
-              <Kicker index="07">{labs.label}</Kicker>
-              <h2 className="xp-title" id="xo-labs-title">
-                {labs.title} <em>{labs.titleAccent}</em>
+            <div className="tm-about-copy" data-reveal>
+              <p className="tm-eyebrow">About TechM4Solutions</p>
+              <h2 className="tm-h2" id="tm-about-title">
+                One team, from the first brief to <span className="tm-accent">working software.</span>
               </h2>
-              <p className="xp-lede">{labs.lede}</p>
-              <ul className="xo-offers">
-                {labs.offers.map((offer, index) => (
-                  <li key={offer.title}>
-                    <span aria-hidden="true">{pad(index + 1)}</span>
-                    <div>
-                      <h3>{offer.title}</h3>
-                      <p>{offer.text}</p>
-                    </div>
+              <p className="tm-lead">
+                We are the software division of TechM4India. We design, build and ship products,
+                apps, AI systems and enterprise software, and we stay for the support after
+                release.
+              </p>
+              <ul className="tm-checks">
+                {hero.sheet.rows.map((row) => (
+                  <li key={row.code}>
+                    <BadgeCheck aria-hidden="true" />
+                    {row.term}
                   </li>
                 ))}
               </ul>
+              <a className="tm-call tm-call--onlight" href={contact.generalPhoneHref}>
+                <span>
+                  <Phone aria-hidden="true" />
+                </span>
+                <span>
+                  <small>Call us now</small>
+                  <strong>{contact.generalPhone}</strong>
+                </span>
+              </a>
             </div>
-            <div className="xo-labs-side">
-              <Plate
-                src={labs.image.src}
-                alt={labs.image.alt}
-                caption={labs.image.caption}
-                note={labs.image.note}
-                ratio="4x3"
-                sizes="(max-width: 900px) 100vw, 44vw"
-              />
-              <div className="xo-labs-who" data-reveal>
-                <p className="xp-meta">{labs.whoTitle}</p>
-                <ul>
-                  {labs.who.map((item) => (
-                    <li key={item}>{item}</li>
+          </div>
+        </section>
+
+        {/* Delivery record */}
+        <section className="tm-section tm-section--tight tm-bg-soft" aria-labelledby="tm-record-title">
+          <div className="tm-container">
+            <div className="tm-head tm-head--center">
+              <p className="tm-eyebrow">{record.label}</p>
+              <h2 className="tm-h2" id="tm-record-title">
+                {record.title} <span className="tm-accent">{record.titleAccent}</span>
+              </h2>
+            </div>
+            <ul className="tm-stats tm-stats--5">
+              {record.figures.map((figure, index) => (
+                <li className="tm-stat" key={figure.label} data-reveal style={delay(index * 70)}>
+                  <strong>
+                    {figure.value}
+                    <sup>{figure.suffix}</sup>
+                  </strong>
+                  <span>{figure.label}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="tm-small tm-center">{record.note}</p>
+          </div>
+        </section>
+
+        {/* Core services */}
+        <section className="tm-section tm-bg-soft tm-services" id="services" aria-labelledby="tm-services-title">
+          <div className="tm-container tm-services-grid">
+            <div className="tm-services-head">
+              <p className="tm-eyebrow">Our core services</p>
+              <h2 className="tm-h2" id="tm-services-title">
+                Everything a product needs, <span className="tm-accent">under one roof.</span>
+              </h2>
+              <p className="tm-body">
+                Most projects draw on two or three of these disciplines. That is why they sit with
+                one team and one point of contact.
+              </p>
+              <a className="tm-btn" href="#contact">
+                Start a project
+                <ArrowRight aria-hidden="true" />
+              </a>
+            </div>
+            <ul className="tm-grid tm-cols-2">
+              {services.map((service, index) => {
+                const Icon = SERVICE_ICONS[index] ?? Sparkles;
+                return (
+                  <li className="tm-card tm-card--hover" key={service.title} data-reveal style={delay((index % 2) * 80)}>
+                    <span className="tm-icon">
+                      <Icon aria-hidden="true" />
+                    </span>
+                    <h3 className="tm-h3">{service.title}</h3>
+                    <p className="tm-body">{service.text}</p>
+                    <p className="tm-small">{service.items.join(" · ")}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+
+        {/* Why us: a navy band, then the technology wall riding over its edge. */}
+        <section className="tm-section tm-bg-dark tm-grid-bg tm-drivers" aria-labelledby="tm-drivers-title">
+          <div className="tm-container tm-split tm-split--top">
+            <div>
+              <p className="tm-eyebrow">{edge.label}</p>
+              <h2 className="tm-h2" id="tm-drivers-title">
+                Practical engineering. <span className="tm-accent">Measurable delivery.</span>
+              </h2>
+            </div>
+            <ul className="tm-drivers-list">
+              {edge.items.map((item, index) => {
+                const Icon = EDGE_ICONS[index] ?? Sparkles;
+                return (
+                  <li key={item.title} data-reveal style={delay(index * 70)}>
+                    <span className="tm-icon">
+                      <Icon aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h3 className="tm-h3">{item.title}</h3>
+                      <p className="tm-body">{item.text}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+        <section className="tm-wall-wrap" aria-labelledby="tm-wall-title">
+          <div className="tm-container">
+            <div className="tm-wall">
+              <div className="tm-head tm-head--center">
+                <p className="tm-eyebrow">Our technologies</p>
+                <h2 className="tm-h3" id="tm-wall-title">
+                  Named in our own products, roles and repositories
+                </h2>
+              </div>
+              <ul className="tm-wall-grid">
+                {stackTiles.map((tech) => (
+                  <li key={tech}>{tech}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured build and selected work */}
+        <section className="tm-section tm-bg-soft" id="work" aria-labelledby="tm-work-title">
+          <div className="tm-container">
+            <div className="tm-head tm-head--split">
+              <div>
+                <p className="tm-eyebrow">Portfolio</p>
+                <h2 className="tm-h2" id="tm-work-title">
+                  {workSection.title} <span className="tm-accent">{workSection.titleAccent}</span>
+                </h2>
+              </div>
+              <p className="tm-body">{workSection.lede}</p>
+            </div>
+
+            <article className="tm-featured" aria-labelledby="tm-featured-title" data-reveal>
+              <div className="tm-featured-copy">
+                <span className="tm-badge tm-badge--green tm-badge--dot">{featured.label}</span>
+                <h3 className="tm-h2" id="tm-featured-title">
+                  {featured.title} <span className="tm-accent">{featured.titleAccent}</span>
+                </h3>
+                <p className="tm-body">{featured.lede}</p>
+                <p className="tm-small">{featured.divisionsNote}</p>
+                <Link className="tm-btn" href={featured.cta.href}>
+                  {featured.cta.label}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </div>
+              <div className="tm-featured-modules">
+                <p className="tm-small">{featured.modulesTitle}</p>
+                <ul className="tm-chips">
+                  {featured.modules.map((module) => (
+                    <li key={module} className="tm-chip">
+                      {module}
+                    </li>
                   ))}
                 </ul>
               </div>
-            </div>
-          </div>
+            </article>
 
-          <div className="xo-lab-steps">
-            <h3 className="xp-meta" id="xo-lab-steps-title">
+            <WorkGrid items={work} stages={workStages} stageLabels={stageLabels} allLabel={workSection.allLabel} />
+          </div>
+        </section>
+
+        {/* Industries */}
+        <section className="tm-section tm-bg-dark tm-grid-bg" id="industries" aria-labelledby="tm-industries-title">
+          <div className="tm-container tm-industries">
+            <div className="tm-industries-head">
+              <p className="tm-eyebrow">{industries.label}</p>
+              <h2 className="tm-h2" id="tm-industries-title">
+                {industries.title} <span className="tm-accent">{industries.titleAccent}</span>
+              </h2>
+              <p className="tm-body">{industries.lede}</p>
+            </div>
+            <ul className="tm-industry-grid">
+              {industries.items.map((industry, index) => {
+                const Icon = INDUSTRY_ICONS[index] ?? Sparkles;
+                return (
+                  <li key={industry.name} data-reveal style={delay((index % 3) * 60)}>
+                    <Icon aria-hidden="true" />
+                    <div>
+                      <h3>{industry.name}</h3>
+                      <p>{industry.builds.join(" · ")}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+
+        {/* Process */}
+        <section className="tm-section" id="process" aria-labelledby="tm-process-title">
+          <div className="tm-container">
+            <div className="tm-head tm-head--center">
+              <p className="tm-eyebrow">{process.label}</p>
+              <h2 className="tm-h2" id="tm-process-title">
+                {process.title} <span className="tm-accent">{process.titleAccent}</span>
+              </h2>
+              <p className="tm-body">{process.lede}</p>
+            </div>
+            <ol className="tm-process">
+              {process.steps.map((step, index) => {
+                const Icon = PROCESS_ICONS[index] ?? Sparkles;
+                return (
+                  <li className="tm-card" key={step.name} data-reveal style={delay(index * 80)}>
+                    <div className="tm-process-top">
+                      <span className="tm-icon">
+                        <Icon aria-hidden="true" />
+                      </span>
+                      <span className="tm-process-no">{String(index + 1).padStart(2, "0")}</span>
+                    </div>
+                    <h3 className="tm-h3">{step.name}</h3>
+                    <p className="tm-body">{step.text}</p>
+                    <p className="tm-process-receive">
+                      <span>{process.receiveLabel}</span>
+                      {step.receive}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </section>
+
+        {/* Pay-and-use labs */}
+        <section className="tm-section tm-bg-soft" id="labs" aria-labelledby="tm-labs-title">
+          <div className="tm-container">
+            <div className="tm-split">
+              <div className="tm-labs-media" data-reveal>
+                <div className="tm-media tm-media--4x3">
+                  <img src={labs.image.src} alt={labs.image.alt} loading="lazy" />
+                </div>
+                <div className="tm-float tm-labs-float">
+                  <span className="tm-icon tm-icon--red">
+                    <Clock aria-hidden="true" />
+                  </span>
+                  <div>
+                    <strong>Pay per hour</strong>
+                    <span>for the time you use</span>
+                  </div>
+                </div>
+              </div>
+              <div className="tm-labs-copy" data-reveal>
+                <p className="tm-eyebrow">{labs.label}</p>
+                <h2 className="tm-h2" id="tm-labs-title">
+                  {labs.title} <span className="tm-accent">{labs.titleAccent}</span>
+                </h2>
+                <p className="tm-lead">{labs.lede}</p>
+                <ul className="tm-labs-offers">
+                  {labs.offers.map((offer, index) => {
+                    const Icon = LAB_ICONS[index] ?? Sparkles;
+                    return (
+                      <li key={offer.title}>
+                        <span className="tm-icon">
+                          <Icon aria-hidden="true" />
+                        </span>
+                        <div>
+                          <h3 className="tm-h3">{offer.title}</h3>
+                          <p className="tm-body">{offer.text}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            <h3 className="tm-subhead" id="tm-lab-steps">
               {labs.stepsTitle}
             </h3>
-            <ol aria-labelledby="xo-lab-steps-title">
+            <ol className="tm-lab-steps" aria-labelledby="tm-lab-steps">
               {labs.steps.map((step, index) => (
                 <li key={step.name} data-reveal style={delay(index * 80)}>
-                  <span aria-hidden="true">{pad(index + 1)}</span>
-                  <strong>{step.name}</strong>
+                  <span>{index + 1}</span>
+                  <h4>{step.name}</h4>
                   <p>{step.text}</p>
                 </li>
               ))}
             </ol>
-          </div>
 
-          <div className="xo-labs-work">
-            <h3 className="xp-meta" id="xo-labs-work-title">
+            <h3 className="tm-subhead" id="tm-lab-work">
               {labs.workTitle}
             </h3>
-            <ul aria-labelledby="xo-labs-work-title">
+            <ul className="tm-grid tm-cols-4" aria-labelledby="tm-lab-work">
               {labs.work.map((item) => (
-                <li key={item.title} data-reveal>
-                  <h4>{item.title}</h4>
-                  <p>{item.text}</p>
-                  <ul className="xo-chips" aria-label={"Software for " + item.title}>
+                <li className="tm-card tm-card--hover" key={item.title} data-reveal>
+                  <h4 className="tm-h3">{item.title}</h4>
+                  <p className="tm-body">{item.text}</p>
+                  <ul className="tm-chips">
                     {item.tools.map((tool) => (
-                      <li key={tool}>{tool}</li>
+                      <li className="tm-chip" key={tool}>
+                        {tool}
+                      </li>
                     ))}
                   </ul>
                 </li>
               ))}
             </ul>
-            <div className="xo-labs-cta">
-              <p>{labs.note}</p>
-              <Btn href={labs.cta.href} variant="light">
-                {labs.cta.label}
-              </Btn>
+
+            <div className="tm-labs-who">
+              <div>
+                <h3 className="tm-h3">{labs.whoTitle}</h3>
+                <ul className="tm-checks">
+                  {labs.who.map((item) => (
+                    <li key={item}>
+                      <BadgeCheck aria-hidden="true" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="tm-labs-cta">
+                <p className="tm-small">{labs.note}</p>
+                <a className="tm-btn" href="#contact">
+                  {labs.cta.label}
+                  <ArrowRight aria-hidden="true" />
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <ClosingPaths
-        label={closing.label}
-        title={
-          <>
-            {closing.title} <em>{closing.titleAccent}</em>
-          </>
-        }
-        lede={
-          <>
-            {closing.lede}{" "}
-            <SmartLink className="xo-inline-link" href={contact.partnershipsHref}>
-              {contact.partnerships}
-            </SmartLink>
-            .
-          </>
-        }
-        paths={closing.paths}
-      />
+        {/* CTA band */}
+        <section className="tm-section tm-section--tight" aria-labelledby="tm-cta-title">
+          <div className="tm-container">
+            <div className="tm-cta">
+              <div>
+                <h2 id="tm-cta-title">{ctaBand.title}</h2>
+                <p>{ctaBand.text}</p>
+              </div>
+              <div className="tm-cta-actions">
+                <a className="tm-btn tm-btn--light" href="#contact">
+                  Let&apos;s start your project
+                  <ArrowRight aria-hidden="true" />
+                </a>
+                <a className="tm-call" href={contact.generalPhoneHref}>
+                  <span>
+                    <Phone aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Call us now</small>
+                    <strong>{contact.generalPhone}</strong>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact */}
+        <section className="tm-section tm-bg-soft tm-contact" id="contact" aria-labelledby="tm-contact-title">
+          <div className="tm-container tm-split tm-split--top">
+            <div className="tm-contact-info">
+              <p className="tm-eyebrow">Book a discovery call</p>
+              <h2 className="tm-h2" id="tm-contact-title">
+                Tell us what you are <span className="tm-accent">trying to build.</span>
+              </h2>
+              <p className="tm-body">
+                Projects, products and lab time all start with a short conversation about the
+                people, the constraints and the result you need.
+              </p>
+              <ul className="tm-contact-list">
+                <li>
+                  <span className="tm-round">
+                    <Mail aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Email</small>
+                    <a href={contact.partnershipsHref}>{contact.partnerships}</a>
+                  </span>
+                </li>
+                <li>
+                  <span className="tm-round">
+                    <Phone aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Phone</small>
+                    <a href={contact.generalPhoneHref}>{contact.generalPhone}</a>
+                  </span>
+                </li>
+                <li>
+                  <span className="tm-round">
+                    <MapPin aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Address</small>
+                    <span>{contact.address}</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div className="tm-card tm-contact-card">
+              <EnquiryForm
+                formId="tm-enquiry"
+                theme="tm"
+                title="New TechM4Solutions enquiry"
+                fields={enquiryFields}
+                submitLabel="Send request"
+              />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <SolutionsFooter />
 
       <StructuredData
         data={breadcrumbSchema([
@@ -464,6 +665,6 @@ export default function SolutionsPage() {
           { name: "Solutions", path: "/solutions" },
         ])}
       />
-    </main>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Newsreader } from "next/font/google";
+import { Manrope, Newsreader, Poppins, Sora } from "next/font/google";
 import { Footer } from "./components/Footer";
 import { MotionController } from "./components/MotionController";
 import { SiteHeader } from "./components/SiteHeader";
@@ -7,12 +7,14 @@ import { StructuredData } from "./components/StructuredData";
 import "./globals.css";
 // Loaded after globals so the workspace design system wins inside `.erp-route`.
 import "./erp-system.css";
-// Landing, Schools, Solutions and Institutes. Namespaced under `.xp`, so order is not load-bearing.
+// Landing and Institutes. Namespaced under `.xp`, so order is not load-bearing.
 import "./styles/xp-foundation.css";
 import "./styles/xp-home.css";
-import "./styles/xp-schools.css";
-import "./styles/xp-solutions.css";
 import "./styles/xp-institutes.css";
+// Division "worlds": each division page is its own site with its own chrome.
+// Solutions follows kodryx.ai, Schools follows pallaviinternationalschool.com.
+import "./styles/tm.css";
+import "./styles/sc.css";
 
 const manrope = Manrope({
   variable: "--font-sans",
@@ -23,6 +25,21 @@ const manrope = Manrope({
 const newsreader = Newsreader({
   variable: "--font-serif",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// TechM4Solutions world display face.
+const sora = Sora({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// TechM4Schools world display face.
+const poppins = Poppins({
+  variable: "--font-school",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -75,7 +92,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${newsreader.variable}`}>
+      <body className={`${manrope.variable} ${newsreader.variable} ${sora.variable} ${poppins.variable}`}>
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
