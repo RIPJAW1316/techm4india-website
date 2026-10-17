@@ -11,10 +11,10 @@ import "./erp-system.css";
 import "./styles/xp-foundation.css";
 import "./styles/xp-home.css";
 import "./styles/xp-institutes.css";
-// Division "worlds": each division page is its own site with its own chrome.
-// Solutions follows kodryx.ai, Schools follows pallaviinternationalschool.com,
-// Engineering follows gitam.edu.
+// Division worlds. Solutions has its own foundry art direction, loaded after
+// the shared tm chrome so it can restyle that page without touching the others.
 import "./styles/tm.css";
+import "./styles/solutions-foundry.css";
 import "./styles/sc.css";
 import "./styles/en.css";
 
@@ -28,6 +28,7 @@ const newsreader = Newsreader({
   variable: "--font-serif",
   subsets: ["latin"],
   display: "swap",
+  style: ["normal", "italic"],
 });
 
 // TechM4Solutions world display face.
