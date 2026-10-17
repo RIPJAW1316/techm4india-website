@@ -1,128 +1,48 @@
-"use client";
-
-/* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
-
+/* eslint-disable @next/next/no-img-element -- Locally hosted editorial photography is part of the static export. */
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import type { EcosystemDivision } from "@/lib/content/home";
 
-const CYCLE_MS = 5600;
-
-/**
- * The landing hero. The five divisions are the navigation: pointing at one
- * (hover, focus or tap) brings its photograph forward, and the index advances
- * on its own until the visitor interacts or asks for reduced motion.
- */
+/** The five divisions are the homepage's primary navigation, even without JavaScript. */
 export function HeroEcosystem({ divisions }: { divisions: EcosystemDivision[] }) {
-  const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-  // Only the first photograph ships with the page; the rest mount once the
-  // page is idle so they never compete with the first paint.
-  const [allImages, setAllImages] = useState(false);
-  const [autoplay, setAutoplay] = useState(false);
-
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setAutoplay(!reduce.matches);
-    sync();
-    reduce.addEventListener("change", sync);
-    const timer = window.setTimeout(() => setAllImages(true), 1400);
-    return () => {
-      reduce.removeEventListener("change", sync);
-      window.clearTimeout(timer);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!autoplay || paused || !allImages) return;
-    const timer = window.setInterval(
-      () => setActive((current) => (current + 1) % divisions.length),
-      CYCLE_MS,
-    );
-    return () => window.clearInterval(timer);
-  }, [autoplay, paused, allImages, divisions.length]);
-
-  const current = divisions[active];
-
   return (
-    <section
-      className="xh-hero xp-tone-ink"
-      aria-labelledby="home-title"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
-    >
-      <div className="xh-hero-stage" aria-hidden="true">
-        {divisions.map((division, index) =>
-          index === 0 || allImages ? (
-            <img
-              key={division.id}
-              className={index === active ? "is-active" : undefined}
-              src={division.image}
-              alt=""
-              decoding="async"
-              {...(index === 0
-                ? { fetchPriority: "high" as const, loading: "eager" as const }
-                : { loading: "lazy" as const })}
-            />
-          ) : null,
-        )}
-      </div>
-
-      <div className="xh-hero-inner xp-shell">
-        <div className="xh-hero-copy">
-          <p className="xp-kicker">
-            <b>TechM4India</b>
-            <span>Hyderabad, India</span>
-          </p>
-          <h1 className="xp-display" id="home-title">
-            Engineering imagination <em>into impact.</em>
-          </h1>
-          <p className="xh-hero-lede">
-            One ecosystem where school students, engineering undergraduates, institutions and
-            companies build real technology: from a first working robot to software in production.
-          </p>
-          <div className="xp-actions">
-            <Link className="xp-btn" href="#ecosystem">
-              <span>Explore the ecosystem</span>
-              <i aria-hidden="true">↓</i>
-            </Link>
-            <Link className="xp-btn xp-btn--line" href="/contact">
-              <span>Partner with us</span>
-              <i aria-hidden="true">↗</i>
-            </Link>
-          </div>
+    <section className="xh-cover" aria-labelledby="home-title">
+      <div className="xh-cover-shell xp-shell">
+        <div className="xh-cover-topline">
+          <p className="xp-kicker"><b>TechM4India</b><span>Five divisions. One ecosystem.</span></p>
+          <span className="xh-cover-edition">Hyderabad · India</span>
         </div>
 
-        <nav className="xh-hero-index" aria-label="TechM4India divisions">
-          <p className="xp-meta">Five divisions, one ecosystem</p>
-          <ol>
-            {divisions.map((division, index) => (
-              <li key={division.id} className={index === active ? "is-active" : undefined}>
-                <Link
-                  href={division.href}
-                  onMouseEnter={() => setActive(index)}
-                  onFocus={() => setActive(index)}
-                >
-                  <span className="xh-hero-index-no">{division.index}</span>
-                  <span className="xh-hero-index-name">{division.name}</span>
-                  <span className="xh-hero-index-line">{division.serves}</span>
-                  <i aria-hidden="true">↗</i>
-                </Link>
-                {index === active && autoplay && !paused && allImages && (
-                  <span className="xh-hero-progress" aria-hidden="true" key={"p" + active} />
-                )}
-              </li>
-            ))}
-          </ol>
-        </nav>
-      </div>
+        <h1 className="xh-cover-title" id="home-title">
+          <span>Engineering</span>
+          <span>imagination</span>
+          <em>into impact.</em>
+        </h1>
 
-      <p className="xh-hero-caption" aria-live="off">
-        <span>{current.imageAlt}</span>
-        {current.imageCredit && <span>{current.imageCredit}</span>}
-      </p>
+        <ol className="xh-cover-cards" aria-label="Explore TechM4India divisions">
+          {divisions.map((division) => (
+            <li className={`xh-cover-item xh-cover-item--${division.id}`} key={division.id}>
+              <Link className="xh-cover-card" href={division.href} aria-label={division.cta}>
+                <img src={division.image} alt={division.imageAlt} loading="eager" decoding="async" />
+                <span className="xh-cover-card-shade" aria-hidden="true" />
+                <span className="xh-cover-card-number">{division.index} / 05</span>
+                <span className="xh-cover-card-name">{division.short}</span>
+                <span className="xh-cover-card-arrow" aria-hidden="true">↗</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+
+        <div className="xh-cover-bottom">
+          <p>From a first working robot to software in production, we give ideas somewhere to go.</p>
+          <Link className="xh-cover-cta" href="#ecosystem">
+            Explore the ecosystem <span aria-hidden="true">↘</span>
+          </Link>
+        </div>
+      </div>
+      <div className="xh-cover-foot xp-shell">
+        <span>Scroll to discover the work</span>
+        <span>Student photography is illustrative · Space image: ISRO / Department of Space</span>
+      </div>
     </section>
   );
 }

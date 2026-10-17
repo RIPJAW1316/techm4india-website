@@ -9,6 +9,7 @@ import { StructuredData } from "./components/StructuredData";
 import { activities, ecosystem, leads, updates, updatesReviewedOn } from "@/lib/content/home";
 import { contact } from "@/lib/site-data";
 import { pageMetadata } from "@/lib/seo";
+import "./styles/xp-home-editorial.css";
 
 export const metadata = pageMetadata({
   title: "TechM4India | Schools, Engineering, Solutions, Space & Institutes",
@@ -43,6 +44,17 @@ export default function Home() {
         <div className="xp-shell xh-idea-grid">
           <div className="xh-idea-side" data-reveal>
             <Kicker index="01">The idea</Kicker>
+            <figure className="xh-idea-visual">
+              <img
+                src="/images/engineering/path-build.webp"
+                alt="Students and a mentor building an electronics and robotics project together"
+                loading="lazy"
+              />
+              <figcaption>
+                <span>Learning becomes tangible through the work.</span>
+                <span>Illustrative photography</span>
+              </figcaption>
+            </figure>
           </div>
           <div className="xh-idea-copy" data-reveal>
             <h2 className="xh-statement" id="idea-title">
