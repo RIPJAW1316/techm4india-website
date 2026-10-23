@@ -11,9 +11,8 @@
 
 import { contact } from "../site-data";
 
-/* Source: page brief (story and headline). The photograph is from
-   pallaviinternationalschool.com, used as the client's brief asks, with
-   credit. */
+/* Source: page brief (story and headline). The illustrative robotics photo
+   is licensed from Pexels; see docs/image-sources-2026-10.json. */
 export const hero = {
   kicker: "TechM4Schools",
   title: "From curiosity to capability",
@@ -21,10 +20,10 @@ export const hero = {
   lede: "TechM4Schools brings labs, structured programmes, learning kits and mentors into the school day, so a student who is curious about technology gets the chance to practise it, build with it and eventually lead with it.",
   primaryCta: { label: "Bring TechM4Schools to your school", href: "/contact" },
   secondaryCta: { label: "Follow the student journey", href: "#student-journey" },
-  image: "/images/schools/pallavi-student-robotics.webp",
-  imageAlt: "A school student in uniform smiling at a small robot he holds up, with a robotic arm on the desk beside him",
+  image: "/images/schools/school-robotics-hero.webp",
+  imageAlt: "A student holding a robotics project in a classroom",
   imageCaption: "Curiosity, in hand",
-  imageNote: "Image: Pallavi International School",
+  imageNote: "Illustrative school photograph",
 };
 
 export type SchoolFigure = { value: string; suffix?: string; label: string };
@@ -128,6 +127,8 @@ export type Lab = {
   id: string;
   name: string;
   short: string;
+  image: string;
+  imageAlt: string;
   /** One-line summary already published on this site. */
   line: string;
   description: string;
@@ -151,6 +152,8 @@ export const labs: Lab[] = [
     id: "coding",
     name: "Coding & programming lab",
     short: "Coding",
+    image: "/images/schools/coding-class.webp",
+    imageAlt: "Pupils working together at desktop computers in a classroom",
     line: "Logic, software and the habit of asking a computer to do something useful.",
     description:
       "Students develop logical thinking and computational skills by learning coding fundamentals, working in Python and JavaScript, and creating simple applications and games.",
@@ -165,6 +168,8 @@ export const labs: Lab[] = [
     id: "robotics",
     name: "Robotics & automation lab",
     short: "Robotics",
+    image: "/images/schools/robotics-team.webp",
+    imageAlt: "Pupils and a teacher assembling a small robot at a table",
     line: "Mechanisms, sensors and the joy of seeing a system respond.",
     description:
       "Students learn robotics basics through hands-on projects: sensors, motors, circuit building, robot programming, automation concepts and solving problems as a team.",
@@ -179,6 +184,8 @@ export const labs: Lab[] = [
     id: "drone",
     name: "Drone & aerial technology lab",
     short: "Drones",
+    image: "/images/schools/drone-flight.webp",
+    imageAlt: "A small camera drone in flight",
     line: "A new perspective on motion, mapping and the world from above.",
     description:
       "Students gain practical exposure to drone technology: flight principles, the components of a drone, safe flying practices and how aerial systems are used in industry.",
@@ -193,6 +200,8 @@ export const labs: Lab[] = [
     id: "ai",
     name: "Artificial intelligence lab",
     short: "AI",
+    image: "/images/schools/ai-learning.webp",
+    imageAlt: "Pupils collaborating around laptops in a classroom",
     line: "A grounded introduction to the systems learning to recognise patterns.",
     description:
       "Students explore the fundamentals of AI, understand how intelligent systems work, build simple AI projects and consider real-world applications and the ethics around them.",
@@ -207,6 +216,8 @@ export const labs: Lab[] = [
     id: "maker",
     name: "Innovation & maker education lab",
     short: "Maker",
+    image: "/images/schools/maker-printer.webp",
+    imageAlt: "Pupils watching a 3D printer make a small object",
     line: "A place to sketch, prototype, question and try again.",
     description:
       "Students apply design thinking, identify real-world problems, create prototypes and develop their own solutions through project-based learning.",
@@ -238,7 +249,7 @@ export const labRoom = {
   imageNote: "Illustrative photograph",
 };
 
-export type Kit = { name: string; text: string };
+export type Kit = { name: string; text: string; image: string; imageAlt: string };
 
 /* Source: previous site, divisions/schools.html, "Hands-On Learning Kits"
    (kit names and what each is for; its project counts were left out), and
@@ -262,18 +273,26 @@ export const kits: Kit[] = [
   {
     name: "Robotics learning kit",
     text: "Build and program a robot using motors, sensors and a microcontroller.",
+    image: "/images/schools/robotics-build.webp",
+    imageAlt: "Pupils working together with robotics components",
   },
   {
     name: "Coding & electronics kit",
     text: "Work from a first LED to complete circuits, writing the code that drives them.",
+    image: "/images/schools/computer-lab.webp",
+    imageAlt: "Pupils using computers in a classroom",
   },
   {
     name: "Drone exploration kit",
     text: "Assemble, calibrate and fly a drone, and learn about aerodynamics, control and navigation.",
+    image: "/images/schools/drone-flight.webp",
+    imageAlt: "A small drone in flight",
   },
   {
     name: "Innovation project kit",
     text: "Electronics components and open-ended project challenges for a student's own idea.",
+    image: "/images/schools/mentor-project.webp",
+    imageAlt: "A mentor helps a pupil with a 3D printing project",
   },
 ];
 
@@ -546,10 +565,10 @@ export const transformation = {
     { aspect: "Confidence", before: "Unsure they can build anything", after: "\"I can do this\"" },
     { aspect: "Careers", before: "Uncertain", after: "Mapped with CareerBuddy" },
   ] satisfies Shift[],
-  image: "/images/schools/pallavi-student-library.webp",
-  imageAlt: "A school student in uniform writing in a notebook at a library table",
+  image: "/images/schools/school-library-learning.webp",
+  imageAlt: "Three school students reading together at a library table",
   imageCaption: "From the textbook to the lab",
-  imageNote: "Image: Pallavi International School",
+  imageNote: "Illustrative school photograph",
 };
 
 /* -------------------------------------------------------------------------- */
@@ -626,6 +645,8 @@ export const outcomes: Outcome[] = [
 
 export type MapBranch = {
   id: string;
+  image: string;
+  imageAlt: string;
   /** What TechM4Schools gives the student on this branch. */
   branch: string;
   branchDetail: string;
@@ -652,6 +673,8 @@ export const mindMap = {
   branches: [
     {
       id: "developer",
+      image: "/images/schools/coding-class.webp",
+      imageAlt: "Pupils collaborating at a computer",
       branch: "Labs and kits",
       branchDetail: "Coding, robotics and AI labs",
       outcome: "Developer",
@@ -663,6 +686,8 @@ export const mindMap = {
     },
     {
       id: "innovator",
+      image: "/images/schools/maker-printer.webp",
+      imageAlt: "Pupils observing a 3D printer",
       branch: "Projects and challenges",
       branchDetail: "Maker lab and competitions",
       outcome: "Innovator",
@@ -674,6 +699,8 @@ export const mindMap = {
     },
     {
       id: "entrepreneur",
+      image: "/images/schools/student-presentation.webp",
+      imageAlt: "Pupils presenting a project to their class",
       branch: "Ideas and funding",
       branchDetail: "Innovate Bharath",
       outcome: "Entrepreneur",
@@ -685,6 +712,8 @@ export const mindMap = {
     },
     {
       id: "leader",
+      image: "/images/schools/mentor-project.webp",
+      imageAlt: "An adult mentoring a pupil on a technology project",
       branch: "Mentorship",
       branchDetail: "TechM4India mentors and CareerBuddy",
       outcome: "Leader",
@@ -696,6 +725,8 @@ export const mindMap = {
     },
     {
       id: "researcher",
+      image: "/images/schools/science-experiment.webp",
+      imageAlt: "Pupils exploring an experiment in a classroom",
       branch: "Exploration",
       branchDetail: "Workshops and awareness series",
       outcome: "Researcher",

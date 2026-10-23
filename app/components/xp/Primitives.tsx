@@ -20,6 +20,7 @@ export function SmartLink({
   className?: string;
   children: ReactNode;
   "aria-label"?: string;
+  "data-home-reveal"?: string;
 }) {
   if (isExternal(href)) {
     const newTab = href.startsWith("http");
@@ -174,7 +175,7 @@ export function Figures({ items }: { items: FigureItem[] }) {
   );
 }
 
-export type ClosePath = { label: string; title: string; text: string; href: string };
+export type ClosePath = { label: string; title: string; text: string; href: string; image?: string; imageAlt?: string };
 
 export function ClosingPaths({
   id = "next-step",
@@ -203,7 +204,12 @@ export function ClosingPaths({
         </header>
         <div className="xp-close-paths">
           {paths.map((path) => (
-            <SmartLink className="xp-close-path" href={path.href} key={path.title}>
+            <SmartLink className="xp-close-path" href={path.href} key={path.title} data-home-reveal="">
+              {path.image && (
+                <span className="xp-close-media">
+                  <img src={path.image} alt={path.imageAlt ?? ""} loading="lazy" decoding="async" />
+                </span>
+              )}
               <span>{path.label}</span>
               <strong>{path.title}</strong>
               <small>

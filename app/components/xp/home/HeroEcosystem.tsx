@@ -41,7 +41,7 @@ export function HeroEcosystem({ divisions }: { divisions: EcosystemDivision[] })
       </div>
       <div className="xh-cover-foot xp-shell">
         <span>Scroll to discover the work</span>
-        <span>Student photography is illustrative · Space image: ISRO / Department of Space</span>
+        <span>Some photography is illustrative · Space image: ISRO / Department of Space</span>
       </div>
     </section>
   );

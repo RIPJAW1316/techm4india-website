@@ -109,7 +109,7 @@ export function ActivityBoard({ activities, buildDate }: { activities: Activity[
         ) : (
           <ol className="xh-board-list">
             {visible.map(({ activity, bucket }) => (
-              <li key={activity.id} className={"xh-board-row is-" + bucket}>
+              <li key={activity.id} className={"xh-board-row is-" + bucket} data-home-reveal>
                 <div className="xh-board-when">
                   <span className={"xp-tag xp-tag--dot is-" + bucket}>{BUCKET_LABEL[bucket]}</span>
                   <span className="xp-meta">{whenLabel(activity)}</span>

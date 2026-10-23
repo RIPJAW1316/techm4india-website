@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Optimized local WebP images keep the interactive scene lightweight. */
 
 import { useRef, useState, type KeyboardEvent } from "react";
 import type { Service } from "@/lib/content/solutions";
@@ -13,6 +14,14 @@ const DIAGRAMS = {
 } as const;
 
 type Kind = (typeof DIAGRAMS)[keyof typeof DIAGRAMS];
+const PHOTOS: Record<Kind, { src: string; alt: string }> = {
+  ai: { src: "/images/solutions/product-planning.webp", alt: "Team discussing a problem around a computer" },
+  software: { src: "/images/solutions/software-detail.webp", alt: "Hands writing code on a laptop" },
+  mobile: { src: "/images/solutions/mobile-interface.webp", alt: "Smartphone showing applications on a desk" },
+  erp: { src: "/images/solutions/workspace.webp", alt: "Laptop displaying application code on a desk" },
+  cloud: { src: "/images/solutions/cloud-infrastructure.webp", alt: "Server equipment in a data center" },
+  data: { src: "/images/solutions/analytics.webp", alt: "A graph being studied on a laptop" },
+};
 const PANEL_ID = "sf-capability-panel";
 const tabId = (index: number) => `sf-capability-tab-${index}`;
 
@@ -149,6 +158,7 @@ export function CapabilitySystem({ services }: { services: Service[] }) {
       <div className="sf-tabs" role="tablist" aria-label="Capabilities" aria-orientation="vertical">
         {services.map((item, index) => {
           const selected = index === active;
+          const itemKind = DIAGRAMS[item.title as keyof typeof DIAGRAMS] ?? "software";
           return (
             <button
               key={item.title}
@@ -165,7 +175,8 @@ export function CapabilitySystem({ services }: { services: Service[] }) {
               onKeyDown={(event) => onKeyDown(event, index)}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
-              {item.title}
+              <span className="sf-tab-title">{item.title}</span>
+              <img src={PHOTOS[itemKind].src} alt="" loading="lazy" width={96} height={72} />
             </button>
           );
         })}
@@ -187,7 +198,11 @@ export function CapabilitySystem({ services }: { services: Service[] }) {
             ))}
           </ul>
         </div>
-        <Diagram kind={kind} items={service.items} />
+        <div className="sf-panel-visual">
+          <img src={PHOTOS[kind].src} alt={PHOTOS[kind].alt} loading="lazy" width={1500} height={1000} />
+          <Diagram kind={kind} items={service.items} />
+          <span className="sf-visual-note">Illustrative engineering scene</span>
+        </div>
       </div>
     </div>
   );

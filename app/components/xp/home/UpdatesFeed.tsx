@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Local editorial imagery is served with the static site. */
 
 import { useState } from "react";
 import type { Update, UpdateKind } from "@/lib/content/home";
@@ -95,7 +96,7 @@ export function UpdatesFeed({ updates, reviewedOn }: { updates: Update[]; review
         ) : (
           <ol className="xh-feed-list">
             {visible.map((update) => (
-              <li key={update.id} className={"xh-feed-item is-" + update.kind.toLowerCase()}>
+              <li key={update.id} className={"xh-feed-item is-" + update.kind.toLowerCase()} data-home-reveal>
                 <div className="xh-feed-when">
                   <span className="xp-tag xp-tag--solid">{update.kind}</span>
                   <span className="xp-meta">{update.postedOn ? formatDate(update.postedOn) : "Open listing"}</span>
@@ -112,6 +113,12 @@ export function UpdatesFeed({ updates, reviewedOn }: { updates: Update[]; review
                     </p>
                   )}
                 </div>
+                {update.image && (
+                  <figure className="xh-feed-image">
+                    <img src={update.image} alt={update.imageAlt ?? ""} loading="lazy" decoding="async" />
+                    <figcaption>{update.imageCaption ?? "Illustrative image"}</figcaption>
+                  </figure>
+                )}
                 <SmartLink
                   className="xp-link xh-feed-cta"
                   href={update.href}

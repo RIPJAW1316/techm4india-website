@@ -3,14 +3,15 @@ const isBrowser = typeof window !== "undefined";
 
 export const API_BASE_URL = (() => {
   if (isBrowser) {
-    // Keep browser requests on the website origin. Vite and Vercel proxy the API.
+    // Keep browser requests on the website origin. Vite and the Cloudflare
+    // Worker route them to the API without cross-origin cookies.
     return "/api/v1";
   }
-  // Server-side rendering needs an absolute URL. Keep the override available
-  // for local development while defaulting deployed builds to Railway.
+  // Server-side rendering needs an absolute URL. Production calls the same
+  // origin, whose Worker forwards /api requests to the ERP API Worker.
   return (
     env?.VITE_API_BASE_URL ||
-    "https://techm4india-website-production.up.railway.app/api/v1"
+    "https://www.techm4india.com/api/v1"
   ).replace(/\/$/, "");
 })();
 

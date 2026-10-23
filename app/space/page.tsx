@@ -212,7 +212,7 @@ export default function SpacePage() {
         <div className="space-kits-image image-frame" data-reveal>
           <img
             src="/images/space/assembly.jpeg"
-            alt="Rocket hardware assembly detail"
+            alt="Spacecraft crew module under assembly in an integration facility"
             loading="lazy"
           />
         </div>

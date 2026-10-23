@@ -13,6 +13,7 @@ interface Env {
       };
     };
   };
+  ERP_API_ORIGIN: string;
 }
 
 interface ExecutionContext {
@@ -29,6 +30,27 @@ interface ExecutionContext {
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    // Keep ERP cookies and browser requests on the website origin. The NestJS
+    // API remains on Vercel until the Cloudflare account can run Containers.
+    if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
+      const origin = request.headers.get("Origin");
+      if (origin && origin !== url.origin) {
+        return Response.json({ message: "Origin not allowed" }, { status: 403 });
+      }
+
+      const upstreamUrl = new URL(`${url.pathname}${url.search}`, env.ERP_API_ORIGIN);
+      const upstreamRequest = new Request(upstreamUrl, request);
+      upstreamRequest.headers.delete("Origin");
+      upstreamRequest.headers.delete("Host");
+
+      try {
+        return await fetch(upstreamRequest, { redirect: "manual" });
+      } catch (error) {
+        console.error("ERP API upstream request failed", error);
+        return Response.json({ message: "ERP API is temporarily unavailable" }, { status: 502 });
+      }
+    }
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

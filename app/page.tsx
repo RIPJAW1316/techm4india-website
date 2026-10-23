@@ -2,6 +2,8 @@
 import { ActivityBoard } from "./components/xp/home/ActivityBoard";
 import { DivisionExplorer } from "./components/xp/home/DivisionExplorer";
 import { HeroEcosystem } from "./components/xp/home/HeroEcosystem";
+import { FeaturedWork } from "./components/xp/home/FeaturedWork";
+import { HomeMotion } from "./components/xp/home/HomeMotion";
 import { UpdatesFeed } from "./components/xp/home/UpdatesFeed";
 import { Btn, ClosingPaths, Kicker, SectionHead, TextLink } from "./components/xp/Primitives";
 import { ProfileDialog } from "./components/xp/ProfileDialog";
@@ -38,6 +40,7 @@ export default function Home() {
 
   return (
     <main className="xp xp-home">
+      <HomeMotion />
       <HeroEcosystem divisions={ecosystem} />
 
       <section className="xp-section xh-idea" aria-labelledby="idea-title">
@@ -99,10 +102,12 @@ export default function Home() {
         </div>
       </section>
 
+      <FeaturedWork />
+
       <section className="xp-section xh-events" id="events" aria-labelledby="events-title">
         <div className="xp-shell">
           <SectionHead
-            index="03"
+            index="04"
             label="Events and activities"
             id="events-title"
             title={
@@ -123,7 +128,7 @@ export default function Home() {
       >
         <div className="xp-shell">
           <SectionHead
-            index="04"
+            index="05"
             label="Internship and placement updates"
             id="roles-title"
             title={
@@ -167,7 +172,7 @@ export default function Home() {
       <section className="xp-section xh-leads" id="leadership" aria-labelledby="leads-title">
         <div className="xp-shell">
           <SectionHead
-            index="05"
+            index="06"
             label="The leads"
             id="leads-title"
             title={
@@ -247,24 +252,32 @@ export default function Home() {
             title: "Bring an innovation lab to your school",
             text: "See TechM4Schools",
             href: "/schools",
+            image: "/images/schools/robotics-build.webp",
+            imageAlt: "Students working together on a robotics project",
           },
           {
             label: "For organisations",
             title: "Get software designed and built",
             text: "See TechM4Solutions",
             href: "/solutions",
+            image: "/images/solutions/software-team.webp",
+            imageAlt: "Illustrative software team collaborating",
           },
           {
             label: "For colleges and universities",
             title: "Build programmes into the degree",
             text: "See TechM4Institutes",
             href: "/institutes",
+            image: "/images/editorial/workshop-crowd.jpeg",
+            imageAlt: "Students attending a TechM4India campus session",
           },
           {
             label: "For students",
             title: "Find an internship or a role",
             text: "See the updates",
             href: "#opportunities",
+            image: "/images/engineering/drive-recruitment.webp",
+            imageAlt: "A TechM4India campus recruitment presentation for students",
           },
         ]}
       />

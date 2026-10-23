@@ -135,6 +135,10 @@ export default function SolutionsPage() {
                 <span>Call us now</span>
                 <strong>{contact.generalPhone}</strong>
               </a>
+              <figure className="sf-record-photo">
+                <img src="/images/solutions/studio-coding.webp" alt="Developer working with code on multiple screens" loading="lazy" width={1467} height={1100} />
+                <figcaption>Illustrative software engineering scene</figcaption>
+              </figure>
             </div>
             <div className="sf-ledger">
               <p className="sf-ledger-main">
@@ -183,6 +187,7 @@ export default function SolutionsPage() {
                 Practical engineering. <em>Measurable delivery.</em>
               </h2>
             </div>
+            <div className="sf-edge-layout">
             <ol className="sf-edge">
               {edge.items.map((item, index) => (
                 <li key={item.title}>
@@ -194,6 +199,18 @@ export default function SolutionsPage() {
                 </li>
               ))}
             </ol>
+            <div className="sf-photo-duo" aria-label="Illustrative software team scenes">
+              <figure>
+                <img src="/images/solutions/software-team.webp" alt="Developers discussing work at a computer" loading="lazy" width={733} height={1100} />
+                <figcaption>Discuss the problem</figcaption>
+              </figure>
+              <figure>
+                <img src="/images/solutions/delivery-team.webp" alt="Colleagues working together around laptops" loading="lazy" width={1500} height={1000} />
+                <figcaption>Build with a team</figcaption>
+              </figure>
+              <p>Illustrative scenes</p>
+            </div>
+            </div>
           </div>
         </section>
 
@@ -219,6 +236,10 @@ export default function SolutionsPage() {
                 </article>
               ))}
             </div>
+            <figure className="sf-tech-photo">
+              <img src="/images/solutions/code-and-data.webp" alt="Laptop displaying code and a data analysis workspace" loading="lazy" width={1500} height={998} />
+              <figcaption>Code, data and delivery · illustrative image</figcaption>
+            </figure>
           </div>
         </section>
 
@@ -258,6 +279,22 @@ export default function SolutionsPage() {
               <p>{industries.lede}</p>
             </div>
             <IndustryIndex items={industries.items} />
+            <div className="sf-ind-field" aria-label="Food production reference photography">
+              <div className="sf-ind-field-copy">
+                <p className="sf-kicker">Industry context / Food production</p>
+                <h3>There is a real operation behind every data point.</h3>
+                <p>From cultivation to material preparation, the details on the ground shape what useful agriculture and manufacturing systems need to account for.</p>
+                <small>Client-supplied reference photography. These are not TechM4India project images.</small>
+              </div>
+              <figure>
+                <img src="/images/solutions/freshbowl-cultivation.webp" alt="A hand inspecting cultivated mushrooms on growing beds" width="1125" height="1500" loading="lazy" />
+                <figcaption><span>01 / Cultivation</span> Growing room</figcaption>
+              </figure>
+              <figure>
+                <img src="/images/solutions/freshbowl-preparation.webp" alt="A worker handling growing material at a preparation table" width="1125" height="1500" loading="lazy" />
+                <figcaption><span>02 / Preparation</span> Material handling</figcaption>
+              </figure>
+            </div>
           </div>
         </section>
 
@@ -287,6 +324,10 @@ export default function SolutionsPage() {
                 </li>
               ))}
             </ol>
+            <figure className="sf-process-photo">
+              <img src="/images/solutions/planning-session.webp" alt="Team arranging ideas on a whiteboard during a planning session" loading="lazy" width={1500} height={1000} />
+              <figcaption>Start with the people and the problem · illustrative image</figcaption>
+            </figure>
           </div>
         </section>
 
@@ -329,6 +370,10 @@ export default function SolutionsPage() {
 
             <div className="sf-lab-foot">
               <div>
+                <figure className="sf-lab-detail-photo">
+                  <img src="/images/editorial/workshop-lab.jpeg" alt="TechM4India mentor with students in a computer lab" loading="lazy" />
+                  <figcaption>Plan the session</figcaption>
+                </figure>
                 <h3>{labs.stepsTitle}</h3>
                 <ol className="sf-lab-steps">
                   {labs.steps.map((step, index) => (
@@ -341,6 +386,10 @@ export default function SolutionsPage() {
                 </ol>
               </div>
               <div>
+                <figure className="sf-lab-detail-photo">
+                  <img src="/images/events/web-fundamentals-session.jpeg" alt="A TechM4India web fundamentals session in a computer lab" loading="lazy" />
+                  <figcaption>Work on real tasks</figcaption>
+                </figure>
                 <h3>{labs.workTitle}</h3>
                 <ul className="sf-lab-work">
                   {labs.work.map((item) => (
@@ -353,6 +402,10 @@ export default function SolutionsPage() {
                 </ul>
               </div>
               <div className="sf-lab-who">
+                <figure className="sf-lab-detail-photo">
+                  <img src="/images/about/computer-lab.jpeg" alt="TechM4India mentor teaching at a computer lab" loading="lazy" />
+                  <figcaption>Learn together</figcaption>
+                </figure>
                 <h3>{labs.whoTitle}</h3>
                 <ul>
                   {labs.who.map((item) => (
@@ -381,6 +434,10 @@ export default function SolutionsPage() {
                 Projects, products and lab time all start with a short conversation about the people, the constraints
                 and the result you need.
               </p>
+              <figure className="sf-contact-photo">
+                <img src="/images/solutions/workspace.webp" alt="Software workspace with a laptop and project materials" loading="lazy" />
+                <figcaption>From brief to build <span>Illustrative workspace</span></figcaption>
+              </figure>
               <dl className="sf-contact-list">
                 <div>
                   <dt>Email</dt>

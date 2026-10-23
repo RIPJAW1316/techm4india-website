@@ -8,7 +8,7 @@ export function DivisionExplorer({ divisions }: { divisions: EcosystemDivision[]
     <div className="xh-directory">
       <p className="xh-directory-guidance">Select a division to explore its work, people and tools.</p>
       {divisions.map((division, index) => (
-        <details className="xh-directory-item" id={`division-${division.id}`} key={division.id} open={index === 0}>
+        <details className="xh-directory-item" id={`division-${division.id}`} key={division.id} name="home-divisions" open={index === 0} data-home-reveal>
           <summary>
             <span className="xh-directory-index">{division.index}</span>
             <span className="xh-directory-name">{division.name}</span>
@@ -17,7 +17,9 @@ export function DivisionExplorer({ divisions }: { divisions: EcosystemDivision[]
           </summary>
           <div className="xh-directory-panel">
             <figure className="xh-directory-media">
-              <img src={division.image} alt={division.imageAlt} loading="lazy" decoding="async" />
+              <div className="xh-directory-image-frame">
+                <img src={division.image} alt={division.imageAlt} loading="lazy" decoding="async" />
+              </div>
               {division.imageCredit && <figcaption>{division.imageCredit}</figcaption>}
             </figure>
             <div className="xh-directory-copy">

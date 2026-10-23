@@ -38,9 +38,9 @@ export const tracks: Track[] = [
     short: "Civil",
     text: "Structural design, BIM modelling and the digital construction workflows used by India's infrastructure firms.",
     tools: ["Revit", "STAAD Pro", "ETABS", "AutoCAD", "Civil 3D"],
-    image: "/images/engineering/track-civil.webp",
-    imageAlt: "Two engineering students in hard hats running a site survey with a total station",
-    focus: "50% 35%",
+    image: "/images/engineering/civil-site.webp",
+    imageAlt: "Two engineers discussing plans at an active construction site",
+    focus: "53% 50%",
   },
   {
     id: "mech",
@@ -58,9 +58,9 @@ export const tracks: Track[] = [
     short: "CSE",
     text: "Full-stack development with DevOps, cloud architecture and modern AI and machine-learning pipelines.",
     tools: ["React", "Node.js", "AWS", "Docker", "Python"],
-    image: "/images/engineering/track-cse.webp",
-    imageAlt: "Students working together on a laptop in a classroom",
-    focus: "60% 40%",
+    image: "/images/engineering/software-engineer.webp",
+    imageAlt: "Software engineer writing code at a workstation",
+    focus: "58% 50%",
   },
   {
     id: "eee",
@@ -78,8 +78,8 @@ export const tracks: Track[] = [
     short: "Electronics",
     text: "VLSI digital design, FPGA architectures and microelectronic circuit modelling.",
     tools: ["Verilog", "Vivado", "Cadence", "Altium"],
-    image: "/images/engineering/track-electronics.webp",
-    imageAlt: "Students assembling and testing an electronics circuit at a lab bench",
+    image: "/images/engineering/electronics-workbench.webp",
+    imageAlt: "Engineer soldering electronic components at a workbench",
     focus: "50% 45%",
   },
   {
@@ -88,8 +88,8 @@ export const tracks: Track[] = [
     short: "Communication",
     text: "Embedded firmware, IoT networks and real-time communication systems.",
     tools: ["C/C++", "FreeRTOS", "RTOS", "IoT protocols"],
-    image: "/images/engineering/track-communication.webp",
-    imageAlt: "Students wiring a microcontroller project together on a workbench",
+    image: "/images/engineering/electronics-board.webp",
+    imageAlt: "Hands examining a printed circuit board",
     focus: "50% 50%",
   },
   {
@@ -98,8 +98,8 @@ export const tracks: Track[] = [
     short: "Chemical",
     text: "Process simulation in Aspen HYSYS, piping layouts and industrial water-treatment design.",
     tools: ["Aspen Plus", "Aspen HYSYS", "Plant 3D", "GPS-X"],
-    image: "/images/engineering/track-chemical.webp",
-    imageAlt: "A student measuring a sample with a pipette in a chemistry lab",
+    image: "/images/engineering/chemical-lab.webp",
+    imageAlt: "Researcher testing materials in a laboratory",
     focus: "40% 40%",
   },
 ];
@@ -154,8 +154,8 @@ export const path = [
     name: "Design",
     text: "Apply the tools to real-world work: architectural layouts, structural models, mechanical assemblies.",
     example: "A five-storey RC framed building modelled in Revit from architectural inputs.",
-    image: "/images/engineering/path-design.webp",
-    imageAlt: "Students gathered around a table, working through a design together",
+    image: "/images/engineering/civil-plan.webp",
+    imageAlt: "Engineers reviewing a detailed construction plan",
   },
   {
     code: "P3",
@@ -182,7 +182,7 @@ export const path = [
     text: "Present to industry, prepare for placements and internships, and earn your certification.",
     example: "Portfolio presentation, interview preparation and referrals.",
     image: "/images/engineering/path-implement.webp",
-    imageAlt: "Five students in business suits standing together, ready for interviews",
+    imageAlt: "Students in business suits standing together, ready for interviews",
   },
 ];
 

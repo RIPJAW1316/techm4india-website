@@ -262,6 +262,16 @@ export default function EngineeringPage() {
                 duration or tool, then open any programme for its full curriculum, projects and career paths.
               </p>
             </div>
+            <div className="en-editorial-pair" aria-label="Engineering learning and campus engagement">
+              <figure data-en-reveal="wipe">
+                <img src="/images/engineering/path-design.webp" alt="Students working together around a project table" loading="lazy" width={1500} height={1000} />
+                <figcaption>Learning through collaboration</figcaption>
+              </figure>
+              <figure data-en-reveal="wipe">
+                <img src={campusDrive.photos[0].src} alt={campusDrive.photos[0].alt} loading="lazy" width={1200} height={900} />
+                <figcaption>TechM4India at Vishwa Vishwani</figcaption>
+              </figure>
+            </div>
             <ProgrammeCatalogue />
           </div>
         </section>
@@ -306,6 +316,11 @@ export default function EngineeringPage() {
                   </ul>
                 </div>
               ))}
+            </div>
+            <div className="en-tool-images" aria-label="Illustrative engineering disciplines">
+              <figure><img src="/images/engineering/electronics-board.webp" alt="Hands examining a printed circuit board" loading="lazy" width={1500} height={1000} /><figcaption>Circuits</figcaption></figure>
+              <figure><img src="/images/engineering/software-engineer.webp" alt="Software engineer working at a computer" loading="lazy" width={1500} height={1000} /><figcaption>Software</figcaption></figure>
+              <figure><img src="/images/engineering/chemical-lab.webp" alt="Researcher testing materials in a laboratory" loading="lazy" width={734} height={1100} /><figcaption>Process</figcaption></figure>
             </div>
           </div>
         </section>
