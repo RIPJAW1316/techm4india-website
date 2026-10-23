@@ -50,3 +50,11 @@ yarn-error.log*
 # local scratch / editor config
 /tmp/
 .claude/
+
+# apps/api
+/apps/api/node_modules/
+/apps/api/dist/
+/apps/api/coverage/
+/apps/api/.env
+/apps/api/.env.*
+!/apps/api/.env.example

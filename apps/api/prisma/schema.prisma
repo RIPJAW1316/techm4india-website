@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// Core Organization / Company Model
+// -------------------------------------------------------------
+model Organization {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  legalName   String?
+  taxId       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+
+  @@map("organizations")
+}
+
+// -------------------------------------------------------------
+// Shared Identity & Users Model
+// -------------------------------------------------------------
+model User {
+  id              String    @id @default(uuid())
+  organizationId  String?
+  email           String    @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  phone           String?
+  isActive        Boolean   @default(true)
+  isEmailVerified Boolean   @default(false)
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  organization    Organization?           @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  userRoles       UserRole[]
+  appAccess       UserApplicationAccess[]
+  auditLogs       AuditLog[]
+
+  @@index([email])
+  @@index([organizationId])
+  @@map("users")
+}
+
+// -------------------------------------------------------------
+// Role-Based Access Control (RBAC)
+// -------------------------------------------------------------
+model Role {
+  id           String           @id @default(uuid())
+  code         String           @unique
+  name         String
+  description  String?
+  isSystemRole Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  userRoles    UserRole[]
+  permissions  RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  code        String           @unique
+  name        String
+  description String?
+  module      String           // e.g., 'AUTH', 'USERS', 'HRMS', 'FINANCE', 'AUDIT'
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// -------------------------------------------------------------
+// Central Applications & Multi-Application Access Control
+// -------------------------------------------------------------
+model Application {
+  id          String   @id @default(uuid())
+  code        String   @unique // e.g. 'CENTRAL_DASHBOARD', 'HRMS', 'FINANCE'
+  name        String
+  description String?
+  baseUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  accessGrants UserApplicationAccess[]
+
+  @@map("applications")
+}
+
+model UserApplicationAccess {
+  id            String      @id @default(uuid())
+  userId        String
+  applicationId String
+  isActive      Boolean     @default(true)
+  grantedAt     DateTime    @default(now())
+  expiresAt     DateTime?
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, applicationId])
+  @@index([userId])
+  @@index([applicationId])
+  @@map("user_application_access")
+}
+
+// -------------------------------------------------------------
+// Central Audit Logging
+// -------------------------------------------------------------
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

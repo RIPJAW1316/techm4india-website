@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: techm4india-api
+    env: node
+    plan: starter
+    rootDir: apps/api
+    buildCommand: npm install && npm run prisma:generate && npm run build
+    preDeployCommand: npm run prisma:migrate
+    startCommand: npm run start:prod
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: API_PREFIX
+        value: api/v1
+      - key: SWAGGER_PATH
+        value: api/v1/docs
+      - key: CORS_ORIGIN
+        sync: false # Set in Render Dashboard with frontend origins
+      - key: DATABASE_URL
+        fromDatabase:
+          name: techm4india-erp-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+databases:
+  - name: techm4india-erp-db
+    plan: starter
+    databaseName: techm4india_erp
+    user: techm4india_admin
+    ipAllowList: [] # Internal network only for web service security
