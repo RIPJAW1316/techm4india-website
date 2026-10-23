@@ -8,7 +8,7 @@ const DIAGRAMS = {
   "AI and agentic AI solutions": "ai",
   "Software development": "software",
   "Mobile app development": "mobile",
-  "ERP and enterprise systems": "erp",
+  "Enterprise platforms & portals": "enterprise",
   "Cloud and DevOps": "cloud",
   "Data and analytics": "data",
 } as const;
@@ -18,7 +18,7 @@ const PHOTOS: Record<Kind, { src: string; alt: string }> = {
   ai: { src: "/images/solutions/product-planning.webp", alt: "Team discussing a problem around a computer" },
   software: { src: "/images/solutions/software-detail.webp", alt: "Hands writing code on a laptop" },
   mobile: { src: "/images/solutions/mobile-interface.webp", alt: "Smartphone showing applications on a desk" },
-  erp: { src: "/images/solutions/workspace.webp", alt: "Laptop displaying application code on a desk" },
+  enterprise: { src: "/images/solutions/workspace.webp", alt: "Laptop displaying application code on a desk" },
   cloud: { src: "/images/solutions/cloud-infrastructure.webp", alt: "Server equipment in a data center" },
   data: { src: "/images/solutions/analytics.webp", alt: "A graph being studied on a laptop" },
 };
@@ -82,10 +82,10 @@ function Diagram({ kind, items }: { kind: Kind; items: string[] }) {
       </div>
     );
   }
-  if (kind === "erp") {
+  if (kind === "enterprise") {
     return (
-      <div className="sf-diagram sf-diagram--erp" data-kind="erp">
-        <p>Schematic · divisions in the ERP</p>
+      <div className="sf-diagram sf-diagram--erp" data-kind="enterprise">
+        <p>Schematic · enterprise systems &amp; operations</p>
         <div className="sf-hub" aria-hidden="true">
           <span>Leadership</span>
           <span>Engineering</span>

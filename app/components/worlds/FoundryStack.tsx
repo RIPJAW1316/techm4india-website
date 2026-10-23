@@ -12,8 +12,8 @@ import { featured } from "@/lib/content/solutions";
  */
 
 const slabs = [
-  { ...featured.layers[0], kind: "interface", mark: "ERP" },
-  { ...featured.layers[1], kind: "api", mark: "ERP" },
+  { ...featured.layers[0], kind: "interface", mark: "PLATFORM" },
+  { ...featured.layers[1], kind: "api", mark: "PLATFORM" },
   {
     code: "AI",
     term: "Intelligence",
@@ -21,7 +21,7 @@ const slabs = [
     kind: "intelligence",
     mark: "Studio layer",
   },
-  { ...featured.layers[2], kind: "data", mark: "ERP" },
+  { ...featured.layers[2], kind: "data", mark: "PLATFORM" },
 ] as const;
 
 const VERT = "attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}";
@@ -250,8 +250,8 @@ export function FoundryStack() {
       <figcaption>
         <span>System diagram</span>
         <p>
-          Interface, services and data describe the Company Management ERP in this repository.
-          Intelligence is a TechM4Solutions discipline drawn in the same stack. It is not a module of that ERP.
+          Interface, services and data describe modern cloud platform architectures.
+          Intelligence is a TechM4Solutions discipline integrated across the stack.
         </p>
         <Link href={featured.cta.href}>
           {featured.cta.label}

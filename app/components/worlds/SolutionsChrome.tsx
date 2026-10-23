@@ -230,7 +230,7 @@ export function SolutionsFooter() {
               <a href="#services">Mobile apps</a>
             </li>
             <li>
-              <a href="#services">ERP and enterprise</a>
+              <a href="#services">Enterprise platforms</a>
             </li>
             <li>
               <a href="#labs">Pay-and-use labs</a>
@@ -244,7 +244,7 @@ export function SolutionsFooter() {
               <a href="#work">Selected work</a>
             </li>
             <li>
-              <Link href="/solutions/erp">Company Management ERP</Link>
+              <Link href="/solutions#work">Featured projects</Link>
             </li>
             <li>
               <a href="#industries">Industries</a>

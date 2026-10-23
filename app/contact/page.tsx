@@ -35,8 +35,8 @@ const partnershipTypes = [
     text: "Test technology with real learners and grow through a connected institutional network.",
   },
   {
-    title: "Company management ERP",
-    text: "Discuss the V1 blueprint for CRM, institutions, programs, projects, finance, assets and CMS.",
+    title: "Enterprise software & platforms",
+    text: "Discuss design and development for custom platforms, cloud solutions, and digital tools.",
   },
   {
     title: "Government / policy",

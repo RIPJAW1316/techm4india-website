@@ -96,10 +96,10 @@ export function SiteHeader() {
         </Link>
         <p className="header-prompt">Engineering imagination into impact.</p>
         <div className="header-actions">
-          <a className="header-login" href="/login">
-            <span>ERP login</span>
+          <Link className="header-login" href="/contact">
+            <span>Get in touch</span>
             <i aria-hidden="true">↗</i>
-          </a>
+          </Link>
           <button
             ref={menuButton}
             className="menu-trigger"
@@ -168,12 +168,6 @@ export function SiteHeader() {
             </ol>
           </nav>
           <div className="menu-aside">
-            <div className="menu-erp-access">
-              <p className="menu-label">Internal workspace</p>
-              <a href="/login" tabIndex={open ? 0 : -1} onClick={() => setOpen(false)}>
-                Sign in to ERP <span aria-hidden="true">↗</span>
-              </a>
-            </div>
             <div>
               <p className="menu-label">Our ecosystem</p>
               <ul>

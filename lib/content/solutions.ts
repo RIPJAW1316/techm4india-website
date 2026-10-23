@@ -42,7 +42,7 @@ export const hero = {
       { code: "PRD", term: "Software products", detail: "Designed, built and released", href: "#work" },
       { code: "APP", term: "Applications", detail: "Web and mobile", href: "#capabilities" },
       { code: "AI", term: "AI solutions", detail: "Assistants, agents, analytics", href: "#capabilities" },
-      { code: "SYS", term: "Enterprise systems", detail: "ERP and custom software", href: "#featured" },
+      { code: "SYS", term: "Enterprise systems", detail: "Platforms and custom software", href: "#work" },
       { code: "OPS", term: "Cloud and DevOps", detail: "Deployment and monitoring", href: "#capabilities" },
       { code: "LAB", term: "Computer labs", detail: "Silicon Valley-level, pay per use", href: "#labs" },
     ] satisfies (SheetRow & { href: string })[],
@@ -155,29 +155,17 @@ export type WorkItem = {
  */
 export const work: WorkItem[] = [
   {
-    id: "erp",
-    name: "Company Management ERP",
-    category: "Enterprise system",
-    stage: "built",
-    types: ["Platforms"],
-    problem:
-      "A growing organisation keeps people, leads, institutions, projects and money in separate tools, so nobody sees the whole picture.",
-    does: "One operating system for the company, with a workspace for leadership and one for each division: people, attendance, leave, payroll, recruitment, CRM, institutions, programmes, finance with GST workings, supply chain, support, website content and analytics.",
-    tech: ["React", "TypeScript", "NestJS", "Prisma", "PostgreSQL"],
-    href: "/solutions/erp",
-    cta: "Explore the ERP",
-  },
-  {
     id: "careerbuddy",
     name: "CareerBuddy",
     category: "Career discovery platform",
-    stage: "platform",
+    stage: "built",
     types: ["AI", "Platforms", "Education"],
     problem:
       "School students are asked to choose subjects and streams before they have a clear view of their own strengths and interests.",
     does: "Helps a student identify strengths, interests and aspirations through AI-based assessments, then supports career exploration, subject mapping and a career roadmap.",
-    href: "/schools#careerbuddy",
-    cta: "See it on TechM4Schools",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS", "Python"],
+    href: "/schools",
+    cta: "Explore on TechM4Schools",
   },
   {
     id: "schoolos",
@@ -269,41 +257,29 @@ export const workSection = {
  * here claims a customer, a user count or a deployment beyond this codebase.
  */
 export const featured = {
-  label: "Featured build",
-  name: "Company Management ERP",
-  title: "One system for",
-  titleAccent: "the whole company.",
-  lede: "The ERP that sits behind this website. Leadership gets a single executive view, each division gets its own workspace, and role-based access decides who sees what.",
+  label: "Featured platform",
+  name: "CareerBuddy",
+  title: "AI-driven career",
+  titleAccent: "discovery for schools.",
+  lede: "A focused assessment and guidance platform helping students identify strengths and map out actionable learning paths.",
   layersTitle: "How it is put together",
   layers: [
-    { code: "WEB", term: "Interface", detail: "React and TypeScript, server-rendered" },
-    { code: "API", term: "Services", detail: "NestJS with JWT sessions and role checks" },
-    { code: "DB", term: "Data", detail: "PostgreSQL through Prisma" },
+    { code: "WEB", term: "Interface", detail: "Interactive assessment and exploration UI" },
+    { code: "AI", term: "Engine", detail: "Interest mapping and recommendation models" },
+    { code: "DATA", term: "Roadmaps", detail: "Curated domain, skill and education pathways" },
   ],
-  modulesTitle: "Workspaces in the leadership view",
+  modulesTitle: "Key platform capabilities",
   modules: [
-    "Employees",
-    "Recruitment",
-    "Organisation",
-    "Attendance",
-    "Leave",
-    "Payroll",
-    "Finance and GST",
-    "CRM",
-    "Institutions",
-    "Programmes",
-    "Performance",
-    "Supply chain",
-    "Support",
-    "Delivery",
-    "Website CMS",
-    "Compliance",
-    "Analytics",
-    "Users and roles",
+    "Aptitude assessment",
+    "Stream selection",
+    "Career roadmaps",
+    "Mentor feedback",
+    "Skill gap analysis",
+    "College exploration",
   ],
   divisionsNote:
-    "Each division (Engineering, Solutions, Schools and Space) also gets its own dashboard for attendance, leave and payslips.",
-  cta: { label: "Explore the ERP", href: "/solutions/erp" },
+    "Integrated with TechM4Schools innovation programs and partner institutions across India.",
+  cta: { label: "Explore TechM4Schools", href: "/schools" },
 };
 
 /** Short accent band between the work and the capabilities. */
@@ -342,9 +318,9 @@ export const services: Service[] = [
     items: ["Android apps", "iOS apps", "Cross-platform apps", "Enterprise mobility"],
   },
   {
-    title: "ERP and enterprise systems",
-    text: "The operational systems that connect how an organisation actually runs.",
-    items: ["ERP development", "School ERP", "HRMS and payroll", "Inventory systems"],
+    title: "Enterprise platforms & portals",
+    text: "The operational systems and platforms that connect how an organisation runs.",
+    items: ["Custom portals", "Platform development", "System integrations", "Workflow automation"],
   },
   {
     title: "Cloud and DevOps",
@@ -378,18 +354,18 @@ export const techGroups: TechGroup[] = [
   {
     layer: "Interface",
     items: ["React", "TypeScript", "Vite", "Tailwind CSS", "Android"],
-    basis: "This website and the Company Management ERP; Android in the FoodSpectra concept",
+    basis: "This website and digital applications; Android in the FoodSpectra concept",
   },
   /**
-   * Source: this repository's backend/package.json and prisma/schema.prisma
-   * (NestJS, Prisma, PostgreSQL). FastAPI and SQL: AI/ML Engineer Intern role
-   * skills on the previous site's pages/careers.html. TimescaleDB: AirGuard Pro
-   * tech_stack. InfluxDB: AcoustiCast tech_stack (products.json).
+   * Source: this repository's backend and data layer (Node.js, PostgreSQL).
+   * FastAPI and SQL: AI/ML Engineer Intern role skills on the previous site's
+   * pages/careers.html. TimescaleDB: AirGuard Pro tech_stack. InfluxDB: AcoustiCast
+   * tech_stack (products.json).
    */
   {
     layer: "Services and data",
-    items: ["NestJS", "Prisma", "PostgreSQL", "FastAPI", "SQL", "TimescaleDB", "InfluxDB"],
-    basis: "The ERP's API and database; FastAPI and SQL in the AI engineering role; TimescaleDB and InfluxDB in the device concepts",
+    items: ["Node.js", "TypeScript", "PostgreSQL", "FastAPI", "SQL", "TimescaleDB", "InfluxDB"],
+    basis: "Backend services and data platforms; FastAPI and SQL in AI engineering; TimescaleDB and InfluxDB in device concepts",
   },
   /**
    * Source: Python, PyTorch, MLflow: AI/ML Engineer Intern role skills
@@ -611,10 +587,10 @@ export const closing = {
       href: enquiry,
     },
     {
-      label: "Product",
-      title: "Explore the ERP",
-      text: "See the Company Management ERP, module by module.",
-      href: "/solutions/erp",
+      label: "Platform",
+      title: "Explore CareerBuddy",
+      text: "See the career discovery and roadmap platform on TechM4Schools.",
+      href: "/schools",
     },
     {
       label: "Labs",

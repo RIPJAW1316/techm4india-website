@@ -9,16 +9,10 @@
     { "source": "/impact", "destination": "/#ecosystem", "permanent": true },
     { "source": "/programs", "destination": "/engineering", "permanent": true },
     { "source": "/research", "destination": "/solutions", "permanent": true },
-    { "source": "/vision", "destination": "/about", "permanent": true }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/v1/:match*",
-      "destination": "https://techm4india-erp-api-l1gv.onrender.com/api/v1/:match*"
-    },
-    {
-      "source": "/api/v2/:match*",
-      "destination": "https://techm4india-erp-api-l1gv.onrender.com/api/v2/:match*"
-    }
+    { "source": "/vision", "destination": "/about", "permanent": true },
+    { "source": "/erp", "destination": "/", "permanent": false },
+    { "source": "/erp/:match*", "destination": "/", "permanent": false },
+    { "source": "/login", "destination": "/", "permanent": false },
+    { "source": "/solutions/erp", "destination": "/solutions", "permanent": false }
   ]
 }

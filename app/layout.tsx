@@ -6,7 +6,7 @@ import { SiteHeader } from "./components/SiteHeader";
 import { StructuredData } from "./components/StructuredData";
 import "./globals.css";
 // Loaded after globals so the workspace design system wins inside `.erp-route`.
-import "./erp-system.css";
+
 // Landing and Institutes. Namespaced under `.xp`, so order is not load-bearing.
 import "./styles/xp-foundation.css";
 import "./styles/xp-home.css";

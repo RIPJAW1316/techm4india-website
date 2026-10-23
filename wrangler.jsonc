@@ -7,10 +7,8 @@
   "no_bundle": true,
   "assets": {
     "directory": "./dist/client",
-    "binding": "ASSETS",
-    "run_worker_first": ["/api", "/api/*"]
+    "binding": "ASSETS"
   },
   "images": { "binding": "IMAGES" },
-  "vars": { "ERP_API_ORIGIN": "https://techm4india-erp-api.vercel.app" },
   "observability": { "enabled": true }
 }

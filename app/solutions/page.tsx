@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
-import Link from "next/link";
+// Client and server components
 import { CapabilitySystem } from "../components/worlds/CapabilitySystem";
 import { EnquiryForm } from "../components/worlds/EnquiryForm";
 import { FoundryStack } from "../components/worlds/FoundryStack";
@@ -48,7 +48,7 @@ const enquiryFields = [
       "A software product",
       "A web or mobile app",
       "An AI solution",
-      "An ERP or enterprise system",
+      "An enterprise software solution",
       "Booking lab time",
       "Something else",
     ],
@@ -457,7 +457,7 @@ export default function SolutionsPage() {
                 </div>
               </dl>
               <p className="sf-note">
-                <Link href="/solutions/erp">Explore the Company Management ERP</Link>
+                <a href="#work">See featured projects</a>
                 {" · "}
                 <a href="#labs">Book lab time</a>
               </p>

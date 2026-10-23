@@ -6,16 +6,10 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "node scripts/dev-db.mjs && concurrently -k -n api,web -c magenta,cyan --handle-input \"npm:dev:api\" \"npm:dev:web\"",
-    "dev:web": "vinext dev",
-    "dev:api": "npm --prefix backend run start:dev",
-    "dev:db": "node scripts/dev-db.mjs",
+    "dev": "vinext dev",
     "build": "vinext build",
-    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/erp-shell.test.mjs tests/division-routing.test.mjs tests/api-client.test.mjs tests/institutions-ui.test.mjs tests/admin-users-ui.test.mjs tests/payroll-ui.test.mjs tests/finance-ui.test.mjs tests/recruitment-ui.test.mjs tests/programs-ui.test.mjs tests/performance-ui.test.mjs tests/supply-chain-ui.test.mjs tests/support-ui.test.mjs tests/cms-ui.test.mjs tests/compliance-ui.test.mjs tests/delivery-ui.test.mjs tests/analytics-ui.test.mjs tests/commercial-engines.test.mjs",
-    "test:api": "npm --prefix backend test",
-    "test:all": "npm run test && npm run test:api",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "lint:api": "npm --prefix backend run lint"
+    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

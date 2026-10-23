@@ -12,24 +12,24 @@ export function FeaturedWork() {
           label="Selected work"
           id="featured-work-title"
           title={<>A few things worth <em>looking closer at.</em></>}
-          lede="An enterprise software product, a student innovation programme, and a campus AI experience. Each has a different place in the ecosystem."
+          lede="A digital engineering foundry, a student innovation programme, and a campus AI experience. Each has a different place in the ecosystem."
         />
 
         <div className="xh-featured-grid">
           <article className="xh-featured-erp" data-home-reveal>
             <div className="xh-featured-erp-copy">
-              <p className="xh-featured-eyebrow"><span>01 / Featured product</span><span>Built product</span></p>
-              <h3>Company<br />Management <em>ERP.</em></h3>
-              <p>One operating system for the work behind TechM4India: people, programmes, projects, finance and content, connected across divisions.</p>
-              <Link className="xh-featured-link" href="/solutions/erp">Explore the ERP <span aria-hidden="true">↗</span></Link>
+              <p className="xh-featured-eyebrow"><span>01 / Software engineering</span><span>Solutions division</span></p>
+              <h3>Software &amp;<br />Digital <em>Foundry.</em></h3>
+              <p>Custom web and mobile apps, AI-powered systems, enterprise platforms, and pay-and-use engineering compute labs.</p>
+              <Link className="xh-featured-link" href="/solutions">Explore TechM4Solutions <span aria-hidden="true">↗</span></Link>
             </div>
-            <figure className="xh-featured-system" aria-label="Illustrative architecture of the Company Management ERP">
-              <div className="xh-system-top"><span>TECHM4INDIA / ERP</span><span>01 — 05</span></div>
-              <div className="xh-system-core"><span>Connected<br />operations</span><svg className="xh-system-flow" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="4" y="5" width="17" height="14" rx="3" /><rect x="43" y="5" width="17" height="14" rx="3" /><rect x="23.5" y="45" width="17" height="14" rx="3" /><path d="M21 12h22M12.5 19v8a5 5 0 0 0 5 5H32m19.5-13v8a5 5 0 0 1-5 5H32m0 0v13" /><circle cx="32" cy="32" r="3" /></svg></div>
+            <figure className="xh-featured-system" aria-label="Illustrative architecture of TechM4Solutions digital systems">
+              <div className="xh-system-top"><span>TECHM4INDIA / SOLUTIONS</span><span>01 — 05</span></div>
+              <div className="xh-system-core"><span>Engineered<br />software</span><svg className="xh-system-flow" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="4" y="5" width="17" height="14" rx="3" /><rect x="43" y="5" width="17" height="14" rx="3" /><rect x="23.5" y="45" width="17" height="14" rx="3" /><path d="M21 12h22M12.5 19v8a5 5 0 0 0 5 5H32m19.5-13v8a5 5 0 0 1-5 5H32m0 0v13" /><circle cx="32" cy="32" r="3" /></svg></div>
               <div className="xh-system-modules" aria-hidden="true">
-                <span>People</span><span>Institutions</span><span>Projects</span><span>Finance</span><span>Content</span>
+                <span>AI Systems</span><span>Web &amp; Mobile</span><span>Platforms</span><span>DevOps</span><span>Compute Labs</span>
               </div>
-              <figcaption>Illustrative system architecture · Not an application screenshot</figcaption>
+              <figcaption>Modern software architectures · Production-ready engineering</figcaption>
             </figure>
           </article>
 
