@@ -21,6 +21,12 @@ export class DatabaseHealthDto {
   @ApiProperty({ example: 4, description: 'Latency in milliseconds' })
   latencyMs: number;
 
+  @ApiProperty({ required: false, example: 'techm4india_erp' })
+  database?: string;
+
+  @ApiProperty({ required: false, example: true })
+  ssl?: boolean;
+
   @ApiProperty({ required: false, example: 'Connection timeout' })
   error?: string;
 }

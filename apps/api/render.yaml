@@ -33,4 +33,7 @@ databases:
     plan: starter
     databaseName: techm4india_erp
     user: techm4india_admin
-    ipAllowList: [] # Internal network only for web service security
+    ipAllowList:
+      # Allows external SSL connections so local backends can access the shared database
+      - source: 0.0.0.0/0
+        description: External access for local developer backends (SSL required)

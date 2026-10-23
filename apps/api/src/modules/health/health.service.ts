@@ -30,6 +30,8 @@ export class HealthService {
       database: {
         status: dbHealth.isHealthy ? 'up' : 'down',
         latencyMs: dbHealth.latencyMs,
+        ...(dbHealth.database ? { database: dbHealth.database } : {}),
+        ...(dbHealth.ssl !== undefined ? { ssl: dbHealth.ssl } : {}),
         ...(dbHealth.error ? { error: dbHealth.error } : {}),
       },
       uptime: process.uptime(),

@@ -14,7 +14,8 @@
     "api:build": "npm --prefix apps/api run build",
     "api:test": "npm --prefix apps/api test",
     "api:test:e2e": "npm --prefix apps/api run test:e2e",
-    "api:lint": "npm --prefix apps/api run lint"
+    "api:lint": "npm --prefix apps/api run lint",
+    "api:db:verify": "npm --prefix apps/api run db:verify"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

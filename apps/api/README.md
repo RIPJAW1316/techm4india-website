@@ -80,29 +80,41 @@ The database foundation establishes a single identity system so users do not req
 - Node.js >= 22.13.0
 - A running PostgreSQL database (or local Docker container)
 
-### 3.2 Environment Setup
+### 3.2 Environment Setup (Shared PostgreSQL)
+
+The local backend connects to the **same managed PostgreSQL database instance** hosted on Render:
 
 1. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-2. Configure your local `DATABASE_URL`:
+2. Configure your `DATABASE_URL` with Render's **External Database URL** (found in Render Dashboard > `techm4india-erp-db` > Connect):
    ```ini
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/techm4india_erp?schema=public
+   DATABASE_URL=postgresql://techm4india_admin:<PASSWORD>@dpg-<ID>.<REGION>-postgres.render.com:5432/techm4india_erp?sslmode=require
    PORT=4000
+   NODE_ENV=development
    ```
 
-### 3.3 Database Migration & Seeding
+> [!WARNING]
+> **Shared Database Operations**:
+> Local reads and writes interact directly with the live shared database.
+> - **Never** run `prisma migrate reset` or destructive table drop commands.
+> - Always run `npm run db:verify` to safely check connectivity and shared record visibility before running tests or local servers.
+
+### 3.3 Database Verification & Migration
 
 ```bash
 # Generate the Prisma Client
 npm run prisma:generate
 
-# Apply pending migrations to PostgreSQL
-npm run prisma:migrate
+# Verify shared database connection and baseline counts safely
+npm run db:verify
 
-# Seed baseline organizations, roles, and applications
-npm run prisma:seed
+# Inspect migration status before deploying schema changes
+npx prisma migrate status --schema prisma/schema.prisma
+
+# Apply pending migrations safely without table resets
+npm run prisma:migrate
 ```
 
 ### 3.4 Starting the Server
