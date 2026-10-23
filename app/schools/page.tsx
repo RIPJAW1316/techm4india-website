@@ -96,14 +96,16 @@ export default function SchoolsPage() {
   const [ibStudents, ibIdeas] = innovateBharath.figures;
 
   const slides = [
-    <div className="sc-slide sc-slide--cutout" key="curiosity">
+    <div className="sc-slide sc-slide--portrait" key="curiosity">
       <div className="sc-slide-bg" aria-hidden="true" />
-      <img
-        className="sc-cutout"
-        src="/images/schools/pallavi-student-robotics-cutout.webp"
-        alt="A school student in uniform smiling at a small robot he holds up"
-        fetchPriority="high"
-      />
+      <figure className="sc-hero-portrait">
+        <img
+          src="/images/schools/school-robotics-hero.webp"
+          alt="Student holding a robot they built in a classroom"
+          fetchPriority="high"
+        />
+        <figcaption>Illustrative robotics learning photograph</figcaption>
+      </figure>
       <div className="sc-container">
         <div className="sc-slide-copy">
           <span className="sc-slide-tag">{hero.kicker}</span>
@@ -287,6 +289,17 @@ export default function SchoolsPage() {
                 </li>
               ))}
             </ol>
+            <div className="sc-ib-photographs" aria-label="Illustrative learning scenes">
+              <figure>
+                <img src="/images/schools/science-experiment.webp" alt="Pupils conducting an experiment in a classroom" loading="lazy" width={1500} height={1000} />
+                <figcaption>Investigate</figcaption>
+              </figure>
+              <figure>
+                <img src="/images/schools/student-presentation.webp" alt="Pupils presenting a science project to their class" loading="lazy" width={1500} height={1000} />
+                <figcaption>Share an idea</figcaption>
+              </figure>
+              <p>Illustrative learning scenes</p>
+            </div>
           </div>
         </section>
 
@@ -347,6 +360,7 @@ export default function SchoolsPage() {
                       aria-labelledby={"sc-lab-" + lab.id}
                     >
                       <div className="sc-lab-top">
+                        <img className="sc-lab-photo" src={lab.image} alt={lab.imageAlt} loading="lazy" width={1500} height={1000} />
                         <Icon aria-hidden="true" />
                         <span>Lab {index + 1}</span>
                         <h3 id={"sc-lab-" + lab.id}>{lab.name}</h3>
@@ -364,6 +378,7 @@ export default function SchoolsPage() {
                 );
               })}
             </ScrollRow>
+            <p className="sc-lab-photo-note">Illustrative lab photography</p>
             <div className="sc-room" data-reveal>
               <img src={labRoom.image} alt={labRoom.imageAlt} loading="lazy" />
               <div>
@@ -395,7 +410,7 @@ export default function SchoolsPage() {
             </div>
             <div className="sc-platforms">
               <div className="sc-frame" data-reveal>
-                <img src={hero.image} alt={hero.imageAlt} loading="lazy" />
+                <img src="/images/schools/computer-lab.webp" alt="Pupils using computers during a classroom lesson" loading="lazy" />
               </div>
               {platforms.map((platform, index) => (
                 <article className="sc-card sc-platform" id={platform.id} key={platform.id} data-reveal style={delay(index * 90)}>
@@ -433,7 +448,8 @@ export default function SchoolsPage() {
               {kits.map((kit, index) => {
                 const Icon = KIT_ICONS[index] ?? Puzzle;
                 return (
-                  <li className="sc-card" key={kit.name} data-reveal style={delay(index * 70)}>
+                  <li className="sc-card sc-kit-card" key={kit.name} data-reveal style={delay(index * 70)}>
+                    <img className="sc-kit-photo" src={kit.image} alt={kit.imageAlt} loading="lazy" width={1500} height={1000} />
                     <span className={"sc-icon" + (["", " sc-icon--green", " sc-icon--yellow", " sc-icon--red"][index] ?? "")}>
                       <Icon aria-hidden="true" />
                     </span>

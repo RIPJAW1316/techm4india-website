@@ -14,11 +14,11 @@
   "rewrites": [
     {
       "source": "/api/v1/:match*",
-      "destination": "https://techm4india-website-production.up.railway.app/api/v1/:match*"
+      "destination": "https://techm4india-erp-api-l1gv.onrender.com/api/v1/:match*"
     },
     {
       "source": "/api/v2/:match*",
-      "destination": "https://techm4india-website-production.up.railway.app/api/v2/:match*"
+      "destination": "https://techm4india-erp-api-l1gv.onrender.com/api/v2/:match*"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "techm4india-website",
+  "main": "./dist/server/index.js",
+  "compatibility_date": "2026-10-21",
+  "compatibility_flags": ["nodejs_compat"],
+  "no_bundle": true,
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api", "/api/*"]
+  },
+  "images": { "binding": "IMAGES" },
+  "vars": { "ERP_API_ORIGIN": "https://techm4india-erp-api.vercel.app" },
+  "observability": { "enabled": true }
+}

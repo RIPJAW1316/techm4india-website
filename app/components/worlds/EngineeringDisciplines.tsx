@@ -1,5 +1,5 @@
 "use client";
-/* eslint-disable @next/next/no-img-element -- Local, approved division photography. */
+/* eslint-disable @next/next/no-img-element -- Optimized local illustrative photography. */
 
 import { ArrowDownRight, ArrowRight } from "lucide-react";
 import { useRef, useState, type KeyboardEvent } from "react";
@@ -45,6 +45,7 @@ export function EngineeringDisciplines() {
             </button>
             <div id={`en-discipline-${item.id}`} className="en-explorer-mobile" hidden={active !== index}>
               <img src={item.image} alt={item.imageAlt} width={1200} height={800} loading="lazy" />
+              <span className="en-explorer-image-note">Illustrative photograph</span>
               <p>{item.text}</p>
               <TrackButton track={item.id} className="en-explorer-link">
                 Explore {item.short} programmes <ArrowRight aria-hidden="true" />
@@ -62,6 +63,7 @@ export function EngineeringDisciplines() {
             height={800}
             style={track.focus ? { objectPosition: track.focus } : undefined}
           />
+          <span className="en-explorer-image-note">Illustrative photograph</span>
         </div>
         <div className="en-explorer-caption" key={`${track.id}-caption`}>
           <div>

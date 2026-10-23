@@ -37,12 +37,15 @@ RUN apk add --no-cache dumb-init
 # Copy package files
 COPY package*.json ./
 
+# The postinstall script runs `prisma generate` during npm ci, so the schema
+# must already be present in the runtime stage.
+COPY --from=builder /app/prisma ./prisma
+
 # Install production dependencies only
 RUN npm ci --omit=dev && npm cache clean --force
 
 # Copy compiled distribution and Prisma artifacts from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -55,4 +58,4 @@ EXPOSE 10000
 ENTRYPOINT ["dumb-init", "--"]
 
 # Execute pending Prisma migrations, then start the compiled NestJS API
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]

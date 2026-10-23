@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Optimized local WebP images are swapped by the interaction. */
 
 import { useState, type CSSProperties } from "react";
 import type { MapBranch } from "@/lib/content/schools";
@@ -73,6 +74,7 @@ export function MindMap({
                   onFocus={() => setActive(index)}
                 >
                   <span className="sr-only">Show how a student becomes a </span>
+                  <img src={branch.image} alt="" loading="lazy" width={30} height={30} />
                   {branch.outcome}
                 </button>
               </div>
@@ -82,6 +84,10 @@ export function MindMap({
       </div>
 
       <div className="xs-map-detail" id="xs-map-detail" aria-live="polite">
+        <figure className="xs-map-image" key={current.id}>
+          <img src={current.image} alt={current.imageAlt} loading="lazy" width={1500} height={1000} />
+          <figcaption>Illustrative learning scene</figcaption>
+        </figure>
         <p className="xp-meta">
           {current.branch} · {current.branchDetail}
         </p>

@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Local imagery supports the static Vinext build. */
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -42,6 +43,29 @@ function WorkLink({ item }: { item: WorkItem }) {
     <a className="sf-textlink" href={href}>
       {content}
     </a>
+  );
+}
+
+const conceptVisuals: Record<string, { signal: string; markers: string[] }> = {
+  "airguard-pro": { signal: "ULTRASONIC / LEAK DETECTION", markers: ["AIR LINE", "SENSOR", "SIGNAL"] },
+  acousticast: { signal: "ACOUSTIC / SOLIDIFICATION", markers: ["MOULD", "EMISSION", "ALERT"] },
+  foodspectra: { signal: "SPECTRAL / SAMPLE ANALYSIS", markers: ["SAMPLE", "SCAN", "READOUT"] },
+  itcmax: { signal: "RECONCILIATION / TAX DATA", markers: ["INVOICE", "MATCH", "ALERT"] },
+};
+
+function ConceptVisual({ id }: { id: string }) {
+  const visual = conceptVisuals[id];
+  if (!visual) return null;
+  return (
+    <div className={`sf-concept-visual sf-concept-visual--${id}`} aria-label={`${visual.signal.toLowerCase()} conceptual diagram`} role="img">
+      <span className="sf-concept-visual-label">{visual.signal}</span>
+      <span className="sf-concept-orbit" aria-hidden="true" />
+      <span className="sf-concept-device" aria-hidden="true">
+        <i /><i /><i /><i /><i />
+      </span>
+      <span className="sf-concept-readout" aria-hidden="true">01 / 02 / 03</span>
+      <span className="sf-concept-visual-foot">{visual.markers.join("  /  ")} <b>Concept visualization</b></span>
+    </div>
   );
 }
 
@@ -162,6 +186,15 @@ export function WorkGrid({
         <ul className="sf-platforms">
           {platforms.map((item) => (
             <li key={item.id} id={"work-" + item.id}>
+              <figure className="sf-platform-visual">
+                <img
+                  src={item.id === "careerbuddy" ? "/images/schools/school-career-discovery.webp" : "/images/schools/computer-lab.webp"}
+                  alt={item.id === "careerbuddy" ? "Student researching with a book and computer in a library" : "Students working at computers in a learning space"}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Illustrative education scene <span>{item.id === "careerbuddy" ? "Explore strengths → directions" : "Connect students → programmes"}</span></figcaption>
+              </figure>
               <p>
                 <span>{stageLabels.platform.short}</span>
                 <span>{item.category}</span>
@@ -184,6 +217,7 @@ export function WorkGrid({
         <ul className="sf-concepts">
           {concepts.map((item, index) => (
             <li key={item.id} id={"work-" + item.id}>
+              <ConceptVisual id={item.id} />
               <p>
                 <span>Concept {String(index + 1).padStart(2, "0")}</span>
                 <span>{stageLabels.concept.short}</span>
@@ -197,7 +231,7 @@ export function WorkGrid({
                 <strong>{doesLabel}.</strong> {item.does}
               </p>
               <p>
-                <strong>{techLabel}.</strong> {item.tech?.join(", ") || noTech}
+                <strong>Proposed stack.</strong> {item.tech?.join(", ") || noTech}
               </p>
               <p className="sf-stage-note">{stageLabels.concept.note}</p>
               <WorkLink item={item} />

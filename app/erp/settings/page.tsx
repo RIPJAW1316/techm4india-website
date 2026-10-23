@@ -77,14 +77,14 @@ export default function Settings() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">Railway ERP API Service</span>
+                      <span className="text-xs font-bold text-slate-900">Cloudflare ERP API Service</span>
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 erp-pulse-dot" />
                         Configured
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-600 font-mono-ui">
-                      https://techm4india-website-production.up.railway.app/api/v1
+                      /api/v1
                     </p>
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export default function Settings() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">Managed PostgreSQL 16</span>
-                      <span className="text-[10px] font-semibold font-mono-ui text-slate-500">Railway production</span>
+                      <span className="text-[10px] font-semibold font-mono-ui text-slate-500">Neon PostgreSQL</span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">
                       Database availability is checked by the ERP API health endpoint
