@@ -157,3 +157,63 @@ export interface ExpenseItem {
   approvalLevel: number;
   poNumber?: string;
 }
+
+export interface HrmsClaimItem {
+  id: string;
+  claimNumber: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SETTLED' | 'PAID';
+  totalAmount: number;
+  currency: string;
+  submissionDate?: string;
+  settlementBatchRef?: string;
+  reimbursementDate?: string;
+  notes?: string;
+  employee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    employeeNumber: string;
+    bankAccountNumber?: string;
+    bankIfsc?: string;
+    bankName?: string;
+    panNumber?: string;
+  };
+  items: Array<{
+    id?: string;
+    amount: number;
+    description: string;
+    expenseDate?: string;
+    merchantName?: string;
+    category?: {
+      id?: string;
+      code?: string;
+      name?: string;
+    };
+  }>;
+}
+
+export interface PayrollPeriodSummary {
+  period: {
+    id: string;
+    month: number;
+    year: number;
+    status: string;
+    finalizedAt?: string;
+  };
+  headcount: number;
+  totals: {
+    grossSalary: number;
+    netPayable: number;
+    totalEmployeeDeductions: number;
+  };
+  statutoryLiabilities: {
+    employeePf: number;
+    employerPf: number;
+    totalPfRemittance: number;
+    professionalTaxPayable: number;
+    employeeEsi: number;
+    employerEsi: number;
+    totalEsiRemittance: number;
+    tdsWithholdingPayable: number;
+  };
+}

@@ -234,4 +234,47 @@ export class FinanceController {
   async exportTallyXml() {
     return this.financeService.exportTallyXml();
   }
+
+  // ===========================================================================
+  // Cross-Domain HRMS Integration (Payroll Accrual & Claim Disbursement)
+  // ===========================================================================
+
+  @Get('hrms/approved-claims')
+  @ApiOperation({ summary: 'List approved HRMS employee expense claims awaiting financial disbursement' })
+  async getHrmsApprovedClaims() {
+    return this.financeService.getHrmsApprovedClaims();
+  }
+
+  @Post('hrms/claims/:id/settle')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Disburse and settle HRMS employee claim, generating General Ledger payment journal' })
+  async settleHrmsExpenseClaim(
+    @Param('id') id: string,
+    @Body('userId') userId?: string,
+    @Body('paymentMethod') paymentMethod?: string,
+    @Body('settlementDate') settlementDate?: string,
+    @Body('notes') notes?: string,
+  ) {
+    return this.financeService.settleHrmsExpenseClaim(id, userId || 'FINANCE_DISBURSER', {
+      paymentMethod,
+      settlementDate,
+      notes,
+    });
+  }
+
+  @Get('hrms/payroll-periods')
+  @ApiOperation({ summary: 'List finalized payroll runs available for General Ledger accrual' })
+  async getFinalizedPayrollPeriods() {
+    return this.financeService.getFinalizedPayrollPeriods();
+  }
+
+  @Post('hrms/payroll/:periodId/accrue')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Accrue finalized payroll period into balanced double-entry General Ledger voucher' })
+  async accruePayrollToLedger(
+    @Param('periodId') periodId: string,
+    @Body('userId') userId?: string,
+  ) {
+    return this.financeService.accruePayrollToLedger(periodId, userId || 'FINANCE_OFFICER');
+  }
 }

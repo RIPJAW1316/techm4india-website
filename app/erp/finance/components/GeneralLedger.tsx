@@ -7,6 +7,8 @@ import {
   Plus,
   RotateCcw,
   Scale,
+  Users,
+  CheckCircle,
 } from 'lucide-react';
 import { AccountItem, DivisionCode, JournalEntryItem, VoucherType } from '../types';
 
@@ -16,6 +18,7 @@ interface GeneralLedgerProps {
   onAddJournalEntry: (entry: any) => void;
   onPostJournal: (id: string) => void;
   onReverseJournal: (id: string) => void;
+  onImportPayrollAccrual?: () => Promise<void> | void;
 }
 
 export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
@@ -24,7 +27,10 @@ export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
   onAddJournalEntry,
   onPostJournal,
   onReverseJournal,
+  onImportPayrollAccrual,
 }) => {
+  const [isPayrollModalOpen, setIsPayrollModalOpen] = useState(false);
+  const [isAccruing, setIsAccruing] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<'journals' | 'coa' | 'trial_balance'>('journals');
   const [selectedEntry, setSelectedEntry] = useState<JournalEntryItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -132,13 +138,24 @@ export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
           </button>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-semibold shadow-xs transition"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Create Journal Entry
-        </button>
+        <div className="flex items-center gap-2">
+          {onImportPayrollAccrual && (
+            <button
+              onClick={() => setIsPayrollModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#1f2946] hover:bg-[#2e3c63] text-white text-xs font-semibold shadow-xs transition"
+            >
+              <Users className="w-3.5 h-3.5 text-[#f1efe9]" />
+              Accrue HRMS Payroll
+            </button>
+          )}
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-semibold shadow-xs transition"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Create Journal Entry
+          </button>
+        </div>
       </div>
 
       {/* VIEW 1: JOURNAL VOUCHERS LIST */}
@@ -587,6 +604,145 @@ export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
           </div>
         </div>
       )}
+    
+      {/* PAYROLL ACCRUAL MODAL */}
+      {isPayrollModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="card-editorial bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-[#e3ded5] p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#e3ded5] pb-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#c62d37]" />
+                <div>
+                  <h3 className="text-base font-bold text-[#1f2946]">Accrue HRMS Payroll into General Ledger</h3>
+                  <p className="text-xs text-[#5a6376]">October 2026 Finalized Pay Run • Automated Double-Entry Balanced Posting</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsPayrollModalOpen(false)}
+                className="text-[#5a6376] hover:text-[#1f2946] text-xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3 bg-[#fcfbf9] rounded-xl border border-[#e3ded5] grid grid-cols-2 gap-3">
+                <div>
+                  <span className="text-[#5a6376] block text-[11px]">Payroll Run Period:</span>
+                  <span className="font-bold text-[#1f2946] text-sm">October 2026 (FY 2026-27)</span>
+                </div>
+                <div>
+                  <span className="text-[#5a6376] block text-[11px]">Total Headcount:</span>
+                  <span className="font-bold text-[#1f2946] text-sm">5 Active Staff Engineers &amp; Leads</span>
+                </div>
+              </div>
+
+              {/* Journal Voucher Line Preview */}
+              <div className="border border-[#e3ded5] rounded-xl overflow-hidden">
+                <div className="p-2.5 bg-[#f1efe9] font-bold text-[#1f2946] text-[11px] flex justify-between">
+                  <span>Balanced Journal Voucher Preview (JV-PAYROLL-2026-10)</span>
+                  <span className="text-emerald-700">In Balance (₹2,24,000)</span>
+                </div>
+                <table className="w-full text-left text-[11px]">
+                  <thead className="border-b border-[#e3ded5] bg-[#faf9f5] text-[#5a6376]">
+                    <tr>
+                      <th className="py-1.5 px-3">Account &amp; Classification</th>
+                      <th className="py-1.5 px-3 text-right">Debit (₹)</th>
+                      <th className="py-1.5 px-3 text-right">Credit (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#ebe7df] font-mono">
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">5010 - Gross Salary &amp; Wages Expense</span>
+                        <span className="block text-[10px] text-[#5a6376]">Operational Expense Debit</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">2,00,000.00</td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">5020 - Employer EPF Contribution (12%)</span>
+                        <span className="block text-[10px] text-[#5a6376]">Statutory Cost Debit</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">24,000.00</td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">2040 - Net Salaries Payable to Staff</span>
+                        <span className="block text-[10px] text-[#5a6376]">Pending Disbursal via HDFC Bank</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">1,78,800.00</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">2050 - EPF Statutory Remittance Payable</span>
+                        <span className="block text-[10px] text-[#5a6376]">Employee (12%) + Employer (12%)</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">48,000.00</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">2060 - Professional Tax Payable</span>
+                        <span className="block text-[10px] text-[#5a6376]">Telangana PT Withholding</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">1,000.00</td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-sans">
+                        <span className="font-semibold text-[#1f2946]">2070 - TDS on Salaries (Section 192)</span>
+                        <span className="block text-[10px] text-[#5a6376]">IT Withholding Payable</span>
+                      </td>
+                      <td className="py-1.5 px-3 text-right text-[#5a6376]">—</td>
+                      <td className="py-1.5 px-3 text-right font-bold text-[#1f2946]">4,200.00</td>
+                    </tr>
+                  </tbody>
+                  <tfoot className="border-t-2 border-[#1f2946] bg-[#fcfbf9] font-mono font-bold text-[#1f2946]">
+                    <tr>
+                      <td className="py-2 px-3 font-sans">Total Balanced Vouchers:</td>
+                      <td className="py-2 px-3 text-right text-emerald-700">₹2,24,000.00</td>
+                      <td className="py-2 px-3 text-right text-emerald-700">₹2,24,000.00</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#e3ded5]">
+                <button
+                  type="button"
+                  onClick={() => setIsPayrollModalOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-white border border-[#d1cbbf] text-[#5a6376] font-semibold hover:bg-[#f1efe9]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isAccruing}
+                  onClick={async () => {
+                    if (!onImportPayrollAccrual) return;
+                    setIsAccruing(true);
+                    try {
+                      await onImportPayrollAccrual();
+                      setIsPayrollModalOpen(false);
+                    } finally {
+                      setIsAccruing(false);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-lg bg-[#15803d] hover:bg-[#166534] disabled:opacity-50 text-white font-semibold flex items-center gap-1.5 shadow-xs"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {isAccruing ? 'Accruing...' : 'Post Payroll JV to General Ledger'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
