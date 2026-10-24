@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/lib/auth-client';
+import { authClient, getApiBaseUrl, setSession } from '@/lib/auth-client';
 
 export default function HrmsAuthCallbackPage() {
   const router = useRouter();
@@ -22,26 +22,80 @@ export default function HrmsAuthCallbackPage() {
       return;
     }
 
-    // In a unified portal setup, check if existing session is already established
     const currentSession = authClient.getSession();
-    if (currentSession?.accessToken) {
+    if (currentSession?.accessToken && !code) {
       setStatus('success');
       setTimeout(() => {
-        router.push('/hrms');
-      }, 800);
+        const dest = window.location.pathname.startsWith('/hrms') ? '/hrms' : '/';
+        router.push(dest);
+      }, 500);
       return;
     }
 
     if (code) {
-      // In full OIDC PKCE, POST /api/v1/auth/token with code and verifier
-      // For now, simulate exchange and redirect
-      setStatus('success');
-      setTimeout(() => {
-        router.push('/hrms');
-      }, 1000);
+      const verifier = sessionStorage.getItem('tm4i_pkce_verifier') || params.get('code_verifier') || 'simulated-verifier-during-testing';
+      const redirectUri = window.location.origin + window.location.pathname;
+      const baseUrl = getApiBaseUrl();
+
+      fetch(`${baseUrl}/api/v1/auth/oidc/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: redirectUri,
+          client_id: 'hrms-app-client',
+          code_verifier: verifier,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            // If code was already redeemed or expired, check existing session
+            if (currentSession?.accessToken) {
+              return { access_token: currentSession.accessToken, id_token: '' };
+            }
+            throw new Error(errBody.message || `Token exchange failed with status ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((tokens) => {
+          setSession({
+            accessToken: tokens.access_token,
+            expiresIn: tokens.expires_in,
+          });
+          sessionStorage.removeItem('tm4i_pkce_verifier');
+
+          // Clean sensitive URL params from history
+          if (window.history?.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          setStatus('success');
+          setTimeout(() => {
+            const dest = window.location.pathname.startsWith('/hrms') ? '/hrms' : '/';
+            router.push(dest);
+          }, 600);
+        })
+        .catch((err) => {
+          // If offline or simulation mode without live DB code
+          if (currentSession?.accessToken) {
+            setStatus('success');
+            setTimeout(() => {
+              const dest = window.location.pathname.startsWith('/hrms') ? '/hrms' : '/';
+              router.push(dest);
+            }, 500);
+            return;
+          }
+          setStatus('error');
+          setErrorMessage(err.message || 'Failed to exchange authorization code for session token.');
+        });
     } else {
-      // Direct visit without params
-      router.push('/hrms');
+      const dest = window.location.pathname.startsWith('/hrms') ? '/hrms' : '/';
+      router.push(dest);
     }
   }, [router]);
 
@@ -98,19 +152,22 @@ export default function HrmsAuthCallbackPage() {
 
         {status === 'error' && (
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => {
+              const centralUrl = process.env.NEXT_PUBLIC_CENTRAL_AUTH_URL || 'http://localhost:3000/login';
+              window.location.href = `${centralUrl}?app=hrms`;
+            }}
             style={{
               padding: '10px 20px',
-              backgroundColor: 'var(--tm-navy)',
+              backgroundColor: 'var(--tm-red)',
               color: '#fff',
               border: 'none',
               borderRadius: '8px',
-              fontSize: '13px',
+              fontSize: '14px',
               fontWeight: 600,
               cursor: 'pointer',
             }}
           >
-            Return to Central Login
+            Authenticate via Central Portal
           </button>
         )}
       </div>

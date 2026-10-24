@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Mail, AlertCircle, Shield, ArrowRight } from 'lucide-react';
-import { login, setSession } from '@/lib/auth-client';
+import { createPkceChallenge, login, setSession } from '@/lib/auth-client';
 
 export default function DirectLoginPage({ onLoginSuccess }: { onLoginSuccess: () => void }) {
   const [email, setEmail] = useState('');
@@ -27,11 +27,13 @@ export default function DirectLoginPage({ onLoginSuccess }: { onLoginSuccess: ()
     }
   };
 
-  const handleCentralPortalSso = () => {
+  const handleCentralPortalSso = async () => {
     // Generate PKCE code challenge and redirect to central portal OIDC authorization
     const centralUrl = import.meta.env.VITE_CENTRAL_AUTH_URL || 'http://localhost:3000/login';
     const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
-    window.location.href = `${centralUrl}?app=hrms&redirect_uri=${redirectUri}`;
+    const { verifier, challenge } = await createPkceChallenge();
+    sessionStorage.setItem('tm4i_pkce_verifier', verifier);
+    window.location.href = `${centralUrl}?app=hrms&client_id=hrms-app-client&redirect_uri=${redirectUri}&code_challenge=${challenge}&code_challenge_method=S256`;
   };
 
   return (

@@ -8,7 +8,7 @@
     "dev": "vite --port 3002",
     "build": "vite build",
     "preview": "vite preview --port 3002",
-    "test": "node --experimental-strip-types --test test/hrms-app.test.mjs"
+    "test": "node --experimental-strip-types --test test/*.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

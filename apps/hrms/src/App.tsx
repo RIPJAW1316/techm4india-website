@@ -40,8 +40,8 @@ export default function App() {
     return <HrmsAuthCallbackPage />;
   }
 
-  // If unauthenticated, present direct login view
-  if (!hasToken) {
+  // If unauthenticated or explicit /login route, present direct login view
+  if (!hasToken || normalizedPath === '/login') {
     return <DirectLoginPage onLoginSuccess={() => setHasToken(true)} />;
   }
 

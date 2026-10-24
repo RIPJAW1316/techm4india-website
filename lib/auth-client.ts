@@ -85,16 +85,28 @@ export function getApplicationUrl(appCode: string): string {
 }
 
 export function getApiBaseUrl(): string {
-  if (typeof window !== "undefined" && typeof window.location !== "undefined" && window.location.origin) {
-    return "";
+  // Check explicit environment variables first
+  const envUrl =
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) ||
+    (typeof process !== 'undefined' && process.env?.VITE_API_BASE_URL) ||
+    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_API_BASE_URL);
+
+  if (envUrl) {
+    return envUrl.replace(/\/api\/v1\/?$/, '').replace(/\/+$/, '');
   }
-  if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+
+  // Browser execution
+  if (typeof window !== 'undefined' && window.location) {
+    // In local development, use relative path "" to leverage Vite dev proxy
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return '';
+    }
+    // In production subdomain, target the verified HTTPS API endpoint
+    return 'https://techm4india-erp-api-l1gv.onrender.com';
   }
-  if (typeof process !== "undefined" && process.env?.VITE_API_BASE_URL) {
-    return process.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "");
-  }
-  return "https://techm4india-erp-api-l1gv.onrender.com";
+
+  // Server-side / Node test environment fallback
+  return 'https://techm4india-erp-api-l1gv.onrender.com';
 }
 
 /**
@@ -157,6 +169,32 @@ export function clearSession(): void {
  */
 export function isAuthenticated(): boolean {
   return Boolean(getAccessToken());
+}
+
+/**
+ * Generates an RFC 7636 PKCE S256 code verifier and code challenge pair.
+ */
+export async function createPkceChallenge(): Promise<{ verifier: string; challenge: string }> {
+  const randomBytes = new Uint8Array(32);
+  if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
+    window.crypto.getRandomValues(randomBytes);
+  } else {
+    for (let i = 0; i < 32; i++) randomBytes[i] = Math.floor(Math.random() * 256);
+  }
+  const verifier = Array.from(randomBytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  let challenge = verifier;
+  if (typeof window !== 'undefined' && window.crypto?.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const hash = await window.crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hash));
+    const base64 = btoa(String.fromCharCode(...hashArray));
+    challenge = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  return { verifier, challenge };
 }
 
 /**
