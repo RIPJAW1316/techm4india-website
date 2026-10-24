@@ -103,7 +103,7 @@ export default function DashboardPage() {
         }
         setErrorMessage(err.message);
       } else {
-        setErrorMessage("Failed to load dashboard data. Please try again.");
+        setErrorMessage("Failed to refresh applications catalog.");
       }
     } finally {
       setIsRefreshing(false);
@@ -111,11 +111,8 @@ export default function DashboardPage() {
   }
 
   async function handleLogout() {
-    try {
-      await logout();
-    } finally {
-      window.location.href = "/login";
-    }
+    await logout();
+    window.location.href = "/login";
   }
 
   function getGreeting(): string {
@@ -134,8 +131,8 @@ export default function DashboardPage() {
     if (code.includes("HRMS")) {
       return {
         icon: Users,
-        iconBg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-        badgeBg: "bg-emerald-950/60 text-emerald-300 border-emerald-500/30",
+        iconBg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        badgeBg: "bg-emerald-50 text-emerald-800 border-emerald-200",
         category: "Human Capital Management",
         summary:
           "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
@@ -144,8 +141,8 @@ export default function DashboardPage() {
     if (code.includes("FINANCE")) {
       return {
         icon: DollarSign,
-        iconBg: "bg-sky-500/10 text-sky-400 border-sky-500/30",
-        badgeBg: "bg-sky-950/60 text-sky-300 border-sky-500/30",
+        iconBg: "bg-blue-50 text-blue-700 border-blue-200",
+        badgeBg: "bg-blue-50 text-blue-800 border-blue-200",
         category: "Financial Operations & ERP",
         summary:
           "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
@@ -154,8 +151,8 @@ export default function DashboardPage() {
     if (code.includes("ADMIN")) {
       return {
         icon: ShieldCheck,
-        iconBg: "bg-red-500/10 text-red-400 border-red-500/30",
-        badgeBg: "bg-red-950/60 text-red-300 border-red-500/30",
+        iconBg: "bg-rose-50 text-rose-700 border-rose-200",
+        badgeBg: "bg-rose-50 text-rose-800 border-rose-200",
         category: "Governance & Master Control",
         summary:
           "System user directory, role-permission matrix administration, audit log streams, and enterprise authorization policies.",
@@ -163,8 +160,8 @@ export default function DashboardPage() {
     }
     return {
       icon: Layers,
-      iconBg: "bg-purple-500/10 text-purple-400 border-purple-500/30",
-      badgeBg: "bg-purple-950/60 text-purple-300 border-purple-500/30",
+      iconBg: "bg-purple-50 text-purple-700 border-purple-200",
+      badgeBg: "bg-purple-50 text-purple-800 border-purple-200",
       category: "Enterprise Module",
       summary: "Authorized corporate platform module integrated with TechM4India identity.",
     };
@@ -172,10 +169,10 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#12192d] text-white flex items-center justify-center">
+      <main className="min-h-screen bg-[#f7f6f2] text-[#1f2946] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-9 h-9 border-3 border-white/20 border-t-[#d73531] rounded-full animate-spin" />
-          <p className="text-sm font-medium text-slate-300">
+          <div className="w-9 h-9 border-3 border-[#e3ded5] border-t-[#c62d37] rounded-full animate-spin" />
+          <p className="text-sm font-semibold text-[#5a6376]">
             Loading TechM4India Central Dashboard...
           </p>
         </div>
@@ -184,28 +181,28 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#12192d] text-slate-100 flex flex-col justify-between">
+    <main className="min-h-screen bg-[#f7f6f2] text-[#20283b] flex flex-col justify-between">
       {/* Top Enterprise Navigation Bar */}
-      <header className="border-b border-white/10 bg-[#172036]/90 backdrop-blur-md sticky top-0 z-30">
+      <header className="border-b border-[#e3ded5] bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-2xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-3 group text-white decoration-none"
+              className="inline-flex items-center gap-3 group text-[#1f2946] decoration-none"
             >
               <img
                 src="/images/brand/logo.png"
                 alt="TechM4India Logo"
                 width="40"
                 height="40"
-                className="transition-transform group-hover:scale-105"
+                className="transition-transform group-hover:scale-105 rounded"
               />
               <div>
-                <span className="text-lg font-black tracking-wider uppercase">
-                  TECHM4<span className="text-[#d73531]">INDIA</span>
+                <span className="text-lg font-black tracking-wider uppercase text-[#1f2946]">
+                  TECHM4<span className="text-[#c62d37]">INDIA</span>
                 </span>
-                <span className="hidden sm:inline-block ml-3 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20">
+                <span className="hidden sm:inline-block ml-3 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#fff1f2] text-[#c62d37] border border-[#fecdd3]">
                   Central ERP Dashboard
                 </span>
               </div>
@@ -219,7 +216,7 @@ export default function DashboardPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               title="Refresh applications and identity"
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors disabled:opacity-50"
+              className="p-2 rounded-lg bg-white hover:bg-[#f7f6f2] text-[#5a6376] hover:text-[#1f2946] border border-[#d1cbbf] transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
             </button>
@@ -227,7 +224,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-red-950/60 hover:bg-red-900/80 text-red-200 hover:text-white border border-red-800/50 text-xs font-semibold transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#fff1f2] hover:bg-[#ffe4e6] text-[#c62d37] border border-[#fecdd3] text-xs font-bold transition-all cursor-pointer shadow-2xs"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign Out</span>
@@ -242,19 +239,19 @@ export default function DashboardPage() {
         {errorMessage && (
           <div
             role="alert"
-            className="p-4 rounded-xl bg-red-950/80 border border-red-500/50 text-red-200 text-sm flex items-start justify-between gap-3 shadow-lg"
+            className="p-4 rounded-xl bg-[#fef2f2] border border-[#fecdd3] text-[#be123c] text-sm flex items-start justify-between gap-3 shadow-xs"
           >
             <div className="flex items-start gap-2.5">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-[#be123c] shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Unable to refresh dashboard data</p>
-                <p className="text-xs text-red-300 mt-0.5">{errorMessage}</p>
+                <p className="text-xs text-[#be123c]/90 mt-0.5">{errorMessage}</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setErrorMessage(null)}
-              className="text-red-400 hover:text-red-200 p-1"
+              className="text-[#be123c] hover:text-[#9f1239] p-1"
             >
               <X className="w-4 h-4" />
             </button>
@@ -263,26 +260,26 @@ export default function DashboardPage() {
 
         {/* User Identity Welcome Banner */}
         {profile && (
-          <section className="bg-gradient-to-r from-[#1c2640] to-[#182035] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+          <section className="bg-white border border-[#e3ded5] rounded-2xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-start sm:items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#d73531] to-[#252e4a] flex items-center justify-center text-white font-extrabold text-xl shadow-lg shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c62d37] to-[#1f2946] flex items-center justify-center text-white font-extrabold text-xl shadow-md shrink-0">
                   {getInitials(profile.firstName, profile.lastName)}
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1f2946] tracking-tight">
                       {getGreeting()}, {profile.firstName} {profile.lastName}
                     </h1>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#ecfdf5] text-[#047857] border border-[#a7f3d0]">
                       <CheckCircle2 className="w-3 h-3" />
                       Active
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <p className="text-xs sm:text-sm text-[#5a6376] mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span>{profile.email}</span>
                     <span>•</span>
-                    <span className="font-medium text-slate-300">
+                    <span className="font-medium text-[#1f2946]">
                       Org: {profile.organizationCode || "TECHM4INDIA"}
                     </span>
                   </p>
@@ -291,14 +288,14 @@ export default function DashboardPage() {
 
               {/* Roles & Permissions Badges */}
               <div className="flex flex-wrap md:flex-col md:items-end gap-2 shrink-0">
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <div className="text-[11px] font-bold text-[#5a6376] uppercase tracking-wider">
                   Assigned Roles
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {profile.roles.map((role) => (
                     <span
                       key={role}
-                      className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-white/10 text-slate-200 border border-white/10"
+                      className="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-[#f1efe9] text-[#1f2946] border border-[#d1cbbf]"
                     >
                       {role}
                     </span>
@@ -308,35 +305,35 @@ export default function DashboardPage() {
             </div>
 
             {/* Platform Metrics Bar */}
-            <div className="mt-6 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="mt-6 pt-6 border-t border-[#e3ded5] grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                <p className="text-[11px] text-[#5a6376] font-bold uppercase tracking-wider">
                   Authorized Apps
                 </p>
-                <p className="text-2xl font-black text-white mt-0.5">{applications.length}</p>
+                <p className="text-2xl font-black text-[#1f2946] mt-0.5">{applications.length}</p>
               </div>
               <div>
-                <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                <p className="text-[11px] text-[#5a6376] font-bold uppercase tracking-wider">
                   Permission Grants
                 </p>
-                <p className="text-2xl font-black text-white mt-0.5">
+                <p className="text-2xl font-black text-[#1f2946] mt-0.5">
                   {profile.permissions.length}
                 </p>
               </div>
               <div>
-                <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                <p className="text-[11px] text-[#5a6376] font-bold uppercase tracking-wider">
                   Session Policy
                 </p>
-                <p className="text-xs font-bold text-emerald-400 mt-1.5 flex items-center gap-1">
+                <p className="text-xs font-bold text-[#047857] mt-1.5 flex items-center gap-1">
                   <Shield className="w-3.5 h-3.5" />
                   Tab-Scoped
                 </p>
               </div>
               <div>
-                <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
+                <p className="text-[11px] text-[#5a6376] font-bold uppercase tracking-wider">
                   SSO Readiness
                 </p>
-                <p className="text-xs font-bold text-amber-400 mt-1.5 flex items-center gap-1">
+                <p className="text-xs font-bold text-[#b45309] mt-1.5 flex items-center gap-1">
                   <Lock className="w-3.5 h-3.5" />
                   OIDC / PKCE Prep
                 </p>
@@ -349,14 +346,14 @@ export default function DashboardPage() {
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-white tracking-tight">
+              <h2 className="text-xl font-bold text-[#1f2946] tracking-tight">
                 Authorized Enterprise Applications
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#5a6376] mt-0.5">
                 Dynamic application directory filtered by your verified permissions.
               </p>
             </div>
-            <span className="text-xs font-medium text-slate-400">
+            <span className="text-xs font-medium text-[#5a6376]">
               Showing {applications.length} authorized service{applications.length === 1 ? "" : "s"}
             </span>
           </div>
@@ -370,7 +367,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={app.code}
-                    className="bg-[#1b233a] border border-white/10 hover:border-slate-500 rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 hover:shadow-2xl hover:-translate-y-1 group"
+                    className="bg-white border border-[#e3ded5] hover:border-[#cbd5e1] rounded-2xl p-6 flex flex-col justify-between transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 group shadow-xs"
                   >
                     <div>
                       {/* Top Header of Card */}
@@ -390,31 +387,31 @@ export default function DashboardPage() {
                       {/* App Name and Code */}
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors">
+                          <h3 className="text-lg font-bold text-[#1f2946] group-hover:text-[#c62d37] transition-colors">
                             {app.name}
                           </h3>
                         </div>
-                        <span className="text-[11px] font-mono font-semibold text-slate-400 tracking-wider">
+                        <span className="text-[11px] font-mono font-semibold text-[#5a6376] tracking-wider">
                           CODE: {app.code}
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-300 mt-3 leading-relaxed">
+                      <p className="text-xs text-[#5a6376] mt-3 leading-relaxed">
                         {app.description || visuals.summary}
                       </p>
                     </div>
 
                     {/* Launch Trigger */}
-                    <div className="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between">
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1.5 truncate max-w-[170px]">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                    <div className="mt-6 pt-4 border-t border-[#e3ded5] flex items-center justify-between">
+                      <div className="text-[11px] text-[#5a6376] flex items-center gap-1.5 truncate max-w-[170px]">
+                        <span className="w-2 h-2 rounded-full bg-[#15803d] shrink-0" />
                         <span className="truncate">{app.baseUrl}</span>
                       </div>
 
                       <button
                         type="button"
                         onClick={() => setSelectedApp(app)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#252e4a] hover:bg-[#d73531] text-white text-xs font-bold transition-all shadow-md group-hover:shadow-red-950/50 cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
                       >
                         <span>Launch</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -426,21 +423,21 @@ export default function DashboardPage() {
             </div>
           ) : (
             /* Empty State for user without authorized applications */
-            <div className="p-10 rounded-2xl bg-[#172036] border border-dashed border-slate-700 text-center space-y-4">
-              <div className="w-14 h-14 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+            <div className="p-10 rounded-2xl bg-white border border-dashed border-[#d1cbbf] text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-full bg-[#fffbeb] text-[#b45309] border border-[#fde68a] flex items-center justify-center mx-auto">
                 <ShieldAlert className="w-7 h-7" />
               </div>
               <div className="max-w-md mx-auto space-y-1.5">
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-[#1f2946]">
                   No Enterprise Applications Assigned
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-[#5a6376] leading-relaxed">
                   Your identity account is active, but you do not have permission grants for
                   specific applications (such as HRMS or Finance ERP).
                 </p>
               </div>
               <div className="pt-2">
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-[#5a6376]">
                   Please contact a TechM4India Platform Administrator to provision application
                   access for your profile.
                 </p>
@@ -450,10 +447,10 @@ export default function DashboardPage() {
         </section>
 
         {/* Enterprise Integration Architecture Note */}
-        <section className="bg-[#172036]/60 border border-white/5 rounded-xl p-5 text-xs text-slate-400 space-y-2">
-          <div className="flex items-center gap-2 text-slate-300 font-semibold">
-            <Info className="w-4 h-4 text-blue-400" />
-            <span>Architecture & Security Assurance</span>
+        <section className="bg-white border border-[#e3ded5] rounded-xl p-5 text-xs text-[#5a6376] space-y-2 shadow-xs">
+          <div className="flex items-center gap-2 text-[#1f2946] font-bold">
+            <Info className="w-4 h-4 text-blue-600" />
+            <span>Architecture &amp; Security Assurance</span>
           </div>
           <p className="leading-relaxed">
             The TechM4India Central Dashboard enforces strict role-based access control.
@@ -468,50 +465,50 @@ export default function DashboardPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
         >
-          <div className="bg-[#1c2438] border border-white/15 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-5">
+          <div className="bg-white border border-[#e3ded5] rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative space-y-5">
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[#fff1f2] border border-[#fecdd3] text-[#c62d37] flex items-center justify-center shrink-0">
                   <ExternalLink className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Launch {selectedApp.name}</h3>
-                  <p className="text-xs text-slate-400">Application Code: {selectedApp.code}</p>
+                  <h3 className="text-lg font-bold text-[#1f2946]">Launch {selectedApp.name}</h3>
+                  <p className="text-xs text-[#5a6376]">Application Code: {selectedApp.code}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedApp(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+                className="text-[#5a6376] hover:text-[#1f2946] p-1 rounded-lg transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Destination URL */}
-            <div className="p-3 rounded-lg bg-[#12192d] border border-slate-700/80">
-              <span className="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+            <div className="p-3 rounded-lg bg-[#fcfbf9] border border-[#e3ded5]">
+              <span className="block text-[10px] font-bold text-[#5a6376] uppercase tracking-wider mb-1">
                 Verified Destination Endpoint
               </span>
-              <span className="font-mono text-xs text-emerald-400 break-all select-all">
+              <span className="font-mono text-xs text-[#15803d] font-semibold break-all select-all">
                 {selectedApp.baseUrl}
               </span>
             </div>
 
             {/* SSO Integration Status Banner */}
-            <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
-              <div className="flex items-center gap-2 font-bold text-amber-300">
+            <div className="p-3.5 rounded-lg bg-[#fffbeb] border border-[#fde68a] text-[#92400e] text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-[#b45309]">
                 <Shield className="w-4 h-4" />
                 <span>SSO Protocol: Integration Pending</span>
               </div>
-              <p className="text-[11px] leading-relaxed text-amber-200/90">
+              <p className="text-[11px] leading-relaxed">
                 Cross-application Single Sign-On (SSO) callback handlers in HRMS and Finance ERP are
                 prepared for <strong>Phase 4 (OpenID Connect with PKCE)</strong>.
               </p>
-              <p className="text-[11px] leading-relaxed text-amber-200/90">
+              <p className="text-[11px] leading-relaxed">
                 In adherence to strict enterprise security standards, <strong>no session tokens or passwords
                 are transmitted in URL query parameters</strong>. You may proceed directly to the
                 application destination below.
@@ -519,11 +516,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 pt-2 border-t border-[#e3ded5]">
               <button
                 type="button"
                 onClick={() => setSelectedApp(null)}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-white border border-[#d1cbbf] text-[#5a6376] hover:bg-[#f1efe9] text-xs font-semibold transition-colors cursor-pointer"
               >
                 Close
               </button>
@@ -532,7 +529,7 @@ export default function DashboardPage() {
                 target={selectedApp.code.includes("HRMS") ? "_self" : "_blank"}
                 rel="noopener noreferrer"
                 onClick={() => setSelectedApp(null)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#d73531] hover:bg-[#b82a27] text-white text-xs font-bold transition-all shadow-lg"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs"
               >
                 <span>{selectedApp.code.includes("HRMS") ? "Open HRMS Application" : "Proceed to Application"}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -543,15 +540,15 @@ export default function DashboardPage() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#172036] py-5 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
+      <footer className="border-t border-[#e3ded5] bg-white py-5 px-4 sm:px-6 lg:px-8 text-center text-xs text-[#5a6376]">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <span>&copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd.</span>
           <span>•</span>
-          <Link href="/" className="text-slate-400 hover:text-slate-200 underline">
+          <Link href="/" className="text-[#5a6376] hover:text-[#1f2946] underline">
             Public Website
           </Link>
           <span>•</span>
-          <span className="text-slate-400">Central Auth & RBAC Active</span>
+          <span className="text-[#5a6376]">Central Auth &amp; RBAC Active</span>
         </div>
       </footer>
     </main>

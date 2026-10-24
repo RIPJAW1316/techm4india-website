@@ -111,93 +111,93 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#12192d] text-slate-100 flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background motif */}
+    <main className="min-h-[calc(100vh-120px)] bg-[#f7f6f2] text-[#20283b] flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Subtle blueprint paper watermark grid */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none opacity-40"
         style={{
           backgroundImage:
-            "radial-gradient(#d73531 1px, transparent 1px), radial-gradient(#252e4a 1px, #12192d 1px)",
-          backgroundSize: "40px 40px",
-          backgroundPosition: "0 0, 20px 20px",
+            "radial-gradient(rgba(198, 45, 55, 0.12) 1px, transparent 1px), radial-gradient(rgba(31, 41, 70, 0.08) 1px, #f7f6f2 1px)",
+          backgroundSize: "36px 36px",
+          backgroundPosition: "0 0, 18px 18px",
         }}
         aria-hidden="true"
       />
 
-      {/* Decorative accent glow */}
+      {/* Gentle ambient warmth glows matching website editorial feel */}
       <div
-        className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-red-600/10 blur-3xl pointer-events-none"
+        className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-[#c62d37]/5 blur-3xl pointer-events-none"
         aria-hidden="true"
       />
       <div
-        className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-indigo-600/10 blur-3xl pointer-events-none"
+        className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-[#1f2946]/5 blur-3xl pointer-events-none"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+      <div className="relative z-10 max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 items-center my-auto">
         {/* Left Column: Platform Branding & Architecture Overview */}
         <div className="lg:col-span-6 flex flex-col justify-center space-y-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-3 group text-white decoration-none"
+            className="inline-flex items-center gap-3.5 group text-[#1f2946] decoration-none"
           >
             <img
               src="/images/brand/logo.png"
               alt="TechM4India Logo"
               width="52"
               height="52"
-              className="transition-transform group-hover:scale-105"
+              className="transition-transform group-hover:scale-105 rounded-md"
             />
             <div>
-              <div className="text-2xl font-black tracking-wider uppercase">
-                TECHM4<span className="text-[#d73531]">INDIA</span>
+              <div className="text-2xl font-black tracking-wider uppercase text-[#1f2946]">
+                TECHM4<span className="text-[#c62d37]">INDIA</span>
               </div>
-              <p className="text-xs text-slate-400 font-medium tracking-widest uppercase">
+              <p className="text-xs text-[#5a6376] font-bold tracking-widest uppercase">
                 Central Enterprise Platform
               </p>
             </div>
           </Link>
 
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#fff1f2] text-[#c62d37] border border-[#fecdd3]">
               <Shield className="w-3.5 h-3.5" />
-              Single Central Identity & RBAC
+              Single Central Identity &amp; RBAC
             </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1f2946] tracking-tight leading-tight">
               One identity for all enterprise operations.
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-lg">
+            <p className="text-sm sm:text-base text-[#5a6376] leading-relaxed max-w-lg">
               Sign in with your centralized TechM4India credentials to access HRMS, Finance ERP,
               and cross-functional management systems securely.
             </p>
           </div>
 
           {/* Key Security Pillars */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <div className="p-3.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-xs font-semibold text-white">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                Argon2id & JWT Auth
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            <div className="p-4 rounded-xl bg-white border border-[#e3ded5] shadow-xs hover:border-[#cbd5e1] transition-colors">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#1f2946]">
+                <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
+                Argon2id &amp; JWT Auth
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#5a6376] mt-1.5 leading-normal">
                 Zero plaintext storage with rotating session tokens.
               </p>
             </div>
-            <div className="p-3.5 rounded-lg bg-white/5 border border-white/10 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-xs font-semibold text-white">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div className="p-4 rounded-xl bg-white border border-[#e3ded5] shadow-xs hover:border-[#cbd5e1] transition-colors">
+              <div className="flex items-center gap-2 text-xs font-bold text-[#1f2946]">
+                <CheckCircle2 className="w-4 h-4 text-[#15803d]" />
                 Dynamic RBAC Gates
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#5a6376] mt-1.5 leading-normal">
                 Authorized applications revealed dynamically per role.
               </p>
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 flex items-center gap-2 pt-2">
+          <div className="text-xs text-[#5a6376] flex items-center gap-2 pt-1">
             <span>TechM4India Innovations Pvt. Ltd.</span>
             <span>•</span>
-            <Link href="/" className="text-slate-300 hover:text-white underline">
+            <Link href="/" className="text-[#1f2946] font-semibold hover:text-[#c62d37] underline transition-colors">
               Return to Website
             </Link>
           </div>
@@ -205,10 +205,10 @@ export default function LoginPage() {
 
         {/* Right Column: Login Card & Demo Selector */}
         <div className="lg:col-span-6 w-full max-w-md mx-auto lg:max-w-none">
-          <div className="bg-[#1c2438] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+          <div className="bg-white border border-[#e3ded5] rounded-2xl p-6 sm:p-8 shadow-xl shadow-slate-900/5">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white tracking-tight">Enterprise Sign In</h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <h2 className="text-2xl font-bold text-[#1f2946] tracking-tight">Enterprise Sign In</h2>
+              <p className="text-xs text-[#5a6376] mt-1">
                 Authenticate with your TechM4India corporate credentials.
               </p>
             </div>
@@ -217,10 +217,10 @@ export default function LoginPage() {
             {errorMessage && (
               <div
                 role="alert"
-                className="mb-5 p-3.5 rounded-lg bg-red-950/80 border border-red-500/50 text-red-200 text-xs flex items-start gap-2.5 animate-fadeIn"
+                className="mb-5 p-3.5 rounded-lg bg-[#fef2f2] border border-[#fecdd3] text-[#be123c] text-xs flex items-start gap-2.5 animate-fadeIn"
               >
-                <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{errorMessage}</span>
+                <AlertCircle className="w-4 h-4 text-[#be123c] shrink-0 mt-0.5" />
+                <span className="leading-relaxed font-medium">{errorMessage}</span>
               </div>
             )}
 
@@ -228,10 +228,10 @@ export default function LoginPage() {
             {successMessage && (
               <div
                 role="status"
-                className="mb-5 p-3.5 rounded-lg bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs flex items-start gap-2.5"
+                className="mb-5 p-3.5 rounded-lg bg-[#ecfdf5] border border-[#a7f3d0] text-[#047857] text-xs flex items-start gap-2.5"
               >
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{successMessage}</span>
+                <CheckCircle2 className="w-4 h-4 text-[#15803d] shrink-0 mt-0.5" />
+                <span className="leading-relaxed font-medium">{successMessage}</span>
               </div>
             )}
 
@@ -239,12 +239,12 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="email-input"
-                  className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5"
+                  className="block text-xs font-bold text-[#1f2946] uppercase tracking-wider mb-1.5"
                 >
                   Work Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#5a6376]">
                     <Mail className="w-4 h-4" />
                   </div>
                   <input
@@ -256,7 +256,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isSubmitting}
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#12192d] border border-slate-700 rounded-lg text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#d73531] focus:border-transparent transition-all disabled:opacity-60"
+                    className="w-full pl-10 pr-4 py-2.5 bg-[#fcfbf9] border border-[#d1cbbf] rounded-lg text-[#1f2946] placeholder-[#8a92a3] text-sm focus:outline-none focus:ring-2 focus:ring-[#c62d37]/20 focus:border-[#c62d37] transition-all disabled:opacity-60"
                   />
                 </div>
               </div>
@@ -265,13 +265,13 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between mb-1.5">
                   <label
                     htmlFor="password-input"
-                    className="block text-xs font-semibold text-slate-300 uppercase tracking-wider"
+                    className="block text-xs font-bold text-[#1f2946] uppercase tracking-wider"
                   >
                     Password
                   </label>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#5a6376]">
                     <Lock className="w-4 h-4" />
                   </div>
                   <input
@@ -283,28 +283,28 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isSubmitting}
-                    className="w-full pl-10 pr-11 py-2.5 bg-[#12192d] border border-slate-700 rounded-lg text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#d73531] focus:border-transparent transition-all disabled:opacity-60"
+                    className="w-full pl-10 pr-11 py-2.5 bg-[#fcfbf9] border border-[#d1cbbf] rounded-lg text-[#1f2946] placeholder-[#8a92a3] text-sm focus:outline-none focus:ring-2 focus:ring-[#c62d37]/20 focus:border-[#c62d37] transition-all disabled:opacity-60"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#5a6376] hover:text-[#1f2946] transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+              <div className="text-[11px] text-[#5a6376] flex items-center gap-1.5 pt-0.5">
+                <Info className="w-3.5 h-3.5 shrink-0 text-[#5a6376]" />
                 <span>Sessions are scoped securely to your browser window.</span>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-2 py-3 px-4 rounded-lg bg-[#d73531] hover:bg-[#b82a27] text-white font-bold text-sm tracking-wide uppercase shadow-lg shadow-red-900/40 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+                className="w-full mt-2 py-3 px-4 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white font-bold text-sm tracking-wide uppercase shadow-md shadow-red-900/15 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>
@@ -321,9 +321,9 @@ export default function LoginPage() {
             </form>
 
             {/* Quick Demo Credentials Assistant */}
-            <div className="mt-6 pt-5 border-t border-slate-700/60">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 mb-2.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <div className="mt-6 pt-5 border-t border-[#e3ded5]">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1f2946] mb-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#d97706]" />
                 <span>Test Role Fast-Fill (Development Environment)</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -332,12 +332,12 @@ export default function LoginPage() {
                     key={acc.email}
                     type="button"
                     onClick={() => handleSelectDemoAccount(acc)}
-                    className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-left transition-all group"
+                    className="p-2.5 rounded-lg bg-[#fcfbf9] hover:bg-white border border-[#e3ded5] hover:border-[#c62d37] text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
                   >
-                    <div className="text-xs font-bold text-white group-hover:text-red-400">
+                    <div className="text-xs font-bold text-[#1f2946] group-hover:text-[#c62d37] transition-colors">
                       {acc.label}
                     </div>
-                    <div className="text-[10px] text-slate-400 truncate">{acc.role}</div>
+                    <div className="text-[10px] text-[#5a6376] truncate">{acc.role}</div>
                   </button>
                 ))}
               </div>
@@ -346,7 +346,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <footer className="relative z-10 text-center text-xs text-slate-500 pt-6">
+      <footer className="relative z-10 text-center text-xs text-[#5a6376] pt-8">
         &copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd. Enterprise Identity Infrastructure.
       </footer>
     </main>

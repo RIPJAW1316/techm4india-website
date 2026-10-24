@@ -1,8 +1,16 @@
 import { Module } from '@nestjs/common';
+import { FinanceController } from './finance.controller';
+import { FinanceService } from './finance.service';
+import { DatabaseModule } from '../../database/database.module';
 
 /**
- * FinanceModule — Finance & Accounting ERP Business Module
- * Scope: Phase 2+ (General ledger, invoicing, GST, expense management)
+ * FinanceModule — Complete Finance, Accounting, GST & Compliance Engine
+ * Covers Section 09 of TechM4India ERP Specification V2.0
  */
-@Module({})
+@Module({
+  imports: [DatabaseModule],
+  controllers: [FinanceController],
+  providers: [FinanceService],
+  exports: [FinanceService],
+})
 export class FinanceModule {}

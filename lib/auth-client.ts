@@ -53,7 +53,10 @@ export function getApiBaseUrl(): string {
   if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
   }
-  return "http://localhost:4000";
+  if (typeof process !== "undefined" && process.env?.VITE_API_BASE_URL) {
+    return process.env.VITE_API_BASE_URL.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "");
+  }
+  return "https://techm4india-erp-api-l1gv.onrender.com";
 }
 
 /**

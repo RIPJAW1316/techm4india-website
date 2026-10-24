@@ -25,6 +25,7 @@ model Organization {
   branches    Branch[]
   employees   Employee[]
   holidays    Holiday[]
+  accounts    Account[]
 
   @@map("organizations")
 }
@@ -201,10 +202,12 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-// =============================================================
+// ======================================================}
+
 // TECHM4INDIA HRMS DOMAIN MODELS (PHASE 4)
 // Functional parity with Hr.my with Indian enterprise compliance
-// =============================================================
+// ======================================================}
+
 
 model Department {
   id             String        @id @default(uuid())
@@ -676,4 +679,321 @@ model Holiday {
 
   @@unique([organizationId, date, branchId])
   @@map("hrms_holidays")
+}
+
+// -------------------------------------------------------------
+// FINANCE & ACCOUNTING ERP MODULE (Section 09 Specification)
+// -------------------------------------------------------------
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  INCOME
+  EXPENSE
+}
+
+enum DivisionCode {
+  TECHM4_SCHOOLS
+  TECHM4_ENGINEERING
+  TECHM4_SOLUTIONS
+  TECHM4_SPACE
+  HORIZON_INSTITUTES
+  GENERAL_OVERHEAD
+}
+
+enum VoucherType {
+  JOURNAL
+  PAYMENT
+  RECEIPT
+  CONTRA
+  SALES_INVOICE
+  PURCHASE_BILL
+}
+
+enum JournalStatus {
+  DRAFT
+  POSTED
+  REVERSED
+}
+
+enum InvoiceType {
+  B2B
+  B2C
+  B2G
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentType {
+  INWARD
+  OUTWARD
+}
+
+enum PaymentMethod {
+  UPI
+  NETBANKING
+  DEBIT_CREDIT_CARD
+  NEFT_RTGS
+  CHEQUE
+  CASH
+}
+
+enum ExpenseStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum TdsSection {
+  SEC_194C
+  SEC_194J_TECH
+  SEC_194J_PROF
+  SEC_194H
+  NONE
+}
+
+model Account {
+  id              String            @id @default(uuid())
+  organizationId  String?
+  code            String            @unique
+  name            String
+  type            AccountType
+  category        String
+  subCategory     String?
+  currency        String            @default("INR")
+  balance         Decimal           @default(0.0) @db.Decimal(15, 2)
+  isActive        Boolean           @default(true)
+  description     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  journalLines    JournalLineItem[]
+  organization    Organization?     @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([category])
+  @@map("accounts")
+}
+
+model JournalEntry {
+  id            String            @id @default(uuid())
+  entryNumber   String            @unique
+  date          DateTime
+  voucherType   VoucherType       @default(JOURNAL)
+  reference     String?
+  narration     String
+  status        JournalStatus     @default(DRAFT)
+  division      DivisionCode      @default(GENERAL_OVERHEAD)
+  totalDebit    Decimal           @default(0.0) @db.Decimal(15, 2)
+  totalCredit   Decimal           @default(0.0) @db.Decimal(15, 2)
+  isReversed    Boolean           @default(false)
+  reversedById  String?
+  createdById   String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  lineItems     JournalLineItem[]
+  invoice       Invoice?          @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  invoiceId     String?           @unique
+  expense       Expense?          @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+  expenseId     String?           @unique
+
+  @@index([entryNumber])
+  @@index([date])
+  @@index([status])
+  @@index([division])
+  @@map("journal_entries")
+}
+
+model JournalLineItem {
+  id              String        @id @default(uuid())
+  journalEntryId  String
+  accountId       String
+  debitAmount     Decimal       @default(0.0) @db.Decimal(15, 2)
+  creditAmount    Decimal       @default(0.0) @db.Decimal(15, 2)
+  description     String?
+  division        DivisionCode?
+
+  journalEntry    JournalEntry  @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account         Account       @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([journalEntryId])
+  @@index([accountId])
+  @@map("journal_line_items")
+}
+
+model Customer {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  name            String
+  legalName       String?
+  gstin           String?
+  pan             String?
+  email           String
+  phone           String?
+  billingAddress  String?
+  shippingAddress String?
+  stateCode       String    @default("36")
+  placeOfSupply   String    @default("Telangana")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  invoices        Invoice[]
+
+  @@index([email])
+  @@index([gstin])
+  @@map("customers")
+}
+
+model Invoice {
+  id                   String        @id @default(uuid())
+  invoiceNumber        String        @unique
+  customerId           String
+  type                 InvoiceType   @default(B2B)
+  status               InvoiceStatus @default(DRAFT)
+  issueDate            DateTime
+  dueDate              DateTime
+  currency             String        @default("INR")
+  exchangeRate         Decimal       @default(1.0) @db.Decimal(10, 4)
+  subtotal             Decimal       @default(0.0) @db.Decimal(15, 2)
+  discount             Decimal       @default(0.0) @db.Decimal(15, 2)
+  taxableAmount        Decimal       @default(0.0) @db.Decimal(15, 2)
+  cgst                 Decimal       @default(0.0) @db.Decimal(15, 2)
+  sgst                 Decimal       @default(0.0) @db.Decimal(15, 2)
+  igst                 Decimal       @default(0.0) @db.Decimal(15, 2)
+  totalAmount          Decimal       @default(0.0) @db.Decimal(15, 2)
+  amountPaid           Decimal       @default(0.0) @db.Decimal(15, 2)
+  balanceDue           Decimal       @default(0.0) @db.Decimal(15, 2)
+  paymentTerms         String?
+  notes                String?
+  division             DivisionCode  @default(TECHM4_SOLUTIONS)
+  irn                  String?
+  qrCodeUrl            String?
+  razorpayPaymentLink  String?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  customer             Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items                InvoiceItem[]
+  payments             Payment[]
+  journalEntry         JournalEntry?
+
+  @@index([invoiceNumber])
+  @@index([status])
+  @@index([division])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id            String    @id @default(uuid())
+  invoiceId     String
+  description   String
+  hsnSacCode    String
+  quantity      Decimal   @default(1.0) @db.Decimal(10, 2)
+  unitPrice     Decimal   @default(0.0) @db.Decimal(15, 2)
+  discount      Decimal   @default(0.0) @db.Decimal(15, 2)
+  gstRate       Decimal   @default(18.0) @db.Decimal(5, 2)
+  taxableAmount Decimal   @default(0.0) @db.Decimal(15, 2)
+  cgstAmount    Decimal   @default(0.0) @db.Decimal(15, 2)
+  sgstAmount    Decimal   @default(0.0) @db.Decimal(15, 2)
+  igstAmount    Decimal   @default(0.0) @db.Decimal(15, 2)
+  totalAmount   Decimal   @default(0.0) @db.Decimal(15, 2)
+
+  invoice       Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_items")
+}
+
+model Vendor {
+  id               String      @id @default(uuid())
+  code             String      @unique
+  name             String
+  contactPerson    String?
+  gstin            String?
+  pan              String?
+  msmeType         String?
+  email            String?
+  phone            String?
+  bankAccount      String?
+  ifsc             String?
+  bankName         String?
+  tdsSection       TdsSection  @default(NONE)
+  paymentTermsDays Int         @default(30)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  expenses         Expense[]
+
+  @@index([code])
+  @@index([gstin])
+  @@map("vendors")
+}
+
+model Expense {
+  id             String        @id @default(uuid())
+  expenseNumber  String        @unique
+  vendorId       String?
+  category       String
+  division       DivisionCode  @default(GENERAL_OVERHEAD)
+  description    String
+  invoiceNumber  String?
+  invoiceDate    DateTime?
+  dueDate        DateTime?
+  grossAmount    Decimal       @default(0.0) @db.Decimal(15, 2)
+  tdsSection     TdsSection    @default(NONE)
+  tdsRate        Decimal       @default(0.0) @db.Decimal(5, 2)
+  tdsAmount      Decimal       @default(0.0) @db.Decimal(15, 2)
+  netPayable     Decimal       @default(0.0) @db.Decimal(15, 2)
+  status         ExpenseStatus @default(DRAFT)
+  approvalLevel  Int           @default(1)
+  approvedById   String?
+  poNumber       String?
+  documentUrl    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  vendor         Vendor?       @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  payments       Payment[]
+  journalEntry   JournalEntry?
+
+  @@index([expenseNumber])
+  @@index([status])
+  @@index([division])
+  @@map("expenses")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  paymentNumber   String        @unique
+  type            PaymentType
+  method          PaymentMethod @default(NEFT_RTGS)
+  amount          Decimal       @default(0.0) @db.Decimal(15, 2)
+  currency        String        @default("INR")
+  transactionDate DateTime      @default(now())
+  referenceNumber String?
+  status          String        @default("COMPLETED")
+  invoiceId       String?
+  expenseId       String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  invoice         Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  expense         Expense?      @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+
+  @@index([paymentNumber])
+  @@index([transactionDate])
+  @@map("payments")
 }
