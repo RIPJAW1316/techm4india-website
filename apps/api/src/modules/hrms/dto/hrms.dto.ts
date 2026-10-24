@@ -450,3 +450,43 @@ export class AddDiscussionReplyDto {
   @IsString()
   content: string;
 }
+
+
+export class SettleClaimDto {
+  @ApiProperty({ example: 'BATCH-2026-10-01', description: 'Finance payment disbursement batch reference' })
+  @IsString()
+  batchReference: string;
+
+  @ApiPropertyOptional({ example: '2026-10-31', description: 'Actual settlement execution date' })
+  @IsOptional()
+  @IsDateString()
+  settlementDate?: string;
+
+  @ApiPropertyOptional({ example: 'Disbursed via HDFC Corporate NetBanking NEFT' })
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
+export class GeneratePresignedUploadDto {
+  @ApiProperty({ example: 'employee_handbook_signed.pdf' })
+  @IsString()
+  fileName: string;
+
+  @ApiProperty({ example: 'application/pdf' })
+  @IsString()
+  mimeType: string;
+
+  @ApiProperty({ example: 1048576, description: 'File size in bytes' })
+  @IsNumber()
+  fileSize: number;
+
+  @ApiProperty({ enum: ['RESUME', 'ID_PROOF', 'CONTRACT', 'CERTIFICATE', 'TAX_FORM', 'POLICY', 'RECEIPT'] })
+  @IsString()
+  documentType: string;
+
+  @ApiPropertyOptional({ description: 'Optional target employee ID if uploaded by HR manager' })
+  @IsOptional()
+  @IsString()
+  employeeId?: string;
+}

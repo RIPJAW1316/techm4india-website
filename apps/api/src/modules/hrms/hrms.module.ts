@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { HrmsController } from './hrms.controller';
 import { HrmsService } from './hrms.service';
+import { FinanceIntegrationService } from './finance-integration.service';
+import { DocumentStorageService } from './document-storage.service';
 
 /**
  * HrmsModule — TechM4India HRMS Business Domain
@@ -10,11 +12,13 @@ import { HrmsService } from './hrms.service';
  * - Time Clock & Attendance Timesheets
  * - Indian Statutory Payroll & Payslips
  * - e-Claim Expense Reimbursements
+ * - Finance ERP Integration (Idempotent Settlement & Payroll Accruals)
+ * - Secure Presigned Object Storage Service
  * - Workplace Incidents, Announcements, Discussions & Documents
  */
 @Module({
   controllers: [HrmsController],
-  providers: [HrmsService],
-  exports: [HrmsService],
+  providers: [HrmsService, FinanceIntegrationService, DocumentStorageService],
+  exports: [HrmsService, FinanceIntegrationService, DocumentStorageService],
 })
 export class HrmsModule {}

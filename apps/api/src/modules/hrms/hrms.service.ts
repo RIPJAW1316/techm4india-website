@@ -746,7 +746,11 @@ export class HrmsService {
     const pfEmployer = pfEmployee;
 
     // 2. Professional Tax (PT): ₹200/mo (standard in Telangana & Karnataka)
-    const pt = dto.professionalTax !== undefined ? dto.professionalTax : 200;
+    // Professional Tax (PT) calculation with state-specific & month differential:
+    // Telangana (TechM4India Hyderabad HQ) / Karnataka: standard ₹200/mo, ₹300 in February for Telangana
+    const currentMonth = new Date().getMonth() + 1;
+    const defaultPt = currentMonth === 2 ? 300 : 200;
+    const pt = dto.professionalTax !== undefined ? dto.professionalTax : defaultPt;
 
     // 3. ESI: Applicable if gross <= ₹21,000/mo. Rate: 0.75% employee, 3.25% employer
     let esiEmployee = dto.esiEmployee || 0;
@@ -833,7 +837,7 @@ export class HrmsService {
         ss.specialAllowance + ss.conveyanceAllowance + ss.medicalAllowance;
       const gross = ss.basicSalary + ss.hra + allowancesTotal;
       const deductions =
-        ss.providentFundEmployee + ss.professionalTax + ss.esiEmployee + ss.tdsEstimate;
+        ss.providentFundEmployee + (dto.month === 2 ? (ss.professionalTax === 200 ? 300 : ss.professionalTax) : ss.professionalTax) + ss.esiEmployee + ss.tdsEstimate;
       const netPay = gross - deductions;
 
       totalGross += gross;
@@ -864,7 +868,7 @@ export class HrmsService {
           allowancesTotal,
           grossEarnings: gross,
           pfDeduction: ss.providentFundEmployee,
-          ptDeduction: ss.professionalTax,
+          ptDeduction: dto.month === 2 ? (ss.professionalTax === 200 ? 300 : ss.professionalTax) : ss.professionalTax,
           esiDeduction: ss.esiEmployee,
           taxDeduction: ss.tdsEstimate,
           totalDeductions: deductions,

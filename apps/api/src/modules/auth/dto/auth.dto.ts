@@ -1,4 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 import {
   IsEmail,
   IsNotEmpty,
@@ -80,4 +81,70 @@ export class UserProfileResponseDto {
 
   @ApiProperty({ example: ['CENTRAL_DASHBOARD', 'HRMS', 'FINANCE'] })
   authorizedApplications: string[];
+}
+
+
+export class OidcAuthorizeQueryDto {
+  @ApiProperty({ example: 'hrms-app-client' })
+  @IsString()
+  @IsNotEmpty()
+  client_id: string;
+
+  @ApiProperty({ example: 'https://techm4india.com/hrms/auth/callback' })
+  @IsString()
+  @IsNotEmpty()
+  redirect_uri: string;
+
+  @ApiProperty({ example: 'code' })
+  @IsString()
+  @IsNotEmpty()
+  response_type: string;
+
+  @ApiPropertyOptional({ example: 'openid profile email' })
+  @IsString()
+  scope?: string;
+
+  @ApiPropertyOptional({ example: 'xyzStateRandom123' })
+  @IsString()
+  state?: string;
+
+  @ApiPropertyOptional({ example: 'nonce-string-random' })
+  @IsString()
+  nonce?: string;
+
+  @ApiProperty({ example: 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM' })
+  @IsString()
+  @IsNotEmpty()
+  code_challenge: string;
+
+  @ApiPropertyOptional({ example: 'S256', default: 'S256' })
+  @IsString()
+  code_challenge_method?: string = 'S256';
+}
+
+export class OidcTokenExchangeDto {
+  @ApiProperty({ example: 'authorization_code' })
+  @IsString()
+  @IsNotEmpty()
+  grant_type: string;
+
+  @ApiProperty({ example: 'auth_code_hex_value' })
+  @IsString()
+  @IsNotEmpty()
+  code: string;
+
+  @ApiProperty({ example: 'https://techm4india.com/hrms/auth/callback' })
+  @IsString()
+  @IsNotEmpty()
+  redirect_uri: string;
+
+  @ApiProperty({ example: 'hrms-app-client' })
+  @IsString()
+  @IsNotEmpty()
+  client_id: string;
+
+  @ApiProperty({ example: 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk' })
+  @IsString()
+  @IsNotEmpty()
+  code_verifier: string;
 }

@@ -49,6 +49,7 @@ model User {
 
   organization    Organization?           @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   userRoles       UserRole[]
+  oidcCodes       OidcAuthorizationCode[]
   appAccess       UserApplicationAccess[]
   auditLogs       AuditLog[]
   refreshTokens   RefreshToken[]
@@ -458,6 +459,8 @@ model ExpenseClaim {
   reviewedById      String?
   reviewedAt        DateTime?
   reimbursementDate DateTime?
+  settledById       String?
+  settlementBatchRef String?
   notes             String?
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
@@ -996,4 +999,52 @@ model Payment {
   @@index([paymentNumber])
   @@index([transactionDate])
   @@map("payments")
+}
+
+// -------------------------------------------------------------
+// OIDC PKCE SSO Provider Models
+// -------------------------------------------------------------
+model OidcClient {
+  id                      String   @id @default(uuid())
+  clientId                String   @unique
+  clientSecretHash        String?
+  clientName              String
+  redirectUris            String[]
+  allowedGrantTypes       String[] @default(["authorization_code", "refresh_token"])
+  allowedResponseTypes    String[] @default(["code"])
+  allowedScopes           String[] @default(["openid", "profile", "email"])
+  requirePkce             Boolean  @default(true)
+  requireClientSecret     Boolean  @default(false)
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  codes                   OidcAuthorizationCode[]
+
+  @@map("oidc_clients")
+}
+
+model OidcAuthorizationCode {
+  id                  String      @id @default(uuid())
+  codeHash            String      @unique
+  clientId            String
+  userId              String
+  redirectUri         String
+  codeChallenge       String
+  codeChallengeMethod String      @default("S256")
+  nonce               String?
+  state               String?
+  scope               String      @default("openid profile email")
+  isUsed              Boolean     @default(false)
+  expiresAt           DateTime
+  usedAt              DateTime?
+  createdAt           DateTime    @default(now())
+
+  client              OidcClient  @relation(fields: [clientId], references: [clientId], onDelete: Cascade)
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([codeHash])
+  @@index([clientId])
+  @@index([userId])
+  @@map("oidc_authorization_codes")
 }

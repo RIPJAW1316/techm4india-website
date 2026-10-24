@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -16,12 +17,15 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { OidcService } from './oidc.service';
 import {
   AuthTokensResponseDto,
   ChangePasswordDto,
   LoginDto,
   RefreshTokenDto,
   UserProfileResponseDto,
+  OidcAuthorizeQueryDto,
+  OidcTokenExchangeDto,
 } from './dto/auth.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -30,7 +34,10 @@ import { Public } from '../../common/decorators/public.decorator';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly oidcService: OidcService,
+  ) {}
 
   @Public()
   @Post('login')
@@ -144,5 +151,42 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
     return this.authService.changePassword(userId, changePasswordDto);
+  }
+
+  // ===========================================================================
+  // OpenID Connect (OIDC) with PKCE S256 SSO Endpoints
+  // ===========================================================================
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @Get('oidc/authorize')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'OIDC Authorize (Generate Authorization Code with PKCE Challenge)',
+    description: 'Validates registered client_id, exact redirect_uri, and user application access. Returns single-use authorization code (60s TTL).',
+  })
+  async oidcAuthorize(
+    @CurrentUser('userId') userId: string,
+    @Query() query: OidcAuthorizeQueryDto,
+  ) {
+    return this.oidcService.authorize(userId, query);
+  }
+
+  @Public()
+  @Post('oidc/token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'OIDC Token Exchange (PKCE S256 Verification)',
+    description: 'Exchanges single-use authorization code and code_verifier for application-scoped access_token and OIDC id_token.',
+  })
+  async oidcToken(@Body() dto: OidcTokenExchangeDto) {
+    return this.oidcService.exchangeCodeForToken(dto);
+  }
+
+  @Public()
+  @Get('oidc/.well-known/openid-configuration')
+  @ApiOperation({ summary: 'OIDC Discovery Document' })
+  getOpenIdConfiguration() {
+    return this.oidcService.getOpenIdConfiguration();
   }
 }

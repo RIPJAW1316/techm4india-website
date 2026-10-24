@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { HrmsService } from './hrms.service';
+import { FinanceIntegrationService } from './finance-integration.service';
 import {
   AddDiscussionReplyDto,
   ApplyLeaveDto,
@@ -35,6 +36,8 @@ import {
   SalaryStructureDto,
   SubmitExpenseClaimDto,
   UpdateEmployeeDto,
+  SettleClaimDto,
+  GeneratePresignedUploadDto,
 } from './dto/hrms.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
@@ -46,7 +49,10 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('hrms')
 export class HrmsController {
-  constructor(private readonly hrmsService: HrmsService) {}
+  constructor(
+    private readonly hrmsService: HrmsService,
+    private readonly financeIntegrationService: FinanceIntegrationService,
+  ) {}
 
   // ---------------------------------------------------------------------------
   // Dashboard & Overview
@@ -483,5 +489,57 @@ export class HrmsController {
   @ApiOperation({ summary: 'Headcount Distribution Report' })
   async getHeadcountReport() {
     return this.hrmsService.getHeadcountReport();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Finance ERP Integration Endpoints
+  // ---------------------------------------------------------------------------
+  @Get('finance-integration/approved-claims')
+  @Permissions('finance:access')
+  @ApiOperation({ summary: 'List Approved Claims Ready for Finance Settlement' })
+  async getApprovedClaimsForFinance(@Query('employeeId') employeeId?: string) {
+    return this.financeIntegrationService.getApprovedClaimsForFinance({ employeeId });
+  }
+
+  @Patch('finance-integration/claims/:id/settle')
+  @Permissions('finance:manage')
+  @ApiOperation({ summary: 'Idempotently Settle Expense Claim (Finance Disbursement)' })
+  async settleExpenseClaim(
+    @Param('id') id: string,
+    @CurrentUser('userId') userId: string,
+    @Body() dto: SettleClaimDto,
+  ) {
+    return this.financeIntegrationService.settleExpenseClaim(id, userId, dto);
+  }
+
+  @Get('finance-integration/payroll-periods/:id/summary')
+  @Permissions('finance:access')
+  @ApiOperation({ summary: 'Get Finalized Payroll Period Summary for Ledger Accrual' })
+  async getFinalizedPayrollSummary(@Param('id') id: string) {
+    return this.financeIntegrationService.getFinalizedPayrollSummary(id);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Secure Private Document Storage
+  // ---------------------------------------------------------------------------
+  @Post('documents/presigned-upload')
+  @Permissions('hrms:access')
+  @ApiOperation({ summary: 'Request Short-Lived Presigned Upload URL' })
+  async requestPresignedUpload(
+    @CurrentUser('userId') userId: string,
+    @CurrentUser('organizationId') orgId: string,
+    @Body() dto: GeneratePresignedUploadDto,
+  ) {
+    return this.financeIntegrationService.requestPresignedDocumentUpload(userId, orgId, dto);
+  }
+
+  @Get('documents/presigned-download')
+  @Permissions('hrms:access')
+  @ApiOperation({ summary: 'Request Short-Lived Presigned Download URL' })
+  async requestPresignedDownload(
+    @Query('storageKey') storageKey: string,
+    @CurrentUser('organizationId') orgId: string,
+  ) {
+    return this.financeIntegrationService.requestPresignedDocumentDownload(storageKey, orgId);
   }
 }
