@@ -25,6 +25,13 @@ export default defineConfig(async () => {
       watch: isCodexSeatbeltSandbox
         ? { useFsEvents: false, usePolling: true }
         : undefined,
+      proxy: {
+        "/api": {
+          target: "https://techm4india-erp-api-l1gv.onrender.com",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     plugins: [
       vinext(),
