@@ -54,6 +54,36 @@ const SESSION_DEMO_PERSONA_KEY = "tm4i_active_demo_persona";
  * same-origin Vite dev proxy or Vercel rewrites without CORS preflight failures.
  * In SSR / Node tests, returns the full absolute HTTP URL.
  */
+
+/**
+ * Resolves application URL based on runtime environment:
+ * - Local development: dedicated ports (:3000 main, :3001 hrms, :3002 finance)
+ * - Production: dedicated subdomains (techm4india.com, hrms.techm4india.com, finance.techm4india.com)
+ */
+export function getApplicationUrl(appCode: string): string {
+  const isBrowser = typeof window !== 'undefined';
+  const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  switch (appCode.toUpperCase()) {
+    case 'FINANCE': {
+      if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FINANCE_URL) {
+        return process.env.NEXT_PUBLIC_FINANCE_URL;
+      }
+      return isLocal ? 'http://localhost:3002' : 'https://finance.techm4india.com';
+    }
+    case 'HRMS': {
+      if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_HRMS_URL) {
+        return process.env.NEXT_PUBLIC_HRMS_URL;
+      }
+      return isLocal ? '/hrms' : 'https://hrms.techm4india.com';
+    }
+    case 'CENTRAL_DASHBOARD':
+    default: {
+      return '/dashboard';
+    }
+  }
+}
+
 export function getApiBaseUrl(): string {
   if (typeof window !== "undefined" && typeof window.location !== "undefined" && window.location.origin) {
     return "";
@@ -221,7 +251,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "/erp/finance",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -275,7 +305,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "/erp/finance",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -352,7 +382,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "/erp/finance",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },

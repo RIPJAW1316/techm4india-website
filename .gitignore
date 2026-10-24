@@ -11,6 +11,8 @@
 !.yarn/versions
 /apps/api/node_modules/
 /apps/api/dist/
+/apps/finance/node_modules/
+/apps/finance/dist/
 
 # testing
 /coverage

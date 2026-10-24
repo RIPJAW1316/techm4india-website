@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { ExternalLink } from 'lucide-react';
 import { hrmsClient } from '@/lib/hrms-client';
 import './finance.css';
 import { FinanceHeader } from './components/FinanceHeader';
@@ -841,6 +842,28 @@ export default function FinancePage() {
           {toastMessage}
         </div>
       )}
+
+
+      {/* Port & Subdomain Banner */}
+      <div className="bg-[#1f2946] text-white px-6 py-2 text-xs border-b border-[#37446b]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>
+              <strong>TechM4 Finance ERP</strong> is configured as a standalone application on <strong>Port :3002</strong> (Local) &amp; Subdomain <strong>finance.techm4india.com</strong> (Production).
+            </span>
+          </div>
+          <a
+            href="http://localhost:3002"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#c62d37] hover:bg-[#a8222e] text-white font-semibold rounded-md transition shadow-xs text-[11px]"
+          >
+            <span>Launch Standalone App (:3002)</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </div>
 
       {/* Finance Header Navigation */}
       <FinanceHeader
