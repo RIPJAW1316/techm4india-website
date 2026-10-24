@@ -15,9 +15,21 @@ export default () => ({
     rateLimitLimit: parseInt(process.env.RATE_LIMIT_LIMIT, 10) || 100,
   },
   jwt: {
-    secret: process.env.JWT_SECRET,
-    expiration: process.env.JWT_EXPIRATION || '1d',
-    refreshSecret: process.env.JWT_REFRESH_SECRET,
+    secret:
+      process.env.JWT_SECRET ||
+      'default_dev_jwt_secret_must_be_overridden_in_prod_min_32_chars',
+    expiration: process.env.JWT_EXPIRATION || '15m',
+    refreshSecret:
+      process.env.JWT_REFRESH_SECRET ||
+      'default_dev_refresh_secret_must_be_overridden_in_prod_min_32_chars',
     refreshExpiration: process.env.JWT_REFRESH_EXPIRATION || '7d',
+  },
+  sso: {
+    trustedAppUrls: (
+      process.env.TRUSTED_APP_URLS ||
+      'http://localhost:3000,http://localhost:3001,http://localhost:3002,https://techm4india.com'
+    )
+      .split(',')
+      .map((u) => u.trim()),
   },
 });

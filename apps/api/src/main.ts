@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -29,7 +30,8 @@ async function bootstrap() {
     }),
   );
 
-  // 2. Body Parser Limits
+  // 2. Body Parser & Cookie Parser Limits
+  app.use(cookieParser());
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -73,6 +75,9 @@ async function bootstrap() {
     )
     .setVersion('1.0.0')
     .addTag('Health & Monitoring', 'Liveness and database readiness probes')
+    .addTag('Authentication', 'Central login, logout, token refresh, and profile management')
+    .addTag('Central Identity & User Management', 'Administrative user provisioning, role assignments, and application grants')
+    .addTag('Applications & Single Sign-On Registry', 'Application directory and user access permissions')
     .addBearerAuth(
       {
         type: 'http',

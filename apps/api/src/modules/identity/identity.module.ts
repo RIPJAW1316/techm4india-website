@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+import { AuthModule } from '../auth/auth.module';
 
-/**
- * IdentityModule — Users, Roles and Permissions
- * Scope: Phase 2 (User management, RBAC, permission evaluation across applications)
- */
-@Module({})
+@Module({
+  imports: [AuthModule],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [UsersService],
+})
 export class IdentityModule {}

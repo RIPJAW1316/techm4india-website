@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 export interface EnvironmentVariables {
-  NODE_ENV: 'development' | 'production' | 'test';
+  NODE_ENV: 'development' | 'production' | 'test' | 'staging';
   PORT: number;
   HOST: string;
   DATABASE_URL: string;
@@ -10,10 +10,11 @@ export interface EnvironmentVariables {
   CORS_ORIGIN: string;
   RATE_LIMIT_TTL: number;
   RATE_LIMIT_LIMIT: number;
-  JWT_SECRET?: string;
-  JWT_EXPIRATION?: string;
-  JWT_REFRESH_SECRET?: string;
-  JWT_REFRESH_EXPIRATION?: string;
+  JWT_SECRET: string;
+  JWT_EXPIRATION: string;
+  JWT_REFRESH_SECRET: string;
+  JWT_REFRESH_EXPIRATION: string;
+  TRUSTED_APP_URLS: string;
 }
 
 export const envValidationSchema = Joi.object<EnvironmentVariables>({
@@ -35,10 +36,17 @@ export const envValidationSchema = Joi.object<EnvironmentVariables>({
   CORS_ORIGIN: Joi.string().default('*'),
   RATE_LIMIT_TTL: Joi.number().positive().default(60000),
   RATE_LIMIT_LIMIT: Joi.number().positive().default(100),
-  JWT_SECRET: Joi.string().optional().default('placeholder_development_secret_only'),
-  JWT_EXPIRATION: Joi.string().optional().default('1d'),
-  JWT_REFRESH_SECRET: Joi.string().optional().default('placeholder_refresh_secret_only'),
-  JWT_REFRESH_EXPIRATION: Joi.string().optional().default('7d'),
+  JWT_SECRET: Joi.string()
+    .default('default_dev_jwt_secret_must_be_overridden_in_prod_min_32_chars')
+    .min(16),
+  JWT_EXPIRATION: Joi.string().default('15m'),
+  JWT_REFRESH_SECRET: Joi.string()
+    .default('default_dev_refresh_secret_must_be_overridden_in_prod_min_32_chars')
+    .min(16),
+  JWT_REFRESH_EXPIRATION: Joi.string().default('7d'),
+  TRUSTED_APP_URLS: Joi.string().default(
+    'http://localhost:3000,http://localhost:3001,http://localhost:3002,https://techm4india.com',
+  ),
 });
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {

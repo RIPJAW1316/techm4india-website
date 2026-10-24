@@ -46,10 +46,34 @@ model User {
   userRoles       UserRole[]
   appAccess       UserApplicationAccess[]
   auditLogs       AuditLog[]
+  refreshTokens   RefreshToken[]
 
   @@index([email])
   @@index([organizationId])
   @@map("users")
+}
+
+// -------------------------------------------------------------
+// Authentication Sessions & Refresh Tokens
+// -------------------------------------------------------------
+model RefreshToken {
+  id          String    @id @default(uuid())
+  userId      String
+  tokenHash   String    @unique
+  family      String    // Token family for rotation & reuse attack detection
+  isRevoked   Boolean   @default(false)
+  expiresAt   DateTime
+  userAgent   String?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([family])
+  @@index([tokenHash])
+  @@map("refresh_tokens")
 }
 
 // -------------------------------------------------------------

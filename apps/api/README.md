@@ -1,58 +1,63 @@
-# TechM4India ERP — Central Backend Foundation (Phase 1)
+# TechM4India ERP — Central Backend (Phases 1 & 2)
 
-This package (`apps/api`) implements the centralized backend foundation for **TechM4India Innovations Pvt. Ltd.** The platform serves as the central identity, role, and permission infrastructure for both **HRMS** and **Finance ERP** applications, as well as future modules.
+This package (`apps/api`) implements the centralized backend foundation, authentication, identity, and Role-Based Access Control (RBAC) infrastructure for **TechM4India Innovations Pvt. Ltd.** It provides a shared identity backbone for both **HRMS** and **Finance ERP** applications.
 
 ---
 
 ## 1. Architecture Overview
 
 - **Framework**: NestJS 11 with TypeScript
-- **Database**: PostgreSQL
-- **ORM**: Prisma 6
+- **Database**: PostgreSQL (Prisma 6 ORM)
+- **Authentication**: Argon2id password hashing, short-lived JWT access tokens (`15m`), rotating refresh tokens (`7d`) with family-based reuse attack detection
+- **Authorization**: Granular RBAC (`@Roles`, `@Permissions`, `RolesGuard`, `PermissionsGuard`) with explicit HRMS and Finance access isolation
 - **API Style**: REST API with global versioning under `/api/v1`
 - **Documentation**: Swagger / OpenAPI at `/api/v1/docs`
-- **Validation**: `class-validator`, `class-transformer`, and `joi` environment validation
-- **Security**: Helmet, restrictive CORS, rate limiting via `@nestjs/throttler`, correlation IDs via `uuid`, sensitive parameter redaction
-- **Deployment**: Render Web Service & Managed PostgreSQL
+- **SSO Architecture**: OIDC-compatible Authorization Code Flow with PKCE specification ([`docs/SSO_INTEGRATION_GUIDE.md`](./docs/SSO_INTEGRATION_GUIDE.md))
+- **Deployment**: Render Web Service & Shared Managed PostgreSQL
 
 ```
 apps/api/
 ├── prisma/
-│   ├── schema.prisma              # Central identity & multi-app RBAC schema
-│   ├── seed.ts                    # Idempotent development seed script
+│   ├── schema.prisma              # Central identity, RBAC, sessions & multi-app schema
+│   ├── seed.ts                    # Idempotent development seed script (Argon2id hashes)
 │   └── migrations/
-│       └── 0_init/
-│           └── migration.sql      # Initial PostgreSQL migration DDL
+│       ├── 0_init/                # Baseline database migration DDL
+│       └── 20261023_phase2_auth_sessions/ # Refresh tokens & sessions DDL
 ├── src/
-│   ├── main.ts                    # Bootstrap: helmet, cors, validation, swagger, interceptors
+│   ├── main.ts                    # Bootstrap: Helmet, CookieParser, Validation, Swagger
 │   ├── app.module.ts              # Root NestJS module & middleware binding
 │   ├── config/
 │   │   ├── configuration.ts       # Structured configuration loader
-│   │   ├── env.validation.ts      # Joi schema & environment validator
+│   │   ├── env.validation.ts      # Joi schema validator
 │   │   └── env.validation.spec.ts # Unit tests for config validation
 │   ├── database/
-│   │   ├── prisma.service.ts      # Prisma client lifecycle & isHealthy probe
-│   │   ├── database.module.ts     # Global database module
-│   │   └── prisma.service.spec.ts # Unit tests for Prisma health checks
+│   │   ├── prisma.service.ts      # Prisma lifecycle, connection probe & URL masking
+│   │   └── database.module.ts     # Global database module
 │   ├── common/
-│   │   ├── constants/             # Headers, sensitive fields list
-│   │   ├── dto/                   # Standardized response envelopes (Swagger annotated)
-│   │   ├── filters/               # Global exception filter (safe error responses)
-│   │   ├── interceptors/          # Logging (sanitized) & response transformation
+│   │   ├── constants/             # Headers, sensitive field blocklists
+│   │   ├── decorators/            # @CurrentUser, @Roles, @Permissions, @Public
+│   │   ├── guards/                # JwtAuthGuard, RolesGuard, PermissionsGuard
+│   │   ├── filters/               # AllExceptionsFilter (safe error responses)
+│   │   ├── interceptors/          # Logging (redacted) & response transformation
 │   │   └── middleware/            # Correlation ID generator & propagator
 │   └── modules/
 │       ├── health/                # Liveness & DB readiness endpoints + tests
-│       ├── auth/                  # Reserved for Phase 2 Auth & SSO
-│       ├── identity/              # Reserved for Phase 2 Users & RBAC
-│       ├── applications/          # Reserved for Phase 2 App access registry
-│       ├── organizations/         # Reserved for Phase 2 Tenant hierarchy
-│       ├── hrms/                  # Reserved for HRMS integration
-│       ├── finance/               # Reserved for Finance ERP integration
-│       ├── audit-logs/            # Reserved for Audit query engine
-│       └── notifications/         # Reserved for Multi-channel notifications
+│       ├── auth/                  # Central Authentication: login, logout, refresh, change-password
+│       ├── identity/              # Central User Management, RBAC & session revocation
+│       ├── applications/          # Applications catalog & access registry
+│       ├── organizations/         # Multi-tenant organization hierarchy
+│       ├── hrms/                  # Prepared for HRMS business integration
+│       ├── finance/               # Prepared for Finance business integration
+│       ├── audit-logs/            # Audit logging queries
+│       └── notifications/         # Notification engine
 ├── test/
 │   ├── jest-e2e.json              # E2E test runner configuration
-│   └── health.e2e-spec.ts         # Full end-to-end integration test suite
+│   ├── health.e2e-spec.ts         # Health & readiness e2e tests
+│   └── auth-rbac.e2e-spec.ts      # Authentication, rotation, reuse & RBAC e2e tests
+├── docs/
+│   └── SSO_INTEGRATION_GUIDE.md   # Architectural guide for HRMS & Finance developers
+├── scripts/
+│   └── verify-shared-db.ts        # Safe shared database verification CLI tool
 ├── .env.example                   # Environment configuration template
 ├── render.yaml                    # Infrastructure-as-code for Render deployment
 └── DEPLOYMENT.md                  # Comprehensive Render deployment guide
@@ -60,168 +65,127 @@ apps/api/
 
 ---
 
-## 2. Central Identity & Multi-App Model
+## 2. Implemented API Endpoints (`/api/v1`)
 
-The database foundation establishes a single identity system so users do not require separate accounts for HRMS and Finance ERP:
+### 2.1 Authentication (`/api/v1/auth`)
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/auth/login` | Public | Employee login via email and password. Returns JWT access token & rotating refresh token. |
+| `POST` | `/api/v1/auth/refresh` | Public | Rotates refresh token. Detects token reuse attacks and invalidates compromised families. |
+| `POST` | `/api/v1/auth/logout` | Public/Auth | Terminates session and revokes the active refresh token. |
+| `GET` | `/api/v1/auth/me` | Bearer Auth | Returns current user profile, roles, permissions, and authorized applications. |
+| `POST` | `/api/v1/auth/change-password` | Bearer Auth | Changes password with Argon2id and invalidates all other active sessions. |
 
-- **Organization**: Company identity (`code`, `name`, `taxId`)
-- **User**: Central identity credentials (`email`, `passwordHash`, `name`, `isActive`)
-- **Role & Permission**: Role-Based Access Control (`SUPER_ADMIN`, `HRMS_ADMIN`, `FINANCE_ADMIN`, etc.)
-- **Application**: Application registry (`CENTRAL_DASHBOARD`, `HRMS`, `FINANCE`)
-- **UserApplicationAccess**: Cross-app grant mapping which users have access to which applications
-- **AuditLog**: Central compliance and activity audit logging
+### 2.2 Central Identity & User Management (`/api/v1/users`)
+| Method | Endpoint | Required Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/users` | `users:read` | List employees with pagination, search, role, and application filters. |
+| `GET` | `/api/v1/users/:id` | `users:read` | Retrieve user details with assigned roles, permissions, and grants. |
+| `POST` | `/api/v1/users` | `users:manage` | Provision a new employee account (prevents privilege escalation). |
+| `PATCH` | `/api/v1/users/:id` | `users:manage` | Update employee profile details. |
+| `PATCH` | `/api/v1/users/:id/status` | `users:manage` | Activate/deactivate account. Deactivation automatically revokes all sessions. |
+| `POST` | `/api/v1/users/:id/roles` | `roles:manage` | Assign a role to a user. |
+| `DELETE` | `/api/v1/users/:id/roles/:roleCode` | `roles:manage` | Revoke a role from a user. |
+| `GET` | `/api/v1/users/me/applications` | Authenticated | Return the current user's authorized applications with verified redirect URLs. |
+| `GET` | `/api/v1/users/:id/applications` | `apps:read` | View application access grants for any user. |
+| `POST` | `/api/v1/users/:id/applications` | `apps:manage` | Grant access to an application (`HRMS`, `FINANCE`, etc.). |
+| `DELETE` | `/api/v1/users/:id/applications/:appCode` | `apps:manage` | Revoke application access. |
+| `POST` | `/api/v1/users/:id/revoke-sessions` | `users:manage` | Administrative kill-switch: revokes all active sessions for a user. |
+
+### 2.3 Applications Catalog (`/api/v1/applications`)
+| Method | Endpoint | Required Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/applications` | Authenticated | List application catalog with access status for the authenticated user. |
+| `POST` | `/api/v1/applications` | `apps:manage` | Register new application (enforces trusted origin validation). |
+| `PATCH` | `/api/v1/applications/:id` | `apps:manage` | Update application details or URL. |
+| `DELETE` | `/api/v1/applications/:id` | `apps:manage` | Remove application from catalog. |
+
+### 2.4 Monitoring & Health (`/api/v1/health`)
+| Method | Endpoint | Access | Purpose |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/health` | Public | Liveness probe (uptime, status). |
+| `GET` | `/api/v1/health/ready` | Public | Database readiness probe (`SELECT 1;`, database identity, SSL status). |
+| `GET` | `/api/v1/docs` | Public | Interactive Swagger / OpenAPI 3.0 documentation. |
 
 ---
 
-## 3. Local Development Setup
+## 3. Security Baseline & Access Isolation
 
-### 3.1 Prerequisites
+1. **Password Hashing**: Uses Argon2id (`timeCost: 3`, `memoryCost: 65536`, `parallelism: 4`).
+2. **Refresh Token Rotation & Reuse Detection**:
+   - Refresh tokens are grouped in token families (`family`).
+   - If an expired or already-revoked refresh token is re-submitted (indicating theft or token replay), the backend detects the reuse attack and immediately invalidates all tokens in that family.
+3. **Application & Role Isolation**:
+   - Users with `HRMS_USER` or `HRMS_ADMIN` cannot access Finance ERP endpoints.
+   - Users with `FINANCE_USER` or `FINANCE_ADMIN` cannot access HRMS endpoints.
+   - `SUPER_ADMIN` privileges are explicitly enforced.
+4. **Privilege Escalation Protection**:
+   - Non-`SUPER_ADMIN` administrators cannot grant the `SUPER_ADMIN` role to themselves or other users.
+   - Users cannot deactivate their own accounts.
+5. **URL Destination Validation**:
+   - Destination application redirect URLs are validated against `TRUSTED_APP_URLS` before registration or redirection.
 
+---
+
+## 4. Local Development Setup
+
+### 4.1 Prerequisites
 - Node.js >= 22.13.0
-- A running PostgreSQL database (or local Docker container)
+- Managed PostgreSQL database on Render (or local PostgreSQL)
 
-### 3.2 Environment Setup (Shared PostgreSQL)
-
-The local backend connects to the **same managed PostgreSQL database instance** hosted on Render:
+### 4.2 Setup Steps
 
 1. Copy `.env.example` to `.env`:
    ```bash
    cp .env.example .env
    ```
-2. Configure your `DATABASE_URL` with Render's **External Database URL** (found in Render Dashboard > `techm4india-erp-db` > Connect):
+2. Configure your `DATABASE_URL` with Render's **External Database URL**:
    ```ini
-   DATABASE_URL=postgresql://techm4india_admin:<PASSWORD>@dpg-<ID>.<REGION>-postgres.render.com:5432/techm4india_erp?sslmode=require
+   DATABASE_URL="postgresql://techm4india_admin:<PASSWORD>@dpg-<ID>.<REGION>-postgres.render.com:5432/techm4india_erp?sslmode=require"
    PORT=4000
    NODE_ENV=development
    ```
-
-> [!WARNING]
-> **Shared Database Operations**:
-> Local reads and writes interact directly with the live shared database.
-> - **Never** run `prisma migrate reset` or destructive table drop commands.
-> - Always run `npm run db:verify` to safely check connectivity and shared record visibility before running tests or local servers.
-
-### 3.3 Database Verification & Migration
-
-```bash
-# Generate the Prisma Client
-npm run prisma:generate
-
-# Verify shared database connection and baseline counts safely
-npm run db:verify
-
-# Inspect migration status before deploying schema changes
-npx prisma migrate status --schema prisma/schema.prisma
-
-# Apply pending migrations safely without table resets
-npm run prisma:migrate
-```
-
-### 3.4 Starting the Server
-
-```bash
-# Development mode with hot-reload
-npm run start:dev
-
-# Production build and run
-npm run build
-npm run start:prod
-```
-
-The API will be available at:
-- **Base URL**: `http://localhost:4000/api/v1`
-- **Swagger Documentation**: `http://localhost:4000/api/v1/docs`
-- **Liveness Probe**: `http://localhost:4000/api/v1/health`
-- **Readiness Probe**: `http://localhost:4000/api/v1/health/ready`
+3. Generate the Prisma Client:
+   ```bash
+   npm run prisma:generate
+   ```
+4. Apply migrations:
+   ```bash
+   npm run prisma:migrate
+   ```
+5. Seed initial accounts (Argon2id default password: `TechM4Admin2026!`):
+   ```bash
+   npm run prisma:seed
+   ```
+   *Provisioned accounts:*
+   - `superadmin@techm4india.com` (Roles: `SUPER_ADMIN`, Apps: all)
+   - `hrms.admin@techm4india.com` (Roles: `HRMS_ADMIN`, Apps: `HRMS`)
+   - `finance.admin@techm4india.com` (Roles: `FINANCE_ADMIN`, Apps: `FINANCE`)
+   - `employee.hrms@techm4india.com` (Roles: `HRMS_USER`, Apps: `HRMS`)
+   - `accountant.finance@techm4india.com` (Roles: `FINANCE_USER`, Apps: `FINANCE`)
 
 ---
 
-## 4. API Endpoints
+## 5. Running Quality Checks & Tests
 
-### `GET /api/v1/health` (Liveness)
-Used by orchestration layers to confirm the server process is responsive.
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "data": {
-    "status": "ok",
-    "uptime": 23.4,
-    "timestamp": "2026-10-23T18:00:00.000Z",
-    "version": "1.0.0"
-  },
-  "timestamp": "2026-10-23T18:00:00.000Z",
-  "correlationId": "85f57a90-3ce9-4a9f-8a07-82ba69d30043"
-}
-```
-
-### `GET /api/v1/health/ready` (Readiness)
-Queries PostgreSQL using `SELECT 1;` to confirm database connectivity.
-- Returns `200 OK` if the database is healthy.
-- Returns `503 Service Unavailable` if the database connection fails.
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "data": {
-    "status": "ok",
-    "database": {
-      "status": "up",
-      "latencyMs": 3
-    },
-    "uptime": 25.1,
-    "timestamp": "2026-10-23T18:00:00.000Z",
-    "version": "1.0.0"
-  },
-  "timestamp": "2026-10-23T18:00:00.000Z",
-  "correlationId": "4c9d5d54-8c88-46fb-a0ef-281ce13d78c9"
-}
-```
-
-### `GET /api/v1/docs` (Swagger / OpenAPI)
-Interactive OpenAPI 3.0 UI documenting all schemas, response codes, tags, and security schemes.
-
----
-
-## 5. Quality & Test Execution
-
-Run the automated test suites:
+From repository root:
 
 ```bash
-# Run unit tests (12 tests across 4 suites)
-npm test
+# Run 36 unit tests across 7 test suites
+npm run api:test
 
-# Run end-to-end integration tests (5 tests)
-npm run test:e2e
+# Run 15 end-to-end integration tests across 2 suites
+npm run api:test:e2e
 
-# Run linting
-npm run lint
+# Run ESLint (0 errors, 0 warnings)
+npm run api:lint
 
 # Compile production build
-npm run build
+npm run api:build
 ```
 
 ---
 
-## 6. Security Baseline
+## 6. Single Sign-On (SSO) Architecture
 
-- **Input Validation**: Global `ValidationPipe` with payload transformation, property whitelisting, and strict rejection of unknown parameters.
-- **Security Headers**: `helmet` enabled for secure headers (CSP, HSTS, X-Frame-Options, etc.).
-- **Rate Limiting**: Configured with `@nestjs/throttler` (default: 100 requests / 60 seconds).
-- **Request Logging**: Request correlation IDs propagated across request and response (`x-correlation-id`). Sensitive keys (`password`, `token`, `secret`, `authorization`) are automatically redacted from logs.
-- **Safe Error Filter**: Global `AllExceptionsFilter` catches all exceptions. In production, raw SQL errors and stack traces are suppressed and replaced with generic safe responses.
-
----
-
-## 7. Roadmap & Next Steps (Phase 2)
-
-1. **Authentication & Identity Provider**:
-   - Argon2 / Bcrypt password hashing.
-   - JWT access & refresh token issuance and revocation.
-   - Central authentication guards and `@CurrentUser()` decorator.
-2. **RBAC Guard**:
-   - `@Roles(...)` and `@Permissions(...)` decorators for endpoint authorization.
-3. **Application Launcher**:
-   - Single sign-on redirect handling for HRMS and Finance ERP applications based on `UserApplicationAccess`.
-4. **Audit Logging Service**:
-   - Ingesting user action logs to PostgreSQL `audit_logs` table.
+For the complete specification on how the HRMS and Finance ERP applications integrate with Central Identity, see [`docs/SSO_INTEGRATION_GUIDE.md`](./docs/SSO_INTEGRATION_GUIDE.md).

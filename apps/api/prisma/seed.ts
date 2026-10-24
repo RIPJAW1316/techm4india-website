@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding initial TechM4India foundation data...');
+  console.log('Seeding initial TechM4India foundation data (Phase 2)...');
 
   // 1. Core Organization
   const org = await prisma.organization.upsert({
@@ -139,6 +140,130 @@ async function main() {
     });
   }
   console.log(`Permissions verified (${permissions.length} items).`);
+
+  // 5. Associate Permissions to Roles
+  const rolePermissionMap: Record<string, string[]> = {
+    SUPER_ADMIN: permissions.map((p) => p.code),
+    HRMS_ADMIN: ['auth:login', 'users:read', 'hrms:access', 'hrms:manage', 'apps:read'],
+    HRMS_USER: ['auth:login', 'hrms:access'],
+    FINANCE_ADMIN: ['auth:login', 'users:read', 'finance:access', 'finance:manage', 'apps:read'],
+    FINANCE_USER: ['auth:login', 'finance:access'],
+  };
+
+  for (const [roleCode, permCodes] of Object.entries(rolePermissionMap)) {
+    const role = await prisma.role.findUnique({ where: { code: roleCode } });
+    if (!role) continue;
+
+    for (const code of permCodes) {
+      const perm = await prisma.permission.findUnique({ where: { code } });
+      if (!perm) continue;
+
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: role.id,
+            permissionId: perm.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: role.id,
+          permissionId: perm.id,
+        },
+      });
+    }
+  }
+  console.log('Role permissions mapped successfully.');
+
+  // 6. Safe Initial Accounts (Argon2id)
+  const defaultPasswordHash = await argon2.hash('TechM4Admin2026!', {
+    type: argon2.argon2id,
+  });
+
+  const seedUsers = [
+    {
+      email: 'superadmin@techm4india.com',
+      firstName: 'Super',
+      lastName: 'Administrator',
+      roles: ['SUPER_ADMIN'],
+      apps: ['CENTRAL_DASHBOARD', 'HRMS', 'FINANCE'],
+    },
+    {
+      email: 'hrms.admin@techm4india.com',
+      firstName: 'Aarav',
+      lastName: 'Patel',
+      roles: ['HRMS_ADMIN'],
+      apps: ['CENTRAL_DASHBOARD', 'HRMS'],
+    },
+    {
+      email: 'finance.admin@techm4india.com',
+      firstName: 'Neha',
+      lastName: 'Kulkarni',
+      roles: ['FINANCE_ADMIN'],
+      apps: ['CENTRAL_DASHBOARD', 'FINANCE'],
+    },
+    {
+      email: 'employee.hrms@techm4india.com',
+      firstName: 'Rohan',
+      lastName: 'Verma',
+      roles: ['HRMS_USER'],
+      apps: ['HRMS'],
+    },
+    {
+      email: 'accountant.finance@techm4india.com',
+      firstName: 'Ananya',
+      lastName: 'Deshmukh',
+      roles: ['FINANCE_USER'],
+      apps: ['FINANCE'],
+    },
+  ];
+
+  for (const su of seedUsers) {
+    const user = await prisma.user.upsert({
+      where: { email: su.email },
+      update: {
+        firstName: su.firstName,
+        lastName: su.lastName,
+        isActive: true,
+      },
+      create: {
+        email: su.email,
+        passwordHash: defaultPasswordHash,
+        firstName: su.firstName,
+        lastName: su.lastName,
+        organizationId: org.id,
+        isActive: true,
+      },
+    });
+
+    // Assign roles
+    for (const rCode of su.roles) {
+      const role = await prisma.role.findUnique({ where: { code: rCode } });
+      if (role) {
+        await prisma.userRole.upsert({
+          where: { userId_roleId: { userId: user.id, roleId: role.id } },
+          update: {},
+          create: { userId: user.id, roleId: role.id },
+        });
+      }
+    }
+
+    // Assign application grants
+    for (const aCode of su.apps) {
+      const app = await prisma.application.findUnique({ where: { code: aCode } });
+      if (app) {
+        await prisma.userApplicationAccess.upsert({
+          where: {
+            userId_applicationId: { userId: user.id, applicationId: app.id },
+          },
+          update: { isActive: true },
+          create: { userId: user.id, applicationId: app.id, isActive: true },
+        });
+      }
+    }
+
+    console.log(`User provisioned: ${user.email} (Roles: ${su.roles.join(', ')})`);
+  }
 
   console.log('Seed completed successfully.');
 }
