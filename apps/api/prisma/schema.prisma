@@ -21,6 +21,10 @@ model Organization {
   updatedAt   DateTime @updatedAt
 
   users       User[]
+  departments Department[]
+  branches    Branch[]
+  employees   Employee[]
+  holidays    Holiday[]
 
   @@map("organizations")
 }
@@ -47,6 +51,7 @@ model User {
   appAccess       UserApplicationAccess[]
   auditLogs       AuditLog[]
   refreshTokens   RefreshToken[]
+  employee        Employee?
 
   @@index([email])
   @@index([organizationId])
@@ -194,4 +199,481 @@ model AuditLog {
   @@index([entity, entityId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// =============================================================
+// TECHM4INDIA HRMS DOMAIN MODELS (PHASE 4)
+// Functional parity with Hr.my with Indian enterprise compliance
+// =============================================================
+
+model Department {
+  id             String        @id @default(uuid())
+  organizationId String
+  code           String        @unique
+  name           String
+  description    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employees      Employee[]
+  designations   Designation[]
+
+  @@map("hrms_departments")
+}
+
+model Branch {
+  id             String       @id @default(uuid())
+  organizationId String
+  code           String       @unique
+  name           String
+  city           String
+  state          String
+  country        String       @default("India")
+  address        String?
+  isHeadquarters Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employees      Employee[]
+  holidays       Holiday[]
+
+  @@map("hrms_branches")
+}
+
+model Designation {
+  id           String      @id @default(uuid())
+  code         String      @unique
+  name         String
+  departmentId String?
+  level        Int         @default(1)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  employees    Employee[]
+
+  @@map("hrms_designations")
+}
+
+model Employee {
+  id                      String                     @id @default(uuid())
+  userId                  String?                    @unique
+  organizationId          String
+  employeeNumber          String                     @unique
+  firstName               String
+  lastName                String
+  email                   String                     @unique
+  phone                   String?
+  dateOfBirth             DateTime?
+  gender                  String?                    // MALE, FEMALE, OTHER
+  dateOfJoining           DateTime
+  probationEndDate        DateTime?
+  confirmationDate        DateTime?
+  contractEndDate         DateTime?
+  employmentType          String                     @default("FULL_TIME") // FULL_TIME, PART_TIME, CONTRACT, INTERN
+  employmentStatus        String                     @default("ACTIVE") // ACTIVE, PROBATION, NOTICE_PERIOD, TERMINATED, RESIGNED
+  departmentId            String?
+  designationId           String?
+  branchId                String?
+  managerId               String?
+  panNumber               String?
+  aadhaarNumber           String?
+  bankAccountNumber       String?
+  bankIfsc                String?
+  bankName                String?
+  pfUanNumber             String?
+  esiNumber               String?
+  address                 String?
+  emergencyContactName    String?
+  emergencyContactPhone   String?
+  emergencyContactRelation String?
+  createdAt               DateTime                   @default(now())
+  updatedAt               DateTime                   @updatedAt
+
+  user                    User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organization            Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  department              Department?                @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  designation             Designation?               @relation(fields: [designationId], references: [id], onDelete: SetNull)
+  branch                  Branch?                    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  manager                 Employee?                  @relation("EmployeeManager", fields: [managerId], references: [id], onDelete: SetNull)
+  directReports           Employee[]                 @relation("EmployeeManager")
+  leaveApplications       LeaveApplication[]
+  leaveBalances           LeaveBalance[]
+  attendanceRecords       AttendanceRecord[]
+  regularizationRequests  AttendanceRegularization[]
+  expenseClaims           ExpenseClaim[]
+  salaryStructure         SalaryStructure?
+  payslips                Payslip[]
+  documents               EmployeeDocument[]
+  incidentsReported       IncidentReport[]           @relation("ReportedIncidents")
+  incidentsAssigned       IncidentReport[]           @relation("AssignedIncidents")
+  discussionTopics        DiscussionTopic[]
+  discussionReplies       DiscussionReply[]
+
+  @@index([employeeNumber])
+  @@index([email])
+  @@index([departmentId])
+  @@index([branchId])
+  @@map("hrms_employees")
+}
+
+model LeaveType {
+  id                 String             @id @default(uuid())
+  organizationId     String
+  code               String             @unique // ANNUAL, CASUAL, SICK, MATERNITY, PATERNITY, UNPAID
+  name               String
+  description        String?
+  defaultDaysPerYear Float              @default(12)
+  isPaid             Boolean            @default(true)
+  requiresDocument   Boolean            @default(false)
+  carryForwardMax    Float              @default(0)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  leaveBalances      LeaveBalance[]
+  applications       LeaveApplication[]
+
+  @@map("hrms_leave_types")
+}
+
+model LeaveBalance {
+  id                 String    @id @default(uuid())
+  employeeId         String
+  leaveTypeId        String
+  year               Int
+  entitledDays       Float
+  takenDays          Float     @default(0)
+  pendingDays        Float     @default(0)
+  carriedForwardDays Float     @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  employee           Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType          LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, leaveTypeId, year])
+  @@map("hrms_leave_balances")
+}
+
+model LeaveApplication {
+  id           String    @id @default(uuid())
+  employeeId   String
+  leaveTypeId  String
+  startDate    DateTime
+  endDate      DateTime
+  totalDays    Float
+  isHalfDay    Boolean   @default(false)
+  halfDayType  String?   // FIRST_HALF, SECOND_HALF
+  reason       String
+  attachmentUrl String?
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  appliedAt    DateTime  @default(now())
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType    LeaveType @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([status])
+  @@map("hrms_leave_applications")
+}
+
+model AttendanceRecord {
+  id               String                    @id @default(uuid())
+  employeeId       String
+  date             DateTime                  // Midnight UTC date
+  clockInTime      DateTime?
+  clockOutTime     DateTime?
+  clockInIp        String?
+  clockOutIp       String?
+  workMinutes      Int                       @default(0)
+  breakMinutes     Int                       @default(0)
+  overtimeMinutes  Int                       @default(0)
+  status           String                    @default("PRESENT") // PRESENT, ON_LEAVE, HOLIDAY, WEEKLY_OFF, HALF_DAY, ABSENT
+  isLate           Boolean                   @default(false)
+  isEarlyDeparture Boolean                   @default(false)
+  notes            String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  employee         Employee                  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  regularization   AttendanceRegularization?
+
+  @@unique([employeeId, date])
+  @@index([date])
+  @@map("hrms_attendance_records")
+}
+
+model AttendanceRegularization {
+  id                String           @id @default(uuid())
+  attendanceId      String           @unique
+  employeeId        String
+  requestedClockIn  DateTime
+  requestedClockOut DateTime
+  reason            String
+  status            String           @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedById      String?
+  reviewedAt        DateTime?
+  reviewNotes       String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  attendance        AttendanceRecord @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  employee          Employee         @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("hrms_attendance_regularizations")
+}
+
+model ClaimCategory {
+  id             String             @id @default(uuid())
+  code           String             @unique
+  name           String
+  description    String?
+  maxAmountLimit Float?
+  requiresReceipt Boolean           @default(true)
+  createdAt      DateTime           @default(now())
+
+  items          ExpenseClaimItem[]
+
+  @@map("hrms_claim_categories")
+}
+
+model ExpenseClaim {
+  id                String             @id @default(uuid())
+  claimNumber       String             @unique
+  employeeId        String
+  title             String
+  totalAmount       Float
+  status            String             @default("SUBMITTED") // DRAFT, SUBMITTED, APPROVED, REJECTED, PAID
+  submittedAt       DateTime           @default(now())
+  reviewedById      String?
+  reviewedAt        DateTime?
+  reimbursementDate DateTime?
+  notes             String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  employee          Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  items             ExpenseClaimItem[]
+
+  @@index([employeeId])
+  @@index([status])
+  @@map("hrms_expense_claims")
+}
+
+model ExpenseClaimItem {
+  id             String        @id @default(uuid())
+  expenseClaimId String
+  claimCategoryId String
+  expenseDate    DateTime
+  amount         Float
+  merchantName   String?
+  description    String
+  receiptUrl     String?
+  createdAt      DateTime      @default(now())
+
+  expenseClaim   ExpenseClaim  @relation(fields: [expenseClaimId], references: [id], onDelete: Cascade)
+  category       ClaimCategory @relation(fields: [claimCategoryId], references: [id], onDelete: Cascade)
+
+  @@map("hrms_expense_claim_items")
+}
+
+model SalaryStructure {
+  id                     String    @id @default(uuid())
+  employeeId             String    @unique
+  effectiveDate          DateTime  @default(now())
+  monthlyCtc             Float
+  basicSalary            Float
+  hra                    Float
+  specialAllowance       Float
+  conveyanceAllowance    Float     @default(0)
+  medicalAllowance       Float     @default(0)
+  providentFundEmployee  Float     @default(0)
+  providentFundEmployer  Float     @default(0)
+  professionalTax        Float     @default(200)
+  esiEmployee            Float     @default(0)
+  esiEmployer            Float     @default(0)
+  tdsEstimate            Float     @default(0)
+  netSalary              Float
+  isActive               Boolean   @default(true)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  employee               Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("hrms_salary_structures")
+}
+
+model PayrollPeriod {
+  id              String    @id @default(uuid())
+  month           Int       // 1-12
+  year            Int       // e.g. 2026
+  status          String    @default("DRAFT") // DRAFT, IN_REVIEW, APPROVED, FINALIZED
+  totalGross      Float     @default(0)
+  totalDeductions Float     @default(0)
+  totalNet        Float     @default(0)
+  finalizedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  payslips        Payslip[]
+
+  @@unique([month, year])
+  @@map("hrms_payroll_periods")
+}
+
+model Payslip {
+  id                  String        @id @default(uuid())
+  payrollPeriodId     String
+  employeeId          String
+  payslipNumber       String        @unique
+  workingDays         Int           @default(30)
+  paidDays            Float         @default(30)
+  absentDays          Float         @default(0)
+  basicSalary         Float
+  hra                 Float
+  allowancesTotal     Float
+  grossEarnings       Float
+  pfDeduction         Float
+  ptDeduction         Float
+  esiDeduction        Float
+  taxDeduction        Float
+  claimsReimbursement Float         @default(0)
+  totalDeductions     Float
+  netPay              Float
+  isPublished         Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  payrollPeriod       PayrollPeriod @relation(fields: [payrollPeriodId], references: [id], onDelete: Cascade)
+  employee            Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([payrollPeriodId, employeeId])
+  @@map("hrms_payslips")
+}
+
+model CompanyDocument {
+  id             String   @id @default(uuid())
+  organizationId String
+  title          String
+  category       String   // POLICY, FORM, HANDBOOK, TEMPLATE
+  description    String?
+  fileUrl        String
+  fileSize       String?
+  version        String   @default("1.0")
+  isRestricted   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("hrms_company_documents")
+}
+
+model EmployeeDocument {
+  id           String    @id @default(uuid())
+  employeeId   String
+  title        String
+  documentType String    // RESUME, ID_PROOF, CONTRACT, CERTIFICATE, TAX_FORM
+  fileUrl      String
+  expiryDate   DateTime?
+  verifiedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  employee     Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("hrms_employee_documents")
+}
+
+model IncidentReport {
+  id              String    @id @default(uuid())
+  reportNumber    String    @unique
+  reporterId      String?
+  isAnonymous     Boolean   @default(false)
+  category        String    // SAFETY, HARASSMENT, MISCONDUCT, FACILITY, POLICY
+  severity        String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  title           String
+  description     String
+  incidentDate    DateTime
+  location        String?
+  status          String    @default("REPORTED") // REPORTED, UNDER_INVESTIGATION, RESOLVED, CLOSED
+  assignedToId    String?
+  resolutionNotes String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reporter        Employee? @relation("ReportedIncidents", fields: [reporterId], references: [id], onDelete: SetNull)
+  assignedTo      Employee? @relation("AssignedIncidents", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  @@map("hrms_incident_reports")
+}
+
+model Announcement {
+  id                 String   @id @default(uuid())
+  organizationId     String
+  title              String
+  content            String
+  category           String   @default("GENERAL") // GENERAL, HOLIDAY, EVENT, POLICY, URGENT
+  targetScope        String   @default("ALL") // ALL, DEPARTMENT, BRANCH
+  targetDepartmentId String?
+  targetBranchId     String?
+  priority           String   @default("NORMAL") // NORMAL, IMPORTANT, URGENT
+  publishedAt        DateTime @default(now())
+  expiresAt          DateTime?
+  isPinned           Boolean  @default(false)
+  authorName         String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("hrms_announcements")
+}
+
+model DiscussionTopic {
+  id         String            @id @default(uuid())
+  title      String
+  content    String
+  category   String            @default("GENERAL")
+  authorId   String
+  isPinned   Boolean           @default(false)
+  isLocked   Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  author     Employee          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies    DiscussionReply[]
+
+  @@map("hrms_discussion_topics")
+}
+
+model DiscussionReply {
+  id        String          @id @default(uuid())
+  topicId   String
+  authorId  String
+  content   String
+  createdAt DateTime        @default(now())
+
+  topic     DiscussionTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author    Employee        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("hrms_discussion_replies")
+}
+
+model Holiday {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  date           DateTime
+  isOptional     Boolean      @default(false)
+  branchId       String?
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch         Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, date, branchId])
+  @@map("hrms_holidays")
 }

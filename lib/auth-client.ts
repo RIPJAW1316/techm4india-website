@@ -314,3 +314,24 @@ export async function getAuthorizedApplications(): Promise<ApplicationAccessInfo
 
   return unwrapResponse<ApplicationAccessInfo[]>(body);
 }
+
+// -----------------------------------------------------------------------------
+// Unified authClient Namespace
+// -----------------------------------------------------------------------------
+export const authClient = {
+  getAccessToken,
+  getRefreshToken,
+  getSession: () => ({
+    accessToken: getAccessToken(),
+    refreshToken: getRefreshToken(),
+  }),
+  saveSession: setSession,
+  setSession,
+  clearSession,
+  isAuthenticated,
+  login,
+  logout,
+  refreshSession: async () => null,
+  getCurrentUser: getMe,
+  getAuthorizedApplications,
+};

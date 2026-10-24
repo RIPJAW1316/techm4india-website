@@ -528,13 +528,13 @@ export default function DashboardPage() {
                 Close
               </button>
               <a
-                href={selectedApp.baseUrl}
-                target="_blank"
+                href={selectedApp.code.includes("HRMS") ? "/hrms" : selectedApp.baseUrl}
+                target={selectedApp.code.includes("HRMS") ? "_self" : "_blank"}
                 rel="noopener noreferrer"
                 onClick={() => setSelectedApp(null)}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#d73531] hover:bg-[#b82a27] text-white text-xs font-bold transition-all shadow-lg"
               >
-                <span>Proceed to Application</span>
+                <span>{selectedApp.code.includes("HRMS") ? "Open HRMS Application" : "Proceed to Application"}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
