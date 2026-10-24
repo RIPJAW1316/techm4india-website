@@ -154,12 +154,11 @@ test('Finance ERP Module Boundary Verification', async (t) => {
     assert.ok(fs.existsSync(financeServicePath), 'Finance backend service must exist');
   });
 
-  await t.test('apps/finance does not exist yet (Finance is not decoupled into standalone app)', () => {
+  await t.test('apps/finance exists as standalone application workspace', () => {
     const standaloneFinancePath = path.join(repoRoot, 'apps/finance');
-    assert.equal(
+    assert.ok(
       fs.existsSync(standaloneFinancePath),
-      false,
-      'Finance ERP is confirmed not yet decoupled into apps/finance'
+      'Finance ERP is decoupled into apps/finance standalone module'
     );
   });
 });

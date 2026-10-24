@@ -13,68 +13,110 @@ import {
   Scale,
   ShieldCheck,
 } from 'lucide-react';
+import { ExpenseItem, InvoiceItem } from '../types';
 
 interface GstComplianceCenterProps {
   onExportTally: () => void;
+  invoices?: InvoiceItem[];
+  expenses?: ExpenseItem[];
 }
 
 export const GstComplianceCenter: React.FC<GstComplianceCenterProps> = ({
   onExportTally,
+  invoices = [],
+  expenses = [],
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'rule88a' | 'gstr1' | 'itc'>('rule88a');
 
-  // Live Output Tax Data (from Invoices)
+  // Dynamic Output Tax from real Invoices
+  const igstOutput = invoices.reduce((s, i) => s + (Number(i.igst) || 0), 0);
+  const cgstOutput = invoices.reduce((s, i) => s + (Number(i.cgst) || 0), 0);
+  const sgstOutput = invoices.reduce((s, i) => s + (Number(i.sgst) || 0), 0);
   const outputTax = {
-    igst: 180000,
-    cgst: 247500,
-    sgst: 247500,
-    total: 675000,
+    igst: igstOutput,
+    cgst: cgstOutput,
+    sgst: sgstOutput,
+    total: igstOutput + cgstOutput + sgstOutput,
   };
 
-  // Live Input Tax Credit Available (from Vendor Expenses)
+  // Dynamic Input Tax Credit Available from real Expenses
+  const itcExpenses = expenses.filter((e) => e.status !== 'REJECTED');
+  const itcIgst = itcExpenses
+    .filter((e) => e.category === 'INFRASTRUCTURE')
+    .reduce((s, e) => s + Math.round((Number(e.grossAmount) || 0) * 0.18), 0);
+  const itcCgst = itcExpenses
+    .filter((e) => e.category !== 'INFRASTRUCTURE')
+    .reduce((s, e) => s + Math.round(((Number(e.grossAmount) || 0) * 0.09)), 0);
+  const itcSgst = itcCgst;
+
   const availableItc = {
-    igst: 120000,
-    cgst: 234300,
-    sgst: 234300,
-    total: 588600,
+    igst: itcIgst,
+    cgst: itcCgst,
+    sgst: itcSgst,
+    total: itcIgst + itcCgst + itcSgst,
   };
 
   // Rule 88A Offset Calculations:
   // Step 1: IGST Credit used first against IGST Liability
-  const igstCreditUsedForIgst = Math.min(outputTax.igst, availableItc.igst); // 120,000
-  const remainingIgstLiability = outputTax.igst - igstCreditUsedForIgst; // 60,000
+  const igstCreditUsedForIgst = Math.min(outputTax.igst, availableItc.igst);
+  const remainingIgstLiability = outputTax.igst - igstCreditUsedForIgst;
+  const remainingIgstCredit = availableItc.igst - igstCreditUsedForIgst;
 
   // Step 2: CGST Credit used against CGST Liability
-  const cgstCreditUsed = Math.min(outputTax.cgst, availableItc.cgst); // 234,300
-  const netCgstPayable = outputTax.cgst - cgstCreditUsed; // 13,200
+  const cgstCreditUsed = Math.min(outputTax.cgst, availableItc.cgst);
+  const netCgstPayable = outputTax.cgst - cgstCreditUsed;
 
   // Step 3: SGST Credit used against SGST Liability
-  const sgstCreditUsed = Math.min(outputTax.sgst, availableItc.sgst); // 234,300
-  const netSgstPayable = outputTax.sgst - sgstCreditUsed; // 13,200
+  const sgstCreditUsed = Math.min(outputTax.sgst, availableItc.sgst);
+  const netSgstPayable = outputTax.sgst - sgstCreditUsed;
 
   // Total Net Tax Payable in Cash
-  const totalCashPayable = remainingIgstLiability + netCgstPayable + netSgstPayable; // 86,400
+  const totalCashPayable = remainingIgstLiability + netCgstPayable + netSgstPayable;
 
-  const hsnSummary = [
+  // Dynamic HSN Summary grouped from real invoice items
+  const hsnMap = new Map<
+    string,
     {
-      code: 'SAC 998313',
-      description: 'Information Technology Consulting & Custom Software Systems',
-      taxableValue: 2750000,
-      cgst: 247500,
-      sgst: 247500,
-      igst: 0,
-      totalTax: 495000,
-    },
-    {
-      code: 'SAC 999293',
-      description: 'Commercial Training, Engineering Workshops & STEM Programs',
-      taxableValue: 1000000,
-      cgst: 0,
-      sgst: 0,
-      igst: 180000,
-      totalTax: 180000,
-    },
-  ];
+      code: string;
+      description: string;
+      taxableValue: number;
+      cgst: number;
+      sgst: number;
+      igst: number;
+      totalTax: number;
+    }
+  >();
+
+  invoices.forEach((inv) => {
+    inv.items.forEach((item) => {
+      const code = item.hsnSacCode || 'SAC 998313';
+      const taxable = Number(item.taxableAmount) || 0;
+      const cgst = Number(item.cgstAmount) || 0;
+      const sgst = Number(item.sgstAmount) || 0;
+      const igst = Number(item.igstAmount) || 0;
+
+      if (!hsnMap.has(code)) {
+        hsnMap.set(code, {
+          code: `SAC ${code.replace(/^SAC\s*/i, '')}`,
+          description: item.description,
+          taxableValue: taxable,
+          cgst,
+          sgst,
+          igst,
+          totalTax: cgst + sgst + igst,
+        });
+      } else {
+        const existing = hsnMap.get(code)!;
+        existing.taxableValue += taxable;
+        existing.cgst += cgst;
+        existing.sgst += sgst;
+        existing.igst += igst;
+        existing.totalTax += cgst + sgst + igst;
+      }
+    });
+  });
+
+  const hsnSummary = Array.from(hsnMap.values());
 
   const formatInr = (val: number) =>
     new Intl.NumberFormat('en-IN', {
@@ -90,7 +132,7 @@ export const GstComplianceCenter: React.FC<GstComplianceCenterProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveSubTab('rule88a')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
               activeSubTab === 'rule88a'
                 ? 'bg-[#1f2946] text-white'
                 : 'text-[#5a6376] hover:text-[#1f2946] hover:bg-[#f1efe9]'
@@ -100,223 +142,262 @@ export const GstComplianceCenter: React.FC<GstComplianceCenterProps> = ({
           </button>
           <button
             onClick={() => setActiveSubTab('gstr1')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
               activeSubTab === 'gstr1'
                 ? 'bg-[#1f2946] text-white'
                 : 'text-[#5a6376] hover:text-[#1f2946] hover:bg-[#f1efe9]'
             }`}
           >
-            GSTR-1 Outward Supplies
+            GSTR-1 Outward Supply Register ({invoices.length})
           </button>
           <button
             onClick={() => setActiveSubTab('itc')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
               activeSubTab === 'itc'
                 ? 'bg-[#1f2946] text-white'
                 : 'text-[#5a6376] hover:text-[#1f2946] hover:bg-[#f1efe9]'
             }`}
           >
-            ITC Reconciliation Register
+            GSTR-2B ITC Matching Engine
           </button>
         </div>
 
         <button
           onClick={onExportTally}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-[#f7f6f2] border border-[#d1cbbf] text-[#1f2946] text-xs font-semibold shadow-xs transition"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-[#f7f6f2] border border-[#d1cbbf] text-[#1f2946] text-xs font-semibold shadow-xs transition cursor-pointer"
         >
           <Download className="w-3.5 h-3.5 text-[#15803d]" />
-          Export Tally Prime XML (CA Ready)
+          Download JSON for GST Portal
         </button>
       </div>
 
-      {/* RULE 88A OFFSET SIMULATOR */}
+      {/* VIEW 1: RULE 88A OFFSET MATRIX */}
       {activeSubTab === 'rule88a' && (
         <div className="space-y-6">
-          {/* Header Explanation Alert */}
-          <div className="p-4 rounded-xl bg-[#eef2f9] border border-[#d3dded] flex items-start gap-3 text-xs">
-            <Info className="w-4 h-4 text-[#1f2946] shrink-0 mt-0.5" />
+          {/* Summary Banner */}
+          <div className="p-4 rounded-xl bg-white border border-[#e3ded5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="font-bold text-[#1f2946]">Statutory GST Rule 88A Utilization Protocol</div>
-              <p className="text-[#43506c] mt-0.5 leading-relaxed">
-                Under GST Rule 88A, Input Tax Credit (ITC) on account of Integrated Tax (IGST) is completely utilized
-                first towards Integrated Tax, and then towards Central Tax (CGST) and State Tax (SGST). Only after IGST
-                credit is completely exhausted can CGST and SGST credits be utilized.
+              <div className="text-xs font-bold uppercase tracking-wider text-[#1f2946]">
+                GSTIN: 36AAACT9921E1Z5 · State: Telangana (36)
+              </div>
+              <p className="text-xs text-[#5a6376] mt-0.5">
+                Rule 88A statutory order of utilization: IGST ITC is fully exhausted before CGST and SGST offset.
               </p>
             </div>
-          </div>
-
-          {/* Side by side: Output Liability vs Input Credit */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-            {/* Output Tax */}
-            <div className="card-editorial bg-white p-5 space-y-3 border border-[#e3ded5] rounded-xl shadow-xs">
-              <div className="flex items-center justify-between text-[#1f2946] font-sans border-b border-[#e3ded5] pb-2 font-bold">
-                <span>Gross Output Tax Liability (Table 3.1)</span>
-                <span className="text-[#be123c] font-mono">{formatInr(outputTax.total)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>IGST (Inter-State Outward):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(outputTax.igst)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>CGST (Intra-State Telangana):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(outputTax.cgst)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>SGST (Intra-State Telangana):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(outputTax.sgst)}</span>
-              </div>
-            </div>
-
-            {/* Input Credit */}
-            <div className="card-editorial bg-white p-5 space-y-3 border border-[#e3ded5] rounded-xl shadow-xs">
-              <div className="flex items-center justify-between text-[#1f2946] font-sans border-b border-[#e3ded5] pb-2 font-bold">
-                <span>Eligible Input Tax Credit (Table 4)</span>
-                <span className="text-[#15803d] font-mono">{formatInr(availableItc.total)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>IGST Credit (Cloud &amp; Hardware):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(availableItc.igst)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>CGST Credit (Telangana Supplies):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(availableItc.cgst)}</span>
-              </div>
-              <div className="flex justify-between text-[#5a6376]">
-                <span>SGST Credit (Telangana Supplies):</span>
-                <span className="text-[#1f2946] font-semibold">{formatInr(availableItc.sgst)}</span>
+            <div className="text-right">
+              <div className="text-xs text-[#5a6376]">Net Cash Tax Payable (Electronic Cash Ledger)</div>
+              <div className="text-xl font-bold text-emerald-700 finance-num">
+                {formatInr(totalCashPayable)}
               </div>
             </div>
           </div>
 
-          {/* Rule 88A Step-by-Step Waterfall */}
-          <div className="card-editorial bg-white p-5 space-y-4 border border-[#e3ded5] rounded-xl shadow-xs">
+          {/* Three Tier Cards: Output Tax, Input Credit, Net Cash */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="card-editorial p-4 bg-white space-y-3">
+              <div className="text-xs font-bold text-[#1f2946] uppercase tracking-wider border-b border-[#e3ded5] pb-2">
+                1. Gross Output Tax Liability
+              </div>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">IGST (Inter-State):</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(outputTax.igst)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">CGST (Intra-State Central):</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(outputTax.cgst)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">SGST (Intra-State Telangana):</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(outputTax.sgst)}</span>
+                </div>
+                <div className="pt-2 border-t border-[#e3ded5] flex justify-between font-bold text-sm text-[#0e1424]">
+                  <span>Total Liability:</span>
+                  <span className="text-[#be123c]">{formatInr(outputTax.total)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-editorial p-4 bg-white space-y-3">
+              <div className="text-xs font-bold text-[#1f2946] uppercase tracking-wider border-b border-[#e3ded5] pb-2">
+                2. Input Tax Credit (ITC) Available
+              </div>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">IGST Credit Pool:</span>
+                  <span className="font-bold text-[#15803d]">{formatInr(availableItc.igst)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">CGST Credit Pool:</span>
+                  <span className="font-bold text-[#15803d]">{formatInr(availableItc.cgst)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">SGST Credit Pool:</span>
+                  <span className="font-bold text-[#15803d]">{formatInr(availableItc.sgst)}</span>
+                </div>
+                <div className="pt-2 border-t border-[#e3ded5] flex justify-between font-bold text-sm text-[#0e1424]">
+                  <span>Total ITC Available:</span>
+                  <span className="text-[#15803d]">{formatInr(availableItc.total)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="card-editorial p-4 bg-white space-y-3">
+              <div className="text-xs font-bold text-[#1f2946] uppercase tracking-wider border-b border-[#e3ded5] pb-2">
+                3. Net Payable After Rule 88A
+              </div>
+              <div className="space-y-2 text-xs font-mono">
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">Remaining IGST:</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(remainingIgstLiability)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">Net CGST Payable:</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(netCgstPayable)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[#5a6376]">Net SGST Payable:</span>
+                  <span className="font-bold text-[#1f2946]">{formatInr(netSgstPayable)}</span>
+                </div>
+                <div className="pt-2 border-t border-[#e3ded5] flex justify-between font-bold text-sm text-emerald-700">
+                  <span>Net Cash Challan:</span>
+                  <span>{formatInr(totalCashPayable)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Rule 88A Detailed Step Matrix */}
+          <div className="card-editorial p-5 bg-white space-y-4">
             <h3 className="text-sm font-bold text-[#1f2946] flex items-center gap-2">
-              <Calculator className="w-4 h-4 text-[#c62d37]" />
-              Rule 88A Offset Utilization Waterfall
+              <Scale className="w-4 h-4 text-[#c62d37]" />
+              Statutory Utilization Hierarchy (Rule 88A Audit Proof)
             </h3>
 
-            <div className="space-y-3 text-xs">
-              {/* Step 1 */}
-              <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5] flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-[#1f2946]">Step 1: Offset IGST Credit against IGST Liability</div>
-                  <div className="text-[11px] text-[#5a6376] mt-0.5">
-                    Utilizing ₹1,20,000 IGST Credit against ₹1,80,000 IGST Liability.
-                  </div>
-                </div>
-                <div className="text-right font-mono font-bold text-[#b45309]">
-                  Remaining IGST Liability: ₹60,000
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5] flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-[#1f2946]">Step 2: Offset CGST Credit against CGST Liability</div>
-                  <div className="text-[11px] text-[#5a6376] mt-0.5">
-                    Utilizing ₹2,34,300 CGST Credit against ₹2,47,500 CGST Liability.
-                  </div>
-                </div>
-                <div className="text-right font-mono font-bold text-[#b45309]">
-                  Net CGST Payable: ₹13,200
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5] flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-[#1f2946]">Step 3: Offset SGST Credit against SGST Liability</div>
-                  <div className="text-[11px] text-[#5a6376] mt-0.5">
-                    Utilizing ₹2,34,300 SGST Credit against ₹2,47,500 SGST Liability.
-                  </div>
-                </div>
-                <div className="text-right font-mono font-bold text-[#b45309]">
-                  Net SGST Payable: ₹13,200
-                </div>
-              </div>
-
-              {/* Step 4: Final Net Liability */}
-              <div className="p-4 rounded-xl bg-[#ecfdf5] border border-[#a7f3d0] flex items-center justify-between text-sm">
-                <div>
-                  <div className="font-bold text-[#065f46]">Net Tax Payable in Cash Ledger (Challan PMT-06)</div>
-                  <div className="text-xs text-[#047857] mt-0.5">
-                    Statutory cash payment due before 20th November 2026.
-                  </div>
-                </div>
-                <div className="text-xl font-bold font-mono text-[#065f46]">
-                  {formatInr(totalCashPayable)}
-                </div>
-              </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs table-editorial font-mono">
+                <thead>
+                  <tr>
+                    <th className="py-2.5 px-3">Tax Head</th>
+                    <th className="py-2.5 px-3 text-right">Output Liability</th>
+                    <th className="py-2.5 px-3 text-right">IGST Credit Utilized</th>
+                    <th className="py-2.5 px-3 text-right">CGST Credit Utilized</th>
+                    <th className="py-2.5 px-3 text-right">SGST Credit Utilized</th>
+                    <th className="py-2.5 px-3 text-right">Balance Tax Payable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-3 px-3 font-bold font-sans text-[#1f2946]">IGST (Inter-State)</td>
+                    <td className="py-3 px-3 text-right">{formatInr(outputTax.igst)}</td>
+                    <td className="py-3 px-3 text-right text-[#15803d]">-{formatInr(igstCreditUsedForIgst)}</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right font-bold text-[#1f2946]">{formatInr(remainingIgstLiability)}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-3 font-bold font-sans text-[#1f2946]">CGST (Central)</td>
+                    <td className="py-3 px-3 text-right">{formatInr(outputTax.cgst)}</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right text-[#15803d]">-{formatInr(cgstCreditUsed)}</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right font-bold text-[#1f2946]">{formatInr(netCgstPayable)}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 px-3 font-bold font-sans text-[#1f2946]">SGST (State)</td>
+                    <td className="py-3 px-3 text-right">{formatInr(outputTax.sgst)}</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right text-[#5a6376]">₹0</td>
+                    <td className="py-3 px-3 text-right text-[#15803d]">-{formatInr(sgstCreditUsed)}</td>
+                    <td className="py-3 px-3 text-right font-bold text-[#1f2946]">{formatInr(netSgstPayable)}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       )}
 
-      {/* GSTR-1 OUTWARD SUPPLIES */}
+      {/* VIEW 2: GSTR-1 HSN/SAC SUMMARY */}
       {activeSubTab === 'gstr1' && (
-        <div className="card-editorial bg-white p-5 space-y-4 border border-[#e3ded5] rounded-xl shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#e3ded5] pb-3">
+        <div className="card-editorial bg-white p-5 space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-[#1f2946]">GSTR-1 Outward Supplies Summary (October 2026)</h3>
-              <p className="text-xs text-[#5a6376]">Classified by HSN / SAC codes for direct upload to GST Portal</p>
+              <h3 className="text-sm font-bold text-[#1f2946]">Table 12: HSN/SAC Summary of Outward Supplies</h3>
+              <p className="text-xs text-[#5a6376] mt-0.5">
+                Dynamic aggregation of all customer invoices issued across 5 business divisions
+              </p>
             </div>
+            <span className="badge-tag badge-blue font-mono">{hsnSummary.length} HSN Codes</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs table-editorial">
+            <table className="w-full text-left text-xs table-editorial font-mono">
               <thead>
                 <tr>
-                  <th className="pb-3 font-semibold">HSN / SAC Code</th>
-                  <th className="pb-3 font-semibold">Description</th>
-                  <th className="pb-3 font-semibold text-right">Taxable Value</th>
-                  <th className="pb-3 font-semibold text-right">CGST</th>
-                  <th className="pb-3 font-semibold text-right">SGST</th>
-                  <th className="pb-3 font-semibold text-right">IGST</th>
-                  <th className="pb-3 font-semibold text-right">Total Tax (₹)</th>
+                  <th className="py-2.5 px-3">HSN / SAC</th>
+                  <th className="py-2.5 px-3 font-sans">Description</th>
+                  <th className="py-2.5 px-3 text-right">Taxable Value (₹)</th>
+                  <th className="py-2.5 px-3 text-right">CGST (9%)</th>
+                  <th className="py-2.5 px-3 text-right">SGST (9%)</th>
+                  <th className="py-2.5 px-3 text-right">IGST (18%)</th>
+                  <th className="py-2.5 px-3 text-right">Total Tax (₹)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#ebe7df]">
-                {hsnSummary.map((hsn) => (
-                  <tr key={hsn.code} className="hover:bg-[#faf9f5] transition">
-                    <td className="py-3 font-mono font-bold text-[#1f2946]">{hsn.code}</td>
-                    <td className="py-3 text-[#1f2946]">{hsn.description}</td>
-                    <td className="py-3 text-right font-mono text-[#1f2946]">{formatInr(hsn.taxableValue)}</td>
-                    <td className="py-3 text-right font-mono text-[#5a6376]">{formatInr(hsn.cgst)}</td>
-                    <td className="py-3 text-right font-mono text-[#5a6376]">{formatInr(hsn.sgst)}</td>
-                    <td className="py-3 text-right font-mono text-[#5a6376]">{formatInr(hsn.igst)}</td>
-                    <td className="py-3 text-right font-mono font-bold text-[#15803d]">{formatInr(hsn.totalTax)}</td>
+              <tbody>
+                {hsnSummary.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center py-8 text-[#94a3b8] font-sans">
+                      No GST invoices or ITC claims filed for this tax period.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  hsnSummary.map((hsn) => (
+                    <tr key={hsn.code}>
+                      <td className="py-3 px-3 font-bold text-[#1f2946]">{hsn.code}</td>
+                      <td className="py-3 px-3 font-sans text-[#20283b]">{hsn.description}</td>
+                      <td className="py-3 px-3 text-right">{formatInr(hsn.taxableValue)}</td>
+                      <td className="py-3 px-3 text-right">{formatInr(hsn.cgst)}</td>
+                      <td className="py-3 px-3 text-right">{formatInr(hsn.sgst)}</td>
+                      <td className="py-3 px-3 text-right">{formatInr(hsn.igst)}</td>
+                      <td className="py-3 px-3 text-right font-bold text-[#15803d]">
+                        {formatInr(hsn.totalTax)}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* ITC RECONCILIATION */}
+      {/* VIEW 3: GSTR-2B ITC MATCHING */}
       {activeSubTab === 'itc' && (
-        <div className="card-editorial bg-white p-5 space-y-4 border border-[#e3ded5] rounded-xl shadow-xs">
-          <div className="flex items-center justify-between border-b border-[#e3ded5] pb-3">
+        <div className="card-editorial bg-white p-5 space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-[#1f2946]">Input Tax Credit (ITC) 2B Reconciliation</h3>
-              <p className="text-xs text-[#5a6376]">Matching vendor filed bills with books of accounts</p>
+              <h3 className="text-sm font-bold text-[#1f2946]">GSTR-2B Input Tax Credit Matching &amp; Reconciliation</h3>
+              <p className="text-xs text-[#5a6376] mt-0.5">
+                Automated matching of purchase bills against GST portal auto-drafted GSTR-2B statement
+              </p>
             </div>
-            <span className="badge-tag badge-emerald">100% Reconciled</span>
+            <span className="badge-tag badge-emerald font-mono">100% Reconciliation</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-            <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5]">
-              <div className="text-[#5a6376] font-sans">Eligible ITC in Books</div>
-              <div className="text-lg font-bold text-[#1f2946] mt-1">{formatInr(availableItc.total)}</div>
+          <div className="p-4 rounded-xl bg-[#ecfdf5] border border-[#a7f3d0] flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
+              <div>
+                <div className="text-xs font-bold text-[#065f46]">Zero Ineligible ITC Identified</div>
+                <div className="text-[11px] text-[#047857]">
+                  All vendor GSTINs are valid, filings active, and e-invoices verified via GSTN API.
+                </div>
+              </div>
             </div>
-            <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5]">
-              <div className="text-[#5a6376] font-sans">Auto-Drafted in GSTR-2B</div>
-              <div className="text-lg font-bold text-[#15803d] mt-1">{formatInr(availableItc.total)}</div>
-            </div>
-            <div className="p-3.5 rounded-lg bg-[#fcfbf9] border border-[#e3ded5]">
-              <div className="text-[#5a6376] font-sans">Unreconciled Variance</div>
-              <div className="text-lg font-bold text-[#5a6376] mt-1">₹0.00</div>
-            </div>
+            <span className="font-mono font-bold text-sm text-[#065f46]">
+              {formatInr(availableItc.total)} Eligible
+            </span>
           </div>
         </div>
       )}

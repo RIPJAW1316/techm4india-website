@@ -12,81 +12,123 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
-import { DivisionCode } from '../types';
+import { AccountItem, DivisionCode, ExpenseItem, InvoiceItem } from '../types';
 
 interface FinancialOverviewProps {
   selectedDivision: DivisionCode;
   onNavigateTab: (tab: string) => void;
+  accounts?: AccountItem[];
+  invoices?: InvoiceItem[];
+  expenses?: ExpenseItem[];
 }
 
 export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
   selectedDivision,
   onNavigateTab,
+  accounts = [],
+  invoices = [],
+  expenses = [],
 }) => {
-  const metrics = {
-    grossRevenue: 4850000,
-    grossRevenueGrowth: 28.4,
-    netProfit: 1420000,
-    netMargin: 29.3,
-    cashAndBank: 3240000,
-    accountsReceivable: 1180000,
-    overdueReceivable: 236000,
-    accountsPayable: 640000,
-    netGstLiability: 86400,
-  };
+  // Filter by selected division if not 'ALL'
+  const filteredInvoices =
+    selectedDivision === 'ALL'
+      ? invoices
+      : invoices.filter((i) => i.division === selectedDivision);
 
-  const divisionContributions = [
+  const filteredExpenses =
+    selectedDivision === 'ALL'
+      ? expenses
+      : expenses.filter((e) => e.division === selectedDivision);
+
+  // Dynamic calculations from actual transactions
+  const grossRevenue = filteredInvoices.reduce((sum, inv) => sum + (Number(inv.subtotal) || 0), 0);
+  const totalBilledGst = filteredInvoices.reduce(
+    (sum, inv) => sum + (Number(inv.cgst) || 0) + (Number(inv.sgst) || 0) + (Number(inv.igst) || 0),
+    0
+  );
+  const accountsReceivable = filteredInvoices
+    .filter((i) => i.status !== 'PAID')
+    .reduce((sum, inv) => sum + (Number(inv.balanceDue) || 0), 0);
+
+  const now = new Date();
+  const overdueReceivable = filteredInvoices
+    .filter((i) => i.status === 'OVERDUE' || (new Date(i.dueDate) < now && i.status !== 'PAID'))
+    .reduce((sum, inv) => sum + (Number(inv.balanceDue) || 0), 0);
+
+  const accountsPayable = filteredExpenses
+    .filter((e) => e.status !== 'PAID')
+    .reduce((sum, exp) => sum + (Number(exp.netPayable) || 0), 0);
+
+  const totalExpenseCost = filteredExpenses.reduce(
+    (sum, exp) => sum + (Number(exp.grossAmount) || 0),
+    0
+  );
+
+  const netProfit = grossRevenue - totalExpenseCost;
+  const netMargin = grossRevenue > 0 ? (netProfit / grossRevenue) * 100 : 0;
+
+  // Cash & Bank balances from accounts ledger
+  const hdfcBalance = accounts.find((a) => a.code === '1010')?.balance || 0;
+  const iciciBalance = accounts.find((a) => a.code === '1020')?.balance || 0;
+  const cashAndBank = accounts
+    .filter((a) => a.category === 'BANK_ACCOUNTS' || a.category === 'CASH')
+    .reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
+
+  // Net GST Liability = Output GST minus available Input Tax Credit
+  const totalItc = filteredExpenses.reduce(
+    (sum, exp) => sum + (Number(exp.tdsAmount) || 0),
+    0
+  );
+  const netGstLiability = Math.max(0, totalBilledGst - totalItc);
+
+  const divisionDefs = [
     {
       id: 'TECHM4_SOLUTIONS',
       name: 'TechM4Solutions',
       focus: 'Enterprise AI & Custom Software Engineering',
-      revenue: 1950000,
-      expenses: 1120000,
-      margin: 42.6,
-      status: 'High Growth',
       tagColor: 'badge-blue',
     },
     {
       id: 'TECHM4_ENGINEERING',
       name: 'TechM4Engineering',
       focus: 'College COE Labs, Faculty Enablement & Core Tech',
-      revenue: 1250000,
-      expenses: 780000,
-      margin: 37.6,
-      status: 'Steady',
       tagColor: 'badge-muted',
     },
     {
       id: 'TECHM4_SCHOOLS',
       name: 'TechM4Schools',
       focus: 'K-12 STEM Labs, Robotics Kits & Tinkering Curricula',
-      revenue: 850000,
-      expenses: 490000,
-      margin: 42.4,
-      status: 'Seasonal Cohort',
       tagColor: 'badge-emerald',
     },
     {
       id: 'TECHM4_SPACE',
       name: 'TechM4Space Technology',
       focus: 'CanSat Programs, Ground Stations & Aerospace R&D',
-      revenue: 520000,
-      expenses: 390000,
-      margin: 25.0,
-      status: 'R&D Phase',
       tagColor: 'badge-purple',
     },
     {
       id: 'HORIZON_INSTITUTES',
       name: 'Horizon Startup School',
       focus: 'Founder Accelerator, Executive Fellowships & Diplomas',
-      revenue: 280000,
-      expenses: 140000,
-      margin: 50.0,
-      status: 'Expanding',
       tagColor: 'badge-amber',
     },
   ];
+
+  const divisionContributions = divisionDefs.map((def) => {
+    const divInvoices = invoices.filter((i) => i.division === def.id);
+    const divExpenses = expenses.filter((e) => e.division === def.id);
+    const divRev = divInvoices.reduce((s, i) => s + (Number(i.subtotal) || 0), 0);
+    const divExp = divExpenses.reduce((s, e) => s + (Number(e.grossAmount) || 0), 0);
+    const divMargin = divRev > 0 ? ((divRev - divExp) / divRev) * 100 : 0;
+
+    return {
+      ...def,
+      revenue: divRev,
+      expenses: divExp,
+      margin: Number(divMargin.toFixed(1)),
+      status: divRev > 0 ? 'Active Operations' : 'Zero Transactions',
+    };
+  });
 
   const formatInr = (val: number) =>
     new Intl.NumberFormat('en-IN', {
@@ -106,11 +148,11 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="mt-2 text-xl font-bold text-[#0e1424] finance-num">
-            {formatInr(metrics.grossRevenue)}
+            {formatInr(grossRevenue)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-emerald-700 font-semibold">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+{metrics.grossRevenueGrowth}% QoQ Growth</span>
+            <span>{filteredInvoices.length} Invoices Active</span>
           </div>
         </div>
 
@@ -121,10 +163,10 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <DollarSign className="w-4 h-4 text-blue-600" />
           </div>
           <div className="mt-2 text-xl font-bold text-[#0e1424] finance-num">
-            {formatInr(metrics.netProfit)}
+            {formatInr(netProfit)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-blue-700 font-semibold">
-            <span>{metrics.netMargin}% Net Margin</span>
+            <span>{netMargin.toFixed(1)}% Net Margin</span>
           </div>
         </div>
 
@@ -135,7 +177,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <Wallet className="w-4 h-4 text-[#c62d37]" />
           </div>
           <div className="mt-2 text-xl font-bold text-[#0e1424] finance-num">
-            {formatInr(metrics.cashAndBank)}
+            {formatInr(cashAndBank)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-[#5a6376]">
             <span>HDFC &amp; ICICI Accounts</span>
@@ -152,10 +194,10 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <Receipt className="w-4 h-4 text-amber-600" />
           </div>
           <div className="mt-2 text-xl font-bold text-amber-700 finance-num">
-            {formatInr(metrics.accountsReceivable)}
+            {formatInr(accountsReceivable)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-amber-800 font-medium">
-            <span>₹2.36L Overdue &gt; 30d</span>
+            <span>{overdueReceivable > 0 ? `${formatInr(overdueReceivable)} Overdue` : 'Zero overdue'}</span>
           </div>
         </div>
 
@@ -169,10 +211,10 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <Scale className="w-4 h-4 text-rose-600" />
           </div>
           <div className="mt-2 text-xl font-bold text-[#0e1424] finance-num">
-            {formatInr(metrics.accountsPayable)}
+            {formatInr(accountsPayable)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-[#5a6376]">
-            <span>Vendor Invoices Booked</span>
+            <span>{filteredExpenses.length} Vendor Bills Booked</span>
           </div>
         </div>
 
@@ -186,7 +228,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="mt-2 text-xl font-bold text-emerald-700 finance-num">
-            {formatInr(metrics.netGstLiability)}
+            {formatInr(netGstLiability)}
           </div>
           <div className="mt-1 flex items-center gap-1 text-[11px] text-emerald-800 font-medium">
             <span>ITC Offset Applied</span>
@@ -208,7 +250,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
                 Segmented operating revenues, program costs, and EBITDA margins
               </p>
             </div>
-            <span className="badge-tag badge-brand-red">5 Active Units</span>
+            <span className="badge-tag badge-brand-red">5 Units Tracked</span>
           </div>
 
           <div className="overflow-x-auto">
@@ -238,8 +280,8 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
                       <td className="py-3 px-3 text-right text-[#5a6376] finance-num">
                         {formatInr(div.expenses)}
                       </td>
-                      <td className="py-3 px-3 text-right font-bold text-emerald-700 finance-num">
-                        +{formatInr(profit)}
+                      <td className={`py-3 px-3 text-right font-bold finance-num ${profit >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {profit >= 0 ? `+${formatInr(profit)}` : formatInr(profit)}
                       </td>
                       <td className="py-3 px-3 text-right font-bold text-[#1f2946] finance-num">
                         {div.margin.toFixed(1)}%
@@ -311,7 +353,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
                   <div className="text-[11px] text-[#5a6376] font-mono">A/C: •••• 1122 (Banjara Hills)</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-[#0e1424] finance-num">₹24,80,000</div>
+                  <div className="font-bold text-[#0e1424] finance-num">{formatInr(hdfcBalance)}</div>
                   <span className="badge-tag badge-emerald text-[10px]">Primary</span>
                 </div>
               </div>
@@ -322,7 +364,7 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
                   <div className="text-[11px] text-[#5a6376] font-mono">A/C: •••• 9841 (Gachibowli)</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-[#0e1424] finance-num">₹7,60,000</div>
+                  <div className="font-bold text-[#0e1424] finance-num">{formatInr(iciciBalance)}</div>
                   <span className="badge-tag badge-blue text-[10px]">Secondary</span>
                 </div>
               </div>

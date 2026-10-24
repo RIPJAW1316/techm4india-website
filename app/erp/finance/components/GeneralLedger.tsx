@@ -185,7 +185,16 @@ export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {journalEntries.map((j) => {
+                  {journalEntries.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center py-12 text-[#94a3b8]">
+                        <Scale className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#94a3b8]" />
+                        <p className="font-semibold text-xs text-[#5a6376]">No journal vouchers recorded</p>
+                        <p className="text-[11px] text-[#94a3b8] mt-0.5">Click &quot;Create Journal Entry&quot; to post a double-entry transaction.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    journalEntries.map((j) => {
                     const isSelected = selectedEntry?.id === j.id;
                     return (
                       <tr
@@ -224,7 +233,7 @@ export const GeneralLedger: React.FC<GeneralLedgerProps> = ({
                         </td>
                       </tr>
                     );
-                  })}
+                  }))}
                 </tbody>
               </table>
             </div>

@@ -203,7 +203,14 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ebe7df]">
-                {expenses.map((exp) => (
+                {expenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} className="py-8 text-center text-[#5a6376]">
+                      No vendor purchase bills recorded. Click &quot;Record Vendor Bill&quot; to book an invoice.
+                    </td>
+                  </tr>
+                ) : (
+                  expenses.map((exp) => (
                   <tr key={exp.id} className="hover:bg-[#faf9f5] transition">
                     <td className="py-3 px-3 font-mono font-bold text-[#1f2946]">{exp.expenseNumber}</td>
                     <td className="py-3 px-3">
@@ -270,7 +277,7 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
                       )}
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>
@@ -428,25 +435,33 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {vendors.map((v) => (
-              <div
-                key={v.id}
-                className="p-4 rounded-xl border border-[#e3ded5] bg-[#fcfbf9] space-y-2 hover:border-[#1f2946] transition"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#c62d37]">{v.code}</span>
-                  <span className="badge-tag badge-emerald text-[10px]">{v.msmeType}</span>
-                </div>
-                <h4 className="font-bold text-sm text-[#1f2946]">{v.name}</h4>
-                <div className="text-xs text-[#5a6376] space-y-0.5">
-                  <div>GSTIN: <span className="font-mono font-medium text-[#1f2946]">{v.gstin || 'Unregistered'}</span></div>
-                  <div>PAN: <span className="font-mono font-medium text-[#1f2946]">{v.pan}</span></div>
-                  <div>Default TDS: <span className="font-semibold text-[#1f2946]">{v.tdsSection.replace('SEC_', '')}</span></div>
-                  <div>Bank: <span className="text-[#1f2946]">{v.bankName} ({v.bankAccount})</span></div>
-                  <div>Payment Terms: <span className="font-semibold text-[#1f2946]">{v.paymentTermsDays} Days</span></div>
-                </div>
+            {vendors.length === 0 ? (
+              <div className="col-span-3 text-center py-10 text-[#5a6376] bg-[#fcfbf9] rounded-xl border border-dashed border-[#e3ded5]">
+                <Building className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#5a6376]" />
+                <p className="font-semibold text-xs">No registered vendor masters</p>
+                <p className="text-[11px] text-[#94a3b8] mt-0.5">Vendors added during bill booking will be indexed here.</p>
               </div>
-            ))}
+            ) : (
+              vendors.map((v) => (
+                <div
+                  key={v.id}
+                  className="p-4 rounded-xl border border-[#e3ded5] bg-[#fcfbf9] space-y-2 hover:border-[#1f2946] transition"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#c62d37]">{v.code}</span>
+                    <span className="badge-tag badge-emerald text-[10px]">{v.msmeType}</span>
+                  </div>
+                  <h4 className="font-bold text-sm text-[#1f2946]">{v.name}</h4>
+                  <div className="text-xs text-[#5a6376] space-y-0.5">
+                    <div>GSTIN: <span className="font-mono font-medium text-[#1f2946]">{v.gstin || 'Unregistered'}</span></div>
+                    <div>PAN: <span className="font-mono font-medium text-[#1f2946]">{v.pan}</span></div>
+                    <div>Default TDS: <span className="font-semibold text-[#1f2946]">{v.tdsSection.replace('SEC_', '')}</span></div>
+                    <div>Bank: <span className="text-[#1f2946]">{v.bankName} ({v.bankAccount})</span></div>
+                    <div>Payment Terms: <span className="font-semibold text-[#1f2946]">{v.paymentTermsDays} Days</span></div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
