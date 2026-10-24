@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
-    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "test": "npm run build && node --experimental-strip-types --test tests/rendered-html.test.mjs tests/auth-dashboard.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern apps",
     "api:dev": "npm --prefix apps/api run start:dev",
     "api:build": "npm --prefix apps/api run build",
     "api:test": "npm --prefix apps/api test",

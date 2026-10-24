@@ -16,6 +16,8 @@ for (const [path, heading] of [
   ["/space", "Build Real Satellites"],
   ["/institutes", "A partner that stays for"],
   ["/contact", "Let&#x27;s build India&#x27;s"],
+  ["/login", "Enterprise"],
+  ["/dashboard", "Dashboard"],
 ]) {
   test(`exports ${path}`, async () => {
     const html = await render(path);
