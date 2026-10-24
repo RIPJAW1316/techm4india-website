@@ -145,22 +145,21 @@ test('Next.js Compatibility Shims Fidelity', async (t) => {
 test('Finance ERP Module Boundary Verification', async (t) => {
   const financePagePath = path.join(repoRoot, 'app/erp/finance/page.tsx');
   const financeServicePath = path.join(repoRoot, 'apps/api/src/modules/finance/finance.service.ts');
+  const standaloneFinancePath = path.join(repoRoot, 'apps/finance');
 
-  await t.test('Finance ERP frontend exists in corporate Next.js/Vinext app at app/erp/finance', () => {
-    assert.ok(fs.existsSync(financePagePath), 'Finance ERP frontend page must exist');
+  await t.test('Finance ERP frontend exists in repository (apps/finance or app/erp/finance)', () => {
+    assert.ok(fs.existsSync(financePagePath) || fs.existsSync(standaloneFinancePath), 'Finance ERP frontend must exist');
   });
 
   await t.test('Finance ERP backend services exist in apps/api/src/modules/finance', () => {
     assert.ok(fs.existsSync(financeServicePath), 'Finance backend service must exist');
   });
 
-  await t.test('apps/finance does not exist yet (Finance is not decoupled into standalone app)', () => {
-    const standaloneFinancePath = path.join(repoRoot, 'apps/finance');
-    assert.equal(
-      fs.existsSync(standaloneFinancePath),
-      false,
-      'Finance ERP is confirmed not yet decoupled into apps/finance'
-    );
+  await t.test('Finance ERP uses non-conflicting port (3001) independent of HRMS (3002)', () => {
+    if (fs.existsSync(standaloneFinancePath)) {
+      const finPkg = JSON.parse(fs.readFileSync(path.join(standaloneFinancePath, 'package.json'), 'utf8'));
+      assert.ok(finPkg.scripts.dev.includes('3001'), 'Finance dev port must be 3001 to avoid conflict with HRMS port 3002');
+    }
   });
 });
 

@@ -54,7 +54,8 @@ export class OidcService {
         clientName: 'TechM4India Finance ERP',
         redirectUris: [
           'http://localhost:3000/erp/finance/auth/callback',
-          'http://localhost:3002/auth/callback',
+          'http://localhost:3001/auth/callback',
+          'http://localhost:3001/erp/finance/auth/callback',
           'https://techm4india.com/erp/finance/auth/callback',
           'https://finance.techm4india.com/auth/callback',
         ],
