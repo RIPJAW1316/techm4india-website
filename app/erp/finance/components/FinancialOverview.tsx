@@ -74,12 +74,21 @@ export const FinancialOverview: React.FC<FinancialOverviewProps> = ({
     .filter((a) => a.category === 'BANK_ACCOUNTS' || a.category === 'CASH')
     .reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
 
-  // Net GST Liability = Output GST minus available Input Tax Credit
-  const totalItc = filteredExpenses.reduce(
-    (sum, exp) => sum + (Number(exp.tdsAmount) || 0),
-    0
-  );
+  // Input Tax Credit from Tax Receivable accounts (acc-1200, 1210, 1220) or expenses
+  const itcFromAccounts = accounts
+    .filter((a) => a.category === 'TAX_RECEIVABLE')
+    .reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
+
+  const itcFromExpenses = filteredExpenses
+    .filter((e) => e.status !== 'REJECTED')
+    .reduce((sum, exp) => sum + Math.round((Number(exp.grossAmount) || 0) * 0.18), 0);
+
+  const totalItc = itcFromAccounts > 0 ? itcFromAccounts : itcFromExpenses;
   const netGstLiability = Math.max(0, totalBilledGst - totalItc);
+
+  const tdsPayable =
+    accounts.find((a) => a.code === '2150')?.balance ||
+    filteredExpenses.reduce((sum, exp) => sum + (Number(exp.tdsAmount) || 0), 0);
 
   const divisionDefs = [
     {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { hrmsClient } from './lib/hrms-client';
+import { financeApi, hrmsClient } from './lib/finance-api';
 import './finance.css';
 import { FinanceHeader } from './components/FinanceHeader';
 import { FinancialOverview } from './components/FinancialOverview';
@@ -78,18 +78,55 @@ export default function App() {
   const [hrmsClaims, setHrmsClaims] = useState<HrmsClaimItem[]>(initialHrmsClaims);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sync with live HRMS claims if API is accessible
+  // Resilient parallel API sync on mount (graceful fallback to zero baseline)
   useEffect(() => {
-    hrmsClient
-      .getApprovedClaimsForFinance()
-      .then((res) => {
-        if (res.data && res.data.length > 0) {
-          setHrmsClaims(res.data);
+    let isMounted = true;
+    async function syncWithApi() {
+      try {
+        const results = await Promise.allSettled([
+          financeApi.getAccounts(),
+          financeApi.getInvoices(),
+          financeApi.getExpenses(),
+          financeApi.getVendors(),
+          financeApi.getJournalEntries(),
+          financeApi.getApprovedClaimsForFinance(),
+        ]);
+
+        if (!isMounted) return;
+
+        // Accounts
+        if (results[0].status === 'fulfilled' && Array.isArray(results[0].value) && results[0].value.length > 0) {
+          setAccounts(results[0].value);
         }
-      })
-      .catch(() => {
-        // Fallback to initial seed gracefully
-      });
+        // Invoices
+        if (results[1].status === 'fulfilled' && Array.isArray(results[1].value) && results[1].value.length > 0) {
+          setInvoices(results[1].value);
+        }
+        // Expenses
+        if (results[2].status === 'fulfilled' && Array.isArray(results[2].value) && results[2].value.length > 0) {
+          setExpenses(results[2].value);
+        }
+        // Vendors
+        if (results[3].status === 'fulfilled' && Array.isArray(results[3].value) && results[3].value.length > 0) {
+          setVendors(results[3].value);
+        }
+        // Journals
+        if (results[4].status === 'fulfilled' && Array.isArray(results[4].value) && results[4].value.length > 0) {
+          setJournalEntries(results[4].value);
+        }
+        // HRMS Claims
+        if (results[5].status === 'fulfilled' && results[5].value?.data && Array.isArray(results[5].value.data) && results[5].value.data.length > 0) {
+          setHrmsClaims(results[5].value.data);
+        }
+      } catch {
+        // Fallback to local zero-baseline state
+      }
+    }
+
+    syncWithApi();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const showToast = (msg: string) => {
@@ -98,6 +135,28 @@ export default function App() {
   };
 
   // Handlers
+    const handleCreateVendor = async (v: VendorItem) => {
+    setVendors([v, ...vendors]);
+    try {
+      await financeApi.createVendor({
+        code: v.code,
+        name: v.name,
+        contactPerson: v.contactPerson,
+        gstin: v.gstin,
+        pan: v.pan,
+        msmeType: v.msmeType,
+        bankAccount: v.bankAccount,
+        ifsc: v.ifsc,
+        bankName: v.bankName,
+        tdsSection: v.tdsSection,
+        paymentTermsDays: v.paymentTermsDays,
+      });
+    } catch {
+      // Optimistic local persistence
+    }
+    showToast(`Vendor ${v.name} registered successfully.`);
+  };
+
   const handleAddJournalEntry = (entry: any) => {
     const newEntry: JournalEntryItem = {
       id: `jv-${Date.now()}`,
@@ -114,6 +173,21 @@ export default function App() {
     };
 
     setJournalEntries([newEntry, ...journalEntries]);
+    try {
+      financeApi.createJournalEntry({
+        date: newEntry.date,
+        voucherType: newEntry.voucherType,
+        reference: newEntry.reference,
+        narration: newEntry.narration,
+        division: newEntry.division,
+        lineItems: newEntry.lineItems.map((l: any) => ({
+          accountId: l.accountId,
+          debitAmount: l.debitAmount,
+          creditAmount: l.creditAmount,
+          description: l.description,
+        })),
+      }).catch(() => {});
+    } catch {}
     showToast(`Journal Entry ${newEntry.entryNumber} created in DRAFT state.`);
   };
 
@@ -143,6 +217,9 @@ export default function App() {
     });
 
     setAccounts(updatedAccounts);
+    try {
+      financeApi.postJournalEntry(id).catch(() => {});
+    } catch {}
     showToast(`Journal ${target.entryNumber} posted to General Ledger.`);
   };
 
@@ -176,6 +253,9 @@ export default function App() {
     };
 
     setJournalEntries([reversalEntry, ...updatedJournals]);
+    try {
+      financeApi.reverseJournalEntry(id, 'User requested reversal').catch(() => {});
+    } catch {}
     showToast(`Reversal entry ${reversalEntry.entryNumber} created & posted.`);
   };
 
@@ -212,6 +292,24 @@ export default function App() {
     };
 
     setInvoices([newInvoice, ...invoices]);
+    try {
+      financeApi.createInvoice({
+        customerId: newInvoice.customerId,
+        type: newInvoice.type,
+        issueDate: newInvoice.issueDate,
+        dueDate: newInvoice.dueDate,
+        currency: newInvoice.currency,
+        division: newInvoice.division,
+        items: newInvoice.items.map((it: any) => ({
+          description: it.description,
+          hsnSacCode: it.hsnSacCode,
+          quantity: it.quantity,
+          unitPrice: it.unitPrice,
+          discount: it.discount,
+          gstRate: it.gstRate,
+        })),
+      }).catch(() => {});
+    } catch {}
     showToast(`Invoice ${invoiceNumber} issued with GST calculations.`);
   };
 
@@ -243,6 +341,13 @@ export default function App() {
       ),
     );
 
+    try {
+      financeApi.recordInvoicePayment(invoiceId, {
+        amount,
+        paymentDate: new Date().toISOString().slice(0, 10),
+        paymentMethod: 'HDFC_CURRENT',
+      }).catch(() => {});
+    } catch {}
     showToast(`Payment of ₹${amount.toLocaleString('en-IN')} recorded against ${inv.invoiceNumber}.`);
   };
 
@@ -270,6 +375,19 @@ export default function App() {
     };
 
     setExpenses([newExp, ...expenses]);
+    try {
+      financeApi.createExpense({
+        vendorId: newExp.vendorId,
+        category: newExp.category,
+        division: newExp.division,
+        description: newExp.description,
+        invoiceNumber: newExp.invoiceNumber,
+        dueDate: newExp.dueDate,
+        grossAmount: newExp.grossAmount,
+        tdsSection: newExp.tdsSection,
+        poNumber: newExp.poNumber,
+      }).catch(() => {});
+    } catch {}
     showToast(`Bill ${expenseNumber} booked with Level ${exp.approvalLevel} routing.`);
   };
 
@@ -277,6 +395,9 @@ export default function App() {
     setExpenses(
       expenses.map((e) => (e.id === id ? { ...e, status: 'APPROVED' } : e)),
     );
+    try {
+      financeApi.approveExpense(id).catch(() => {});
+    } catch {}
     showToast(`Expense bill approved for payment.`);
   };
 
@@ -295,6 +416,13 @@ export default function App() {
       ),
     );
 
+    try {
+      financeApi.payExpense(id, {
+        amount: exp.netPayable,
+        paymentDate: new Date().toISOString().slice(0, 10),
+        paymentMethod: 'HDFC_CURRENT',
+      }).catch(() => {});
+    } catch {}
     showToast(`Payment of ₹${exp.netPayable.toLocaleString('en-IN')} disbursed for ${exp.expenseNumber}.`);
   };
 
@@ -531,6 +659,7 @@ export default function App() {
             onCreateExpense={handleCreateExpense}
             onApproveExpense={handleApproveExpense}
             onPayExpense={handlePayExpense}
+            onCreateVendor={handleCreateVendor}
             onSettleHrmsClaim={handleSettleHrmsClaim}
           />
         )}

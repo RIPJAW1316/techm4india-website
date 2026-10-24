@@ -14,7 +14,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'https://techm4india-erp-api-l1gv.onrender.com',
+        target: process.env.VITE_API_TARGET || process.env.VITE_API_URL || 'http://localhost:4000',
         changeOrigin: true,
         secure: false,
       },

@@ -27,6 +27,7 @@ interface PayablesExpensesProps {
   onCreateExpense: (exp: any) => void;
   onApproveExpense: (id: string) => void;
   onPayExpense: (id: string) => void;
+  onCreateVendor?: (vendor: any) => void;
   onSettleHrmsClaim?: (claimId: string, notes?: string) => Promise<void> | void;
 }
 
@@ -37,12 +38,27 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
   onCreateExpense,
   onApproveExpense,
   onPayExpense,
+  onCreateVendor,
   onSettleHrmsClaim,
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'bills' | 'vendors' | 'hrms_claims'>('bills');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterDivision, setFilterDivision] = useState<string>('ALL');
   const [settlingClaimId, setSettlingClaimId] = useState<string | null>(null);
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
+  const [customVendorName, setCustomVendorName] = useState('');
+
+  // Vendor Master Form State
+  const [newVendorName, setNewVendorName] = useState('');
+  const [newVendorContact, setNewVendorContact] = useState('');
+  const [newVendorGstin, setNewVendorGstin] = useState('');
+  const [newVendorPan, setNewVendorPan] = useState('');
+  const [newVendorMsme, setNewVendorMsme] = useState<'MICRO' | 'SMALL' | 'MEDIUM' | 'NONE'>('MICRO');
+  const [newVendorBankName, setNewVendorBankName] = useState('');
+  const [newVendorAccount, setNewVendorAccount] = useState('');
+  const [newVendorIfsc, setNewVendorIfsc] = useState('');
+  const [newVendorTds, setNewVendorTds] = useState<TdsSection>('SEC_194C');
+  const [newVendorTerms, setNewVendorTerms] = useState(30);
 
   // Form State
   const [vendorId, setVendorId] = useState(vendors[0]?.id || '');
@@ -76,14 +92,52 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
     else setTdsRate(0);
   };
 
+  const handleVendorSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVendorName) return;
+
+    const vendorCode = `VND-${String(vendors.length + 1).padStart(3, '0')}`;
+    const newVendor: VendorItem = {
+      id: `v-${Date.now()}`,
+      code: vendorCode,
+      name: newVendorName,
+      contactPerson: newVendorContact || undefined,
+      gstin: newVendorGstin || undefined,
+      pan: newVendorPan || 'PAN_NOT_PROVIDED',
+      msmeType: newVendorMsme,
+      bankAccount: newVendorAccount || '',
+      ifsc: newVendorIfsc || '',
+      bankName: newVendorBankName || '',
+      tdsSection: newVendorTds,
+      paymentTermsDays: Number(newVendorTerms) || 30,
+    };
+
+    if (onCreateVendor) {
+      onCreateVendor(newVendor);
+    }
+    setVendorId(newVendor.id);
+    setIsVendorModalOpen(false);
+    setNewVendorName('');
+    setNewVendorContact('');
+    setNewVendorGstin('');
+    setNewVendorPan('');
+    setNewVendorBankName('');
+    setNewVendorAccount('');
+    setNewVendorIfsc('');
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || grossAmount <= 0) return;
 
     const vendor = vendors.find((v) => v.id === vendorId);
+    const resolvedVendorName = vendor
+      ? vendor.name
+      : (customVendorName.trim() || 'Direct Expense Supplier');
+
     onCreateExpense({
-      vendorId,
-      vendorName: vendor ? vendor.name : 'Direct Expense Claim',
+      vendorId: vendor?.id || `v-manual-${Date.now()}`,
+      vendorName: resolvedVendorName,
       category,
       division,
       description,
@@ -102,6 +156,7 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
     setDescription('');
     setInvoiceNumber('');
     setGrossAmount(0);
+    setCustomVendorName('');
   };
 
   const handleSettleClaim = async (claimId: string) => {
@@ -427,10 +482,10 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
               <p className="text-xs text-[#5a6376]">GSTIN, PAN, Bank Details &amp; MSME classification records</p>
             </div>
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-[#1f2946] hover:bg-[#2e3c63] text-white text-xs font-semibold"
+              onClick={() => setIsVendorModalOpen(true)}
+              className="px-3 py-1.5 rounded-lg bg-[#1f2946] hover:bg-[#2e3c63] text-white text-xs font-semibold cursor-pointer shadow-xs"
             >
-              Add Vendor Master
+              + Add Vendor Master
             </button>
           </div>
 
@@ -486,18 +541,54 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#1f2946] font-semibold mb-1">Vendor Beneficiary</label>
-                  <select
-                    value={vendorId}
-                    onChange={(e) => setVendorId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
-                  >
-                    {vendors.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.name} ({v.code})
-                      </option>
-                    ))}
-                  </select>
+                  <label className="block text-[#1f2946] font-semibold mb-1">Vendor / Beneficiary</label>
+                  {vendors.length > 0 ? (
+                    <div className="space-y-1.5">
+                      <select
+                        value={vendorId}
+                        onChange={(e) => setVendorId(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                      >
+                        {vendors.map((v) => (
+                          <option key={v.id} value={v.id}>
+                            {v.name} ({v.code})
+                          </option>
+                        ))}
+                        <option value="CUSTOM">+ Enter Custom Beneficiary Name</option>
+                      </select>
+                      {vendorId === 'CUSTOM' && (
+                        <input
+                          type="text"
+                          required
+                          value={customVendorName}
+                          onChange={(e) => setCustomVendorName(e.target.value)}
+                          placeholder="Enter Beneficiary / Supplier Name"
+                          className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        required
+                        value={customVendorName}
+                        onChange={(e) => setCustomVendorName(e.target.value)}
+                        placeholder="Enter Vendor / Supplier Name"
+                        className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsModalOpen(false);
+                          setIsVendorModalOpen(true);
+                        }}
+                        className="text-[11px] text-[#c62d37] hover:underline font-semibold cursor-pointer"
+                      >
+                        + Or register as a permanent Vendor Master
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -613,6 +704,158 @@ export const PayablesExpenses: React.FC<PayablesExpensesProps> = ({
                   className="px-4 py-2 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white font-semibold shadow-xs"
                 >
                   Book Bill in Payables
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* REGISTER NEW VENDOR MODAL */}
+      {isVendorModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="card-editorial bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-[#e3ded5] p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#e3ded5] pb-3">
+              <div>
+                <h3 className="text-base font-bold text-[#1f2946]">Register Approved Vendor Master</h3>
+                <p className="text-xs text-[#5a6376]">GSTIN, PAN, Bank NEFT Credentials &amp; MSME Classification</p>
+              </div>
+              <button
+                onClick={() => setIsVendorModalOpen(false)}
+                className="text-[#5a6376] hover:text-[#1f2946] text-xl font-bold cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleVendorSubmit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-[#1f2946] font-semibold mb-1">Company / Entity Legal Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newVendorName}
+                    onChange={(e) => setNewVendorName(e.target.value)}
+                    placeholder="e.g. AWS Cloud India Pvt. Ltd. or Robu Technologies"
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">GSTIN (Optional / 15 chars)</label>
+                  <input
+                    type="text"
+                    value={newVendorGstin}
+                    onChange={(e) => setNewVendorGstin(e.target.value.toUpperCase())}
+                    placeholder="36AAACS1234F1Z8"
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946] font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">PAN Number *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newVendorPan}
+                    onChange={(e) => setNewVendorPan(e.target.value.toUpperCase())}
+                    placeholder="AAACS1234F"
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946] font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">Contact Person</label>
+                  <input
+                    type="text"
+                    value={newVendorContact}
+                    onChange={(e) => setNewVendorContact(e.target.value)}
+                    placeholder="e.g. Accounts Manager"
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">MSME Classification</label>
+                  <select
+                    value={newVendorMsme}
+                    onChange={(e) => setNewVendorMsme(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                  >
+                    <option value="MICRO">Micro Enterprise (45-day MSME law)</option>
+                    <option value="SMALL">Small Enterprise</option>
+                    <option value="MEDIUM">Medium Enterprise</option>
+                    <option value="NONE">Not Applicable / Large Corp</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">Default Statutory TDS Section</label>
+                  <select
+                    value={newVendorTds}
+                    onChange={(e) => setNewVendorTds(e.target.value as TdsSection)}
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                  >
+                    <option value="SEC_194C">Sec 194C - Contractor (2%)</option>
+                    <option value="SEC_194J_TECH">Sec 194J - Tech Services (2%)</option>
+                    <option value="SEC_194J_PROF">Sec 194J - Professional (10%)</option>
+                    <option value="SEC_194H">Sec 194H - Brokerage (5%)</option>
+                    <option value="NONE">None / Zero Deduction</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[#1f2946] font-semibold mb-1">Credit Payment Terms (Days)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={newVendorTerms}
+                    onChange={(e) => setNewVendorTerms(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                  />
+                </div>
+
+                <div className="sm:col-span-2 pt-2 border-t border-[#e3ded5]">
+                  <h4 className="font-bold text-[#1f2946] mb-2">NEFT / RTGS Banking Details</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <input
+                      type="text"
+                      value={newVendorBankName}
+                      onChange={(e) => setNewVendorBankName(e.target.value)}
+                      placeholder="Bank Name (e.g. HDFC)"
+                      className="px-3 py-1.5 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946]"
+                    />
+                    <input
+                      type="text"
+                      value={newVendorAccount}
+                      onChange={(e) => setNewVendorAccount(e.target.value)}
+                      placeholder="Bank Account #"
+                      className="px-3 py-1.5 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946] font-mono"
+                    />
+                    <input
+                      type="text"
+                      value={newVendorIfsc}
+                      onChange={(e) => setNewVendorIfsc(e.target.value.toUpperCase())}
+                      placeholder="IFSC Code"
+                      className="px-3 py-1.5 rounded-lg border border-[#d1cbbf] bg-white text-[#1f2946] font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#e3ded5]">
+                <button
+                  type="button"
+                  onClick={() => setIsVendorModalOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-white border border-[#d1cbbf] text-[#5a6376] font-semibold hover:bg-[#f1efe9] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-[#1f2946] hover:bg-[#2e3c63] text-white font-semibold shadow-xs cursor-pointer"
+                >
+                  Save Vendor Master
                 </button>
               </div>
             </form>
