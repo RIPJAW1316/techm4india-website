@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+/apps/api/node_modules/
+/apps/api/dist/
 
 # testing
 /coverage
@@ -21,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+.claude/
+/tmp/
 
 # debug
 npm-debug.log*
@@ -28,9 +32,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-!.env.example
+# env files (committed per team configuration for shared developer access)
+!.env
+!.env.local
+!apps/api/.env
 
 # vercel
 .vercel
@@ -48,13 +53,7 @@ yarn-error.log*
 !/backend/.env.example
 
 # local scratch / editor config
-/tmp/
-.claude/
-
-# apps/api
-/apps/api/node_modules/
-/apps/api/dist/
-/apps/api/coverage/
-/apps/api/.env
-/apps/api/.env.*
-!/apps/api/.env.example
+.idea/
+.vscode/
+*.swp
+*.swo
