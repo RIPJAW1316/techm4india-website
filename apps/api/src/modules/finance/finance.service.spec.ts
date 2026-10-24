@@ -2,11 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FinanceService } from './finance.service';
 import { PrismaService } from '../../database/prisma.service';
 import { BadRequestException } from '@nestjs/common';
-import { DivisionCode, VoucherType } from '@prisma/client';
+import { DivisionCode, VoucherType, AccountType } from '@prisma/client';
+import { FinanceIntegrationService } from '../hrms/finance-integration.service';
 
 describe('FinanceService', () => {
   let service: FinanceService;
 
+
+  const mockFinanceIntegration = {
+    getApprovedClaimsForFinance: jest.fn(),
+    settleExpenseClaim: jest.fn(),
+    getFinalizedPayrollSummary: jest.fn(),
+  };
   const mockPrismaService = {
     account: {
       findMany: jest.fn(),
@@ -59,6 +66,7 @@ describe('FinanceService', () => {
       providers: [
         FinanceService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: FinanceIntegrationService, useValue: mockFinanceIntegration },
       ],
     }).compile();
 
@@ -209,6 +217,77 @@ describe('FinanceService', () => {
 
       const result = await service.createExpense(highExpenseDto);
       expect(result.approvalLevel).toBe(3); // > 100,000 is Tier 3
+    });
+  });
+
+  describe('Cross-Domain HRMS Integration (Payroll Accrual & Claims)', () => {
+    it('should settle an approved employee claim and post cash disbursement in GL', async () => {
+      mockFinanceIntegration.settleExpenseClaim.mockResolvedValue({
+        id: 'clm-1',
+        claimNumber: 'CLM-2026-004',
+        status: 'SETTLED',
+        totalAmount: 3200,
+        alreadySettled: false,
+      });
+
+      mockPrismaService.account.findUnique.mockResolvedValue({
+        id: 'acc-reimb',
+        code: '5050',
+        name: 'Employee Expense Reimbursements',
+        type: AccountType.EXPENSE,
+      });
+
+      mockPrismaService.journalEntry.create.mockResolvedValue({
+        id: 'jv-reimb-1',
+        entryNumber: 'JV-2026-00012',
+      });
+
+      const res = await service.settleHrmsExpenseClaim('clm-1', 'fin-officer-1', {
+        paymentMethod: 'NEFT',
+        notes: 'Monthly corporate conveyance payout',
+      });
+
+      expect(res.status).toBe('SETTLED');
+      expect(res.journalEntryNumber).toBe('JV-2026-00012');
+      expect(mockFinanceIntegration.settleExpenseClaim).toHaveBeenCalled();
+      expect(mockPrismaService.account.update).toHaveBeenCalledTimes(2);
+    });
+
+    it('should accrue finalized payroll run into balanced GL journal voucher', async () => {
+      mockFinanceIntegration.getFinalizedPayrollSummary.mockResolvedValue({
+        period: { id: 'p-1', month: 10, year: 2026 },
+        headcount: 5,
+        totals: {
+          grossSalary: 500000,
+          netPayable: 450000,
+          totalEmployeeDeductions: 50000,
+        },
+        statutoryLiabilities: {
+          employerPf: 25000,
+          totalPfRemittance: 50000,
+          professionalTaxPayable: 1000,
+          tdsWithholdingPayable: 24000,
+        },
+      });
+
+      mockPrismaService.account.findUnique.mockResolvedValue({
+        id: 'acc-gen',
+        type: AccountType.EXPENSE,
+      });
+
+      mockPrismaService.journalEntry.create.mockResolvedValue({
+        id: 'jv-payroll-1',
+        entryNumber: 'JV-PAYROLL-2026-10',
+        totalDebit: 525000,
+        totalCredit: 525000,
+      });
+
+      const res = await service.accruePayrollToLedger('p-1', 'fin-officer-1');
+
+      expect(res.success).toBe(true);
+      expect(res.journalEntry.entryNumber).toBe('JV-PAYROLL-2026-10');
+      expect(res.journalEntry.totalDebit).toBe(525000);
+      expect(res.journalEntry.totalCredit).toBe(525000);
     });
   });
 });

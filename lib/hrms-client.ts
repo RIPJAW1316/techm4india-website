@@ -693,4 +693,25 @@ export const hrmsClient = {
         byBranch: res?.byBranch || [],
       },
     })),
+  // Cross-Domain Finance ERP Integration
+  getApprovedClaimsForFinance: () =>
+    hrmsFetch<any[]>('/hrms/finance-integration/approved-claims').then((data) => ({ data })),
+  settleClaimInFinance: (claimId: string, data?: { batchReference?: string; settlementDate?: string; notes?: string }) =>
+    hrmsFetch<any>(`/hrms/finance-integration/claims/${claimId}/settle`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        batchReference: data?.batchReference || `BATCH-EXP-${Date.now()}`,
+        settlementDate: data?.settlementDate || new Date().toISOString(),
+        notes: data?.notes,
+      }),
+    }),
+  getFinalizedPayrollSummary: (periodId: string) =>
+    hrmsFetch<any>(`/hrms/finance-integration/payroll-periods/${periodId}/summary`),
+  getPresignedUpload: (data: { documentType: string; fileName: string; mimeType: string; fileSize: number }) =>
+    hrmsFetch<any>('/hrms/documents/presigned-upload', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getPresignedDownload: (storageKey: string) =>
+    hrmsFetch<any>(`/hrms/documents/presigned-download?storageKey=${encodeURIComponent(storageKey)}`),
 };

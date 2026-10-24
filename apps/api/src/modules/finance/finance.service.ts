@@ -1,9 +1,11 @@
 import {
   BadRequestException,
   Injectable,
+  Optional,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { FinanceIntegrationService } from '../hrms/finance-integration.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { CreateJournalEntryDto } from './dto/create-journal-entry.dto';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
@@ -22,7 +24,10 @@ import {
 
 @Injectable()
 export class FinanceService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Optional() private readonly financeIntegration?: FinanceIntegrationService,
+  ) {}
 
   // ===========================================================================
   // 1. CHART OF ACCOUNTS & GENERAL LEDGER
@@ -1072,5 +1077,336 @@ export class FinanceService {
 
     xml += `      </REQUESTDATA>\n    </IMPORTDATA>\n  </BODY>\n</ENVELOPE>`;
     return xml;
+  }
+
+  // ===========================================================================
+  // 8. CROSS-DOMAIN HRMS INTEGRATION (PAYROLL ACCRUAL & CLAIM SETTLEMENT)
+  // ===========================================================================
+
+  /**
+   * Helper to ensure standard General Ledger accounts exist before posting journal vouchers
+   */
+  private async getOrCreateStandardAccount(
+    code: string,
+    name: string,
+    type: AccountType,
+    category: string,
+  ) {
+    let acc = await this.prisma.account.findUnique({ where: { code } });
+    if (!acc) {
+      acc = await this.prisma.account.create({
+        data: {
+          code,
+          name,
+          type,
+          category,
+          subCategory: 'OPERATING',
+          currency: 'INR',
+          description: `Auto-provisioned ERP GL Account: ${name}`,
+        },
+      });
+    }
+    return acc;
+  }
+
+  /**
+   * Get approved employee expense claims from HRMS ready for payment disbursement
+   */
+  async getHrmsApprovedClaims() {
+    if (!this.financeIntegration) {
+      return this.prisma.expenseClaim.findMany({
+        where: { status: 'APPROVED' },
+        include: {
+          employee: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              employeeNumber: true,
+              bankAccountNumber: true,
+              bankIfsc: true,
+              bankName: true,
+              panNumber: true,
+            },
+          },
+          items: { include: { category: true } },
+        },
+      });
+    }
+    return this.financeIntegration.getApprovedClaimsForFinance();
+  }
+
+  /**
+   * Settle an approved HRMS expense claim with payment disbursement and General Ledger entry
+   */
+  async settleHrmsExpenseClaim(
+    claimId: string,
+    financeUserId: string,
+    dto: { paymentMethod?: string; settlementDate?: string; notes?: string },
+  ) {
+    const batchReference = `BATCH-EXP-${Date.now()}`;
+    let settlement: any;
+
+    if (this.financeIntegration) {
+      settlement = await this.financeIntegration.settleExpenseClaim(claimId, financeUserId, {
+        batchReference,
+        settlementDate: dto.settlementDate,
+        notes: dto.notes,
+      });
+    } else {
+      const claim = await this.prisma.expenseClaim.findUnique({ where: { id: claimId } });
+      if (!claim) throw new NotFoundException('Expense claim not found');
+      settlement = await this.prisma.expenseClaim.update({
+        where: { id: claimId },
+        data: {
+          status: 'SETTLED',
+          settlementBatchRef: batchReference,
+          reimbursementDate: new Date(dto.settlementDate || Date.now()),
+        },
+      });
+    }
+
+    if (settlement.alreadySettled) {
+      return settlement;
+    }
+
+    const claimAmount = Number(settlement.totalAmount);
+
+    // Ensure GL accounts exist
+    const reimbursementAccount = await this.getOrCreateStandardAccount(
+      '5050',
+      'Employee Expense Reimbursements',
+      AccountType.EXPENSE,
+      'Operating Expenses',
+    );
+    const bankAccount = await this.getOrCreateStandardAccount(
+      '1020',
+      'HDFC Bank - Operational Account',
+      AccountType.ASSET,
+      'Current Assets',
+    );
+
+    // Create and post payment journal entry in GL
+    const count = await this.prisma.journalEntry.count();
+    const entryNumber = `JV-${new Date().getFullYear()}-${String(count + 1).padStart(5, '0')}`;
+
+    const journal = await this.prisma.journalEntry.create({
+      data: {
+        entryNumber,
+        date: new Date(dto.settlementDate || Date.now()),
+        voucherType: VoucherType.PAYMENT,
+        reference: `REIMB-${settlement.claimNumber}`,
+        narration: `Settlement of HRMS Claim #${settlement.claimNumber} via ${dto.paymentMethod || 'NEFT'}. Ref: ${batchReference}`,
+        status: JournalStatus.POSTED,
+        division: DivisionCode.GENERAL_OVERHEAD,
+        totalDebit: claimAmount,
+        totalCredit: claimAmount,
+        createdById: financeUserId,
+        lineItems: {
+          create: [
+            {
+              accountId: reimbursementAccount.id,
+              debitAmount: claimAmount,
+              creditAmount: 0,
+              description: `Reimbursement expense for Claim ${settlement.claimNumber}`,
+            },
+            {
+              accountId: bankAccount.id,
+              debitAmount: 0,
+              creditAmount: claimAmount,
+              description: `Bank disbursement for Claim ${settlement.claimNumber}`,
+            },
+          ],
+        },
+      },
+    });
+
+    // Update balances
+    await this.prisma.account.update({
+      where: { id: bankAccount.id },
+      data: { balance: { decrement: claimAmount } },
+    });
+    await this.prisma.account.update({
+      where: { id: reimbursementAccount.id },
+      data: { balance: { increment: claimAmount } },
+    });
+
+    return {
+      ...settlement,
+      journalEntryNumber: journal.entryNumber,
+      journalId: journal.id,
+    };
+  }
+
+  /**
+   * List finalized payroll periods available for Finance General Ledger accrual
+   */
+  async getFinalizedPayrollPeriods() {
+    return this.prisma.payrollPeriod.findMany({
+      where: { status: 'FINALIZED' },
+      include: {
+        _count: { select: { payslips: true } },
+      },
+      orderBy: [{ year: 'desc' }, { month: 'desc' }],
+    });
+  }
+
+  /**
+   * Accrue finalized payroll run into General Ledger as a balanced double-entry Journal Voucher
+   */
+  async accruePayrollToLedger(periodId: string, financeUserId: string) {
+    if (!this.financeIntegration) {
+      throw new BadRequestException('Finance integration service is unavailable');
+    }
+
+    const summary = await this.financeIntegration.getFinalizedPayrollSummary(periodId);
+
+    // Auto-provision standard Indian payroll accounts
+    const salaryExpenseAcc = await this.getOrCreateStandardAccount(
+      '5010',
+      'Salary & Wages Gross Expense',
+      AccountType.EXPENSE,
+      'Operating Expenses',
+    );
+    const employerPfExpenseAcc = await this.getOrCreateStandardAccount(
+      '5020',
+      'Employer EPF Contribution Expense',
+      AccountType.EXPENSE,
+      'Operating Expenses',
+    );
+    const netSalaryPayableAcc = await this.getOrCreateStandardAccount(
+      '2040',
+      'Net Salaries Payable',
+      AccountType.LIABILITY,
+      'Current Liabilities',
+    );
+    const epfPayableAcc = await this.getOrCreateStandardAccount(
+      '2050',
+      'EPF Statutory Payable',
+      AccountType.LIABILITY,
+      'Current Liabilities',
+    );
+    const ptPayableAcc = await this.getOrCreateStandardAccount(
+      '2060',
+      'Professional Tax Payable',
+      AccountType.LIABILITY,
+      'Current Liabilities',
+    );
+    const tdsPayableAcc = await this.getOrCreateStandardAccount(
+      '2070',
+      'TDS on Salaries Payable (Sec 192)',
+      AccountType.LIABILITY,
+      'Current Liabilities',
+    );
+
+    const grossSalary = Number(summary.totals.grossSalary);
+    const employerPf = Number(summary.statutoryLiabilities.employerPf);
+    const netPayable = Number(summary.totals.netPayable);
+    const totalPf = Number(summary.statutoryLiabilities.totalPfRemittance);
+    const pt = Number(summary.statutoryLiabilities.professionalTaxPayable);
+    const tds = Number(summary.statutoryLiabilities.tdsWithholdingPayable);
+
+    const totalDebits = Number((grossSalary + employerPf).toFixed(2));
+    const totalCredits = Number((netPayable + totalPf + pt + tds).toFixed(2));
+
+    const variance = Math.abs(totalDebits - totalCredits);
+    if (variance > 0.05) {
+      throw new BadRequestException(
+        `Payroll double-entry imbalance: Debits ₹${totalDebits} != Credits ₹${totalCredits}. Variance: ₹${variance}`,
+      );
+    }
+
+    const count = await this.prisma.journalEntry.count();
+    const entryNumber = `JV-PAYROLL-${summary.period.year}-${String(summary.period.month).padStart(2, '0')}`;
+
+    const journal = await this.prisma.journalEntry.create({
+      data: {
+        entryNumber,
+        date: new Date(),
+        voucherType: VoucherType.JOURNAL,
+        reference: `PAYROLL-RUN-${summary.period.year}-${summary.period.month}`,
+        narration: `Payroll Accrual for Month ${summary.period.month}/${summary.period.year} (${summary.headcount} employees). Gross Salary + Employer PF accrued against statutory liabilities and net disbursals.`,
+        status: JournalStatus.POSTED,
+        division: DivisionCode.GENERAL_OVERHEAD,
+        totalDebit: totalDebits,
+        totalCredit: totalCredits,
+        createdById: financeUserId,
+        lineItems: {
+          create: [
+            {
+              accountId: salaryExpenseAcc.id,
+              debitAmount: grossSalary,
+              creditAmount: 0,
+              description: `Gross Salaries & Wages for ${summary.period.month}/${summary.period.year}`,
+            },
+            {
+              accountId: employerPfExpenseAcc.id,
+              debitAmount: employerPf,
+              creditAmount: 0,
+              description: `Employer PF 12% Statutory Contribution`,
+            },
+            {
+              accountId: netSalaryPayableAcc.id,
+              debitAmount: 0,
+              creditAmount: netPayable,
+              description: `Net Salary Payable to ${summary.headcount} Employees`,
+            },
+            {
+              accountId: epfPayableAcc.id,
+              debitAmount: 0,
+              creditAmount: totalPf,
+              description: `EPF Statutory Remittance Liability (Employee 12% + Employer 12%)`,
+            },
+            {
+              accountId: ptPayableAcc.id,
+              debitAmount: 0,
+              creditAmount: pt,
+              description: `Professional Tax Deductions Withheld`,
+            },
+            {
+              accountId: tdsPayableAcc.id,
+              debitAmount: 0,
+              creditAmount: tds,
+              description: `TDS under Section 192 Income Tax Withholding`,
+            },
+          ],
+        },
+      },
+      include: {
+        lineItems: { include: { account: true } },
+      },
+    });
+
+    // Update balances
+    await this.prisma.account.update({
+      where: { id: salaryExpenseAcc.id },
+      data: { balance: { increment: grossSalary } },
+    });
+    await this.prisma.account.update({
+      where: { id: employerPfExpenseAcc.id },
+      data: { balance: { increment: employerPf } },
+    });
+    await this.prisma.account.update({
+      where: { id: netSalaryPayableAcc.id },
+      data: { balance: { increment: netPayable } },
+    });
+    await this.prisma.account.update({
+      where: { id: epfPayableAcc.id },
+      data: { balance: { increment: totalPf } },
+    });
+    await this.prisma.account.update({
+      where: { id: ptPayableAcc.id },
+      data: { balance: { increment: pt } },
+    });
+    await this.prisma.account.update({
+      where: { id: tdsPayableAcc.id },
+      data: { balance: { increment: tds } },
+    });
+
+    return {
+      success: true,
+      journalEntry: journal,
+      summary,
+    };
   }
 }
