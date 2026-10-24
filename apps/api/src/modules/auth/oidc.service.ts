@@ -40,8 +40,11 @@ export class OidcService {
         clientName: 'TechM4India HRMS Portal',
         redirectUris: [
           'http://localhost:3000/hrms/auth/callback',
-          'http://localhost:3001/hrms/auth/callback',
+          'http://localhost:3002/auth/callback',
+          'http://localhost:3002/hrms/auth/callback',
           'https://techm4india.com/hrms/auth/callback',
+          'https://hrms.techm4india.com/auth/callback',
+          'https://hrms.techm4india.com/hrms/auth/callback',
           'https://portal.techm4india.com/hrms/auth/callback',
         ],
         requirePkce: true,

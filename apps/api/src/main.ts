@@ -36,7 +36,32 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // 3. CORS Configuration
-  const allowedOrigins = corsOrigin === '*' ? '*' : corsOrigin.split(',').map((o) => o.trim());
+  const defaultTrustedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'https://techm4india.com',
+    'https://hrms.techm4india.com',
+    'https://finance.techm4india.com',
+    'https://portal.techm4india.com',
+  ];
+  let allowedOrigins: string[] | string | ((origin: string | undefined, callback: (err: Error | null, origin?: any) => void) => void);
+
+  if (nodeEnv === 'production') {
+    const configured = corsOrigin && corsOrigin !== '*' ? corsOrigin.split(',').map((o) => o.trim()) : defaultTrustedOrigins;
+    allowedOrigins = (origin, callback) => {
+      if (!origin || configured.includes(origin) || defaultTrustedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        logger.warn(`CORS rejected for unauthorized origin: ${origin}`);
+        callback(new Error('Not allowed by CORS policy'));
+      }
+    };
+  } else {
+    // Development/Test
+    allowedOrigins = corsOrigin === '*' ? '*' : corsOrigin.split(',').map((o) => o.trim());
+  }
+
   app.enableCors({
     origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --tm-navy: #1f2946;
+  --tm-navy-deep: #12192d;
+  --tm-red: #c62d37;
+  --tm-sand: #fbfbf9;
+  --tm-gold: #c9983e;
+  --tm-paper: #f8fafc;
+  --tm-line: #e2e8f0;
+  --tm-text: #0f172a;
+  --tm-muted: #64748b;
+  --tm-border: #cbd5e1;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8fafc;
+  color: var(--tm-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.erp-route {
+  isolation: isolate;
+}

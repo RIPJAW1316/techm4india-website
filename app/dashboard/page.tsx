@@ -525,7 +525,13 @@ export default function DashboardPage() {
                 Close
               </button>
               <a
-                href={selectedApp.code.includes("HRMS") ? "/hrms" : selectedApp.baseUrl}
+                href={
+                  selectedApp.code.includes("HRMS")
+                    ? typeof window !== "undefined" && window.location.hostname === "localhost"
+                      ? "http://localhost:3002"
+                      : process.env.NEXT_PUBLIC_HRMS_URL || "/hrms"
+                    : selectedApp.baseUrl
+                }
                 target={selectedApp.code.includes("HRMS") ? "_self" : "_blank"}
                 rel="noopener noreferrer"
                 onClick={() => setSelectedApp(null)}

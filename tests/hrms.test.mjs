@@ -75,4 +75,18 @@ describe('HRMS Route Prerendering & Asset Verification', () => {
     assert.ok(content.includes('authClient.getSession()'), 'Must use transient session verification');
     assert.ok(!content.includes('localStorage.setItem("refresh_token"'), 'Must never leak refresh token to localStorage');
   });
+
+  test('HRMS independent application structure is established under apps/hrms', () => {
+    const hrmsPkgPath = join(process.cwd(), 'apps', 'hrms', 'package.json');
+    assert.ok(existsSync(hrmsPkgPath), 'apps/hrms/package.json must exist');
+    const pkg = JSON.parse(readFileSync(hrmsPkgPath, 'utf8'));
+    assert.equal(pkg.name, '@techm4india/hrms');
+    assert.ok(pkg.scripts.dev.includes('3002'), 'Dev port must be 3002');
+
+    const viteConfigPath = join(process.cwd(), 'apps', 'hrms', 'vite.config.ts');
+    assert.ok(existsSync(viteConfigPath), 'apps/hrms/vite.config.ts must exist');
+
+    const distPath = join(process.cwd(), 'apps', 'hrms', 'dist', 'index.html');
+    assert.ok(existsSync(distPath), 'apps/hrms/dist/index.html must exist as build artifact');
+  });
 });
