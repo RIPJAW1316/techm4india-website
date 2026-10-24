@@ -21,6 +21,7 @@ export class ApplicationsService {
     private readonly configService: ConfigService,
   ) {
     this.trustedOrigins = this.configService.get<string[]>('sso.trustedAppUrls') || [
+      'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',

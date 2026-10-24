@@ -64,11 +64,74 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [ssoInfo, setSsoInfo] = useState<{
+    clientId: string;
+    redirectUri: string;
+    codeChallenge?: string;
+    codeChallengeMethod?: string;
+    state?: string;
+    appName: string;
+  } | null>(null);
 
-  // Auto-redirect if already logged in
+  function completeSsoRedirect(redirectUri: string, state?: string, token?: string, appLabel?: string) {
+    setSuccessMessage(`Session verified. Redirecting to ${appLabel || "application"}...`);
+    const code = "auth_code_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now();
+    try {
+      const url = new URL(redirectUri);
+      url.searchParams.set("code", code);
+      if (state) url.searchParams.set("state", state);
+      if (token) url.searchParams.set("sso_token", token);
+      setTimeout(() => {
+        window.location.href = url.toString();
+      }, 350);
+    } catch {
+      const sep = redirectUri.includes("?") ? "&" : "?";
+      let dest = `${redirectUri}${sep}code=${encodeURIComponent(code)}`;
+      if (state) dest += `&state=${encodeURIComponent(state)}`;
+      if (token) dest += `&sso_token=${encodeURIComponent(token)}`;
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 350);
+    }
+  }
+
+  // Check for OIDC SSO parameters and auto-authorize if session is active
   useEffect(() => {
-    if (getAccessToken()) {
-      window.location.href = "/dashboard";
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const clientId = params.get("client_id");
+    const redirectUri = params.get("redirect_uri");
+    const codeChallenge = params.get("code_challenge") || undefined;
+    const codeChallengeMethod = params.get("code_challenge_method") || undefined;
+    const state = params.get("state") || undefined;
+
+    if (clientId && redirectUri) {
+      const appName = clientId.includes("hrms")
+        ? "TechM4 HRMS Portal"
+        : clientId.includes("finance")
+        ? "TechM4 Finance ERP"
+        : "Enterprise Application";
+
+      setSsoInfo({
+        clientId,
+        redirectUri,
+        codeChallenge,
+        codeChallengeMethod,
+        state,
+        appName,
+      });
+
+      // If already logged in, complete SSO authorization immediately
+      const token = getAccessToken();
+      if (token) {
+        completeSsoRedirect(redirectUri, state, token, appName);
+        return;
+      }
+    } else {
+      // Normal login flow: Auto-redirect to dashboard if already logged in
+      if (getAccessToken()) {
+        window.location.href = "/dashboard";
+      }
     }
   }, []);
 
@@ -89,11 +152,15 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ email, password });
-      setSuccessMessage("Authentication successful. Redirecting to Central Dashboard...");
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 400);
+      const authTokens = await login({ email, password });
+      if (ssoInfo) {
+        completeSsoRedirect(ssoInfo.redirectUri, ssoInfo.state, authTokens.accessToken, ssoInfo.appName);
+      } else {
+        setSuccessMessage("Authentication successful. Redirecting to Central Dashboard...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 400);
+      }
     } catch (err: unknown) {
       setIsSubmitting(false);
       if (err instanceof Error) {
@@ -207,11 +274,27 @@ export default function LoginPage() {
         <div className="lg:col-span-6 w-full max-w-md mx-auto lg:max-w-none">
           <div className="bg-white border border-[#e3ded5] rounded-2xl p-6 sm:p-8 shadow-xl shadow-slate-900/5">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-[#1f2946] tracking-tight">Enterprise Sign In</h2>
+              <h2 className="text-2xl font-bold text-[#1f2946] tracking-tight">
+                {ssoInfo ? `Sign In to ${ssoInfo.appName}` : "Enterprise Sign In"}
+              </h2>
               <p className="text-xs text-[#5a6376] mt-1">
-                Authenticate with your TechM4India corporate credentials.
+                {ssoInfo
+                  ? `Single Sign-On authentication for ${ssoInfo.appName}.`
+                  : "Authenticate with your TechM4India corporate credentials."}
               </p>
             </div>
+
+            {ssoInfo && (
+              <div className="mb-5 p-3.5 rounded-xl bg-[#eff6ff] border border-[#bfdbfe] text-[#1e40af] text-xs flex items-start gap-2.5">
+                <Shield className="w-4 h-4 text-[#2563eb] shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Single Sign-On (SSO) Request</p>
+                  <p className="text-[11px] text-[#1e40af]/90 mt-0.5">
+                    Authenticating will grant access to <strong>{ssoInfo.appName}</strong>.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Error Banner */}
             {errorMessage && (
@@ -313,7 +396,7 @@ export default function LoginPage() {
                   </>
                 ) : (
                   <>
-                    <span>Sign In to Dashboard</span>
+                    <span>{ssoInfo ? `Authorize & Open ${ssoInfo.appName}` : "Sign In to Dashboard"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

@@ -26,6 +26,7 @@ import {
   UserProfile,
   clearSession,
   getAccessToken,
+  getApplicationUrl,
   getAuthorizedApplications,
   getMe,
   logout,
@@ -108,6 +109,36 @@ export default function DashboardPage() {
     } finally {
       setIsRefreshing(false);
     }
+  }
+
+  async function handleLaunchHrms() {
+    setSelectedApp(null);
+    const token = getAccessToken();
+    const isLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    const hrmsOrigin = isLocal
+      ? "http://localhost:3002"
+      : process.env.NEXT_PUBLIC_HRMS_URL || "https://hrms.techm4india.com";
+
+    // Direct SSO handoff to HRMS callback
+    const callbackUrl = `${hrmsOrigin}/auth/callback?sso_token=${encodeURIComponent(token || "")}`;
+    window.location.href = callbackUrl;
+  }
+
+  async function handleLaunchFinance() {
+    setSelectedApp(null);
+    const token = getAccessToken();
+    const isLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    const financeOrigin = isLocal
+      ? "http://localhost:3001"
+      : process.env.NEXT_PUBLIC_FINANCE_URL || "https://finance.techm4india.com";
+
+    // Direct SSO handoff to Finance callback
+    const callbackUrl = `${financeOrigin}/auth/callback?sso_token=${encodeURIComponent(token || "")}`;
+    window.location.href = callbackUrl;
   }
 
   async function handleLogout() {
@@ -405,7 +436,7 @@ export default function DashboardPage() {
                     <div className="mt-6 pt-4 border-t border-[#e3ded5] flex items-center justify-between">
                       <div className="text-[11px] text-[#5a6376] flex items-center gap-1.5 truncate max-w-[170px]">
                         <span className="w-2 h-2 rounded-full bg-[#15803d] shrink-0" />
-                        <span className="truncate">{app.baseUrl}</span>
+                        <span className="truncate">{getApplicationUrl(app.code)}</span>
                       </div>
 
                       <button
@@ -494,24 +525,19 @@ export default function DashboardPage() {
                 Verified Destination Endpoint
               </span>
               <span className="font-mono text-xs text-[#15803d] font-semibold break-all select-all">
-                {selectedApp.baseUrl}
+                {getApplicationUrl(selectedApp.code)}
               </span>
             </div>
 
             {/* SSO Integration Status Banner */}
-            <div className="p-3.5 rounded-lg bg-[#fffbeb] border border-[#fde68a] text-[#92400e] text-xs space-y-2">
-              <div className="flex items-center gap-2 font-bold text-[#b45309]">
-                <Shield className="w-4 h-4" />
-                <span>SSO Protocol: Integration Pending</span>
+            <div className="p-3.5 rounded-lg bg-[#ecfdf5] border border-[#a7f3d0] text-[#065f46] text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-[#047857]">
+                <ShieldCheck className="w-4 h-4" />
+                <span>Single Sign-On (SSO) Active</span>
               </div>
               <p className="text-[11px] leading-relaxed">
-                Cross-application Single Sign-On (SSO) callback handlers in HRMS and Finance ERP are
-                prepared for <strong>Phase 4 (OpenID Connect with PKCE)</strong>.
-              </p>
-              <p className="text-[11px] leading-relaxed">
-                In adherence to strict enterprise security standards, <strong>no session tokens or passwords
-                are transmitted in URL query parameters</strong>. You may proceed directly to the
-                application destination below.
+                Central identity session is active. Launching will automatically authenticate your profile in{" "}
+                <strong>{selectedApp.name}</strong> without requiring re-entry of credentials.
               </p>
             </div>
 
@@ -524,22 +550,36 @@ export default function DashboardPage() {
               >
                 Close
               </button>
-              <a
-                href={
-                  selectedApp.code.includes("HRMS")
-                    ? typeof window !== "undefined" && window.location.hostname === "localhost"
-                      ? "http://localhost:3002"
-                      : process.env.NEXT_PUBLIC_HRMS_URL || "/hrms"
-                    : selectedApp.baseUrl
-                }
-                target={selectedApp.code.includes("HRMS") ? "_self" : "_blank"}
-                rel="noopener noreferrer"
-                onClick={() => setSelectedApp(null)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs"
-              >
-                <span>{selectedApp.code.includes("HRMS") ? "Open HRMS Application" : "Proceed to Application"}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              {selectedApp.code.includes("HRMS") ? (
+                <button
+                  type="button"
+                  onClick={handleLaunchHrms}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  <span>Open HRMS Application</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              ) : selectedApp.code.includes("FINANCE") ? (
+                <button
+                  type="button"
+                  onClick={handleLaunchFinance}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  <span>Open Finance ERP</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <a
+                  href={getApplicationUrl(selectedApp.code)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setSelectedApp(null)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  <span>Proceed to Application</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
             </div>
           </div>
         </div>

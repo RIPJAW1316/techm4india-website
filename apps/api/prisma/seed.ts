@@ -32,13 +32,13 @@ async function main() {
       code: 'HRMS',
       name: 'TechM4 HRMS',
       description: 'Human Resource Management System application.',
-      baseUrl: 'http://localhost:3001',
+      baseUrl: 'http://localhost:3002',
     },
     {
       code: 'FINANCE',
       name: 'TechM4 Finance ERP',
       description: 'Financial Management and Accounting application.',
-      baseUrl: 'http://localhost:3002',
+      baseUrl: 'http://localhost:3001',
     },
   ];
 

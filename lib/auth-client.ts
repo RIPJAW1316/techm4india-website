@@ -57,7 +57,7 @@ const SESSION_DEMO_PERSONA_KEY = "tm4i_active_demo_persona";
 
 /**
  * Resolves application URL based on runtime environment:
- * - Local development: dedicated ports (:3000 main, :3001 hrms, :3002 finance)
+ * - Local development: dedicated ports (:3000 main, :3001 finance, :3002 hrms)
  * - Production: dedicated subdomains (techm4india.com, hrms.techm4india.com, finance.techm4india.com)
  */
 export function getApplicationUrl(appCode: string): string {
@@ -69,13 +69,13 @@ export function getApplicationUrl(appCode: string): string {
       if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FINANCE_URL) {
         return process.env.NEXT_PUBLIC_FINANCE_URL;
       }
-      return isLocal ? 'http://localhost:3002' : 'https://finance.techm4india.com';
+      return isLocal ? 'http://localhost:3001' : 'https://finance.techm4india.com';
     }
     case 'HRMS': {
       if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_HRMS_URL) {
         return process.env.NEXT_PUBLIC_HRMS_URL;
       }
-      return isLocal ? '/hrms' : 'https://hrms.techm4india.com';
+      return isLocal ? 'http://localhost:3002' : 'https://hrms.techm4india.com';
     }
     case 'CENTRAL_DASHBOARD':
     default: {
@@ -289,7 +289,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3002",
+        baseUrl: "http://localhost:3001",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -297,7 +297,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "HRMS",
         name: "TechM4 HRMS",
         description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "/hrms",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -343,7 +343,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3002",
+        baseUrl: "http://localhost:3001",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -351,7 +351,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "HRMS",
         name: "TechM4 HRMS",
         description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "/hrms",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -390,7 +390,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "HRMS",
         name: "TechM4 HRMS",
         description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "/hrms",
+        baseUrl: "http://localhost:3002",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -420,7 +420,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         code: "FINANCE",
         name: "TechM4 Finance ERP",
         description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3002",
+        baseUrl: "http://localhost:3001",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },

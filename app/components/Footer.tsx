@@ -1,8 +1,22 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Suppress public marketing footer on enterprise workspaces
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname?.startsWith("/hrms") ||
+    pathname?.startsWith("/erp")
+  ) {
+    return null;
+  }
+
   return (
     <footer className="site-footer">
       <div className="footer-motif" aria-hidden="true">

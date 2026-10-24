@@ -39,6 +39,8 @@ export class OidcService {
         clientId: 'hrms-app-client',
         clientName: 'TechM4India HRMS Portal',
         redirectUris: [
+          'http://localhost:5173/hrms/auth/callback',
+          'http://localhost:5173/auth/callback',
           'http://localhost:3000/hrms/auth/callback',
           'http://localhost:3002/auth/callback',
           'http://localhost:3002/hrms/auth/callback',
@@ -53,6 +55,8 @@ export class OidcService {
         clientId: 'finance-erp-client',
         clientName: 'TechM4India Finance ERP',
         redirectUris: [
+          'http://localhost:5173/erp/finance/auth/callback',
+          'http://localhost:5173/auth/callback',
           'http://localhost:3000/erp/finance/auth/callback',
           'http://localhost:3001/auth/callback',
           'http://localhost:3001/erp/finance/auth/callback',

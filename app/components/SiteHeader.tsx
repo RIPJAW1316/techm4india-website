@@ -4,10 +4,21 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";
 
 export function SiteHeader() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  // Suppress public website floating header on dedicated ERP / HRMS / Dashboard routes
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname?.startsWith("/hrms") ||
+    pathname?.startsWith("/erp")
+  ) {
+    return null;
+  }
   const closeButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const menuOverlay = useRef<HTMLDivElement>(null);
