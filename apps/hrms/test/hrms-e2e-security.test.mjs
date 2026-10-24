@@ -161,6 +161,13 @@ test('Finance ERP Module Boundary Verification', async (t) => {
       assert.ok(finPkg.scripts.dev.includes('3001'), 'Finance dev port must be 3001 to avoid conflict with HRMS port 3002');
     }
   });
+
+  await t.test('apps/finance exists as standalone application workspace', () => {
+    assert.ok(
+      fs.existsSync(standaloneFinancePath),
+      'Finance ERP is decoupled into apps/finance standalone module'
+    );
+  });
 });
 
 test('Render Static Site Configuration & SPA Deep Linking', async (t) => {

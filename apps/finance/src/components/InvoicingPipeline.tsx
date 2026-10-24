@@ -45,10 +45,10 @@ export const InvoicingPipeline: React.FC<InvoicingPipelineProps> = ({
     }>
   >([
     {
-      description: 'Enterprise AI Strategy & Architecture Enablement',
+      description: '',
       hsnSacCode: '998313',
       quantity: 1,
-      unitPrice: 150000,
+      unitPrice: 0,
       discount: 0,
       gstRate: 18,
     },
@@ -84,10 +84,10 @@ export const InvoicingPipeline: React.FC<InvoicingPipelineProps> = ({
     setItems([
       ...items,
       {
-        description: 'STEM Curriculum Lab Equipment',
+        description: '',
         hsnSacCode: '999293',
         quantity: 1,
-        unitPrice: 50000,
+        unitPrice: 0,
         discount: 0,
         gstRate: 18,
       },
@@ -252,7 +252,16 @@ export const InvoicingPipeline: React.FC<InvoicingPipelineProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {filteredInvoices.map((inv) => {
+                {filteredInvoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center py-12 text-[#94a3b8]">
+                      <FileText className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#94a3b8]" />
+                      <p className="font-semibold text-xs text-[#5a6376]">No tax invoices found</p>
+                      <p className="text-[11px] text-[#94a3b8] mt-0.5">Click &quot;New Tax Invoice&quot; to issue your first invoice.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInvoices.map((inv) => {
                   const isSelected = selectedInvoice?.id === inv.id;
                   return (
                     <tr
@@ -294,7 +303,7 @@ export const InvoicingPipeline: React.FC<InvoicingPipelineProps> = ({
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>

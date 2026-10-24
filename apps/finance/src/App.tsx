@@ -21,411 +21,49 @@ import {
 } from './types';
 
 // ==============================================================================
-// INITIAL PRODUCTION DATA SEED (Section 09 Specification)
+// CHART OF ACCOUNTS MASTER (Zero Baseline - Ready for live operations)
 // ==============================================================================
 
 const initialAccounts: AccountItem[] = [
   // Assets
-  { id: 'acc-1010', code: '1010', name: 'HDFC Bank Operating Current A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 2480000, isActive: true },
-  { id: 'acc-1020', code: '1020', name: 'ICICI Bank Secondary Operating A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 760000, isActive: true },
-  { id: 'acc-1030', code: '1030', name: 'Petty Cash Hyderabad HQ', type: 'ASSET', category: 'CASH', currency: 'INR', balance: 45000, isActive: true },
-  { id: 'acc-1100', code: '1100', name: 'Accounts Receivable (Trade Debtors)', type: 'ASSET', category: 'CURRENT_ASSETS', currency: 'INR', balance: 1180000, isActive: true },
-  { id: 'acc-1200', code: '1200', name: 'Input Tax Credit - IGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 120000, isActive: true },
-  { id: 'acc-1210', code: '1210', name: 'Input Tax Credit - CGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 234300, isActive: true },
-  { id: 'acc-1220', code: '1220', name: 'Input Tax Credit - SGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 234300, isActive: true },
-  { id: 'acc-1500', code: '1500', name: 'STEM Labs & Hardware Equipment', type: 'ASSET', category: 'FIXED_ASSETS', currency: 'INR', balance: 831400, isActive: true },
+  { id: 'acc-1010', code: '1010', name: 'HDFC Bank Operating Current A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1020', code: '1020', name: 'ICICI Bank Secondary Operating A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1030', code: '1030', name: 'Petty Cash Hyderabad HQ', type: 'ASSET', category: 'CASH', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1100', code: '1100', name: 'Accounts Receivable (Trade Debtors)', type: 'ASSET', category: 'CURRENT_ASSETS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1200', code: '1200', name: 'Input Tax Credit - IGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1210', code: '1210', name: 'Input Tax Credit - CGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1220', code: '1220', name: 'Input Tax Credit - SGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-1500', code: '1500', name: 'STEM Labs & Hardware Equipment', type: 'ASSET', category: 'FIXED_ASSETS', currency: 'INR', balance: 0, isActive: true },
 
   // Liabilities
-  { id: 'acc-2010', code: '2010', name: 'Accounts Payable (Trade Creditors)', type: 'LIABILITY', category: 'CURRENT_LIABILITIES', currency: 'INR', balance: 640000, isActive: true },
-  { id: 'acc-2100', code: '2100', name: 'Output GST Payable (Net Central & State)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 86400, isActive: true },
-  { id: 'acc-2150', code: '2150', name: 'TDS Payable (Section 194C & 194J)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 41600, isActive: true },
+  { id: 'acc-2010', code: '2010', name: 'Accounts Payable (Trade Creditors)', type: 'LIABILITY', category: 'CURRENT_LIABILITIES', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-2100', code: '2100', name: 'Output GST Payable (Net Central & State)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-2150', code: '2150', name: 'TDS Payable (Section 194C & 194J)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 0, isActive: true },
 
   // Equity
-  { id: 'acc-3010', code: '3010', name: 'Paid-up Equity Share Capital', type: 'EQUITY', category: 'SHARE_CAPITAL', currency: 'INR', balance: 1000000, isActive: true },
-  { id: 'acc-3020', code: '3020', name: 'Retained Earnings & Reserves', type: 'EQUITY', category: 'RESERVES', currency: 'INR', balance: 4072000, isActive: true },
+  { id: 'acc-3010', code: '3010', name: 'Paid-up Equity Share Capital', type: 'EQUITY', category: 'SHARE_CAPITAL', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-3020', code: '3020', name: 'Retained Earnings & Reserves', type: 'EQUITY', category: 'RESERVES', currency: 'INR', balance: 0, isActive: true },
 
   // Income / Revenue (Division-wise)
-  { id: 'acc-4010', code: '4010', name: 'Revenue: TechM4Solutions Software', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 1950000, isActive: true },
-  { id: 'acc-4020', code: '4020', name: 'Revenue: TechM4Engineering COE Labs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 1250000, isActive: true },
-  { id: 'acc-4030', code: '4030', name: 'Revenue: TechM4Schools STEM Programs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 850000, isActive: true },
-  { id: 'acc-4040', code: '4040', name: 'Revenue: TechM4Space CanSat Aerospace', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 520000, isActive: true },
-  { id: 'acc-4050', code: '4050', name: 'Revenue: Horizon Startup School', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 280000, isActive: true },
+  { id: 'acc-4010', code: '4010', name: 'Revenue: TechM4Solutions Software', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-4020', code: '4020', name: 'Revenue: TechM4Engineering COE Labs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-4030', code: '4030', name: 'Revenue: TechM4Schools STEM Programs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-4040', code: '4040', name: 'Revenue: TechM4Space CanSat Aerospace', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-4050', code: '4050', name: 'Revenue: Horizon Startup School', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
 
   // Expenses
-  { id: 'acc-5010', code: '5010', name: 'Cloud Infrastructure & GPU Compute', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 510000, isActive: true },
-  { id: 'acc-5020', code: '5020', name: 'Lab Hardware & Components Procurement', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 620000, isActive: true },
-  { id: 'acc-5030', code: '5030', name: 'Technical Honorarium & SME Payouts', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 320000, isActive: true },
-  { id: 'acc-5100', code: '5100', name: 'Employee Salaries & Allowances', type: 'EXPENSE', category: 'OPERATING_EXPENSES', currency: 'INR', balance: 1320000, isActive: true },
-  { id: 'acc-5200', code: '5200', name: 'Corporate Office Rent & Facility', type: 'EXPENSE', category: 'ADMIN_OVERHEADS', currency: 'INR', balance: 310000, isActive: true },
+  { id: 'acc-5010', code: '5010', name: 'Cloud Infrastructure & GPU Compute', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-5020', code: '5020', name: 'Lab Hardware & Components Procurement', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-5030', code: '5030', name: 'Technical Honorarium & SME Payouts', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-5100', code: '5100', name: 'Employee Salaries & Allowances', type: 'EXPENSE', category: 'OPERATING_EXPENSES', currency: 'INR', balance: 0, isActive: true },
+  { id: 'acc-5200', code: '5200', name: 'Corporate Office Rent & Facility', type: 'EXPENSE', category: 'ADMIN_OVERHEADS', currency: 'INR', balance: 0, isActive: true },
 ];
 
-const initialJournalEntries: JournalEntryItem[] = [
-  {
-    id: 'jv-1',
-    entryNumber: 'JV-2026-00041',
-    date: '2026-10-22',
-    voucherType: 'RECEIPT',
-    reference: 'HDFC-NEFT-99120',
-    narration: 'Client settlement received from Gitam University for COE Engineering Lab installation',
-    status: 'POSTED',
-    division: 'TECHM4_ENGINEERING',
-    totalDebit: 650000,
-    totalCredit: 650000,
-    lineItems: [
-      { accountId: 'acc-1010', accountName: 'HDFC Bank Operating Current A/C', debitAmount: 650000, creditAmount: 0 },
-      { accountId: 'acc-1100', accountName: 'Accounts Receivable (Trade Debtors)', debitAmount: 0, creditAmount: 650000 },
-    ],
-  },
-  {
-    id: 'jv-2',
-    entryNumber: 'JV-2026-00042',
-    date: '2026-10-21',
-    voucherType: 'PURCHASE_BILL',
-    reference: 'AMZN-99182',
-    narration: 'Monthly GPU cluster and database hosting invoice for Solutions division',
-    status: 'POSTED',
-    division: 'TECHM4_SOLUTIONS',
-    totalDebit: 118000,
-    totalCredit: 118000,
-    lineItems: [
-      { accountId: 'acc-5010', accountName: 'Cloud Infrastructure & GPU Compute', debitAmount: 100000, creditAmount: 0 },
-      { accountId: 'acc-1200', accountName: 'Input Tax Credit - IGST Receivable', debitAmount: 18000, creditAmount: 0 },
-      { accountId: 'acc-2010', accountName: 'Accounts Payable (Trade Creditors)', debitAmount: 0, creditAmount: 116000 },
-      { accountId: 'acc-2150', accountName: 'TDS Payable (Section 194C & 194J)', debitAmount: 0, creditAmount: 2000 },
-    ],
-  },
-  {
-    id: 'jv-3',
-    entryNumber: 'JV-2026-00043',
-    date: '2026-10-20',
-    voucherType: 'JOURNAL',
-    reference: 'MONTH-END-ADJ',
-    narration: 'Depreciation accrual on STEM Lab Hardware and 3D printing equipment',
-    status: 'POSTED',
-    division: 'TECHM4_SCHOOLS',
-    totalDebit: 35000,
-    totalCredit: 35000,
-    lineItems: [
-      { accountId: 'acc-5020', accountName: 'Lab Hardware & Components Procurement', debitAmount: 35000, creditAmount: 0 },
-      { accountId: 'acc-1500', accountName: 'STEM Labs & Hardware Equipment', debitAmount: 0, creditAmount: 35000 },
-    ],
-  },
-];
-
-const initialInvoices: InvoiceItem[] = [
-  {
-    id: 'inv-1',
-    invoiceNumber: 'INV-2026-00101',
-    customerId: 'cust-1',
-    customerName: 'Anurag University Hyderabad',
-    customerGstin: '36AAACA1122F1Z4',
-    stateCode: '36',
-    placeOfSupply: 'Telangana (36)',
-    type: 'B2B',
-    status: 'PARTIALLY_PAID',
-    issueDate: '2026-10-05',
-    dueDate: '2026-11-04',
-    currency: 'INR',
-    subtotal: 500000,
-    discount: 0,
-    taxableAmount: 500000,
-    cgst: 45000,
-    sgst: 45000,
-    igst: 0,
-    totalAmount: 590000,
-    amountPaid: 300000,
-    balanceDue: 290000,
-    paymentTerms: 'Net 30',
-    division: 'TECHM4_ENGINEERING',
-    razorpayPaymentLink: 'https://rzp.io/i/tm4_inv202600101',
-    irn: 'irn_49a8c1f038d10b77e23190abf410',
-    items: [
-      {
-        description: 'Advanced AI & Embedded Robotics Centre of Excellence (COE) Setup',
-        hsnSacCode: '998313',
-        quantity: 1,
-        unitPrice: 500000,
-        discount: 0,
-        gstRate: 18,
-        taxableAmount: 500000,
-        cgstAmount: 45000,
-        sgstAmount: 45000,
-        igstAmount: 0,
-        totalAmount: 590000,
-      },
-    ],
-  },
-  {
-    id: 'inv-2',
-    invoiceNumber: 'INV-2026-00102',
-    customerId: 'cust-2',
-    customerName: 'Bengaluru Tech Park Innovations',
-    customerGstin: '29AAACF9988H1Z1',
-    stateCode: '29',
-    placeOfSupply: 'Karnataka (29)',
-    type: 'B2B',
-    status: 'SENT',
-    issueDate: '2026-10-12',
-    dueDate: '2026-11-11',
-    currency: 'INR',
-    subtotal: 600000,
-    discount: 0,
-    taxableAmount: 600000,
-    cgst: 0,
-    sgst: 0,
-    igst: 108000,
-    totalAmount: 708000,
-    amountPaid: 0,
-    balanceDue: 708000,
-    paymentTerms: 'Net 30',
-    division: 'TECHM4_SOLUTIONS',
-    razorpayPaymentLink: 'https://rzp.io/i/tm4_inv202600102',
-    irn: 'irn_88bb213190abf410a8c1f038d10b',
-    items: [
-      {
-        description: 'Custom Enterprise ERP Architecture & Backend Microservices Consulting',
-        hsnSacCode: '998313',
-        quantity: 1,
-        unitPrice: 600000,
-        discount: 0,
-        gstRate: 18,
-        taxableAmount: 600000,
-        cgstAmount: 0,
-        sgstAmount: 0,
-        igstAmount: 108000,
-        totalAmount: 708000,
-      },
-    ],
-  },
-  {
-    id: 'inv-3',
-    invoiceNumber: 'INV-2026-00103',
-    customerId: 'cust-3',
-    customerName: 'Oakridge International School Hyderabad',
-    customerGstin: '36AAAC08821K1Z9',
-    stateCode: '36',
-    placeOfSupply: 'Telangana (36)',
-    type: 'B2B',
-    status: 'OVERDUE',
-    issueDate: '2026-09-01',
-    dueDate: '2026-10-01',
-    currency: 'INR',
-    subtotal: 200000,
-    discount: 0,
-    taxableAmount: 200000,
-    cgst: 18000,
-    sgst: 18000,
-    igst: 0,
-    totalAmount: 236000,
-    amountPaid: 0,
-    balanceDue: 236000,
-    paymentTerms: 'Net 30',
-    division: 'TECHM4_SCHOOLS',
-    razorpayPaymentLink: 'https://rzp.io/i/tm4_inv202600103',
-    items: [
-      {
-        description: 'Semester 1 STEM Tinkering Lab Curricula & Robotic Kits (Grades 6-10)',
-        hsnSacCode: '999293',
-        quantity: 1,
-        unitPrice: 200000,
-        discount: 0,
-        gstRate: 18,
-        taxableAmount: 200000,
-        cgstAmount: 18000,
-        sgstAmount: 18000,
-        igstAmount: 0,
-        totalAmount: 236000,
-      },
-    ],
-  },
-];
-
-const initialVendors: VendorItem[] = [
-  {
-    id: 'v-1',
-    code: 'VND-001',
-    name: 'Silicon Embedded & Robotic Components LLP',
-    contactPerson: 'Suresh Kumar',
-    gstin: '36AAACS1234F1Z8',
-    pan: 'AAACS1234F',
-    msmeType: 'MICRO',
-    bankAccount: '50200012345678',
-    ifsc: 'HDFC0000123',
-    bankName: 'HDFC Bank Banjara Hills',
-    tdsSection: 'SEC_194C',
-    paymentTermsDays: 30,
-  },
-  {
-    id: 'v-2',
-    code: 'VND-002',
-    name: 'Amazon Web Services Cloud India Pvt. Ltd.',
-    contactPerson: 'Cloud Billing Ops',
-    gstin: '27AABCA1234R1Z0',
-    pan: 'AABCA1234R',
-    msmeType: 'NONE',
-    bankAccount: '000205001928',
-    ifsc: 'ICIC0000002',
-    bankName: 'ICICI Bank Mumbai',
-    tdsSection: 'SEC_194J_TECH',
-    paymentTermsDays: 15,
-  },
-  {
-    id: 'v-3',
-    code: 'VND-003',
-    name: 'Aerospace Dynamics Sensors & CanSat Kits',
-    contactPerson: 'Vikram Mohan',
-    gstin: '36AADCA9876P1Z3',
-    pan: 'AADCA9876P',
-    msmeType: 'SMALL',
-    bankAccount: '91802001928371',
-    ifsc: 'UTIB0000881',
-    bankName: 'Axis Bank Hyderabad',
-    tdsSection: 'SEC_194C',
-    paymentTermsDays: 30,
-  },
-];
-
-const initialExpenses: ExpenseItem[] = [
-  {
-    id: 'exp-1',
-    expenseNumber: 'EXP-2026-00051',
-    vendorId: 'v-2',
-    vendorName: 'Amazon Web Services Cloud India Pvt. Ltd.',
-    category: 'INFRASTRUCTURE',
-    division: 'TECHM4_SOLUTIONS',
-    description: 'October AWS GPU Cluster & Managed Postgres instances',
-    invoiceNumber: 'AWS-INV-2026-10',
-    dueDate: '2026-11-05',
-    grossAmount: 100000,
-    tdsSection: 'SEC_194J_TECH',
-    tdsRate: 2.0,
-    tdsAmount: 2000,
-    netPayable: 98000,
-    status: 'APPROVED',
-    approvalLevel: 2,
-    poNumber: 'PO-2026-088',
-  },
-  {
-    id: 'exp-2',
-    expenseNumber: 'EXP-2026-00052',
-    vendorId: 'v-1',
-    vendorName: 'Silicon Embedded & Robotic Components LLP',
-    category: 'HARDWARE',
-    division: 'TECHM4_SCHOOLS',
-    description: 'Microcontroller boards & sensor modules for 50 School Tinkering Kits',
-    invoiceNumber: 'SIL-9912',
-    dueDate: '2026-11-15',
-    grossAmount: 140000,
-    tdsSection: 'SEC_194C',
-    tdsRate: 2.0,
-    tdsAmount: 2800,
-    netPayable: 137200,
-    status: 'SUBMITTED',
-    approvalLevel: 3,
-    poNumber: 'PO-2026-092',
-  },
-];
-
-
-const initialHrmsClaims: HrmsClaimItem[] = [
-  {
-    id: 'clm-seed-001',
-    claimNumber: 'CLM-2026-001',
-    status: 'APPROVED',
-    totalAmount: 4850,
-    currency: 'INR',
-    submissionDate: '2026-10-18',
-    notes: 'Client onsite demonstration and telemetry sensor transport to ISRO Hyderabad incubator',
-    employee: {
-      id: 'emp-002',
-      employeeNumber: 'TM-002',
-      firstName: 'Rohan',
-      lastName: 'Verma',
-      bankAccountNumber: '123456789012',
-      bankIfsc: 'ICIC0000456',
-      bankName: 'ICICI Bank',
-      panNumber: 'FGHIJ5678K',
-    },
-    items: [
-      {
-        id: 'item-001',
-        amount: 3200,
-        description: 'Local conveyance & airport taxi for client hardware deployment',
-        expenseDate: '2026-10-17',
-        merchantName: 'Ola Cabs Hyderabad',
-        category: { id: 'c-1', code: 'TRAVEL', name: 'Travel & Local Conveyance' },
-      },
-      {
-        id: 'item-002',
-        amount: 1650,
-        description: 'Client team working dinner during deployment',
-        expenseDate: '2026-10-17',
-        merchantName: 'Paradise Biryani Gachibowli',
-        category: { id: 'c-2', code: 'MEALS', name: 'Client Entertainment & Food' },
-      },
-    ],
-  },
-  {
-    id: 'clm-seed-002',
-    claimNumber: 'CLM-2026-002',
-    status: 'APPROVED',
-    totalAmount: 12500,
-    currency: 'INR',
-    submissionDate: '2026-10-20',
-    notes: 'K-12 STEM Innovation Lab hardware components and fast-track shipping',
-    employee: {
-      id: 'emp-003',
-      employeeNumber: 'TM-003',
-      firstName: 'Dr. K. Sudheer',
-      lastName: 'Reddy',
-      bankAccountNumber: '918273645544',
-      bankIfsc: 'HDFC0001234',
-      bankName: 'HDFC Bank',
-      panNumber: 'ABCDE1234F',
-    },
-    items: [
-      {
-        id: 'item-003',
-        amount: 12500,
-        description: 'Emergency Raspberry Pi 5 boards for school robotics curriculum',
-        expenseDate: '2026-10-19',
-        merchantName: 'Robu.in Pune',
-        category: { id: 'c-4', code: 'OFFICE', name: 'Office Equipment & Books' },
-      },
-    ],
-  },
-  {
-    id: 'clm-seed-003',
-    claimNumber: 'CLM-2026-003',
-    status: 'SETTLED',
-    totalAmount: 2400,
-    currency: 'INR',
-    submissionDate: '2026-10-10',
-    settlementBatchRef: 'BATCH-EXP-20261015-01',
-    reimbursementDate: '2026-10-15',
-    notes: 'Monthly broadband internet reimbursement for remote dev operations',
-    employee: {
-      id: 'emp-004',
-      employeeNumber: 'TM-004',
-      firstName: 'Mahesh',
-      lastName: 'Mannuru',
-      bankAccountNumber: '445566778899',
-      bankIfsc: 'SBIN0002134',
-      bankName: 'State Bank of India',
-      panNumber: 'KLMNO9012P',
-    },
-    items: [
-      {
-        id: 'item-004',
-        amount: 2400,
-        description: 'ACT Fibernet 1 Gbps Gigabit Fiber connection (Sept-Oct)',
-        expenseDate: '2026-10-08',
-        merchantName: 'ACT Fibernet',
-        category: { id: 'c-3', code: 'COMM', name: 'Internet & Mobile Reimbursement' },
-      },
-    ],
-  },
-];
+const initialJournalEntries: JournalEntryItem[] = [];
+const initialInvoices: InvoiceItem[] = [];
+const initialVendors: VendorItem[] = [];
+const initialExpenses: ExpenseItem[] = [];
+const initialHrmsClaims: HrmsClaimItem[] = [];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('overview');
@@ -860,6 +498,9 @@ export default function App() {
           <FinancialOverview
             selectedDivision={selectedDivision}
             onNavigateTab={(tab) => setActiveTab(tab)}
+            accounts={accounts}
+            invoices={invoices}
+            expenses={expenses}
           />
         )}
 
@@ -895,13 +536,20 @@ export default function App() {
         )}
 
         {activeTab === 'gst' && (
-          <GstComplianceCenter onExportTally={handleExportTally} />
+          <GstComplianceCenter
+            onExportTally={handleExportTally}
+            invoices={invoices}
+            expenses={expenses}
+          />
         )}
 
         {activeTab === 'statements' && (
           <FinancialStatements
             selectedDivision={selectedDivision}
             onExportTally={handleExportTally}
+            accounts={accounts}
+            invoices={invoices}
+            expenses={expenses}
           />
         )}
       </main>
