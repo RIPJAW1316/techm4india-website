@@ -286,6 +286,14 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         "finance:access",
         "finance:manage",
         "audit:read",
+        "crm:access",
+        "crm:manage",
+        "crm:leads:read",
+        "crm:leads:manage",
+        "crm:deals:read",
+        "crm:deals:manage",
+        "crm:institutions:read",
+        "crm:institutions:manage",
       ],
       organizationCode: "TECHM4INDIA",
       authorizedApplications: ["CENTRAL_DASHBOARD", "HRMS", "FINANCE", "CRM"],
@@ -304,6 +312,14 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         name: "TechM4 HRMS",
         description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
         baseUrl: "http://localhost:3002",
+        isActive: true,
+        grantedAt: new Date().toISOString(),
+      },
+      {
+        code: "CRM",
+        name: "TechM4 CRM & Sales",
+        description: "Zoho-inspired enterprise sales pipeline, institution relationship management, 1-click lead conversion, deals Kanban, and MoU tracking.",
+        baseUrl: "http://localhost:3003",
         isActive: true,
         grantedAt: new Date().toISOString(),
       },
@@ -432,6 +448,50 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
       },
     ],
   },
+  "crm.lead@techm4india.com": {
+    email: "crm.lead@techm4india.com",
+    passwords: ["TechM4Crm#2026", "TechM4Admin2026!", "TechM4Crm2026", "crm123", "password"],
+    profile: {
+      id: "usr-demo-crm-006",
+      email: "crm.lead@techm4india.com",
+      firstName: "Dr. Sneha",
+      lastName: "Roy",
+      isActive: true,
+      roles: ["CRM_LEAD", "INSTITUTIONAL_SALES_HEAD"],
+      permissions: [
+        "auth:login",
+        "crm:access",
+        "crm:manage",
+        "crm:leads:read",
+        "crm:leads:manage",
+        "crm:deals:read",
+        "crm:deals:manage",
+        "crm:institutions:read",
+        "crm:institutions:manage",
+        "users:read",
+      ],
+      organizationCode: "TECHM4INDIA",
+      authorizedApplications: ["CRM", "CENTRAL_DASHBOARD"],
+    },
+    applications: [
+      {
+        code: "CRM",
+        name: "TechM4 CRM & Sales",
+        description: "Zoho-inspired enterprise sales pipeline, institution relationship management, 1-click lead conversion, deals Kanban, and MoU tracking.",
+        baseUrl: "http://localhost:3003",
+        isActive: true,
+        grantedAt: new Date().toISOString(),
+      },
+      {
+        code: "CENTRAL_DASHBOARD",
+        name: "Central Governance & Administration",
+        description: "System user directory, role-permission matrix administration, audit log streams, and enterprise authorization policies.",
+        baseUrl: "/dashboard",
+        isActive: true,
+        grantedAt: new Date().toISOString(),
+      },
+    ],
+  },
   "engineer@techm4india.com": {
     email: "engineer@techm4india.com",
     passwords: ["TechM4Eng#2026", "TechM4Admin2026!"],
@@ -475,17 +535,25 @@ export async function login(credentials: {
   const url = `${baseUrl}/api/v1/auth/login`;
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        email: credentials.email.trim(),
-        password: credentials.password,
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email.trim(),
+          password: credentials.password,
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (response.ok) {
       const body = await response.json();

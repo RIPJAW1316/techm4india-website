@@ -88,6 +88,14 @@ test("Dynamic Application Filtering & Launch Security", async (t) => {
       isActive: true,
       grantedAt: "2026-10-24T00:00:00.000Z",
     },
+    {
+      code: "CRM",
+      name: "TechM4India CRM & Sales",
+      description: "CRM & Institutional Partnerships",
+      baseUrl: "http://localhost:3003",
+      isActive: true,
+      grantedAt: "2026-10-24T00:00:00.000Z",
+    },
   ];
 
   await t.test("HR-only user receives only HRMS in catalog", () => {
@@ -110,6 +118,17 @@ test("Dynamic Application Filtering & Launch Security", async (t) => {
     assert.equal(visibleApps.length, 1);
     assert.equal(visibleApps[0].code, "FINANCE");
     assert.ok(!visibleApps.some((a) => a.code === "HRMS"));
+  });
+
+  await t.test("CRM-only user receives only CRM in catalog", () => {
+    const crmAuthorizedCodes = ["CRM"];
+    const visibleApps = mockApplications.filter((app) =>
+      crmAuthorizedCodes.includes(app.code)
+    );
+
+    assert.equal(visibleApps.length, 1);
+    assert.equal(visibleApps[0].code, "CRM");
+    assert.ok(!visibleApps.some((a) => a.code === "HRMS" || a.code === "FINANCE"));
   });
 
   await t.test("Unassigned employee receives empty application set", () => {

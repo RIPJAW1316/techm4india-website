@@ -32,7 +32,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     role: "Full Platform Admin",
     email: "admin@techm4india.com",
     passwordHint: "TechM4Admin#2026",
-    accessNote: "Access to Central Admin, HRMS, and Finance ERP",
+    accessNote: "Access to Central Admin, HRMS, Finance ERP, and CRM",
   },
   {
     label: "HR Lead",
@@ -47,6 +47,13 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
     email: "finance.lead@techm4india.com",
     passwordHint: "TechM4Finance#2026",
     accessNote: "Access to Finance ERP application",
+  },
+  {
+    label: "CRM Lead",
+    role: "Head of Institutional Sales",
+    email: "crm.lead@techm4india.com",
+    passwordHint: "TechM4Crm#2026",
+    accessNote: "Access to TechM4 CRM & Sales application",
   },
   {
     label: "Staff Engineer",
