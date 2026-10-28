@@ -149,13 +149,31 @@ export const InvoicingPipeline: React.FC<InvoicingPipelineProps> = ({
       ? invoices
       : invoices.filter((i) => i.status === filterStatus);
 
-  const aging = {
-    current: 450000,
-    thirtyToSixty: 380000,
-    sixtyToNinety: 114000,
-    overNinety: 236000,
-    total: 1180000,
-  };
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  const aging = invoices.reduce(
+    (acc, inv) => {
+      const balance = Number(inv.balanceDue) || 0;
+      if (balance <= 0 || inv.status === 'PAID' || inv.status === 'CANCELLED') return acc;
+
+      const dueTime = new Date(inv.dueDate).getTime();
+      const overdueDays = Math.floor((now - dueTime) / dayMs);
+
+      if (overdueDays <= 30) {
+        acc.current += balance;
+      } else if (overdueDays <= 60) {
+        acc.thirtyToSixty += balance;
+      } else if (overdueDays <= 90) {
+        acc.sixtyToNinety += balance;
+      } else {
+        acc.overNinety += balance;
+      }
+      acc.total += balance;
+      return acc;
+    },
+    { current: 0, thirtyToSixty: 0, sixtyToNinety: 0, overNinety: 0, total: 0 }
+  );
 
   const formatInr = (val: number) =>
     new Intl.NumberFormat('en-IN', {

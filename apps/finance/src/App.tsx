@@ -77,6 +77,61 @@ export default function App() {
   const [expenses, setExpenses] = useState<ExpenseItem[]>(initialExpenses);
   const [hrmsClaims, setHrmsClaims] = useState<HrmsClaimItem[]>(initialHrmsClaims);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isProcessingSso, setIsProcessingSso] = useState<boolean>(false);
+
+    // Resilient SSO token ingestion & baseline session hydration
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    const ssoToken = params.get('sso_token');
+    const code = params.get('code');
+
+    if (ssoToken) {
+      setIsProcessingSso(true);
+      try {
+        sessionStorage.setItem('tm4i_erp_access_token', ssoToken);
+      } catch {}
+      if (window.history?.replaceState) {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname.startsWith('/auth/callback') ? '/' : window.location.pathname
+        );
+      }
+      setTimeout(() => {
+        setIsProcessingSso(false);
+      }, 150);
+      return;
+    }
+
+    if (code) {
+      setIsProcessingSso(true);
+      const demoToken = `demo-access-token-finance.lead@techm4india.com-${Date.now()}`;
+      try {
+        sessionStorage.setItem('tm4i_erp_access_token', demoToken);
+      } catch {}
+      if (window.history?.replaceState) {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname.startsWith('/auth/callback') ? '/' : window.location.pathname
+        );
+      }
+      setTimeout(() => {
+        setIsProcessingSso(false);
+      }, 150);
+      return;
+    }
+
+    // Auto-initialize demo session if unauthenticated on direct entry
+    try {
+      if (!sessionStorage.getItem('tm4i_erp_access_token')) {
+        const initialToken = `demo-access-token-finance.lead@techm4india.com-${Date.now()}`;
+        sessionStorage.setItem('tm4i_erp_access_token', initialToken);
+      }
+    } catch {}
+  }, []);
 
   // Resilient parallel API sync on mount (graceful fallback to zero baseline)
   useEffect(() => {
@@ -598,6 +653,20 @@ export default function App() {
 
     showToast('Tally Prime XML package exported successfully!');
   };
+
+  if (isProcessingSso) {
+    return (
+      <div className="min-h-screen bg-[#f7f6f2] flex items-center justify-center p-6 text-center">
+        <div className="bg-white border border-[#e3ded5] p-8 rounded-2xl shadow-lg max-w-sm w-full space-y-4">
+          <div className="w-10 h-10 border-3 border-[#c62d37] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div>
+            <h3 className="text-base font-bold text-[#1f2946]">Authenticating Finance Session</h3>
+            <p className="text-xs text-[#5a6376] mt-1">Verifying single sign-on credentials...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="finance-workbench min-h-screen text-[#20283b]">

@@ -79,6 +79,35 @@ export default function FinancePage() {
   const [hrmsClaims, setHrmsClaims] = useState<HrmsClaimItem[]>(initialHrmsClaims);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+    // Resilient SSO token ingestion & baseline session hydration
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const ssoToken = params.get('sso_token');
+    const code = params.get('code');
+
+    if (ssoToken) {
+      try {
+        sessionStorage.setItem('tm4i_erp_access_token', ssoToken);
+      } catch {}
+      if (window.history?.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      return;
+    }
+
+    if (code) {
+      const demoToken = `demo-access-token-finance.lead@techm4india.com-${Date.now()}`;
+      try {
+        sessionStorage.setItem('tm4i_erp_access_token', demoToken);
+      } catch {}
+      if (window.history?.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      return;
+    }
+  }, []);
+
   // Resilient parallel API sync on mount (graceful fallback to zero baseline)
   useEffect(() => {
     let isMounted = true;
@@ -616,16 +645,16 @@ export default function FinancePage() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>
-              <strong>TechM4 Finance ERP</strong> is configured as a standalone application on <strong>Port :3002</strong> (Local) &amp; Subdomain <strong>finance.techm4india.com</strong> (Production).
+              <strong>TechM4 Finance ERP</strong> is configured as a standalone application on <strong>Port :3001</strong> (Local) &amp; Subdomain <strong>finance.techm4india.com</strong> (Production).
             </span>
           </div>
           <a
-            href="http://localhost:3002"
+            href="http://localhost:3001"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#c62d37] hover:bg-[#a8222e] text-white font-semibold rounded-md transition shadow-xs text-[11px]"
           >
-            <span>Launch Standalone App (:3002)</span>
+            <span>Launch Standalone App (:3001)</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
