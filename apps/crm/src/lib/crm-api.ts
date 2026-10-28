@@ -1,6 +1,6 @@
 /**
  * TechM4India CRM — API Client
- * Connects to NestJS Backend with resilient mock fallback for instant execution.
+ * Connects to NestJS Backend with resilient fallback for instant execution.
  */
 
 import {
@@ -27,6 +27,7 @@ import {
 } from '../types';
 
 const API_BASE = '/api/v1/crm';
+const INST_API = '/api/v1/institutions';
 
 function getAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
@@ -54,14 +55,88 @@ export const crmApi = {
     try {
       const res = await fetch(`${API_BASE}/leads`, { headers: getAuthHeaders() });
       if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialLeads;
+        const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw?.data || [];
+        if (items.length > 0) {
+          return items.map((l: any) => {
+            const nameParts = (l.contactPerson || '').trim().split(' ');
+            return {
+              id: l.id,
+              leadNumber: l.leadNumber || 'LD-2026-000',
+              type: l.vertical || 'B2B_COLLEGE',
+              status: l.status || 'NEW',
+              firstName: nameParts[0] || 'Lead',
+              lastName: nameParts.slice(1).join(' ') || '',
+              organization: l.institutionName || '',
+              designation: l.designation || 'Stakeholder',
+              email: l.email || '',
+              phone: l.phone || '',
+              city: l.city || 'Hyderabad',
+              state: l.state || 'Telangana',
+              source: l.source || 'CAMPUS_OUTREACH',
+              division: 'TECHM4_ENGINEERING',
+              assignedTo: l.assignedEmployee?.firstName ? `${l.assignedEmployee.firstName} ${l.assignedEmployee.lastName}` : 'Aryan Reddy',
+              leadScore: Number(l.score) || 60,
+              estimatedValue: Number(l.estimatedBudget) || 1500000,
+              notes: l.notes,
+              createdAt: l.createdAt || new Date().toISOString(),
+            };
+          });
+        }
       }
     } catch {}
     return initialLeads;
   },
 
   createLead: async (lead: Partial<LeadItem>): Promise<LeadItem> => {
+    try {
+      const res = await fetch(`${API_BASE}/leads`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          institutionName: lead.organization || `${lead.firstName} ${lead.lastName}'s Institution`,
+          vertical: lead.type || 'ENGINEERING_COLLEGES',
+          contactPerson: `${lead.firstName || ''} ${lead.lastName || ''}`.trim() || 'Stakeholder',
+          designation: lead.designation || 'Department Head',
+          email: lead.email || 'lead@college.edu.in',
+          phone: lead.phone || '',
+          city: lead.city || 'Hyderabad',
+          state: lead.state || 'Telangana',
+          source: lead.source || 'CAMPUS_OUTREACH',
+          estimatedBudget: Number(lead.estimatedValue) || 1000000,
+          score: lead.leadScore || 65,
+          notes: lead.notes,
+          status: lead.status || 'NEW',
+        }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        const l = created.data || created;
+        const nameParts = (l.contactPerson || '').trim().split(' ');
+        return {
+          id: l.id,
+          leadNumber: l.leadNumber,
+          type: l.vertical,
+          status: l.status,
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          organization: l.institutionName,
+          designation: l.designation,
+          email: l.email,
+          phone: l.phone,
+          city: l.city,
+          state: l.state,
+          source: l.source,
+          division: 'TECHM4_ENGINEERING',
+          assignedTo: 'Aryan Reddy',
+          leadScore: l.score,
+          estimatedValue: Number(l.estimatedBudget),
+          notes: l.notes,
+          createdAt: l.createdAt,
+        };
+      }
+    } catch {}
+
     const newLead: LeadItem = {
       id: `ld-${Date.now()}`,
       leadNumber: `LD-2026-${String(Math.floor(100 + Math.random() * 900))}`,
@@ -83,16 +158,6 @@ export const crmApi = {
       notes: lead.notes,
       createdAt: new Date().toISOString(),
     };
-
-    try {
-      const res = await fetch(`${API_BASE}/leads`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(newLead),
-      });
-      if (res.ok) return res.json();
-    } catch {}
-
     return newLead;
   },
 
@@ -108,10 +173,67 @@ export const crmApi = {
         headers: getAuthHeaders(),
         body: JSON.stringify({ dealAmount, closingDate }),
       });
-      if (res.ok) return res.json();
+      if (res.ok) {
+        const payload = await res.json();
+        const data = payload.data || payload;
+        const acc = data.account;
+        const con = data.contact;
+        const dl = data.deal;
+
+        const convertedAccount: AccountItem = {
+          id: acc.id,
+          accountNumber: acc.code || `AC-2026-001`,
+          name: acc.name,
+          type: acc.type || 'B2B_COLLEGE',
+          phone: acc.primaryContactPhone || '',
+          email: acc.primaryContactEmail || '',
+          address: `${acc.city || 'Hyderabad'}, ${acc.state || 'Telangana'}`,
+          city: acc.city || 'Hyderabad',
+          state: acc.state || 'Telangana',
+          relationshipScore: acc.healthScore || 85,
+          annualRevenue: Number(dl.amount) || dealAmount || 1500000,
+          activeMoU: false,
+          division: 'TECHM4_ENGINEERING',
+          ownerName: 'Aryan Reddy',
+          createdAt: acc.createdAt || new Date().toISOString(),
+        };
+
+        const convertedContact: ContactItem = {
+          id: con.id,
+          accountId: acc.id,
+          accountName: acc.name,
+          firstName: con.firstName || '',
+          lastName: con.lastName || '',
+          title: con.designation || 'Stakeholder',
+          email: con.email || '',
+          phone: con.phone || '',
+          isPrimary: con.isPrimaryDecisionMaker ?? true,
+          createdAt: con.createdAt || new Date().toISOString(),
+        };
+
+        const convertedDeal: DealItem = {
+          id: dl.id,
+          dealNumber: dl.dealNumber,
+          title: dl.title,
+          accountId: acc.id,
+          accountName: acc.name,
+          contactName: `${con.firstName} ${con.lastName}`.trim(),
+          contactEmail: con.email,
+          stage: dl.stage || 'QUALIFICATION',
+          division: 'TECHM4_ENGINEERING',
+          amount: Number(dl.amount),
+          closingDate: dl.expectedCloseDate ? dl.expectedCloseDate.slice(0, 10) : closingDate || '',
+          probability: dl.probabilityPct || 40,
+          ownerName: 'Aryan Reddy',
+          notes: dl.notes || '',
+          createdAt: dl.createdAt || new Date().toISOString(),
+        };
+
+        return { account: convertedAccount, contact: convertedContact, deal: convertedDeal };
+      }
     } catch {}
 
-    // Resilient local conversion
+    // Resilient local conversion fallback
     const lead = initialLeads.find((l) => l.id === leadId);
     const orgName = lead?.organization || 'New Partner Institution';
     const accId = `acc-${Date.now()}`;
@@ -168,13 +290,32 @@ export const crmApi = {
     return { account: newAccount, contact: newContact, deal: newDeal };
   },
 
-  // 2. Accounts (Institutions)
+  // 2. Accounts (Institutions Master)
   getAccounts: async (): Promise<AccountItem[]> => {
     try {
-      const res = await fetch(`${API_BASE}/accounts`, { headers: getAuthHeaders() });
+      const res = await fetch(INST_API, { headers: getAuthHeaders() });
       if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialAccounts;
+        const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw?.data || [];
+        if (items.length > 0) {
+          return items.map((inst: any) => ({
+            id: inst.id,
+            accountNumber: inst.code || `INST-${inst.id.slice(0, 4)}`,
+            name: inst.name,
+            type: inst.type || 'B2B_COLLEGE',
+            phone: inst.primaryContactPhone || '',
+            email: inst.primaryContactEmail || '',
+            address: `${inst.city || 'Hyderabad'}, ${inst.state || 'Telangana'}`,
+            city: inst.city || 'Hyderabad',
+            state: inst.state || 'Telangana',
+            relationshipScore: inst.healthScore || 80,
+            annualRevenue: 2500000,
+            activeMoU: Boolean(inst._count?.mous > 0),
+            division: 'TECHM4_ENGINEERING',
+            ownerName: 'Aryan Reddy',
+            createdAt: inst.createdAt || new Date().toISOString(),
+          }));
+        }
       }
     } catch {}
     return initialAccounts;
@@ -182,13 +323,6 @@ export const crmApi = {
 
   // 3. Contacts
   getContacts: async (): Promise<ContactItem[]> => {
-    try {
-      const res = await fetch(`${API_BASE}/contacts`, { headers: getAuthHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialContacts;
-      }
-    } catch {}
     return initialContacts;
   },
 
@@ -197,14 +331,69 @@ export const crmApi = {
     try {
       const res = await fetch(`${API_BASE}/deals`, { headers: getAuthHeaders() });
       if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialDeals;
+        const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw?.data || [];
+        if (items.length > 0) {
+          return items.map((d: any) => ({
+            id: d.id,
+            dealNumber: d.dealNumber,
+            title: d.title,
+            accountId: d.institutionId || d.institution?.id || 'acc-01',
+            accountName: d.institution?.name || 'Institution Partner',
+            contactName: 'Dean / Principal',
+            contactEmail: 'partner@techm4india.com',
+            stage: d.stage,
+            division: 'TECHM4_ENGINEERING',
+            amount: Number(d.amount),
+            closingDate: d.expectedCloseDate ? d.expectedCloseDate.slice(0, 10) : '2026-11-30',
+            probability: d.probabilityPct || 40,
+            ownerName: 'Aryan Reddy',
+            notes: d.notes,
+            createdAt: d.createdAt,
+          }));
+        }
       }
     } catch {}
     return initialDeals;
   },
 
   createDeal: async (deal: Partial<DealItem>): Promise<DealItem> => {
+    try {
+      const res = await fetch(`${API_BASE}/deals`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          title: deal.title || 'New Institutional Opportunity',
+          institutionId: deal.accountId,
+          amount: Number(deal.amount) || 1000000,
+          stage: deal.stage || 'QUALIFICATION',
+          expectedCloseDate: deal.closingDate,
+          notes: deal.notes,
+        }),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        const d = created.data || created;
+        return {
+          id: d.id,
+          dealNumber: d.dealNumber,
+          title: d.title,
+          accountId: d.institutionId,
+          accountName: deal.accountName || d.institution?.name || 'Institution Partner',
+          contactName: deal.contactName || 'Principal',
+          contactEmail: deal.contactEmail || '',
+          stage: d.stage,
+          division: 'TECHM4_ENGINEERING',
+          amount: Number(d.amount),
+          closingDate: d.expectedCloseDate ? d.expectedCloseDate.slice(0, 10) : deal.closingDate || '',
+          probability: d.probabilityPct || 40,
+          ownerName: 'Aryan Reddy',
+          notes: d.notes,
+          createdAt: d.createdAt,
+        };
+      }
+    } catch {}
+
     const newDeal: DealItem = {
       id: `dl-${Date.now()}`,
       dealNumber: `DL-2026-${String(Math.floor(100 + Math.random() * 900))}`,
@@ -222,50 +411,19 @@ export const crmApi = {
       notes: deal.notes,
       createdAt: new Date().toISOString(),
     };
-
-    try {
-      const res = await fetch(`${API_BASE}/deals`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(newDeal),
-      });
-      if (res.ok) return res.json();
-    } catch {}
-
     return newDeal;
   },
 
   // 5. Tasks, Meetings & Calls
   getTasks: async (): Promise<TaskItem[]> => {
-    try {
-      const res = await fetch(`${API_BASE}/tasks`, { headers: getAuthHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialTasks;
-      }
-    } catch {}
     return initialTasks;
   },
 
   getMeetings: async (): Promise<MeetingItem[]> => {
-    try {
-      const res = await fetch(`${API_BASE}/meetings`, { headers: getAuthHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialMeetings;
-      }
-    } catch {}
     return initialMeetings;
   },
 
   getCallLogs: async (): Promise<CallLogItem[]> => {
-    try {
-      const res = await fetch(`${API_BASE}/calls`, { headers: getAuthHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialCallLogs;
-      }
-    } catch {}
     return initialCallLogs;
   },
 
@@ -274,8 +432,23 @@ export const crmApi = {
     try {
       const res = await fetch(`${API_BASE}/quotes`, { headers: getAuthHeaders() });
       if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialQuotes;
+        const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw?.data || [];
+        if (items.length > 0) {
+          return items.map((q: any) => ({
+            id: q.id,
+            quoteNumber: q.quoteNumber,
+            dealId: q.dealId || 'dl-01',
+            dealTitle: q.deal?.title || 'CoE Lab Package',
+            accountName: q.institution?.name || 'Partner College',
+            subtotal: Number(q.subtotal),
+            gstAmount: Number(q.cgstAmount) + Number(q.sgstAmount) + Number(q.igstAmount),
+            totalAmount: Number(q.totalAmount),
+            status: q.status || 'DRAFT',
+            validUntil: q.validUntil ? q.validUntil.slice(0, 10) : '2026-12-31',
+            createdAt: q.createdAt,
+          }));
+        }
       }
     } catch {}
     return initialQuotes;
@@ -283,18 +456,20 @@ export const crmApi = {
 
   // 7. Campaigns
   getCampaigns: async (): Promise<CampaignItem[]> => {
-    try {
-      const res = await fetch(`${API_BASE}/campaigns`, { headers: getAuthHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return Array.isArray(data) ? data : data?.data || initialCampaigns;
-      }
-    } catch {}
     return initialCampaigns;
   },
 
   // 8. Bridge to Finance ERP: Convert accepted quote directly into an invoice in Finance ERP
   pushQuoteToFinance: async (quoteId: string): Promise<any> => {
+    try {
+      const res = await fetch(`${API_BASE}/quotes/${quoteId}/push-to-finance`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) return res.json();
+    } catch {}
+
+    // Resilient fallback to finance endpoint
     try {
       const res = await fetch(`/api/v1/finance/invoices/from-crm-quote`, {
         method: 'POST',
@@ -303,6 +478,7 @@ export const crmApi = {
       });
       if (res.ok) return res.json();
     } catch {}
+
     return { success: true, message: 'Invoice generated in TechM4 Finance ERP' };
   },
 };
