@@ -13,6 +13,10 @@
 /apps/api/dist/
 /apps/finance/node_modules/
 /apps/finance/dist/
+/apps/hrms/node_modules/
+/apps/hrms/dist/
+/apps/crm/node_modules/
+/apps/crm/dist/
 
 # testing
 /coverage

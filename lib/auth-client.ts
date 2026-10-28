@@ -65,6 +65,12 @@ export function getApplicationUrl(appCode: string): string {
   const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   switch (appCode.toUpperCase()) {
+    case 'CRM': {
+      if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_CRM_URL) {
+        return process.env.NEXT_PUBLIC_CRM_URL;
+      }
+      return isLocal ? 'http://localhost:3003' : 'https://crm.techm4india.com';
+    }
     case 'FINANCE': {
       if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_FINANCE_URL) {
         return process.env.NEXT_PUBLIC_FINANCE_URL;
@@ -282,7 +288,7 @@ const DEMO_PERSONAS: Record<string, DemoPersona> = {
         "audit:read",
       ],
       organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["CENTRAL_DASHBOARD", "HRMS", "FINANCE"],
+      authorizedApplications: ["CENTRAL_DASHBOARD", "HRMS", "FINANCE", "CRM"],
     },
     applications: [
       {

@@ -126,6 +126,21 @@ export default function DashboardPage() {
     window.location.href = callbackUrl;
   }
 
+  async function handleLaunchCrm() {
+    setSelectedApp(null);
+    const token = getAccessToken();
+    const isLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    const crmOrigin = isLocal
+      ? "http://localhost:3003"
+      : process.env.NEXT_PUBLIC_CRM_URL || "https://crm.techm4india.com";
+
+    // Direct SSO handoff to CRM callback
+    const callbackUrl = `${crmOrigin}/auth/callback?sso_token=${encodeURIComponent(token || "")}`;
+    window.location.href = callbackUrl;
+  }
+
   async function handleLaunchFinance() {
     setSelectedApp(null);
     const token = getAccessToken();
@@ -167,6 +182,16 @@ export default function DashboardPage() {
         category: "Human Capital Management",
         summary:
           "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
+      };
+    }
+    if (code.includes("CRM")) {
+      return {
+        icon: Target,
+        iconBg: "bg-amber-50 text-amber-700 border-amber-200",
+        badgeBg: "bg-amber-50 text-amber-800 border-amber-200",
+        category: "CRM & Institution Partnerships",
+        summary:
+          "Enterprise sales pipeline, institution relationship management, 1-click lead conversion, deals Kanban, and MoU tracking.",
       };
     }
     if (code.includes("FINANCE")) {
@@ -557,6 +582,15 @@ export default function DashboardPage() {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
                 >
                   <span>Open HRMS Application</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              ) : selectedApp.code.includes("CRM") ? (
+                <button
+                  type="button"
+                  onClick={handleLaunchCrm}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#c62d37] hover:bg-[#a8222e] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                >
+                  <span>Open CRM & Sales</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
               ) : selectedApp.code.includes("FINANCE") ? (

@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/* ==============================================================================
+   TECHM4INDIA ERP V2.0 — CRM & SALES INTELLIGENCE DESIGN SYSTEM
+   Modeled on Zoho CRM + TechM4India Editorial Design Language
+   ============================================================================== */
+
+:root {
+  --crm-bg: #f7f6f2;
+  --crm-surface: #ffffff;
+  --crm-muted-bg: #f1efe9;
+  --crm-border: #e3ded5;
+  --crm-border-strong: #cbd5e1;
+  --crm-ink: #0e1424;
+  --crm-navy: #1f2946;
+  --crm-navy-dark: #12192d;
+  --crm-text: #20283b;
+  --crm-muted: #5a6376;
+  --crm-red: #c62d37;
+  --crm-red-hover: #aa222c;
+  --crm-blue: #2563eb;
+  --crm-emerald: #059669;
+  --crm-amber: #d97706;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--crm-bg);
+  color: var(--crm-text);
+  overflow-x: hidden;
+}
+
+.crm-workbench {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.crm-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.card-editorial {
+  background: #ffffff;
+  border: 1px solid #e3ded5;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-editorial:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-emerald {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-amber {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.badge-blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-rose {
+  background: #fef2f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.badge-purple {
+  background: #faf5ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+
+.badge-muted {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-brand-red {
+  background: #fff1f2;
+  color: #c62d37;
+  border: 1px solid #fecdd3;
+}
+
+.table-editorial th {
+  background-color: #f8f7f4;
+  color: #1f2946;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  border-bottom: 1px solid #e3ded5;
+}
+
+.table-editorial td {
+  border-bottom: 1px solid #f0ece3;
+}
+
+.table-editorial tr:hover td {
+  background-color: #faf9f5;
+}

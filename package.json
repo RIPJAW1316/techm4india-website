@@ -14,7 +14,7 @@
     "build:hrms": "npm --prefix apps/hrms run build",
     "test:hrms": "npm --prefix apps/hrms test",
     "dev:finance": "npm --prefix apps/finance run dev",
-    "dev:all": "concurrently -n \"WEB,API,HRMS,FIN\" -c \"blue,green,magenta,yellow\" \"npm run dev\" \"npm run api:dev\" \"npm run dev:hrms\" \"npm run dev:finance\"",
+    "dev:all": "concurrently -n \"WEB,API,HRMS,FIN,CRM\" -c \"blue,green,magenta,yellow,cyan\" \"npm run dev\" \"npm run api:dev\" \"npm run dev:hrms\" \"npm run dev:finance\" \"npm run dev:crm\"",
     "api:dev": "npm --prefix apps/api run start:dev",
     "api:build": "npm --prefix apps/api run build",
     "api:test": "npm --prefix apps/api test",
@@ -24,7 +24,12 @@
     "build:finance": "npm --prefix apps/finance run build",
     "preview:finance": "npm --prefix apps/finance run preview",
     "finance:dev": "npm --prefix apps/finance run dev",
-    "finance:build": "npm --prefix apps/finance run build"
+    "finance:build": "npm --prefix apps/finance run build",
+    "dev:crm": "npm --prefix apps/crm run dev",
+    "build:crm": "npm --prefix apps/crm run build",
+    "test:crm": "npm --prefix apps/crm test",
+    "crm:dev": "npm --prefix apps/crm run dev",
+    "crm:build": "npm --prefix apps/crm run build"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
