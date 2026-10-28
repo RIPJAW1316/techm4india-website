@@ -22,12 +22,13 @@ export default defineConfig(async () => {
 
   return {
     server: {
+      port: 5173,
       watch: isCodexSeatbeltSandbox
         ? { useFsEvents: false, usePolling: true }
         : undefined,
       proxy: {
         "/api": {
-          target: "https://techm4india-erp-api-l1gv.onrender.com",
+          target: process.env.VITE_API_TARGET || "http://localhost:4000",
           changeOrigin: true,
           secure: false,
         },

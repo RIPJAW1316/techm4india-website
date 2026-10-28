@@ -1,6 +1,7 @@
 import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import {
   initialAnnouncements,
   initialAttendance,
@@ -143,18 +144,21 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'react': path.resolve(__dirname, 'node_modules/react'),
-      'react-dom/client': path.resolve(__dirname, 'node_modules/react-dom/client'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react/jsx-runtime': path.resolve(__dirname, 'node_modules/react/jsx-runtime'),
-      'react/jsx-dev-runtime': path.resolve(__dirname, 'node_modules/react/jsx-dev-runtime'),
-      'lucide-react': path.resolve(__dirname, 'node_modules/lucide-react'),
+      'react': fs.existsSync(path.resolve(__dirname, 'node_modules/react'))
+        ? path.resolve(__dirname, 'node_modules/react')
+        : path.resolve(__dirname, '../../node_modules/react'),
+      'react-dom': fs.existsSync(path.resolve(__dirname, 'node_modules/react-dom'))
+        ? path.resolve(__dirname, 'node_modules/react-dom')
+        : path.resolve(__dirname, '../../node_modules/react-dom'),
+      'lucide-react': fs.existsSync(path.resolve(__dirname, 'node_modules/lucide-react'))
+        ? path.resolve(__dirname, 'node_modules/lucide-react')
+        : path.resolve(__dirname, '../../node_modules/lucide-react'),
       'next/link': path.resolve(__dirname, 'src/shims/next-link.tsx'),
       'next/navigation': path.resolve(__dirname, 'src/shims/next-navigation.tsx'),
       '@/lib': path.resolve(__dirname, '../../lib'),
       '@': path.resolve(__dirname, '../../'),
     },
-    dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime', 'lucide-react'],
+    dedupe: ['react', 'react-dom', 'lucide-react'],
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
   },
   optimizeDeps: {
