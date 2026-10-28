@@ -41,9 +41,11 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:3002',
+    'http://localhost:3003',
     'https://techm4india.com',
     'https://hrms.techm4india.com',
     'https://finance.techm4india.com',
+    'https://crm.techm4india.com',
     'https://portal.techm4india.com',
   ];
   let allowedOrigins: string[] | string | ((origin: string | undefined, callback: (err: Error | null, origin?: any) => void) => void);
@@ -104,6 +106,10 @@ async function bootstrap() {
     .addTag('Authentication', 'Central login, logout, token refresh, and profile management')
     .addTag('Central Identity & User Management', 'Administrative user provisioning, role assignments, and application grants')
     .addTag('Applications & Single Sign-On Registry', 'Application directory and user access permissions')
+    .addTag('CRM & Institutional Partnerships', 'Lead scoring, 6-stage Kanban deals, and quote generation')
+    .addTag('Institutions & MoUs', 'College and university directory, NAAC/AISHE tracking, and active MoUs')
+    .addTag('Programs & LMS', 'Academic catalogue across 5 divisions, course builder, and certification')
+    .addTag('Finance & General Ledger', 'GAAP/IndAS double-entry accounting, GST invoices, and 3-way matching')
     .addBearerAuth(
       {
         type: 'http',

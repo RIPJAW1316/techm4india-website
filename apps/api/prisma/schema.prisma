@@ -54,6 +54,8 @@ model User {
   auditLogs       AuditLog[]
   refreshTokens   RefreshToken[]
   employee        Employee?
+  student         Student?
+  ticketsCreated  Ticket[]                @relation("TicketRequester")
 
   @@index([email])
   @@index([organizationId])
@@ -222,6 +224,7 @@ model Department {
   organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   employees      Employee[]
   designations   Designation[]
+  jobPostings    JobPosting[]
 
   @@map("hrms_departments")
 }
@@ -242,6 +245,8 @@ model Branch {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   employees      Employee[]
   holidays       Holiday[]
+  stockLevels    StockLevel[]
+  assets         Asset[]
 
   @@map("hrms_branches")
 }
@@ -257,6 +262,8 @@ model Designation {
 
   department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
   employees    Employee[]
+  jobPostings  JobPosting[]
+  offerLetters OfferLetter[] @relation("OfferedDesignation")
 
   @@map("hrms_designations")
 }
@@ -315,6 +322,17 @@ model Employee {
   incidentsAssigned       IncidentReport[]           @relation("AssignedIncidents")
   discussionTopics        DiscussionTopic[]
   discussionReplies       DiscussionReply[]
+  interviewsInterviewer   Interview[]                @relation("InterviewerEmployee")
+  dealsAssigned           Deal[]                     @relation("DealOwner")
+  leadsAssigned           Lead[]                     @relation("LeadOwner")
+  mousSigned              MoU[]                      @relation("MouSignatory")
+  batchesLed              Batch[]                    @relation("BatchFaculty")
+  coursesTaught           Course[]                   @relation("CourseInstructor")
+  projectsLed             Project[]                  @relation("ProjectLead")
+  tasksAssigned           Task[]                     @relation("TaskAssignee")
+  timesheets              Timesheet[]                @relation("EmployeeTimesheets")
+  assetsAssigned          Asset[]                    @relation("AssetAssignee")
+  blogPosts               CmsBlogPost[]              @relation("BlogPostAuthor")
 
   @@index([employeeNumber])
   @@index([email])
@@ -938,6 +956,7 @@ model Vendor {
   updatedAt        DateTime    @updatedAt
 
   expenses         Expense[]
+  purchaseOrders   PurchaseOrder[]
 
   @@index([code])
   @@index([gstin])
@@ -1047,4 +1066,1269 @@ model OidcAuthorizationCode {
   @@index([clientId])
   @@index([userId])
   @@map("oidc_authorization_codes")
+}
+
+
+// =========================================================================
+// RECRUITMENT & APPLICANT TRACKING SYSTEM (ATS) (Domain 7)
+// =========================================================================
+
+enum JobPostingStatus {
+  DRAFT
+  PUBLISHED
+  ON_HOLD
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENING
+  INTERVIEW_SCHEDULED
+  OFFER_EXTENDED
+  HIRED
+  REJECTED
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum OfferLetterStatus {
+  ISSUED
+  ACCEPTED
+  DECLINED
+  REVOKED
+}
+
+model JobPosting {
+  id              String            @id @default(uuid())
+  code            String            @unique
+  title           String
+  departmentId    String?
+  designationId   String?
+  division        DivisionCode      @default(TECHM4_SOLUTIONS)
+  location        String            @default("Hyderabad HQ")
+  experienceMin   Int               @default(0)
+  experienceMax   Int               @default(5)
+  openPositions   Int               @default(1)
+  salaryMin       Decimal?          @db.Decimal(12, 2)
+  salaryMax       Decimal?          @db.Decimal(12, 2)
+  jobDescription  String
+  status          JobPostingStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  closingDate     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  department      Department?       @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  designation     Designation?      @relation(fields: [designationId], references: [id], onDelete: SetNull)
+  applications    JobApplication[]
+
+  @@index([status])
+  @@index([division])
+  @@map("ats_job_postings")
+}
+
+model Candidate {
+  id                String            @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String            @unique
+  phone             String?
+  currentCompany    String?
+  currentCtc        Decimal?          @db.Decimal(12, 2)
+  expectedCtc       Decimal?          @db.Decimal(12, 2)
+  noticePeriodDays  Int?              @default(30)
+  resumeUrl         String?
+  source            String            @default("PORTAL")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  applications      JobApplication[]
+
+  @@index([email])
+  @@map("ats_candidates")
+}
+
+model JobApplication {
+  id              String            @id @default(uuid())
+  jobPostingId    String
+  candidateId     String
+  status          ApplicationStatus @default(APPLIED)
+  appliedAt       DateTime          @default(now())
+  stageNotes      String?
+  rating          Int?              @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  jobPosting      JobPosting        @relation(fields: [jobPostingId], references: [id], onDelete: Cascade)
+  candidate       Candidate         @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interviews      Interview[]
+  offerLetters    OfferLetter[]
+
+  @@unique([jobPostingId, candidateId])
+  @@index([status])
+  @@map("ats_job_applications")
+}
+
+model Interview {
+  id                    String          @id @default(uuid())
+  applicationId         String
+  roundName             String
+  interviewerEmployeeId String?
+  scheduledAt           DateTime
+  durationMinutes       Int             @default(45)
+  meetingUrl            String?
+  score                 Int?
+  feedback              String?
+  status                InterviewStatus @default(SCHEDULED)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  application           JobApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  interviewer           Employee?       @relation("InterviewerEmployee", fields: [interviewerEmployeeId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@index([scheduledAt])
+  @@map("ats_interviews")
+}
+
+model OfferLetter {
+  id                    String            @id @default(uuid())
+  applicationId         String
+  offeredDesignationId  String?
+  offeredCtc            Decimal           @db.Decimal(12, 2)
+  joiningDate           DateTime
+  validUntil            DateTime
+  status                OfferLetterStatus @default(ISSUED)
+  signedLetterUrl       String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  application           JobApplication    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  designation           Designation?      @relation("OfferedDesignation", fields: [offeredDesignationId], references: [id], onDelete: SetNull)
+
+  @@map("ats_offer_letters")
+}
+
+// =========================================================================
+// CRM & INSTITUTIONAL SALES PIPELINE (Domain 8)
+// =========================================================================
+
+enum LeadVertical {
+  ENGINEERING_COLLEGES
+  UNIVERSITIES_AUTONOMOUS
+  POLYTECHNICS
+  K12_STEM_SCHOOLS
+  ATL_LABS
+  AEROSPACE_DEFENCE_LABS
+  EDTECH_PARTNERS
+  CORPORATE_CSR
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+enum DealStage {
+  QUALIFICATION
+  NEEDS_ANALYSIS
+  PROPOSAL_QUOTE
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  INVOICED
+}
+
+model Lead {
+  id                  String        @id @default(uuid())
+  leadNumber          String        @unique
+  institutionName     String
+  vertical            LeadVertical  @default(ENGINEERING_COLLEGES)
+  contactPerson       String
+  designation         String?
+  email               String
+  phone               String?
+  city                String
+  state               String        @default("Telangana")
+  source              String        @default("CAMPUS_OUTREACH")
+  score               Int           @default(50)
+  status              LeadStatus    @default(NEW)
+  estimatedBudget     Decimal?      @db.Decimal(15, 2)
+  notes               String?
+  assignedEmployeeId  String?
+  isConverted         Boolean       @default(false)
+  convertedAccountId  String?
+  convertedDealId     String?
+  convertedAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  assignedEmployee    Employee?     @relation("LeadOwner", fields: [assignedEmployeeId], references: [id], onDelete: SetNull)
+
+  @@index([vertical])
+  @@index([status])
+  @@index([score])
+  @@map("crm_leads")
+}
+
+model Contact {
+  id                     String        @id @default(uuid())
+  institutionId          String?
+  firstName              String
+  lastName               String
+  designation            String?
+  department             String?
+  email                  String
+  phone                  String?
+  whatsapp               String?
+  isPrimaryDecisionMaker Boolean       @default(false)
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  institution            Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([institutionId])
+  @@map("crm_contacts")
+}
+
+model Deal {
+  id                  String             @id @default(uuid())
+  dealNumber          String             @unique
+  title               String
+  institutionId       String?
+  vertical            LeadVertical       @default(ENGINEERING_COLLEGES)
+  amount              Decimal            @default(0.0) @db.Decimal(15, 2)
+  stage               DealStage          @default(QUALIFICATION)
+  probabilityPct      Int                @default(10)
+  expectedCloseDate   DateTime?
+  closedAt            DateTime?
+  ownerEmployeeId     String?
+  notes               String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  institution         Institution?       @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  ownerEmployee       Employee?          @relation("DealOwner", fields: [ownerEmployeeId], references: [id], onDelete: SetNull)
+  stageHistory        DealStageHistory[]
+  quotes              Quote[]
+
+  @@index([stage])
+  @@index([vertical])
+  @@index([expectedCloseDate])
+  @@map("crm_deals")
+}
+
+model DealStageHistory {
+  id          String    @id @default(uuid())
+  dealId      String
+  fromStage   DealStage
+  toStage     DealStage
+  notes       String?
+  changedById String?
+  changedAt   DateTime  @default(now())
+
+  deal        Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([dealId])
+  @@map("crm_deal_stage_history")
+}
+
+model Quote {
+  id              String        @id @default(uuid())
+  quoteNumber     String        @unique
+  dealId          String?
+  institutionId   String?
+  subtotal        Decimal       @default(0.0) @db.Decimal(15, 2)
+  discount        Decimal       @default(0.0) @db.Decimal(15, 2)
+  cgstAmount      Decimal       @default(0.0) @db.Decimal(15, 2)
+  sgstAmount      Decimal       @default(0.0) @db.Decimal(15, 2)
+  igstAmount      Decimal       @default(0.0) @db.Decimal(15, 2)
+  totalAmount     Decimal       @default(0.0) @db.Decimal(15, 2)
+  status          QuoteStatus   @default(DRAFT)
+  validUntil      DateTime
+  notes           String?
+  invoicedAt      DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  deal            Deal?         @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  institution     Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  items           QuoteItem[]
+
+  @@index([quoteNumber])
+  @@index([status])
+  @@map("crm_quotes")
+}
+
+model QuoteItem {
+  id            String    @id @default(uuid())
+  quoteId       String
+  description   String
+  hsnSacCode    String    @default("998334")
+  quantity      Decimal   @default(1.0) @db.Decimal(10, 2)
+  unitRate      Decimal   @default(0.0) @db.Decimal(15, 2)
+  taxRatePct    Decimal   @default(18.0) @db.Decimal(5, 2)
+  taxableAmount Decimal   @default(0.0) @db.Decimal(15, 2)
+  totalAmount   Decimal   @default(0.0) @db.Decimal(15, 2)
+
+  quote         Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+  @@map("crm_quote_items")
+}
+
+// =========================================================================
+// INSTITUTIONAL RELATIONSHIPS & MOUS (Domain 9)
+// =========================================================================
+
+enum InstitutionType {
+  GOVERNMENT_UNIVERSITY
+  PRIVATE_UNIVERSITY
+  AUTONOMOUS_COLLEGE
+  AFFILIATED_COLLEGE
+  POLYTECHNIC
+  K12_SCHOOL
+  R_AND_D_LAB
+}
+
+enum NaacRating {
+  A_PLUS_PLUS
+  A_PLUS
+  A
+  B_PLUS_PLUS
+  B_PLUS
+  B
+  C
+  NOT_ACCREDITED
+}
+
+enum MouStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  ACTIVE
+  RENEWAL_DUE
+  EXPIRED
+  TERMINATED
+}
+
+model Institution {
+  id                    String          @id @default(uuid())
+  code                  String          @unique
+  name                  String
+  type                  InstitutionType @default(AUTONOMOUS_COLLEGE)
+  naacRating            NaacRating      @default(NOT_ACCREDITED)
+  aisheCode             String?         @unique
+  nirfRankTier          String?
+  city                  String
+  state                 String          @default("Telangana")
+  pincode               String?
+  totalStudents         Int?            @default(0)
+  primaryContactName    String?
+  primaryContactPhone   String?
+  primaryContactEmail   String?
+  healthScore           Int             @default(80)
+  isActive              Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  contacts              Contact[]
+  deals                 Deal[]
+  quotes                Quote[]
+  mous                  MoU[]
+  batches               Batch[]
+  students              Student[]
+  projects              Project[]
+
+  @@index([name])
+  @@index([type])
+  @@index([healthScore])
+  @@map("crm_institutions")
+}
+
+model MoU {
+  id                          String      @id @default(uuid())
+  mouNumber                   String      @unique
+  institutionId               String
+  title                       String
+  effectiveDate               DateTime
+  expiryDate                  DateTime
+  scopeSummary                String
+  signedDocumentUrl           String?
+  techm4SignatoryEmployeeId   String?
+  institutionSignatoryName    String
+  institutionSignatoryRole    String
+  status                      MouStatus   @default(ACTIVE)
+  createdAt                   DateTime    @default(now())
+  updatedAt                   DateTime    @updatedAt
+
+  institution                 Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  techm4Signatory             Employee?   @relation("MouSignatory", fields: [techm4SignatoryEmployeeId], references: [id], onDelete: SetNull)
+
+  @@index([mouNumber])
+  @@index([status])
+  @@map("crm_mous")
+}
+
+// =========================================================================
+// ACADEMIC PROGRAMS & MODULAR LMS (Domains 10 & 11)
+// =========================================================================
+
+enum ProgramCertificationType {
+  TECHM4_INDUSTRY_CERTIFICATE
+  UNIVERSITY_JOINT_CERTIFICATE
+  GLOBAL_AFFILIATE_DIPLOMA
+  AICTE_NEAT_APPROVED
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum LessonContentType {
+  VIDEO
+  MARKDOWN_ARTICLE
+  CODE_KIT
+  LAB_EXERCISE
+  SLIDE_DECK
+}
+
+enum BatchStatus {
+  UPCOMING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Program {
+  id                String                    @id @default(uuid())
+  code              String                    @unique
+  title             String
+  division          DivisionCode              @default(TECHM4_ENGINEERING)
+  summary           String
+  durationWeeks     Int                       @default(12)
+  credits           Int                       @default(4)
+  certificationType ProgramCertificationType  @default(TECHM4_INDUSTRY_CERTIFICATE)
+  targetAudience    String                    @default("Undergraduate Engineering")
+  isActive          Boolean                   @default(true)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  modules           CurriculumModule[]
+  batches           Batch[]
+  courses           Course[]
+  certificates      Certificate[]
+
+  @@index([division])
+  @@index([isActive])
+  @@map("academic_programs")
+}
+
+model CurriculumModule {
+  id            String    @id @default(uuid())
+  programId     String
+  moduleNumber  Int
+  title         String
+  description   String?
+  totalHours    Int       @default(20)
+  labHours      Int       @default(12)
+  theoryHours   Int       @default(8)
+  createdAt     DateTime  @default(now())
+
+  program       Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([programId, moduleNumber])
+  @@map("academic_curriculum_modules")
+}
+
+model Batch {
+  id                    String        @id @default(uuid())
+  batchCode             String        @unique
+  programId             String
+  institutionId         String?
+  name                  String
+  startDate             DateTime
+  endDate               DateTime
+  capacity              Int           @default(60)
+  currentEnrolled       Int           @default(0)
+  leadFacultyEmployeeId String?
+  status                BatchStatus   @default(UPCOMING)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  program               Program       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  institution           Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  leadFaculty           Employee?     @relation("BatchFaculty", fields: [leadFacultyEmployeeId], references: [id], onDelete: SetNull)
+  sessions              BatchSession[]
+  students              Student[]
+
+  @@index([batchCode])
+  @@index([status])
+  @@map("academic_batches")
+}
+
+model BatchSession {
+  id              String    @id @default(uuid())
+  batchId         String
+  sessionNumber   Int
+  topic           String
+  scheduledDate   DateTime
+  durationMinutes Int       @default(90)
+  meetingUrl      String?
+  isCompleted     Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  batch           Batch     @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, sessionNumber])
+  @@map("academic_batch_sessions")
+}
+
+model Course {
+  id                    String          @id @default(uuid())
+  code                  String          @unique
+  title                 String
+  category              String
+  programId             String?
+  instructorEmployeeId  String?
+  thumbnailUrl          String?
+  difficultyLevel       DifficultyLevel @default(BEGINNER)
+  isPublished           Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  program               Program?        @relation(fields: [programId], references: [id], onDelete: SetNull)
+  instructor            Employee?       @relation("CourseInstructor", fields: [instructorEmployeeId], references: [id], onDelete: SetNull)
+  lessons               Lesson[]
+  assignments           Assignment[]
+
+  @@index([category])
+  @@index([isPublished])
+  @@map("lms_courses")
+}
+
+model Lesson {
+  id              String            @id @default(uuid())
+  courseId        String
+  lessonNumber    Int
+  title           String
+  contentType     LessonContentType @default(VIDEO)
+  contentUrl      String?
+  durationMinutes Int               @default(30)
+  createdAt       DateTime          @default(now())
+
+  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, lessonNumber])
+  @@map("lms_lessons")
+}
+
+model Assignment {
+  id                String                 @id @default(uuid())
+  courseId          String
+  title             String
+  problemStatement  String
+  maxScore          Int                    @default(100)
+  dueDate           DateTime?
+  createdAt         DateTime               @default(now())
+
+  course            Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions       AssignmentSubmission[]
+
+  @@map("lms_assignments")
+}
+
+model AssignmentSubmission {
+  id              String      @id @default(uuid())
+  assignmentId    String
+  studentId       String
+  submittedAt     DateTime    @default(now())
+  repoUrl         String?
+  attachmentUrl   String?
+  scoreAwarded    Int?
+  feedback        String?
+  gradedById      String?
+
+  assignment      Assignment  @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student         Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@map("lms_assignment_submissions")
+}
+
+model Certificate {
+  id                String    @id @default(uuid())
+  certificateNumber String    @unique
+  studentId         String
+  programId         String
+  issueDate         DateTime  @default(now())
+  verificationToken String    @unique
+  qrVerificationUrl String
+  pdfUrl            String?
+  isRevoked         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+
+  student           Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  program           Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([certificateNumber])
+  @@index([verificationToken])
+  @@map("lms_certificates")
+}
+
+// =========================================================================
+// STUDENTS & ADMISSIONS (Domain 12)
+// =========================================================================
+
+enum StudentFeeStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+  WAIVED
+}
+
+enum GrievanceCategory {
+  ACADEMIC
+  LAB_EQUIPMENT
+  FACULTY
+  PORTAL_ACCESS
+  FEES_BILLING
+}
+
+enum GrievanceStatus {
+  OPEN
+  UNDER_INVESTIGATION
+  RESOLVED
+  CLOSED
+}
+
+model Student {
+  id                String                 @id @default(uuid())
+  studentId         String                 @unique
+  userId            String?                @unique
+  institutionId     String?
+  batchId           String?
+  firstName         String
+  lastName          String
+  email             String                 @unique
+  phone             String?
+  gender            String?
+  dob               DateTime?
+  academicBranch    String                 @default("Computer Science & Engineering")
+  yearOfStudy       Int                    @default(3)
+  guardianName      String?
+  guardianPhone     String?
+  kycVerified       Boolean                @default(true)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  user              User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  institution       Institution?           @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  batch             Batch?                 @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  submissions       AssignmentSubmission[]
+  certificates      Certificate[]
+  fees              StudentFee[]
+  grievances        StudentGrievance[]
+
+  @@index([studentId])
+  @@index([email])
+  @@index([batchId])
+  @@map("academic_students")
+}
+
+model StudentFee {
+  id              String            @id @default(uuid())
+  studentId       String
+  feeType         String            @default("TUITION")
+  totalAmount     Decimal           @db.Decimal(12, 2)
+  discountAmount  Decimal           @default(0.0) @db.Decimal(12, 2)
+  netPayable      Decimal           @db.Decimal(12, 2)
+  paidAmount      Decimal           @default(0.0) @db.Decimal(12, 2)
+  balanceDue      Decimal           @db.Decimal(12, 2)
+  dueDate         DateTime
+  status          StudentFeeStatus  @default(UNPAID)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([status])
+  @@map("academic_student_fees")
+}
+
+model StudentGrievance {
+  id              String            @id @default(uuid())
+  ticketNumber    String            @unique
+  studentId       String
+  category        GrievanceCategory @default(ACADEMIC)
+  title           String
+  description     String
+  status          GrievanceStatus   @default(OPEN)
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  student         Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([status])
+  @@map("academic_student_grievances")
+}
+
+// =========================================================================
+// PROJECT MANAGEMENT & ENGINEERING TIMESHEETS (Domain 13)
+// =========================================================================
+
+enum ProjectType {
+  INTERNAL_RND
+  CLIENT_DELIVERY
+  GOVERNMENT_DEFENSE
+  INSTITUTIONAL_LAB_SETUP
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskType {
+  FEATURE
+  BUG
+  LAB_DEPLOYMENT
+  DOCUMENTATION
+  RESEARCH
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  CODE_REVIEW
+  TESTING
+  DONE
+}
+
+model Project {
+  id                String        @id @default(uuid())
+  code              String        @unique
+  name              String
+  type              ProjectType   @default(INTERNAL_RND)
+  institutionId     String?
+  division          DivisionCode  @default(TECHM4_ENGINEERING)
+  leadEmployeeId    String?
+  startDate         DateTime
+  targetDate        DateTime?
+  budgetTotal       Decimal       @default(0.0) @db.Decimal(15, 2)
+  budgetUtilized    Decimal       @default(0.0) @db.Decimal(15, 2)
+  status            ProjectStatus @default(ACTIVE)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  institution       Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  leadEmployee      Employee?     @relation("ProjectLead", fields: [leadEmployeeId], references: [id], onDelete: SetNull)
+  milestones        Milestone[]
+  tasks             Task[]
+
+  @@index([code])
+  @@index([status])
+  @@index([division])
+  @@map("pm_projects")
+}
+
+model Milestone {
+  id                String    @id @default(uuid())
+  projectId         String
+  title             String
+  dueDate           DateTime
+  billingPercentage Decimal   @default(0.0) @db.Decimal(5, 2)
+  isCompleted       Boolean   @default(false)
+  invoiceRef        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  project           Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks             Task[]
+
+  @@index([projectId])
+  @@map("pm_milestones")
+}
+
+model Task {
+  id                  String      @id @default(uuid())
+  projectId           String
+  milestoneId         String?
+  title               String
+  description         String?
+  taskType            TaskType    @default(FEATURE)
+  assigneeEmployeeId  String?
+  storyPoints         Int         @default(3)
+  status              TaskStatus  @default(TODO)
+  githubPrUrl         String?
+  dueDate             DateTime?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  project             Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestone           Milestone?  @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  assigneeEmployee    Employee?   @relation("TaskAssignee", fields: [assigneeEmployeeId], references: [id], onDelete: SetNull)
+  timesheets          Timesheet[]
+
+  @@index([projectId])
+  @@index([status])
+  @@map("pm_tasks")
+}
+
+model Timesheet {
+  id              String    @id @default(uuid())
+  taskId          String
+  employeeId      String
+  date            DateTime
+  hoursLogged     Decimal   @db.Decimal(4, 2)
+  workDescription String
+  isBillable      Boolean   @default(true)
+  isApproved      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+
+  task            Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  employee        Employee  @relation("EmployeeTimesheets", fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([date])
+  @@map("pm_timesheets")
+}
+
+// =========================================================================
+// PROCUREMENT & 3-WAY MATCHING (Domain 16 Expansion)
+// =========================================================================
+
+enum PurchaseOrderStatus {
+  DRAFT
+  APPROVED
+  DISPATCHED
+  COMPLETED
+  CANCELLED
+}
+
+enum QualityInspectionStatus {
+  ACCEPTED
+  REJECTED
+  PARTIALLY_ACCEPTED
+}
+
+model PurchaseOrder {
+  id                String              @id @default(uuid())
+  poNumber          String              @unique
+  vendorId          String
+  division          DivisionCode        @default(TECHM4_SOLUTIONS)
+  orderDate         DateTime            @default(now())
+  deliveryDueDate   DateTime
+  subtotal          Decimal             @default(0.0) @db.Decimal(15, 2)
+  taxAmount         Decimal             @default(0.0) @db.Decimal(15, 2)
+  totalAmount       Decimal             @default(0.0) @db.Decimal(15, 2)
+  status            PurchaseOrderStatus @default(DRAFT)
+  approvedById      String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  vendor            Vendor              @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  goodsReceiptNotes GoodsReceiptNote[]
+
+  @@index([poNumber])
+  @@index([status])
+  @@map("procurement_purchase_orders")
+}
+
+model GoodsReceiptNote {
+  id                String                  @id @default(uuid())
+  grnNumber         String                  @unique
+  purchaseOrderId   String
+  receivedDate      DateTime                @default(now())
+  inspectedById     String?
+  qualityStatus     QualityInspectionStatus @default(ACCEPTED)
+  remarks           String?
+  createdAt         DateTime                @default(now())
+
+  purchaseOrder     PurchaseOrder           @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+
+  @@index([grnNumber])
+  @@map("procurement_goods_receipt_notes")
+}
+
+// =========================================================================
+// INVENTORY & LAB KIT BILL OF MATERIALS (BOM) (Domain 17)
+// =========================================================================
+
+enum ItemCategory {
+  ROBOTICS_PARTS
+  SATELLITE_RIGS
+  MICROCONTROLLERS
+  CONSUMABLES
+  SENSORS
+  FINISHED_KIT
+}
+
+enum StockMovementType {
+  PURCHASE_RECEIPT
+  LAB_DISPATCH
+  KIT_ASSEMBLY
+  SCRAP
+  RETURN
+}
+
+model InventoryItem {
+  id                  String          @id @default(uuid())
+  sku                 String          @unique
+  name                String
+  category            ItemCategory    @default(ROBOTICS_PARTS)
+  uom                 String          @default("UNIT")
+  hsnCode             String          @default("8471")
+  reorderLevel        Int             @default(10)
+  unitCost            Decimal         @default(0.0) @db.Decimal(12, 2)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  kitBomsAsComponent  KitBOM[]        @relation("KitComponentItem")
+  stockLevels         StockLevel[]
+  stockMovements      StockMovement[]
+
+  @@index([sku])
+  @@index([category])
+  @@map("inventory_items")
+}
+
+model KitBOM {
+  id                String        @id @default(uuid())
+  kitSku            String
+  componentItemId   String
+  quantityRequired  Int           @default(1)
+  createdAt         DateTime      @default(now())
+
+  componentItem     InventoryItem @relation("KitComponentItem", fields: [componentItemId], references: [id], onDelete: Restrict)
+
+  @@unique([kitSku, componentItemId])
+  @@map("inventory_kit_boms")
+}
+
+model StockLevel {
+  id                String        @id @default(uuid())
+  itemId            String
+  branchId          String?
+  quantityOnHand    Int           @default(0)
+  quantityReserved  Int           @default(0)
+  quantityAvailable Int           @default(0)
+  updatedAt         DateTime      @updatedAt
+
+  item              InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  branch            Branch?       @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@unique([itemId, branchId])
+  @@map("inventory_stock_levels")
+}
+
+model StockMovement {
+  id            String            @id @default(uuid())
+  itemId        String
+  type          StockMovementType
+  quantity      Int
+  referenceId   String?
+  notes         String?
+  timestamp     DateTime          @default(now())
+
+  item          InventoryItem     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([timestamp])
+  @@map("inventory_stock_movements")
+}
+
+// =========================================================================
+// FIXED ASSET LIFECYCLE MANAGEMENT (Domain 18)
+// =========================================================================
+
+enum AssetCategory {
+  IT_LAPTOPS
+  LAB_INSTRUMENTS
+  THREE_D_PRINTERS
+  AV_MEDIA
+  FURNITURE
+}
+
+enum DepreciationMethod {
+  SLM
+  WDV
+}
+
+enum AssetStatus {
+  IN_USE
+  UNDER_MAINTENANCE
+  SPARE
+  DISPOSED
+}
+
+model Asset {
+  id                    String              @id @default(uuid())
+  assetTag              String              @unique
+  name                  String
+  category              AssetCategory       @default(IT_LAPTOPS)
+  purchaseDate          DateTime
+  purchaseCost          Decimal             @db.Decimal(15, 2)
+  serialNumber          String?
+  depreciationMethod    DepreciationMethod  @default(SLM)
+  depreciationRatePct   Decimal             @default(15.0) @db.Decimal(5, 2)
+  currentBookValue      Decimal             @db.Decimal(15, 2)
+  assignedEmployeeId    String?
+  branchId              String?
+  status                AssetStatus         @default(IN_USE)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  assignedEmployee      Employee?           @relation("AssetAssignee", fields: [assignedEmployeeId], references: [id], onDelete: SetNull)
+  branch                Branch?             @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  maintenanceLogs       AssetMaintenance[]
+
+  @@index([assetTag])
+  @@index([category])
+  @@index([status])
+  @@map("assets_register")
+}
+
+model AssetMaintenance {
+  id              String    @id @default(uuid())
+  assetId         String
+  serviceDate     DateTime
+  vendorName      String
+  cost            Decimal   @default(0.0) @db.Decimal(12, 2)
+  description     String
+  nextServiceDate DateTime?
+  createdAt       DateTime  @default(now())
+
+  asset           Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@map("assets_maintenance")
+}
+
+// =========================================================================
+// HEADLESS CMS & CONTENT (Domain 19)
+// =========================================================================
+
+model CmsPage {
+  id                  String    @id @default(uuid())
+  slug                String    @unique
+  title               String
+  contentHtml         String
+  seoTitle            String?
+  seoMetaDescription String?
+  isPublished         Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([slug])
+  @@map("cms_pages")
+}
+
+model CmsBlogPost {
+  id                  String    @id @default(uuid())
+  slug                String    @unique
+  title               String
+  authorEmployeeId    String?
+  category            String    @default("AEROSPACE_AI")
+  tags                String[]
+  bodyMarkdown        String
+  coverImageUrl       String?
+  readingTimeMinutes  Int       @default(5)
+  isPublished         Boolean   @default(true)
+  publishedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  author              Employee? @relation("BlogPostAuthor", fields: [authorEmployeeId], references: [id], onDelete: SetNull)
+
+  @@index([slug])
+  @@index([category])
+  @@map("cms_blog_posts")
+}
+
+model CmsEvent {
+  id                    String    @id @default(uuid())
+  slug                  String    @unique
+  title                 String
+  eventType             String    @default("HACKATHON")
+  startDate             DateTime
+  endDate               DateTime
+  venue                 String    @default("Hyderabad HQ")
+  registrationLimit     Int       @default(100)
+  currentRegistrations  Int       @default(0)
+  isPublished           Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([slug])
+  @@map("cms_events")
+}
+
+// =========================================================================
+// COMMUNICATIONS & MARKETING AUTOMATION (Domain 20)
+// =========================================================================
+
+enum CommunicationChannel {
+  WHATSAPP_API
+  EMAIL_SES
+  SMS
+}
+
+model CommunicationCampaign {
+  id                  String                @id @default(uuid())
+  name                String
+  channel             CommunicationChannel  @default(WHATSAPP_API)
+  targetAudienceType  String                @default("COLLEGE_DEANS")
+  sentCount           Int                   @default(0)
+  deliveredCount      Int                   @default(0)
+  readCount           Int                   @default(0)
+  repliedCount        Int                   @default(0)
+  scheduledAt         DateTime?
+  createdAt           DateTime              @default(now())
+
+  @@map("comm_campaigns")
+}
+
+model CommunicationTemplate {
+  id        String                @id @default(uuid())
+  name      String
+  channel   CommunicationChannel  @default(WHATSAPP_API)
+  subject   String?
+  bodyText  String
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+
+  @@map("comm_templates")
+}
+
+// =========================================================================
+// HELPDESK, GRIEVANCES & SLA (Domain 21)
+// =========================================================================
+
+enum TicketCategory {
+  IT_SUPPORT
+  HR_QUERY
+  FINANCE_QUERY
+  STUDENT_GRIEVANCE
+  INSTITUTION_SUPPORT
+}
+
+enum TicketPriority {
+  CRITICAL
+  HIGH
+  NORMAL
+  LOW
+}
+
+enum TicketStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  CLOSED
+}
+
+model Ticket {
+  id              String          @id @default(uuid())
+  ticketNumber    String          @unique
+  category        TicketCategory  @default(IT_SUPPORT)
+  priority        TicketPriority  @default(NORMAL)
+  subject         String
+  requesterUserId String?
+  assignedAgentId String?
+  slaDueAt        DateTime?
+  resolvedAt      DateTime?
+  status          TicketStatus    @default(OPEN)
+  csatRating      Int?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  requester       User?           @relation("TicketRequester", fields: [requesterUserId], references: [id], onDelete: SetNull)
+  comments        TicketComment[]
+
+  @@index([ticketNumber])
+  @@index([status])
+  @@index([category])
+  @@map("support_tickets")
+}
+
+model TicketComment {
+  id              String    @id @default(uuid())
+  ticketId        String
+  authorUserId    String?
+  message         String
+  isInternalNote  Boolean   @default(false)
+  timestamp       DateTime  @default(now())
+
+  ticket          Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("support_ticket_comments")
+}
+
+// =========================================================================
+// STATUTORY COMPLIANCE CALENDAR (Domain 22)
+// =========================================================================
+
+enum ComplianceFrequency {
+  MONTHLY
+  QUARTERLY
+  HALF_YEARLY
+  ANNUAL
+}
+
+model ComplianceObligation {
+  id                String                @id @default(uuid())
+  title             String
+  authority         String
+  frequency         ComplianceFrequency   @default(MONTHLY)
+  dueDayOfMonth     Int                   @default(20)
+  responsibleRoleId String?
+  description       String?
+  createdAt         DateTime              @default(now())
+
+  executions        ComplianceExecution[]
+
+  @@map("compliance_obligations")
+}
+
+model ComplianceExecution {
+  id                  String                @id @default(uuid())
+  obligationId        String
+  periodMonth         Int
+  periodYear          Int
+  challanRefNumber    String?
+  acknowledgementUrl  String?
+  filedAt             DateTime?
+  filedById           String?
+  penaltyPaid         Decimal               @default(0.0) @db.Decimal(12, 2)
+  createdAt           DateTime              @default(now())
+
+  obligation          ComplianceObligation  @relation(fields: [obligationId], references: [id], onDelete: Cascade)
+
+  @@unique([obligationId, periodMonth, periodYear])
+  @@map("compliance_executions")
 }

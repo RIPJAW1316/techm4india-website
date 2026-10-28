@@ -40,6 +40,12 @@ async function main() {
       description: 'Financial Management and Accounting application.',
       baseUrl: 'http://localhost:3001',
     },
+    {
+      code: 'CRM',
+      name: 'TechM4 CRM & Sales',
+      description: 'Institutional partnerships, lead scoring, deals pipeline and quotation management.',
+      baseUrl: 'http://localhost:3003',
+    },
   ];
 
   for (const app of applications) {
@@ -93,6 +99,36 @@ async function main() {
       description: 'Standard access to Finance and accounting views.',
       isSystemRole: false,
     },
+    {
+      code: 'CRM_ADMIN',
+      name: 'CRM Administrator',
+      description: 'Administrative control over CRM, institutional sales and deals.',
+      isSystemRole: false,
+    },
+    {
+      code: 'CRM_USER',
+      name: 'CRM Sales Executive',
+      description: 'Standard access to leads, deals, contacts and quotations.',
+      isSystemRole: false,
+    },
+    {
+      code: 'INSTITUTION_COORDINATOR',
+      name: 'Institutional Relations Coordinator',
+      description: 'Manages campus partnership MoUs, batches, and lab setups.',
+      isSystemRole: false,
+    },
+    {
+      code: 'LMS_INSTRUCTOR',
+      name: 'Academic Instructor & Faculty',
+      description: 'Delivers courses, assessments, and curriculum modules.',
+      isSystemRole: false,
+    },
+    {
+      code: 'STUDENT',
+      name: 'Enrolled Student',
+      description: 'Access to learning materials, assignments, and certificates.',
+      isSystemRole: false,
+    },
   ];
 
   for (const role of roles) {
@@ -138,6 +174,17 @@ async function main() {
     { code: 'finance:access', name: 'Access Finance Application', module: 'FINANCE' },
     { code: 'finance:manage', name: 'Manage Finance Operations', module: 'FINANCE' },
     { code: 'audit:read', name: 'Read Audit Logs', module: 'AUDIT' },
+    { code: 'crm:access', name: 'Access CRM Application', module: 'CRM' },
+    { code: 'crm:manage', name: 'Manage CRM Pipeline & Deals', module: 'CRM' },
+    { code: 'crm:leads:manage', name: 'Lead Scoring & Conversion', module: 'CRM' },
+    { code: 'crm:quotes:push', name: 'Bridge Quotes to Finance ERP', module: 'CRM' },
+    { code: 'institutions:manage', name: 'Manage Partner Institutions & MoUs', module: 'INSTITUTIONS' },
+    { code: 'programs:manage', name: 'Manage Academic Programs & Batches', module: 'ACADEMIC' },
+    { code: 'lms:manage', name: 'Manage LMS Courses & Certifications', module: 'LMS' },
+    { code: 'projects:manage', name: 'Manage Engineering Projects & Tasks', module: 'PROJECTS' },
+    { code: 'inventory:manage', name: 'Manage Lab Kits & BOMs', module: 'INVENTORY' },
+    { code: 'assets:manage', name: 'Manage Fixed Assets & Depreciation', module: 'ASSETS' },
+    { code: 'compliance:manage', name: 'Manage Statutory Compliance Calendar', module: 'COMPLIANCE' },
   ];
 
   for (const perm of permissions) {
@@ -186,6 +233,9 @@ async function main() {
     ],
     FINANCE_ADMIN: ['auth:login', 'users:read', 'finance:access', 'finance:manage', 'apps:read'],
     FINANCE_USER: ['auth:login', 'finance:access'],
+    CRM_ADMIN: ['auth:login', 'users:read', 'crm:access', 'crm:manage', 'crm:leads:manage', 'crm:quotes:push', 'institutions:manage', 'apps:read'],
+    CRM_USER: ['auth:login', 'crm:access', 'crm:leads:manage'],
+    INSTITUTION_COORDINATOR: ['auth:login', 'institutions:manage', 'programs:manage'],
   };
 
   for (const [roleCode, permCodes] of Object.entries(rolePermissionMap)) {
@@ -224,7 +274,14 @@ async function main() {
       firstName: 'Super',
       lastName: 'Administrator',
       roles: ['SUPER_ADMIN'],
-      apps: ['CENTRAL_DASHBOARD', 'HRMS', 'FINANCE'],
+      apps: ['CENTRAL_DASHBOARD', 'HRMS', 'FINANCE', 'CRM'],
+    },
+    {
+      email: 'crm.lead@techm4india.com',
+      firstName: 'Sneha',
+      lastName: 'Roy',
+      roles: ['CRM_ADMIN'],
+      apps: ['CENTRAL_DASHBOARD', 'CRM'],
     },
     {
       email: 'hrms.admin@techm4india.com',
@@ -633,6 +690,453 @@ async function main() {
   }
 
   console.log('HRMS foundation data seeded successfully.');
+
+  // =========================================================================
+  // 10. Institutional Partners Master (Domain 9)
+  // =========================================================================
+  console.log('Seeding institutional directory & MoUs...');
+  const institutions = [
+    {
+      code: 'INST-OU-001',
+      name: 'Osmania University College of Engineering',
+      type: 'GOVERNMENT_UNIVERSITY' as const,
+      naacRating: 'A_PLUS_PLUS' as const,
+      aisheCode: 'U-0027',
+      nirfRankTier: 'TOP_50',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500007',
+      totalStudents: 4500,
+      primaryContactName: 'Dr. Rajesh Varma',
+      primaryContactPhone: '+91 94401 23456',
+      primaryContactEmail: 'dean.engg@osmania.ac.in',
+      healthScore: 94,
+    },
+    {
+      code: 'INST-JNTUH-002',
+      name: 'Jawaharlal Nehru Technological University Hyderabad',
+      type: 'GOVERNMENT_UNIVERSITY' as const,
+      naacRating: 'A_PLUS' as const,
+      aisheCode: 'U-0017',
+      nirfRankTier: 'TOP_100',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500085',
+      totalStudents: 8500,
+      primaryContactName: 'Dr. M. Sreenivasa Rao',
+      primaryContactPhone: '+91 98480 34567',
+      primaryContactEmail: 'rnd.director@jntuh.ac.in',
+      healthScore: 91,
+    },
+    {
+      code: 'INST-VNR-003',
+      name: 'VNR Vignana Jyothi Institute of Engineering & Technology',
+      type: 'AUTONOMOUS_COLLEGE' as const,
+      naacRating: 'A_PLUS_PLUS' as const,
+      aisheCode: 'C-19754',
+      nirfRankTier: 'BAND_101_200',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500090',
+      totalStudents: 5200,
+      primaryContactName: 'Dr. C.D. Naidu',
+      primaryContactPhone: '+91 98661 45678',
+      primaryContactEmail: 'principal@vnrvjiet.ac.in',
+      healthScore: 89,
+    },
+    {
+      code: 'INST-CBIT-004',
+      name: 'Chaitanya Bharathi Institute of Technology',
+      type: 'AUTONOMOUS_COLLEGE' as const,
+      naacRating: 'A_PLUS_PLUS' as const,
+      aisheCode: 'C-19642',
+      nirfRankTier: 'BAND_101_200',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500075',
+      totalStudents: 4800,
+      primaryContactName: 'Dr. P. Ravinder Reddy',
+      primaryContactPhone: '+91 98492 56789',
+      primaryContactEmail: 'principal@cbit.ac.in',
+      healthScore: 88,
+    },
+    {
+      code: 'INST-DPS-005',
+      name: 'Delhi Public School Hyderabad',
+      type: 'K12_SCHOOL' as const,
+      naacRating: 'NOT_ACCREDITED' as const,
+      aisheCode: 'SCH-DPS-01',
+      nirfRankTier: 'PARTICIPATED',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500034',
+      totalStudents: 2200,
+      primaryContactName: 'Geetha Swamy',
+      primaryContactPhone: '+91 97011 67890',
+      primaryContactEmail: 'principal@dpshyderabad.in',
+      healthScore: 85,
+    },
+  ];
+
+  const instMap = new Map<string, string>();
+  for (const inst of institutions) {
+    const record = await prisma.institution.upsert({
+      where: { code: inst.code },
+      update: { healthScore: inst.healthScore, primaryContactName: inst.primaryContactName },
+      create: inst,
+    });
+    instMap.set(inst.code, record.id);
+  }
+
+  // Active MoUs
+  const ouId = instMap.get('INST-OU-001');
+  if (ouId) {
+    await prisma.moU.upsert({
+      where: { mouNumber: 'MOU-2026-001' },
+      update: {},
+      create: {
+        mouNumber: 'MOU-2026-001',
+        institutionId: ouId,
+        title: 'Institutional Centre of Excellence in Edge AI & Autonomous Robotics',
+        effectiveDate: new Date('2026-01-10'),
+        expiryDate: new Date('2029-01-09'),
+        scopeSummary: 'Establishment of 60-seat GPU-accelerated robotics laboratory, curriculum integration, faculty development, and student co-certification.',
+        institutionSignatoryName: 'Prof. S. Ramachandram',
+        institutionSignatoryRole: 'Vice Chancellor',
+        status: 'ACTIVE',
+      },
+    });
+  }
+
+  // =========================================================================
+  // 11. CRM Leads & 6-Stage Deals (Domain 8)
+  // =========================================================================
+  console.log('Seeding CRM 8-vertical leads and Kanban pipeline...');
+  const crmLeads = [
+    {
+      leadNumber: 'TM4I-LD-2026-001',
+      institutionName: 'Osmania University College of Engineering',
+      vertical: 'ENGINEERING_COLLEGES' as const,
+      contactPerson: 'Dr. Rajesh Varma',
+      designation: 'Dean of Engineering',
+      email: 'dean.engg@osmania.ac.in',
+      phone: '+91 94401 23456',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      source: 'CAMPUS_OUTREACH',
+      score: 88,
+      status: 'QUALIFIED' as const,
+      estimatedBudget: 1500000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-002',
+      institutionName: 'GITAM Deemed University',
+      vertical: 'UNIVERSITIES_AUTONOMOUS' as const,
+      contactPerson: 'Prof. K. Venkatesh',
+      designation: 'Director R&D',
+      email: 'rnd.director@gitam.edu',
+      phone: '+91 98481 12233',
+      city: 'Visakhapatnam',
+      state: 'Andhra Pradesh',
+      source: 'TENDER',
+      score: 92,
+      status: 'PROPOSAL_SENT' as const,
+      estimatedBudget: 3500000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-003',
+      institutionName: 'Government Polytechnic Masab Tank',
+      vertical: 'POLYTECHNICS' as const,
+      contactPerson: 'K. Subba Rao',
+      designation: 'Principal',
+      email: 'principal@gptmasabtank.ac.in',
+      phone: '+91 94411 99887',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      source: 'CAMPUS_OUTREACH',
+      score: 74,
+      status: 'CONTACTED' as const,
+      estimatedBudget: 800000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-004',
+      institutionName: 'Oakridge International School',
+      vertical: 'K12_STEM_SCHOOLS' as const,
+      contactPerson: 'Sarah Mathews',
+      designation: 'STEM Coordinator',
+      email: 'sarah.m@oakridge.in',
+      phone: '+91 99899 44556',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      source: 'WEBSITE',
+      score: 85,
+      status: 'QUALIFIED' as const,
+      estimatedBudget: 1200000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-005',
+      institutionName: 'Bhavans Sri Ramakrishna Vidyalaya',
+      vertical: 'ATL_LABS' as const,
+      contactPerson: 'N. Radhika',
+      designation: 'ATL Lab In-Charge',
+      email: 'atl.incharge@bhavansrk.edu.in',
+      phone: '+91 98765 43210',
+      city: 'Secunderabad',
+      state: 'Telangana',
+      source: 'CAMPUS_OUTREACH',
+      score: 78,
+      status: 'NEW' as const,
+      estimatedBudget: 600000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-006',
+      institutionName: 'DRDO Defence Research and Development Lab (DRDL)',
+      vertical: 'AEROSPACE_DEFENCE_LABS' as const,
+      contactPerson: 'Dr. V.G. Sekaran',
+      designation: 'Scientist G & Director',
+      email: 'director@drdl.drdo.in',
+      phone: '+91 94900 11223',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      source: 'REFERRAL',
+      score: 95,
+      status: 'PROPOSAL_SENT' as const,
+      estimatedBudget: 6500000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-007',
+      institutionName: 'NextGen Skills Academy India',
+      vertical: 'EDTECH_PARTNERS' as const,
+      contactPerson: 'Abhinav Saxena',
+      designation: 'Co-Founder & COO',
+      email: 'abhinav@nextgenskills.in',
+      phone: '+91 98112 33445',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      source: 'WEBSITE',
+      score: 68,
+      status: 'CONTACTED' as const,
+      estimatedBudget: 1000000,
+    },
+    {
+      leadNumber: 'TM4I-LD-2026-008',
+      institutionName: 'Tata Trusts Rural Tech Initiative',
+      vertical: 'CORPORATE_CSR' as const,
+      contactPerson: 'Ritu Chhabra',
+      designation: 'Head of CSR Partnerships',
+      email: 'rchhabra@tatatrusts.org',
+      phone: '+91 98200 55667',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      source: 'REFERRAL',
+      score: 90,
+      status: 'QUALIFIED' as const,
+      estimatedBudget: 5000000,
+    },
+  ];
+
+  for (const ld of crmLeads) {
+    await prisma.lead.upsert({
+      where: { leadNumber: ld.leadNumber },
+      update: { score: ld.score, status: ld.status },
+      create: ld,
+    });
+  }
+
+  // CRM Deals
+  const deals = [
+    {
+      dealNumber: 'TM4I-DL-2026-001',
+      title: 'Osmania Univ - Centre of Excellence in Robotics & Edge AI',
+      institutionId: ouId,
+      vertical: 'ENGINEERING_COLLEGES' as const,
+      amount: 1500000,
+      stage: 'PROPOSAL_QUOTE' as const,
+      probabilityPct: 50,
+      expectedCloseDate: new Date('2026-11-30'),
+    },
+    {
+      dealNumber: 'TM4I-DL-2026-002',
+      title: 'JNTUH - Satellite Ground Station & CanSat Lab Rig',
+      institutionId: instMap.get('INST-JNTUH-002'),
+      vertical: 'UNIVERSITIES_AUTONOMOUS' as const,
+      amount: 2850000,
+      stage: 'NEGOTIATION' as const,
+      probabilityPct: 75,
+      expectedCloseDate: new Date('2026-12-15'),
+    },
+    {
+      dealNumber: 'TM4I-DL-2026-003',
+      title: 'VNR VJIET - Drone Avionics & Autopilot Research Facility',
+      institutionId: instMap.get('INST-VNR-003'),
+      vertical: 'ENGINEERING_COLLEGES' as const,
+      amount: 1200000,
+      stage: 'CLOSED_WON' as const,
+      probabilityPct: 100,
+      expectedCloseDate: new Date('2026-10-15'),
+      closedAt: new Date('2026-10-15'),
+    },
+  ];
+
+  for (const dl of deals) {
+    await prisma.deal.upsert({
+      where: { dealNumber: dl.dealNumber },
+      update: { stage: dl.stage, amount: dl.amount },
+      create: dl,
+    });
+  }
+
+  // =========================================================================
+  // 12. Academic Programs, Batches & LMS Courses (Domains 10 & 11)
+  // =========================================================================
+  console.log('Seeding academic programs & LMS courses...');
+  const programs = [
+    {
+      code: 'PRG-AI-ROB-01',
+      title: 'Advanced Certificate in Autonomous Robotics & Edge AI',
+      division: 'TECHM4_ENGINEERING' as const,
+      summary: 'Comprehensive hands-on curriculum covering ROS2, LiDAR SLAM, NVIDIA Jetson edge inference, and mobile robotics kinematic control.',
+      durationWeeks: 16,
+      credits: 4,
+      certificationType: 'TECHM4_INDUSTRY_CERTIFICATE' as const,
+      targetAudience: 'ECE / CSE / Mechanical 3rd & 4th Year B.Tech',
+    },
+    {
+      code: 'PRG-SAT-IOT-02',
+      title: 'CanSat & Space Payloads Systems Engineering',
+      division: 'TECHM4_SPACE' as const,
+      summary: 'End-to-end design, telemetry link budgets, sensor integration, and atmospheric descent recovery for CanSat nano-satellite payloads.',
+      durationWeeks: 12,
+      credits: 4,
+      certificationType: 'TECHM4_INDUSTRY_CERTIFICATE' as const,
+      targetAudience: 'Aerospace / ECE / Mechatronics Undergraduates',
+    },
+    {
+      code: 'PRG-STEM-K12-03',
+      title: 'K-12 STEM & Atal Tinkering Labs Starter Curriculum',
+      division: 'TECHM4_SCHOOLS' as const,
+      summary: 'Project-based robotics, visual block coding, microcontrollers, and 3D printing design thinking for middle and high school students.',
+      durationWeeks: 8,
+      credits: 2,
+      certificationType: 'AICTE_NEAT_APPROVED' as const,
+      targetAudience: 'Grades 6 to 10 School Students',
+    },
+  ];
+
+  for (const prg of programs) {
+    await prisma.program.upsert({
+      where: { code: prg.code },
+      update: { title: prg.title, summary: prg.summary },
+      create: prg,
+    });
+  }
+
+  // =========================================================================
+  // 13. Inventory Items & Lab Kit BOMs (Domain 17)
+  // =========================================================================
+  console.log('Seeding inventory items & lab kit BOMs...');
+  const inventoryItems = [
+    { sku: 'KIT-CANSAT-01', name: 'TechM4 CanSat Advanced Training Rig', category: 'FINISHED_KIT' as const, uom: 'KIT', hsnCode: '8802', reorderLevel: 5, unitCost: 18500 },
+    { sku: 'PRT-SENS-BME280', name: 'BME280 Environmental Pressure & Temp Sensor', category: 'SENSORS' as const, uom: 'UNIT', hsnCode: '9031', reorderLevel: 25, unitCost: 450 },
+    { sku: 'PRT-MCU-ESP32', name: 'ESP32-S3 Dual-Core SoC Development Board', category: 'MICROCONTROLLERS' as const, uom: 'UNIT', hsnCode: '8542', reorderLevel: 30, unitCost: 650 },
+    { sku: 'PRT-RADIO-LORA', name: 'SX1276 LoRa 868MHz Transceiver Module', category: 'ROBOTICS_PARTS' as const, uom: 'UNIT', hsnCode: '8517', reorderLevel: 20, unitCost: 850 },
+    { sku: 'KIT-DRONE-4X', name: 'TechM4 Quadcopter Autonomous Avionics Kit', category: 'FINISHED_KIT' as const, uom: 'KIT', hsnCode: '8806', reorderLevel: 5, unitCost: 24000 },
+  ];
+
+  const itemMap = new Map<string, string>();
+  for (const it of inventoryItems) {
+    const item = await prisma.inventoryItem.upsert({
+      where: { sku: it.sku },
+      update: { unitCost: it.unitCost, reorderLevel: it.reorderLevel },
+      create: it,
+    });
+    itemMap.set(it.sku, item.id);
+  }
+
+  // Kit BOM Linkage
+  const canSatRigId = itemMap.get('PRT-SENS-BME280');
+  if (canSatRigId) {
+    await prisma.kitBOM.upsert({
+      where: { kitSku_componentItemId: { kitSku: 'KIT-CANSAT-01', componentItemId: canSatRigId } },
+      update: {},
+      create: { kitSku: 'KIT-CANSAT-01', componentItemId: canSatRigId, quantityRequired: 1 },
+    });
+  }
+
+  // =========================================================================
+  // 14. Fixed Assets Register (Domain 18)
+  // =========================================================================
+  console.log('Seeding fixed assets register...');
+  const assets = [
+    {
+      assetTag: 'TM4I-AST-001',
+      name: 'Creality Ender-3 V3 Plus High-Temp 3D Printer',
+      category: 'THREE_D_PRINTERS' as const,
+      purchaseDate: new Date('2025-08-15'),
+      purchaseCost: 45000,
+      serialNumber: 'CR3-2025-8819',
+      depreciationMethod: 'SLM' as const,
+      depreciationRatePct: 15.0,
+      currentBookValue: 38250,
+      branchId: branchMap.get('HYD-HQ'),
+      status: 'IN_USE' as const,
+    },
+    {
+      assetTag: 'TM4I-AST-002',
+      name: 'Rigol DS1054Z 50MHz Digital Storage Oscilloscope',
+      category: 'LAB_INSTRUMENTS' as const,
+      purchaseDate: new Date('2025-09-01'),
+      purchaseCost: 38000,
+      serialNumber: 'RIG-50M-1029',
+      depreciationMethod: 'SLM' as const,
+      depreciationRatePct: 15.0,
+      currentBookValue: 33500,
+      branchId: branchMap.get('HYD-HQ'),
+      status: 'IN_USE' as const,
+    },
+    {
+      assetTag: 'TM4I-AST-003',
+      name: 'Apple MacBook Pro M3 Max 36GB (Lead Architect Rig)',
+      category: 'IT_LAPTOPS' as const,
+      purchaseDate: new Date('2025-11-10'),
+      purchaseCost: 249000,
+      serialNumber: 'C02G9988MD6R',
+      depreciationMethod: 'WDV' as const,
+      depreciationRatePct: 40.0,
+      currentBookValue: 198000,
+      branchId: branchMap.get('HYD-HQ'),
+      status: 'IN_USE' as const,
+    },
+  ];
+
+  for (const ast of assets) {
+    await prisma.asset.upsert({
+      where: { assetTag: ast.assetTag },
+      update: { currentBookValue: ast.currentBookValue, status: ast.status },
+      create: ast,
+    });
+  }
+
+  // =========================================================================
+  // 15. Statutory Compliance Calendar (Domain 22)
+  // =========================================================================
+  console.log('Seeding Indian statutory compliance calendar obligations...');
+  const obligations = [
+    { title: 'GSTR-3B Monthly Tax Return Filing', authority: 'GSTN', frequency: 'MONTHLY' as const, dueDayOfMonth: 20, description: 'Monthly summary return of outward and inward supplies and payment of GST liability.' },
+    { title: 'GSTR-1 Monthly Outward Supplies Statement', authority: 'GSTN', frequency: 'MONTHLY' as const, dueDayOfMonth: 11, description: 'Details of all B2B and B2C sales invoices and debit/credit notes.' },
+    { title: 'TDS Payment & Quarterly 24Q/26Q Return', authority: 'CBDT', frequency: 'MONTHLY' as const, dueDayOfMonth: 7, description: 'Challan ITNS 281 deposit of salary and vendor TDS withheld under Sec 192, 194C, 194J.' },
+    { title: 'EPFO Electronic Challan cum Return (ECR)', authority: 'EPFO', frequency: 'MONTHLY' as const, dueDayOfMonth: 15, description: 'Remittance of employee and employer Provident Fund contributions.' },
+    { title: 'ESIC Monthly Contribution Deposit', authority: 'ESIC', frequency: 'MONTHLY' as const, dueDayOfMonth: 15, description: 'Deposit of employee state insurance statutory contribution for eligible employees.' },
+    { title: 'MCA Annual Filing (MGT-7 & AOC-4)', authority: 'MCA', frequency: 'ANNUAL' as const, dueDayOfMonth: 30, description: 'Filing of annual financial accounts and return of company with the Registrar of Companies (ROC).' },
+    { title: 'DPIIT Startup India Annual Compliance Review', authority: 'DPIIT', frequency: 'ANNUAL' as const, dueDayOfMonth: 31, description: 'Annual validation of innovation metrics and tax exemption status under Section 80-IAC.' },
+  ];
+
+  for (const ob of obligations) {
+    const existing = await prisma.complianceObligation.findFirst({ where: { title: ob.title } });
+    if (!existing) {
+      await prisma.complianceObligation.create({ data: ob });
+    }
+  }
 
   console.log('Seed completed successfully.');
 }
