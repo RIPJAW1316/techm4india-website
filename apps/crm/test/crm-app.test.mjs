@@ -98,6 +98,7 @@ test('Zoho UI Components Structure & Dual-Rail Navigation', () => {
     'CrmQuotesView.tsx',
     'CrmReportsView.tsx',
     'CrmCampaignsView.tsx',
+    'CrmInvoicesView.tsx',
     'CrmConvertLeadModal.tsx',
   ];
 
@@ -105,4 +106,28 @@ test('Zoho UI Components Structure & Dual-Rail Navigation', () => {
     const compPath = path.join(appDir, 'src/components', comp);
     assert.ok(fs.existsSync(compPath), `Component ${comp} must exist in apps/crm/src/components`);
   }
+});
+
+test('Finance Invoices Integration & ViewTabs', () => {
+  const typesContent = fs.readFileSync(path.join(appDir, 'src/types.ts'), 'utf8');
+  assert.ok(typesContent.includes("'invoices'"), "CrmViewTab must support 'invoices'");
+  assert.ok(typesContent.includes("'meetings'"), "CrmViewTab must support 'meetings'");
+  assert.ok(typesContent.includes("'call_logs'"), "CrmViewTab must support 'call_logs'");
+  assert.ok(typesContent.includes('interface InvoiceItem'), 'InvoiceItem interface must exist in types.ts');
+
+  const sidebarContent = fs.readFileSync(path.join(appDir, 'src/components/CrmRailAndSidebar.tsx'), 'utf8');
+  assert.ok(!sidebarContent.includes('href="http://localhost:3001"'), 'External redirect to :3001 must be removed');
+  assert.ok(sidebarContent.includes("setActiveTab('invoices')"), 'Sidebar must navigate internally to invoices tab');
+  assert.ok(sidebarContent.includes("setActiveTab('meetings')"), 'Sidebar must navigate internally to meetings tab');
+  assert.ok(sidebarContent.includes("setActiveTab('call_logs')"), 'Sidebar must navigate internally to call_logs tab');
+
+  // Verify blue rail visibility condition
+  assert.ok(
+    sidebarContent.includes('{isCollapsed && (') || sidebarContent.includes('isCollapsed &&'),
+    'Blue sidebar rail must only be rendered/visible when sidebar extended option is disabled (isCollapsed)'
+  );
+  assert.ok(
+    sidebarContent.includes('{!isCollapsed && (') || sidebarContent.includes('!isCollapsed &&'),
+    'White extended sidebar must only be rendered/visible when extended (!isCollapsed)'
+  );
 });

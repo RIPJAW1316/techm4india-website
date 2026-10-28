@@ -26,6 +26,7 @@ interface CrmActivitiesViewProps {
   tasks: TaskItem[];
   meetings: MeetingItem[];
   callLogs: CallLogItem[];
+  initialSubTab?: 'TASKS' | 'MEETINGS' | 'CALLS';
   onToggleTask: (taskId: string) => void;
   onCreateTask: (task: Partial<TaskItem>) => void;
   onCreateMeeting: (meeting: Partial<MeetingItem>) => void;
@@ -36,12 +37,19 @@ export const CrmActivitiesView: React.FC<CrmActivitiesViewProps> = ({
   tasks,
   meetings,
   callLogs,
+  initialSubTab = 'TASKS',
   onToggleTask,
   onCreateTask,
   onCreateMeeting,
   onCreateCallLog,
 }) => {
-  const [subTab, setSubTab] = useState<'TASKS' | 'MEETINGS' | 'CALLS'>('TASKS');
+  const [subTab, setSubTab] = useState<'TASKS' | 'MEETINGS' | 'CALLS'>(initialSubTab);
+
+  React.useEffect(() => {
+    if (initialSubTab) {
+      setSubTab(initialSubTab);
+    }
+  }, [initialSubTab]);
   const [searchTerm, setSearchTerm] = useState('');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'PENDING' | 'COMPLETED'>('ALL');
 

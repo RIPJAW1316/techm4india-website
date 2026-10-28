@@ -22,6 +22,7 @@ import { CrmConvertLeadModal } from './components/CrmConvertLeadModal';
 import { CrmDealsView } from './components/CrmDealsView';
 import { CrmHeader } from './components/CrmHeader';
 import { CrmHomeDashboard } from './components/CrmHomeDashboard';
+import { CrmInvoicesView } from './components/CrmInvoicesView';
 import { CrmLeadsView } from './components/CrmLeadsView';
 import { CrmQuotesView } from './components/CrmQuotesView';
 import { CrmRailAndSidebar } from './components/CrmRailAndSidebar';
@@ -33,6 +34,7 @@ import {
   initialCampaigns,
   initialContacts,
   initialDeals,
+  initialInvoices,
   initialLeads,
   initialMeetings,
   initialQuotes,
@@ -46,6 +48,7 @@ import {
   CrmViewTab,
   DealItem,
   DealStage,
+  InvoiceItem,
   LeadItem,
   MeetingItem,
   QuoteItem,
@@ -67,6 +70,7 @@ export default function App() {
   const [meetings, setMeetings] = useState<MeetingItem[]>(initialMeetings);
   const [callLogs, setCallLogs] = useState<CallLogItem[]>(initialCallLogs);
   const [quotes, setQuotes] = useState<QuoteItem[]>(initialQuotes);
+  const [invoices, setInvoices] = useState<InvoiceItem[]>(initialInvoices);
   const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns);
 
   // Conversion Modal State
@@ -111,6 +115,13 @@ export default function App() {
         }
       }
     }
+
+    // Hydrate invoices from Finance integration
+    crmApi.getInvoices().then((invs) => {
+      if (invs && invs.length > 0) {
+        setInvoices(invs);
+      }
+    });
   }, []);
 
   // Handlers
@@ -285,11 +296,73 @@ export default function App() {
   };
 
   const handlePushQuoteToFinance = async (quoteId: string) => {
+    const q = quotes.find((quote) => quote.id === quoteId);
     await crmApi.pushQuoteToFinance(quoteId);
+
     setQuotes((prev) =>
-      prev.map((q) => (q.id === quoteId ? { ...q, status: 'CONVERTED_TO_INVOICE' } : q))
+      prev.map((item) => (item.id === quoteId ? { ...item, status: 'CONVERTED_TO_INVOICE' } : item))
     );
-    addToast(`Quotation pushed to TechM4 Finance ERP as Invoice!`);
+
+    if (q) {
+      const invNumber = `INV-2026-${String(invoices.length + 45).padStart(5, '0')}`;
+      const newInvoice: InvoiceItem = {
+        id: `inv-${Date.now()}`,
+        invoiceNumber: invNumber,
+        customerName: q.accountName,
+        customerGstin: '36AAACA1234F1Z8',
+        dealTitle: q.dealTitle || 'Commercial Contract Package',
+        quoteNumber: q.quoteNumber,
+        type: 'B2B',
+        status: 'SENT',
+        issueDate: new Date().toISOString().slice(0, 10),
+        dueDate: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
+        subtotal: q.subtotal,
+        cgst: Math.round(q.subtotal * 0.09),
+        sgst: Math.round(q.subtotal * 0.09),
+        igst: 0,
+        totalAmount: q.totalAmount,
+        amountPaid: 0,
+        balanceDue: q.totalAmount,
+        division: 'TECHM4_ENGINEERING',
+        razorpayPaymentLink: `https://rzp.io/i/tm4_${q.quoteNumber.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+        items: q.lineItems.map((li) => ({
+          description: li.description,
+          quantity: li.quantity,
+          unitPrice: li.unitPrice,
+          taxableAmount: li.amount,
+          gstRate: 18,
+          cgstAmount: Math.round(li.amount * 0.09),
+          sgstAmount: Math.round(li.amount * 0.09),
+          igstAmount: 0,
+          totalAmount: Math.round(li.amount * 1.18),
+        })),
+      };
+
+      setInvoices((prev) => [newInvoice, ...prev]);
+      addToast(
+        `Quote ${q.quoteNumber} converted to Finance ERP Invoice ${invNumber} & synced!`,
+        'success'
+      );
+    } else {
+      addToast(`Quotation pushed to TechM4 Finance ERP as Invoice!`);
+    }
+  };
+
+  const handleRecordPayment = (invoiceId: string, amount: number) => {
+    setInvoices((prev) =>
+      prev.map((inv) => {
+        if (inv.id !== invoiceId) return inv;
+        const newPaid = (inv.amountPaid || 0) + amount;
+        const newBalance = Math.max(0, inv.totalAmount - newPaid);
+        return {
+          ...inv,
+          amountPaid: newPaid,
+          balanceDue: newBalance,
+          status: newBalance === 0 ? 'PAID' : 'PARTIALLY_PAID',
+        };
+      })
+    );
+    addToast(`Payment of ₹${amount.toLocaleString('en-IN')} recorded against invoice.`, 'success');
   };
 
   const handleCreateCampaign = (campData: Partial<CampaignItem>) => {
@@ -333,10 +406,14 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
           leadCount={leads.length}
           dealCount={deals.length}
           accountCount={accounts.length}
           taskCount={tasks.filter((t) => t.status !== 'COMPLETED').length}
+          meetingCount={meetings.length}
+          callLogCount={callLogs.length}
+          invoiceCount={invoices.length}
         />
 
         {/* Dynamic Content Pane */}
@@ -395,6 +472,33 @@ export default function App() {
               tasks={tasks}
               meetings={meetings}
               callLogs={callLogs}
+              initialSubTab="TASKS"
+              onToggleTask={handleToggleTask}
+              onCreateTask={handleCreateTask}
+              onCreateMeeting={handleCreateMeeting}
+              onCreateCallLog={handleCreateCallLog}
+            />
+          )}
+
+          {activeTab === 'meetings' && (
+            <CrmActivitiesView
+              tasks={tasks}
+              meetings={meetings}
+              callLogs={callLogs}
+              initialSubTab="MEETINGS"
+              onToggleTask={handleToggleTask}
+              onCreateTask={handleCreateTask}
+              onCreateMeeting={handleCreateMeeting}
+              onCreateCallLog={handleCreateCallLog}
+            />
+          )}
+
+          {activeTab === 'call_logs' && (
+            <CrmActivitiesView
+              tasks={tasks}
+              meetings={meetings}
+              callLogs={callLogs}
+              initialSubTab="CALLS"
               onToggleTask={handleToggleTask}
               onCreateTask={handleCreateTask}
               onCreateMeeting={handleCreateMeeting}
@@ -409,6 +513,19 @@ export default function App() {
               deals={deals}
               onCreateQuote={handleCreateQuote}
               onPushToFinance={handlePushQuoteToFinance}
+            />
+          )}
+
+          {activeTab === 'invoices' && (
+            <CrmInvoicesView
+              invoices={invoices}
+              onRecordPayment={handleRecordPayment}
+              onRefresh={() => {
+                crmApi.getInvoices().then((invs) => {
+                  if (invs && invs.length > 0) setInvoices(invs);
+                });
+                addToast('Synchronized with Finance ERP Invoices.');
+              }}
             />
           )}
 

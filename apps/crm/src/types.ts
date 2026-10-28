@@ -43,8 +43,11 @@ export type CrmViewTab =
   | 'contacts'
   | 'deals'
   | 'activities'
+  | 'meetings'
+  | 'call_logs'
   | 'campaigns'
   | 'quotes'
+  | 'invoices'
   | 'reports';
 
 export interface LeadItem {
@@ -171,13 +174,58 @@ export interface QuoteItem {
   subtotal: number;
   taxGst: number;
   totalAmount: number;
-  status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'REJECTED' | 'CONVERTED_TO_INVOICE';
+  status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'REJECTED' | 'CONVERTED_TO_INVOICE' | 'INVOICED';
   lineItems: Array<{
     description: string;
     quantity: number;
     unitPrice: number;
     amount: number;
   }>;
+}
+
+export interface InvoiceLineItem {
+  id?: string;
+  description: string;
+  hsnSacCode?: string;
+  quantity: number;
+  unitPrice: number;
+  taxableAmount: number;
+  gstRate: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
+  totalAmount: number;
+}
+
+export interface InvoiceItem {
+  id: string;
+  invoiceNumber: string;
+  customerId?: string;
+  customerName: string;
+  customerGstin?: string;
+  stateCode?: string;
+  placeOfSupply?: string;
+  dealTitle?: string;
+  quoteNumber?: string;
+  type?: 'B2B' | 'B2C' | 'B2G';
+  status: 'DRAFT' | 'SENT' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  issueDate: string;
+  dueDate: string;
+  currency?: string;
+  subtotal: number;
+  taxableAmount?: number;
+  cgst: number;
+  sgst: number;
+  igst: number;
+  taxGst?: number;
+  totalAmount: number;
+  amountPaid: number;
+  balanceDue: number;
+  paymentTerms?: string;
+  division: DivisionCode;
+  razorpayPaymentLink?: string;
+  irn?: string;
+  items?: InvoiceLineItem[];
 }
 
 export interface CampaignItem {

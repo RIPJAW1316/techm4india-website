@@ -9,6 +9,7 @@ import {
   initialCampaigns,
   initialContacts,
   initialDeals,
+  initialInvoices,
   initialLeads,
   initialMeetings,
   initialQuotes,
@@ -20,6 +21,7 @@ import {
   CampaignItem,
   ContactItem,
   DealItem,
+  InvoiceItem,
   LeadItem,
   MeetingItem,
   QuoteItem,
@@ -480,5 +482,42 @@ export const crmApi = {
     } catch {}
 
     return { success: true, message: 'Invoice generated in TechM4 Finance ERP' };
+  },
+
+  // 9. Finance Invoices Integration
+  getInvoices: async (): Promise<InvoiceItem[]> => {
+    try {
+      const res = await fetch(`/api/v1/finance/invoices`, { headers: getAuthHeaders() });
+      if (res.ok) {
+        const raw = await res.json();
+        const items = Array.isArray(raw) ? raw : raw?.data || [];
+        if (items.length > 0) {
+          return items.map((inv: any) => ({
+            id: inv.id,
+            invoiceNumber: inv.invoiceNumber,
+            customerName: inv.customer?.name || inv.customerName || 'Institution Client',
+            customerGstin: inv.customer?.gstin || inv.customerGstin || '36AAACT0000A1Z5',
+            dealTitle: inv.reference || inv.dealTitle || 'Commercial Contract',
+            quoteNumber: inv.quoteNumber,
+            type: inv.type || 'B2B',
+            status: inv.status || 'SENT',
+            issueDate: inv.issueDate ? inv.issueDate.slice(0, 10) : '2026-10-20',
+            dueDate: inv.dueDate ? inv.dueDate.slice(0, 10) : '2026-11-20',
+            subtotal: Number(inv.taxableAmount || inv.subtotal || 0),
+            cgst: Number(inv.cgst || 0),
+            sgst: Number(inv.sgst || 0),
+            igst: Number(inv.igst || 0),
+            totalAmount: Number(inv.totalAmount || 0),
+            amountPaid: Number(inv.amountPaid || 0),
+            balanceDue: Number(inv.balanceDue ?? inv.totalAmount ?? 0),
+            division: inv.division || 'TECHM4_ENGINEERING',
+            razorpayPaymentLink: inv.razorpayPaymentLink,
+            irn: inv.irn,
+            items: inv.items || [],
+          }));
+        }
+      }
+    } catch {}
+    return initialInvoices;
   },
 };
