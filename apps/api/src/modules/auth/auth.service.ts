@@ -10,6 +10,8 @@ import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../database/prisma.service';
 import { PasswordService } from './password.service';
+import { TotpService } from './totp.service';
+import { EnableMfaDto, VerifyMfaDto, DisableMfaDto } from './dto/mfa.dto';
 import {
   AuthTokensResponseDto,
   ChangePasswordDto,
@@ -29,6 +31,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly totpService: TotpService,
   ) {}
 
   private hashToken(token: string): string {
@@ -74,6 +77,22 @@ export class AuthService {
     if (!isPasswordValid) {
       this.logger.warn(`Failed login attempt for user: ${user.id}`);
       throw new UnauthorizedException('Invalid email or password.');
+    }
+
+    // Step-up 2FA Challenge if MFA is enabled
+    if (user.mfaEnabled) {
+      const tempToken = this.jwtService.sign(
+        { sub: user.id, email: user.email, type: 'mfa_temp' },
+        { expiresIn: '5m' },
+      );
+      return {
+        accessToken: '',
+        refreshToken: '',
+        tokenType: 'Bearer',
+        expiresIn: 0,
+        mfaRequired: true,
+        tempToken,
+      };
     }
 
     // Extract roles and distinct permissions
@@ -395,5 +414,218 @@ export class AuthService {
     });
 
     return { message: 'Password changed successfully. All active sessions have been revoked.' };
+  }
+
+  // =========================================================================
+  // Time-based One-Time Password (TOTP) MFA Engine
+  // =========================================================================
+
+  async setupMfa(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    const secret = this.totpService.generateSecret();
+    const { rawCodes, hashedCodes } = this.totpService.generateRecoveryCodes();
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { mfaRecoveryCodes: hashedCodes },
+    });
+
+    const otpauthUri = this.totpService.getTotpUri(user.email, secret);
+
+    return {
+      secret,
+      otpauthUri,
+      recoveryCodes: rawCodes,
+    };
+  }
+
+  async enableMfa(userId: string, dto: EnableMfaDto) {
+    const isValid = this.totpService.verifyTotp(dto.secret, dto.token);
+    if (!isValid) {
+      throw new BadRequestException('Invalid verification code from Authenticator app.');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        mfaEnabled: true,
+        mfaSecret: dto.secret,
+      },
+    });
+
+    return { message: 'Two-factor authentication successfully enabled.' };
+  }
+
+  async verifyMfaLogin(
+    dto: VerifyMfaDto,
+    ip?: string,
+    userAgent?: string,
+  ): Promise<AuthTokensResponseDto> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(dto.tempToken);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired MFA session.');
+    }
+
+    if (payload?.type !== 'mfa_temp') {
+      throw new UnauthorizedException('Invalid token type for MFA verification.');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+      include: {
+        organization: true,
+        userRoles: {
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user || !user.isActive || !user.mfaSecret) {
+      throw new UnauthorizedException('User not found or MFA not configured.');
+    }
+
+    let verified = false;
+    if (dto.token) {
+      verified = this.totpService.verifyTotp(user.mfaSecret, dto.token);
+    } else if (dto.recoveryCode) {
+      const { isValid, remainingHashedCodes } = this.totpService.verifyRecoveryCode(
+        dto.recoveryCode,
+        user.mfaRecoveryCodes,
+      );
+      if (isValid) {
+        verified = true;
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { mfaRecoveryCodes: remainingHashedCodes },
+        });
+      }
+    } else {
+      throw new BadRequestException('Either TOTP token or recovery code is required.');
+    }
+
+    if (!verified) {
+      throw new UnauthorizedException('Invalid MFA token or recovery code.');
+    }
+
+    // Extract roles and distinct permissions
+    const roles: string[] = user.userRoles.map((ur) => ur.role.code);
+    const permissionSet = new Set<string>();
+    for (const ur of user.userRoles) {
+      for (const rp of ur.role.permissions) {
+        permissionSet.add(rp.permission.code);
+      }
+    }
+    const permissions = Array.from(permissionSet);
+
+    // Create Access Token
+    const jwtPayload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      roles,
+      permissions,
+      organizationId: user.organizationId,
+    };
+
+    const accessToken = this.jwtService.sign(jwtPayload);
+
+    // Generate & store Refresh Token
+    const rawRefreshToken = uuidv4() + '-' + crypto.randomBytes(32).toString('hex');
+    const tokenHash = this.hashToken(rawRefreshToken);
+    const family = uuidv4();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + this.refreshTokenTtlDays);
+
+    await this.prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        family,
+        expiresAt,
+        ipAddress: ip,
+        userAgent,
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    return {
+      accessToken,
+      refreshToken: rawRefreshToken,
+      expiresIn: this.accessTokenTtlSeconds,
+      tokenType: 'Bearer',
+      mfaRequired: false,
+    };
+  }
+
+  async disableMfa(userId: string, dto: DisableMfaDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found.');
+    }
+
+    let verified = false;
+    if (dto.password) {
+      verified = await this.passwordService.verify(user.passwordHash, dto.password);
+      if (!verified) {
+        throw new BadRequestException('Incorrect account password.');
+      }
+    } else if (dto.token && user.mfaSecret) {
+      verified = this.totpService.verifyTotp(user.mfaSecret, dto.token);
+      if (!verified) {
+        throw new BadRequestException('Invalid TOTP token.');
+      }
+    } else {
+      throw new BadRequestException('Password or TOTP token is required to disable MFA.');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        mfaEnabled: false,
+        mfaSecret: null,
+        mfaRecoveryCodes: [],
+      },
+    });
+
+    return { message: 'Two-factor authentication disabled successfully.' };
+  }
+
+  // =========================================================================
+  // Active Session Revocation
+  // =========================================================================
+
+  async revokeAllSessions(userId: string) {
+    const result = await this.prisma.refreshToken.updateMany({
+      where: { userId, isRevoked: false },
+      data: { isRevoked: true },
+    });
+
+    return {
+      message: 'All active sessions and refresh tokens have been revoked.',
+      revokedCount: result.count,
+    };
   }
 }

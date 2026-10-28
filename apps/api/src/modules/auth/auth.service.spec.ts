@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { PasswordService } from './password.service';
+import { TotpService } from './totp.service';
 import { PrismaService } from '../../database/prisma.service';
 
 describe('AuthService', () => {
@@ -57,6 +58,7 @@ describe('AuthService', () => {
 
     jwtService = {
       sign: jest.fn().mockReturnValue('mock-jwt-access-token'),
+      verify: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -65,6 +67,7 @@ describe('AuthService', () => {
         { provide: PrismaService, useValue: prismaService },
         { provide: PasswordService, useValue: passwordService },
         { provide: JwtService, useValue: jwtService },
+        TotpService,
         {
           provide: ConfigService,
           useValue: {
@@ -250,6 +253,69 @@ describe('AuthService', () => {
           newPassword: 'SamePassword123!',
         }),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('Two-Factor Authentication (TOTP MFA)', () => {
+    it('setupMfa should return base32 secret, otpauth URI, and recovery codes', async () => {
+      prismaService.user.findUnique.mockResolvedValue(mockUser);
+      prismaService.user.update.mockResolvedValue(mockUser);
+
+      const result = await authService.setupMfa(mockUser.id);
+      expect(result).toHaveProperty('secret');
+      expect(result).toHaveProperty('otpauthUri');
+      expect(result.otpauthUri).toContain('otpauth://totp/');
+      expect(result.recoveryCodes).toHaveLength(8);
+      expect(prismaService.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: mockUser.id },
+          data: expect.objectContaining({ mfaRecoveryCodes: expect.any(Array) }),
+        }),
+      );
+    });
+
+    it('enableMfa should activate MFA when TOTP code is valid', async () => {
+      const totpService = new TotpService();
+      const secret = totpService.generateSecret();
+      const validCode = totpService.generateTotp(secret);
+
+      prismaService.user.update.mockResolvedValue({ ...mockUser, mfaEnabled: true, mfaSecret: secret });
+
+      const result = await authService.enableMfa(mockUser.id, {
+        secret,
+        token: validCode,
+      });
+
+      expect(result).toHaveProperty('message');
+      expect(prismaService.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: mockUser.id },
+          data: { mfaEnabled: true, mfaSecret: secret },
+        }),
+      );
+    });
+
+    it('enableMfa should throw BadRequestException when TOTP code is invalid', async () => {
+      const totpService = new TotpService();
+      const secret = totpService.generateSecret();
+
+      await expect(
+        authService.enableMfa(mockUser.id, {
+          secret,
+          token: '000000',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('revokeAllSessions should invalidate active refresh tokens for user', async () => {
+      prismaService.refreshToken.updateMany.mockResolvedValue({ count: 3 });
+
+      const result = await authService.revokeAllSessions(mockUser.id);
+      expect(result.revokedCount).toBe(3);
+      expect(prismaService.refreshToken.updateMany).toHaveBeenCalledWith({
+        where: { userId: mockUser.id, isRevoked: false },
+        data: { isRevoked: true },
+      });
     });
   });
 });

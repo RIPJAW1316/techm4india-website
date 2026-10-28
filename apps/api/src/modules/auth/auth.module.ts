@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { PasswordService } from './password.service';
 import { JwtStrategy } from './jwt.strategy';
 import { OidcService } from './oidc.service';
+import { TotpService } from './totp.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { OidcService } from './oidc.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PasswordService, JwtStrategy, OidcService],
-  exports: [AuthService, PasswordService, JwtStrategy, OidcService, PassportModule, JwtModule],
+  providers: [AuthService, PasswordService, JwtStrategy, OidcService, TotpService],
+  exports: [AuthService, PasswordService, JwtStrategy, OidcService, TotpService, PassportModule, JwtModule],
 })
 export class AuthModule {}

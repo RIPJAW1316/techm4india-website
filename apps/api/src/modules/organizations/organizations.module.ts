@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { OrganizationsService } from './organizations.service';
+import { OrganizationsController } from './organizations.controller';
 
-/**
- * OrganizationsModule — Company & Multi-tenant Hierarchy
- * Scope: Phase 2 (Organization profile, legal entities, branches)
- */
-@Module({})
+@Module({
+  controllers: [OrganizationsController],
+  providers: [OrganizationsService],
+  exports: [OrganizationsService],
+})
 export class OrganizationsModule {}

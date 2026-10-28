@@ -18,6 +18,7 @@ import {
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { OidcService } from './oidc.service';
+import { EnableMfaDto, VerifyMfaDto, DisableMfaDto } from './dto/mfa.dto';
 import {
   AuthTokensResponseDto,
   ChangePasswordDto,
@@ -151,6 +152,85 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
     return this.authService.changePassword(userId, changePasswordDto);
+  }
+
+  // ===========================================================================
+  // Two-Factor Authentication (TOTP MFA)
+  // ===========================================================================
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @Post('mfa/setup')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Initialize TOTP MFA Setup',
+    description: 'Generates base32 secret, 8 backup recovery codes, and otpauth:// URI for authenticator apps.',
+  })
+  async setupMfa(@CurrentUser('userId') userId: string) {
+    return this.authService.setupMfa(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @Post('mfa/enable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Verify and Enable TOTP MFA',
+    description: 'Verifies the 6-digit TOTP code against secret and activates 2FA on the user account.',
+  })
+  async enableMfa(
+    @CurrentUser('userId') userId: string,
+    @Body() dto: EnableMfaDto,
+  ) {
+    return this.authService.enableMfa(userId, dto);
+  }
+
+  @Public()
+  @Post('mfa/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Verify 2FA Step-up Challenge on Login',
+    description: 'Exchanges tempToken and 6-digit TOTP code (or recovery code) for full JWT access and refresh tokens.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'MFA verified; tokens issued',
+    type: AuthTokensResponseDto,
+  })
+  async verifyMfa(
+    @Body() dto: VerifyMfaDto,
+    @Req() req: Request,
+  ): Promise<AuthTokensResponseDto> {
+    const ip = req.ip || req.socket.remoteAddress;
+    const userAgent = req.get('user-agent');
+    return this.authService.verifyMfaLogin(dto, ip, userAgent);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @Post('mfa/disable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Disable Two-Factor Authentication',
+    description: 'Disables MFA on user account with password or TOTP confirmation.',
+  })
+  async disableMfa(
+    @CurrentUser('userId') userId: string,
+    @Body() dto: DisableMfaDto,
+  ) {
+    return this.authService.disableMfa(userId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @Post('sessions/revoke-all')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Revoke All Active Sessions',
+    description: 'Immediately invalidates all active refresh token families for the current user across all applications.',
+  })
+  async revokeAllSessions(@CurrentUser('userId') userId: string) {
+    return this.authService.revokeAllSessions(userId);
   }
 
   // ===========================================================================

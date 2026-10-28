@@ -52,6 +52,12 @@ export class AuthTokensResponseDto {
 
   @ApiProperty({ example: 'Bearer' })
   tokenType: string;
+
+  @ApiPropertyOptional({ example: false })
+  mfaRequired?: boolean;
+
+  @ApiPropertyOptional({ example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." })
+  tempToken?: string;
 }
 
 export class UserProfileResponseDto {
@@ -78,6 +84,9 @@ export class UserProfileResponseDto {
 
   @ApiProperty({ example: 'TECHM4INDIA', required: false })
   organizationCode?: string;
+
+  @ApiPropertyOptional({ example: false })
+  mfaEnabled?: boolean;
 
   @ApiProperty({ example: ['CENTRAL_DASHBOARD', 'HRMS', 'FINANCE'] })
   authorizedApplications: string[];

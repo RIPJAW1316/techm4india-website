@@ -111,6 +111,7 @@ async function bootstrap() {
     .addTag('Academic Programs & Batches', 'Curriculum definitions, division catalogues, cohort scheduling, and sessions')
     .addTag('LMS & Course Delivery', 'LMS courses, multimedia lessons, project submissions, grading, and anti-fraud certificates')
     .addTag('Students & Admissions', '360 student profiles, atomic batch enrollment, fee balances, and grievance redressal')
+    .addTag('Company & Organization Master', 'Corporate legal registry, multi-branch directory, 5-division matrix, and cost centre budgets')
     .addTag('Finance & General Ledger', 'GAAP/IndAS double-entry accounting, GST invoices, and 3-way matching')
     .addBearerAuth(
       {

@@ -11,23 +11,52 @@ datasource db {
 // Core Organization / Company Model
 // -------------------------------------------------------------
 model Organization {
-  id          String   @id @default(uuid())
-  code        String   @unique
-  name        String
-  legalName   String?
-  taxId       String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String       @id @default(uuid())
+  code                String       @unique
+  name                String
+  legalName           String?
+  taxId               String?
+  cin                 String?
+  gstin               String?
+  pan                 String?
+  website             String?      @default("https://techm4india.com")
+  email               String?      @default("contact@techm4india.com")
+  phone               String?
+  registeredAddress   String?
+  corporateAddress    String?
+  isActive            Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
-  users       User[]
-  departments Department[]
-  branches    Branch[]
-  employees   Employee[]
-  holidays    Holiday[]
-  accounts    Account[]
+  users               User[]
+  departments         Department[]
+  branches            Branch[]
+  costCentres         CostCentre[]
+  employees           Employee[]
+  holidays            Holiday[]
+  accounts            Account[]
 
   @@map("organizations")
+}
+
+model CostCentre {
+  id                 String       @id @default(uuid())
+  organizationId     String
+  code               String       @unique
+  name               String
+  division           DivisionCode @default(GENERAL_OVERHEAD)
+  budgetAnnual       Decimal      @default(0.0) @db.Decimal(15, 2)
+  budgetUtilized     Decimal      @default(0.0) @db.Decimal(15, 2)
+  managerEmployeeId  String?
+  isActive           Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([division])
+  @@map("org_cost_centres")
 }
 
 // -------------------------------------------------------------
@@ -43,9 +72,12 @@ model User {
   phone           String?
   isActive        Boolean   @default(true)
   isEmailVerified Boolean   @default(false)
-  lastLoginAt     DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  lastLoginAt      DateTime?
+  mfaEnabled       Boolean   @default(false)
+  mfaSecret        String?
+  mfaRecoveryCodes String[]  @default([])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   organization    Organization?           @relation(fields: [organizationId], references: [id], onDelete: SetNull)
   userRoles       UserRole[]
