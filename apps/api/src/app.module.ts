@@ -13,6 +13,9 @@ import { HrmsModule } from './modules/hrms/hrms.module';
 import { FinanceModule } from './modules/finance/finance.module';
 import { CrmModule } from './modules/crm/crm.module';
 import { InstitutionsModule } from './modules/institutions/institutions.module';
+import { ProgramsModule } from './modules/programs/programs.module';
+import { LmsModule } from './modules/lms/lms.module';
+import { StudentsModule } from './modules/students/students.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
@@ -54,6 +57,9 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
     FinanceModule,
     CrmModule,
     InstitutionsModule,
+    ProgramsModule,
+    LmsModule,
+    StudentsModule,
     AuditLogsModule,
     NotificationsModule,
   ],

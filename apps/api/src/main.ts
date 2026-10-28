@@ -108,7 +108,9 @@ async function bootstrap() {
     .addTag('Applications & Single Sign-On Registry', 'Application directory and user access permissions')
     .addTag('CRM & Institutional Partnerships', 'Lead scoring, 6-stage Kanban deals, and quote generation')
     .addTag('Institutions & MoUs', 'College and university directory, NAAC/AISHE tracking, and active MoUs')
-    .addTag('Programs & LMS', 'Academic catalogue across 5 divisions, course builder, and certification')
+    .addTag('Academic Programs & Batches', 'Curriculum definitions, division catalogues, cohort scheduling, and sessions')
+    .addTag('LMS & Course Delivery', 'LMS courses, multimedia lessons, project submissions, grading, and anti-fraud certificates')
+    .addTag('Students & Admissions', '360 student profiles, atomic batch enrollment, fee balances, and grievance redressal')
     .addTag('Finance & General Ledger', 'GAAP/IndAS double-entry accounting, GST invoices, and 3-way matching')
     .addBearerAuth(
       {
