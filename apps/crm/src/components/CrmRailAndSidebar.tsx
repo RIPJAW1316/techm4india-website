@@ -20,7 +20,6 @@ import {
   Layers,
   Megaphone,
   PanelLeftClose,
-  PanelLeftOpen,
   PhoneCall,
   PieChart,
   Plus,
@@ -75,21 +74,6 @@ export const CrmRailAndSidebar: React.FC<CrmRailAndSidebarProps> = ({
       {isCollapsed && (
         <div className="w-14 bg-[#1f2946] border-r border-[#12192d] flex flex-col items-center py-4 justify-between min-h-[calc(100vh-53px)] transition-all duration-300">
           <div className="flex flex-col items-center gap-3">
-            {/* Expand Sidebar Toggle on Rail */}
-            {setIsCollapsed && (
-              <button
-                type="button"
-                onClick={() => setIsCollapsed(false)}
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer relative group mb-1"
-                title="Expand sidebar"
-              >
-                <PanelLeftOpen className="w-5 h-5 text-blue-400" />
-                <div className="absolute left-14 ml-2 px-2 py-1 bg-[#0e1424] text-white text-[10px] rounded shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition whitespace-nowrap z-50">
-                  Expand Navigation
-                </div>
-              </button>
-            )}
-
             <button
               onClick={() => setActiveTab('home')}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer relative group ${
