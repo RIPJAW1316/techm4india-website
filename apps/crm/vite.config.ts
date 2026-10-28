@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
-
 // TechM4India CRM — Independent Application Vite Configuration
 export default defineConfig({
   plugins: [react()],
