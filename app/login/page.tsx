@@ -363,6 +363,7 @@ export default function LoginPage() {
             </form>
           </div>
         </div>
+      </div>
 
       <footer className="relative z-10 text-center text-xs text-[#5a6376] pt-8">
         &copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd. Enterprise Identity Infrastructure.
