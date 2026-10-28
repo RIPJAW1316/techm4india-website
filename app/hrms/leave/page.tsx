@@ -33,19 +33,19 @@ export default function LeavePage() {
       setLoading(true);
       const [emp, typesRes, balRes, appRes] = await Promise.all([
         hrmsClient.getMyProfile().catch(() => null),
-        hrmsClient.getLeaveTypes().catch(() => ({ data: [] })),
-        hrmsClient.getLeaveBalances().catch(() => ({ data: [] })),
-        hrmsClient.getLeaveApplications().catch(() => ({ data: [] })),
+        hrmsClient.getLeaveTypes().catch(() => [] as LeaveType[]),
+        hrmsClient.getLeaveBalances().catch(() => [] as LeaveBalance[]),
+        hrmsClient.getLeaveApplications().catch(() => [] as LeaveApplication[]),
       ]);
 
       setProfile(emp);
-      const types = typesRes.data || [];
+      const types = Array.isArray(typesRes) ? typesRes : (typesRes as any)?.data || [];
       setLeaveTypes(types);
       if (types.length > 0 && !selectedTypeId) {
         setSelectedTypeId(types[0].id);
       }
-      setBalances(balRes.data || []);
-      setApplications(appRes.data || []);
+      setBalances(Array.isArray(balRes) ? balRes : (balRes as any)?.data || []);
+      setApplications(Array.isArray(appRes) ? appRes : (appRes as any)?.data || []);
     } catch (err: any) {
       console.error('Failed to load leave records:', err);
     } finally {
@@ -248,7 +248,7 @@ export default function LeavePage() {
                           {app.employee ? `${app.employee.firstName} ${app.employee.lastName}` : (profile ? `${profile.firstName} ${profile.lastName}` : 'Self')}
                         </div>
                         <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                          {app.employee?.employeeCode || profile?.employeeCode}
+                          {(app.employee as any)?.employeeCode || app.employee?.employeeNumber || profile?.employeeNumber}
                         </div>
                       </td>
                       <td style={{ padding: '14px 20px' }}>

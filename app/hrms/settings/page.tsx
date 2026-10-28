@@ -19,16 +19,16 @@ export default function SettingsPage() {
 
   useEffect(() => {
     Promise.all([
-      hrmsClient.getDepartments().catch(() => ({ data: [] })),
-      hrmsClient.getBranches().catch(() => ({ data: [] })),
-      hrmsClient.getDesignations().catch(() => ({ data: [] })),
-      hrmsClient.getLeaveTypes().catch(() => ({ data: [] })),
+      hrmsClient.getDepartments().catch(() => [] as any[]),
+      hrmsClient.getBranches().catch(() => [] as any[]),
+      hrmsClient.getDesignations().catch(() => [] as any[]),
+      hrmsClient.getLeaveTypes().catch(() => [] as any[]),
     ])
       .then(([depRes, brRes, desRes, ltRes]) => {
-        setDepartments(depRes.data || []);
-        setBranches(brRes.data || []);
-        setDesignations(desRes.data || []);
-        setLeaveTypes(ltRes.data || []);
+        setDepartments(Array.isArray(depRes) ? depRes : (depRes as any)?.data || []);
+        setBranches(Array.isArray(brRes) ? brRes : (brRes as any)?.data || []);
+        setDesignations(Array.isArray(desRes) ? desRes : (desRes as any)?.data || []);
+        setLeaveTypes(Array.isArray(ltRes) ? ltRes : (ltRes as any)?.data || []);
       })
       .finally(() => setLoading(false));
   }, []);

@@ -11,7 +11,7 @@ import {
   EyeOff,
   Info,
 } from 'lucide-react';
-import { createPkceChallenge, login } from '@/lib/auth-client';
+import { createPkceChallenge, login, setSession } from '@/lib/auth-client';
 
 interface DemoAccount {
   label: string;
@@ -57,7 +57,7 @@ export default function DirectLoginPage({ onLoginSuccess }: { onLoginSuccess: ()
   const MAIN_PORTAL_URL =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? (import.meta.env.VITE_MAIN_PORTAL_URL || 'http://localhost:5173')
+      ? (((import.meta as any).env?.VITE_MAIN_PORTAL_URL) || 'http://localhost:5173')
       : 'https://techm4india.com';
 
   const handleSubmit = async (e: React.FormEvent) => {
