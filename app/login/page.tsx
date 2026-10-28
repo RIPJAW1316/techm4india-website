@@ -18,51 +18,7 @@ import {
 } from "lucide-react";
 import { getAccessToken, login } from "@/lib/auth-client";
 
-interface DemoAccount {
-  label: string;
-  role: string;
-  email: string;
-  passwordHint: string;
-  accessNote: string;
-}
 
-const DEMO_ACCOUNTS: DemoAccount[] = [
-  {
-    label: "Super Admin",
-    role: "Full Platform Admin",
-    email: "admin@techm4india.com",
-    passwordHint: "TechM4Admin#2026",
-    accessNote: "Access to Central Admin, HRMS, Finance ERP, and CRM",
-  },
-  {
-    label: "HR Lead",
-    role: "HR Manager",
-    email: "hrms.lead@techm4india.com",
-    passwordHint: "TechM4Hrms#2026",
-    accessNote: "Access to HRMS application",
-  },
-  {
-    label: "Finance Lead",
-    role: "Finance Manager",
-    email: "finance.lead@techm4india.com",
-    passwordHint: "TechM4Finance#2026",
-    accessNote: "Access to Finance ERP application",
-  },
-  {
-    label: "CRM Lead",
-    role: "Head of Institutional Sales",
-    email: "crm.lead@techm4india.com",
-    passwordHint: "TechM4Crm#2026",
-    accessNote: "Access to TechM4 CRM & Sales application",
-  },
-  {
-    label: "Staff Engineer",
-    role: "General Employee",
-    email: "engineer@techm4india.com",
-    passwordHint: "TechM4Eng#2026",
-    accessNote: "Standard employee portal access",
-  },
-];
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -178,11 +134,7 @@ export default function LoginPage() {
     }
   }
 
-  function handleSelectDemoAccount(account: DemoAccount) {
-    setEmail(account.email);
-    setPassword(account.passwordHint);
-    setErrorMessage(null);
-  }
+  
 
   return (
     <main className="min-h-[calc(100vh-120px)] bg-[#f7f6f2] text-[#20283b] flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -409,32 +361,8 @@ export default function LoginPage() {
                 )}
               </button>
             </form>
-
-            {/* Quick Demo Credentials Assistant */}
-            <div className="mt-6 pt-5 border-t border-[#e3ded5]">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1f2946] mb-2.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#d97706]" />
-                <span>Test Role Fast-Fill (Development Environment)</span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {DEMO_ACCOUNTS.map((acc) => (
-                  <button
-                    key={acc.email}
-                    type="button"
-                    onClick={() => handleSelectDemoAccount(acc)}
-                    className="p-2.5 rounded-lg bg-[#fcfbf9] hover:bg-white border border-[#e3ded5] hover:border-[#c62d37] text-left transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-                  >
-                    <div className="text-xs font-bold text-[#1f2946] group-hover:text-[#c62d37] transition-colors">
-                      {acc.label}
-                    </div>
-                    <div className="text-[10px] text-[#5a6376] truncate">{acc.role}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
-      </div>
 
       <footer className="relative z-10 text-center text-xs text-[#5a6376] pt-8">
         &copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd. Enterprise Identity Infrastructure.

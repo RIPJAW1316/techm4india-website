@@ -1,12 +1,12 @@
 /**
  * TechM4India ERP — Central Authentication & Identity Client
  *
- * Implements token-based authentication against the NestJS Phase 1 & 2 backend.
+ * Implements token-based authentication against the NestJS backend.
  * Conforms to enterprise security policies:
  * - Short-lived access tokens and rotating refresh tokens
  * - No persistent tokens in localStorage (scoped exclusively to sessionStorage)
  * - Safe error message extraction without credential leakage
- * - Built-in verified development demo persona fallback for seamless evaluation
+ * - Zero hardcoded demo credentials or fake tokens
  */
 
 export interface AuthTokens {
@@ -46,19 +46,11 @@ export interface ApiError {
 
 const SESSION_ACCESS_TOKEN_KEY = "tm4i_erp_access_token";
 const SESSION_REFRESH_TOKEN_KEY = "tm4i_erp_refresh_token";
-const SESSION_DEMO_PERSONA_KEY = "tm4i_active_demo_persona";
-
-/**
- * Returns the configured API base URL.
- * In a browser with a valid location, returns "" (empty string) to route through
- * same-origin Vite dev proxy or Vercel rewrites without CORS preflight failures.
- * In SSR / Node tests, returns the full absolute HTTP URL.
- */
 
 /**
  * Resolves application URL based on runtime environment:
- * - Local development: dedicated ports (:3000 main, :3001 finance, :3002 hrms)
- * - Production: dedicated subdomains (techm4india.com, hrms.techm4india.com, finance.techm4india.com)
+ * - Local development: dedicated ports (:3000 main, :3001 finance, :3002 hrms, :3003 crm)
+ * - Production: dedicated subdomains (techm4india.com, hrms.techm4india.com, finance.techm4india.com, crm.techm4india.com)
  */
 export function getApplicationUrl(appCode: string): string {
   const isBrowser = typeof window !== 'undefined';
@@ -164,7 +156,6 @@ export function clearSession(): void {
   try {
     sessionStorage.removeItem(SESSION_ACCESS_TOKEN_KEY);
     sessionStorage.removeItem(SESSION_REFRESH_TOKEN_KEY);
-    sessionStorage.removeItem(SESSION_DEMO_PERSONA_KEY);
   } catch {
     // Storage access may be blocked
   }
@@ -240,401 +231,77 @@ function extractErrorMessage(status: number, data: unknown): string {
   return "An unexpected error occurred during authentication.";
 }
 
-// =============================================================================
-// VERIFIED ENTERPRISE DEMO PERSONAS
-// Provides seamless local & staging preview capability with complete RBAC scopes
-// =============================================================================
-
-interface DemoPersona {
-  email: string;
-  passwords: string[];
-  profile: UserProfile;
-  applications: ApplicationAccessInfo[];
-}
-
-const DEMO_PERSONAS: Record<string, DemoPersona> = {
-  "admin@techm4india.com": {
-    email: "admin@techm4india.com",
-    passwords: ["TechM4Admin#2026", "TechM4Admin2026!", "TechM4Admin2026", "admin123", "password"],
-    profile: {
-      id: "usr-demo-superadmin-001",
-      email: "admin@techm4india.com",
-      firstName: "K Aryan",
-      lastName: "Reddy",
-      isActive: true,
-      roles: ["SUPER_ADMIN", "FOUNDER_CEO"],
-      permissions: [
-        "auth:login",
-        "users:read",
-        "users:manage",
-        "roles:read",
-        "roles:manage",
-        "apps:read",
-        "apps:manage",
-        "hrms:access",
-        "hrms:manage",
-        "hrms:employees:read",
-        "hrms:employees:manage",
-        "hrms:leave:apply",
-        "hrms:leave:approve",
-        "hrms:attendance:clock",
-        "hrms:attendance:manage",
-        "hrms:claims:submit",
-        "hrms:claims:approve",
-        "hrms:payroll:read",
-        "hrms:payroll:manage",
-        "finance:access",
-        "finance:manage",
-        "audit:read",
-        "crm:access",
-        "crm:manage",
-        "crm:leads:read",
-        "crm:leads:manage",
-        "crm:deals:read",
-        "crm:deals:manage",
-        "crm:institutions:read",
-        "crm:institutions:manage",
-      ],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["CENTRAL_DASHBOARD", "HRMS", "FINANCE", "CRM"],
-    },
-    applications: [
-      {
-        code: "FINANCE",
-        name: "TechM4 Finance ERP",
-        description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3001",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-      {
-        code: "HRMS",
-        name: "TechM4 HRMS",
-        description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "http://localhost:3002",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-      {
-        code: "CRM",
-        name: "TechM4 CRM & Sales",
-        description: "Zoho-inspired enterprise sales pipeline, institution relationship management, 1-click lead conversion, deals Kanban, and MoU tracking.",
-        baseUrl: "http://localhost:3003",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-      {
-        code: "CENTRAL_DASHBOARD",
-        name: "Central Governance & Administration",
-        description: "System user directory, role-permission matrix administration, audit log streams, and enterprise authorization policies.",
-        baseUrl: "/dashboard",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-  "superadmin@techm4india.com": {
-    email: "superadmin@techm4india.com",
-    passwords: ["TechM4Admin#2026", "TechM4Admin2026!", "TechM4Admin2026"],
-    profile: {
-      id: "usr-demo-superadmin-002",
-      email: "superadmin@techm4india.com",
-      firstName: "Super",
-      lastName: "Administrator",
-      isActive: true,
-      roles: ["SUPER_ADMIN"],
-      permissions: [
-        "auth:login",
-        "users:read",
-        "users:manage",
-        "roles:read",
-        "roles:manage",
-        "apps:read",
-        "apps:manage",
-        "hrms:access",
-        "hrms:manage",
-        "finance:access",
-        "finance:manage",
-        "audit:read",
-      ],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["CENTRAL_DASHBOARD", "HRMS", "FINANCE"],
-    },
-    applications: [
-      {
-        code: "FINANCE",
-        name: "TechM4 Finance ERP",
-        description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3001",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-      {
-        code: "HRMS",
-        name: "TechM4 HRMS",
-        description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "http://localhost:3002",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-  "hrms.lead@techm4india.com": {
-    email: "hrms.lead@techm4india.com",
-    passwords: ["TechM4Hrms#2026", "TechM4Admin2026!"],
-    profile: {
-      id: "usr-demo-hrms-003",
-      email: "hrms.lead@techm4india.com",
-      firstName: "Aarav",
-      lastName: "Patel",
-      isActive: true,
-      roles: ["HRMS_ADMIN", "HR_MANAGER"],
-      permissions: [
-        "auth:login",
-        "hrms:access",
-        "hrms:manage",
-        "hrms:employees:read",
-        "hrms:employees:manage",
-        "hrms:leave:apply",
-        "hrms:leave:approve",
-        "hrms:attendance:clock",
-        "hrms:attendance:manage",
-        "hrms:claims:submit",
-        "hrms:claims:approve",
-        "hrms:payroll:read",
-        "hrms:payroll:manage",
-      ],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["HRMS"],
-    },
-    applications: [
-      {
-        code: "HRMS",
-        name: "TechM4 HRMS",
-        description: "Manage company workforce, employee profiles, attendance, departmental hierarchy, and leaves under central identity.",
-        baseUrl: "http://localhost:3002",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-  "finance.lead@techm4india.com": {
-    email: "finance.lead@techm4india.com",
-    passwords: ["TechM4Finance#2026", "TechM4Admin2026!"],
-    profile: {
-      id: "usr-demo-finance-004",
-      email: "finance.lead@techm4india.com",
-      firstName: "Neha",
-      lastName: "Kulkarni",
-      isActive: true,
-      roles: ["FINANCE_ADMIN", "FINANCE_MANAGER"],
-      permissions: [
-        "auth:login",
-        "finance:access",
-        "finance:manage",
-        "users:read",
-      ],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["FINANCE"],
-    },
-    applications: [
-      {
-        code: "FINANCE",
-        name: "TechM4 Finance ERP",
-        description: "Enterprise ledger, fiscal accounting, invoicing, vendor purchase orders, and multi-department budget reconciliation.",
-        baseUrl: "http://localhost:3001",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-  "crm.lead@techm4india.com": {
-    email: "crm.lead@techm4india.com",
-    passwords: ["TechM4Crm#2026", "TechM4Admin2026!", "TechM4Crm2026", "crm123", "password"],
-    profile: {
-      id: "usr-demo-crm-006",
-      email: "crm.lead@techm4india.com",
-      firstName: "Dr. Sneha",
-      lastName: "Roy",
-      isActive: true,
-      roles: ["CRM_LEAD", "INSTITUTIONAL_SALES_HEAD"],
-      permissions: [
-        "auth:login",
-        "crm:access",
-        "crm:manage",
-        "crm:leads:read",
-        "crm:leads:manage",
-        "crm:deals:read",
-        "crm:deals:manage",
-        "crm:institutions:read",
-        "crm:institutions:manage",
-        "users:read",
-      ],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["CRM", "CENTRAL_DASHBOARD"],
-    },
-    applications: [
-      {
-        code: "CRM",
-        name: "TechM4 CRM & Sales",
-        description: "Zoho-inspired enterprise sales pipeline, institution relationship management, 1-click lead conversion, deals Kanban, and MoU tracking.",
-        baseUrl: "http://localhost:3003",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-      {
-        code: "CENTRAL_DASHBOARD",
-        name: "Central Governance & Administration",
-        description: "System user directory, role-permission matrix administration, audit log streams, and enterprise authorization policies.",
-        baseUrl: "/dashboard",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-  "engineer@techm4india.com": {
-    email: "engineer@techm4india.com",
-    passwords: ["TechM4Eng#2026", "TechM4Admin2026!"],
-    profile: {
-      id: "usr-demo-eng-005",
-      email: "engineer@techm4india.com",
-      firstName: "Rohan",
-      lastName: "Verma",
-      isActive: true,
-      roles: ["STAFF_ENGINEER", "EMPLOYEE"],
-      permissions: ["auth:login"],
-      organizationCode: "TECHM4INDIA",
-      authorizedApplications: ["CENTRAL_DASHBOARD"],
-    },
-    applications: [
-      {
-        code: "CENTRAL_DASHBOARD",
-        name: "Employee Self-Service Dashboard",
-        description: "Personal identity overview, company profile, and self-service authorization center.",
-        baseUrl: "/dashboard",
-        isActive: true,
-        grantedAt: new Date().toISOString(),
-      },
-    ],
-  },
-};
-
 /**
  * Authenticate with corporate credentials via POST /api/v1/auth/login.
- * First connects to live Render backend API; seamlessly falls back to verified demo accounts
- * for immediate offline/dev evaluation.
  */
 export async function login(credentials: {
   email: string;
   password: string;
 }): Promise<AuthTokens> {
-  const normalizedEmail = credentials.email.trim().toLowerCase();
-  const demoPersona = DEMO_PERSONAS[normalizedEmail];
-
   const baseUrl = getApiBaseUrl();
   const url = `${baseUrl}/api/v1/auth/login`;
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  let response: Response;
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500);
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          email: credentials.email.trim(),
-          password: credentials.password,
-        }),
-        signal: controller.signal,
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (response.ok) {
-      const body = await response.json();
-      const tokens = unwrapResponse<AuthTokens>(body);
-      setSession(tokens);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.removeItem(SESSION_DEMO_PERSONA_KEY);
-      }
-      return tokens;
-    }
-
-    // If server responded with 401 and input matches a valid demo persona, allow fallback
-    if (response.status === 401 && demoPersona && demoPersona.passwords.includes(credentials.password)) {
-      const demoTokens: AuthTokens = {
-        accessToken: `demo-access-token-${normalizedEmail}-${Date.now()}`,
-        refreshToken: `demo-refresh-token-${normalizedEmail}-${Date.now()}`,
-        expiresIn: 86400,
-        tokenType: "Bearer",
-      };
-      setSession(demoTokens);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem(SESSION_DEMO_PERSONA_KEY, normalizedEmail);
-      }
-      return demoTokens;
-    }
-
-    let body: unknown;
-    try {
-      body = await response.json();
-    } catch {
-      body = null;
-    }
-    const errorMessage = extractErrorMessage(response.status, body);
-    throw new Error(errorMessage);
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        email: credentials.email.trim(),
+        password: credentials.password,
+      }),
+      signal: controller.signal,
+    });
   } catch (err) {
-    // If network connection failed, timeout, or CORS preflight was blocked:
-    // If credentials match a demo persona, authenticate smoothly!
-    if (demoPersona && demoPersona.passwords.includes(credentials.password)) {
-      const demoTokens: AuthTokens = {
-        accessToken: `demo-access-token-${normalizedEmail}-${Date.now()}`,
-        refreshToken: `demo-refresh-token-${normalizedEmail}-${Date.now()}`,
-        expiresIn: 86400,
-        tokenType: "Bearer",
-      };
-      setSession(demoTokens);
-      if (typeof sessionStorage !== "undefined") {
-        sessionStorage.setItem(SESSION_DEMO_PERSONA_KEY, normalizedEmail);
-      }
-      return demoTokens;
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("Authentication request timed out. Please try again.");
     }
-
-    if (err instanceof Error && !err.message.includes("Unable to connect")) {
-      throw err;
-    }
-
     throw new Error(
-      "Unable to connect to the TechM4India authentication service. Please verify network connectivity.",
+      "Unable to connect to the TechM4India authentication service. Please verify network connectivity."
     );
+  } finally {
+    clearTimeout(timeoutId);
   }
+
+  if (response.ok) {
+    const body = await response.json();
+    const tokens = unwrapResponse<AuthTokens>(body);
+    setSession(tokens);
+    return tokens;
+  }
+
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+  const errorMessage = extractErrorMessage(response.status, body);
+  throw new Error(errorMessage);
 }
 
 /**
  * Terminate the user session via POST /api/v1/auth/logout
  */
 export async function logout(): Promise<void> {
-  const baseUrl = getApiBaseUrl();
-  const accessToken = getAccessToken();
+  const token = getAccessToken();
   const refreshToken = getRefreshToken();
+  const baseUrl = getApiBaseUrl();
 
   try {
-    if (accessToken || refreshToken) {
+    if (token) {
       await fetch(`${baseUrl}/api/v1/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          refreshToken: refreshToken || undefined,
-        }),
+        body: JSON.stringify({ refreshToken }),
       });
     }
   } catch {
@@ -648,29 +315,10 @@ export async function logout(): Promise<void> {
  * Fetch current user profile via GET /api/v1/auth/me
  */
 export async function getMe(): Promise<UserProfile> {
-  const activeDemoEmail =
-    typeof sessionStorage !== "undefined"
-      ? sessionStorage.getItem(SESSION_DEMO_PERSONA_KEY)
-      : null;
-
-  if (activeDemoEmail && DEMO_PERSONAS[activeDemoEmail]) {
-    return DEMO_PERSONAS[activeDemoEmail].profile;
-  }
-
   const accessToken = getAccessToken();
 
   if (!accessToken) {
     throw new Error("No active session found. Please sign in.");
-  }
-
-  // If token is a demo token
-  if (accessToken.startsWith("demo-access-token-")) {
-    const parts = accessToken.split("-");
-    const email = parts[3];
-    if (email && DEMO_PERSONAS[email]) {
-      return DEMO_PERSONAS[email].profile;
-    }
-    return DEMO_PERSONAS["admin@techm4india.com"].profile;
   }
 
   const baseUrl = getApiBaseUrl();
@@ -710,29 +358,10 @@ export async function getMe(): Promise<UserProfile> {
  * Fetch applications authorized for the current user via GET /api/v1/users/me/applications
  */
 export async function getAuthorizedApplications(): Promise<ApplicationAccessInfo[]> {
-  const activeDemoEmail =
-    typeof sessionStorage !== "undefined"
-      ? sessionStorage.getItem(SESSION_DEMO_PERSONA_KEY)
-      : null;
-
-  if (activeDemoEmail && DEMO_PERSONAS[activeDemoEmail]) {
-    return DEMO_PERSONAS[activeDemoEmail].applications;
-  }
-
   const accessToken = getAccessToken();
 
   if (!accessToken) {
     throw new Error("No active session found. Please sign in.");
-  }
-
-  // If token is a demo token
-  if (accessToken.startsWith("demo-access-token-")) {
-    const parts = accessToken.split("-");
-    const email = parts[3];
-    if (email && DEMO_PERSONAS[email]) {
-      return DEMO_PERSONAS[email].applications;
-    }
-    return DEMO_PERSONAS["admin@techm4india.com"].applications;
   }
 
   const baseUrl = getApiBaseUrl();
@@ -765,7 +394,8 @@ export async function getAuthorizedApplications(): Promise<ApplicationAccessInfo
     throw new Error(extractErrorMessage(response.status, body));
   }
 
-  return unwrapResponse<ApplicationAccessInfo[]>(body);
+  const apps = unwrapResponse<ApplicationAccessInfo[]>(body);
+  return Array.isArray(apps) ? apps : [];
 }
 
 // -----------------------------------------------------------------------------

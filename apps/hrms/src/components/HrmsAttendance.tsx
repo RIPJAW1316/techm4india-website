@@ -14,7 +14,7 @@ import {
 import { AttendanceRecord } from '../types';
 
 interface HrmsAttendanceProps {
-  attendance: AttendanceRecord;
+  attendance: AttendanceRecord | null;
   onToggleClock: () => void;
 }
 
@@ -29,14 +29,18 @@ export const HrmsAttendance: React.FC<HrmsAttendanceProps> = ({
 
   const isClockedIn = Boolean(attendance?.clockInTime && !attendance?.clockOutTime);
 
-  const pastLogs = [
-    { date: '2026-10-24', in: attendance?.clockInTime || '09:14 AM', out: attendance?.clockOutTime || '—', hours: isClockedIn ? 'In Progress' : '8.5h', status: 'PRESENT', terminal: 'Hyderabad HQ Gate 1' },
-    { date: '2026-10-23', in: '09:02 AM', out: '06:15 PM', hours: '9.2h', status: 'PRESENT', terminal: 'Hyderabad HQ Gate 1' },
-    { date: '2026-10-22', in: '08:58 AM', out: '06:05 PM', hours: '9.1h', status: 'PRESENT', terminal: 'Hyderabad HQ Gate 1' },
-    { date: '2026-10-21', in: '09:30 AM', out: '06:30 PM', hours: '9.0h', status: 'PRESENT', terminal: 'Remote / VPN Punch' },
-    { date: '2026-10-20', in: '09:10 AM', out: '06:00 PM', hours: '8.8h', status: 'PRESENT', terminal: 'Hyderabad HQ Gate 1' },
-    { date: '2026-10-19', in: '—', out: '—', hours: '0h', status: 'WEEKEND', terminal: '—' },
-  ];
+  const pastLogs = attendance
+    ? [
+        {
+          date: attendance.workDate,
+          in: attendance.clockInTime || '—',
+          out: attendance.clockOutTime || '—',
+          hours: isClockedIn ? 'In Progress' : `${attendance.totalHours || 0}h`,
+          status: attendance.status,
+          terminal: 'Web Attendance Portal',
+        },
+      ]
+    : [];
 
   const handleRegularizeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,23 +97,31 @@ export const HrmsAttendance: React.FC<HrmsAttendanceProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-[#e3ded5] shadow-xs">
           <span className="text-[11px] font-bold text-[#5a6376] uppercase">Monthly Working Days</span>
-          <div className="text-2xl font-black text-[#1f2946] mt-1">22 Days</div>
-          <span className="text-[10px] text-[#5a6376]">October 2026 cycle</span>
+          <div className="text-2xl font-black text-[#1f2946] mt-1">
+            {attendance ? '22 Days' : '—'}
+          </div>
+          <span className="text-[10px] text-[#5a6376]">Active payroll cycle</span>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-[#e3ded5] shadow-xs">
           <span className="text-[11px] font-bold text-[#5a6376] uppercase">Days Present</span>
-          <div className="text-2xl font-black text-[#047857] mt-1">19 Days</div>
-          <span className="text-[10px] text-[#047857] font-semibold">95% On-Time Punch</span>
+          <div className="text-2xl font-black text-[#047857] mt-1">
+            {attendance?.status === 'PRESENT' ? '1 Day' : '0 Days'}
+          </div>
+          <span className="text-[10px] text-[#047857] font-semibold">Active Cycle Logs</span>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-[#e3ded5] shadow-xs">
-          <span className="text-[11px] font-bold text-[#5a6376] uppercase">Leaves &amp; Holidays</span>
-          <div className="text-2xl font-black text-[#b45309] mt-1">2 Days</div>
-          <span className="text-[10px] text-[#5a6376]">1 Leave · 1 Holiday</span>
+          <span className="text-[11px] font-bold text-[#5a6376] uppercase">Current Status</span>
+          <div className="text-2xl font-black text-[#b45309] mt-1">
+            {attendance?.status || 'ABSENT'}
+          </div>
+          <span className="text-[10px] text-[#5a6376]">{isClockedIn ? 'Clocked In' : 'Clocked Out'}</span>
         </div>
         <div className="bg-white rounded-2xl p-5 border border-[#e3ded5] shadow-xs">
           <span className="text-[11px] font-bold text-[#5a6376] uppercase">Assigned Shift</span>
-          <div className="text-lg font-black text-[#1f2946] mt-1">09:00 - 18:00</div>
-          <span className="text-[10px] text-[#5a6376]">Standard 45h / week</span>
+          <div className="text-lg font-black text-[#1f2946] mt-1">
+            {attendance?.shiftName || 'Standard Shift'}
+          </div>
+          <span className="text-[10px] text-[#5a6376]">Corporate General Shift</span>
         </div>
       </div>
 
@@ -133,26 +145,34 @@ export const HrmsAttendance: React.FC<HrmsAttendanceProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0ece3]">
-              {pastLogs.map((log) => (
-                <tr key={log.date} className="hover:bg-[#fbfbf9]">
-                  <td className="py-3 px-4 font-mono font-bold text-[#1f2946]">{log.date}</td>
-                  <td className="py-3 px-4 font-mono">{log.in}</td>
-                  <td className="py-3 px-4 font-mono">{log.out}</td>
-                  <td className="py-3 px-4 font-semibold text-[#1f2946]">{log.hours}</td>
-                  <td className="py-3 px-4 text-[#5a6376]">{log.terminal}</td>
-                  <td className="py-3 px-4 text-right">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        log.status === 'PRESENT'
-                          ? 'bg-[#ecfdf5] text-[#047857] border border-[#a7f3d0]'
-                          : 'bg-[#f1efe9] text-[#5a6376] border border-[#d1cbbf]'
-                      }`}
-                    >
-                      {log.status}
-                    </span>
+              {pastLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-xs text-[#5a6376]">
+                    No attendance records for today. Clock in to record your attendance.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                pastLogs.map((log) => (
+                  <tr key={log.date} className="hover:bg-[#fbfbf9]">
+                    <td className="py-3 px-4 font-mono font-bold text-[#1f2946]">{log.date}</td>
+                    <td className="py-3 px-4 font-mono">{log.in}</td>
+                    <td className="py-3 px-4 font-mono">{log.out}</td>
+                    <td className="py-3 px-4 font-semibold text-[#1f2946]">{log.hours}</td>
+                    <td className="py-3 px-4 text-[#5a6376]">{log.terminal}</td>
+                    <td className="py-3 px-4 text-right">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          log.status === 'PRESENT'
+                            ? 'bg-[#ecfdf5] text-[#047857] border border-[#a7f3d0]'
+                            : 'bg-[#f1efe9] text-[#5a6376] border border-[#d1cbbf]'
+                        }`}
+                      >
+                        {log.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -205,13 +225,13 @@ export const HrmsAttendance: React.FC<HrmsAttendanceProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsRegularizeModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-[#d1cbbf] text-[#5a6376] font-bold"
+                  className="px-4 py-2 rounded-xl border border-[#d1cbbf] text-[#5a6376] font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-[#1f2946] text-white font-bold"
+                  className="px-4 py-2 rounded-xl bg-[#1f2946] text-white font-bold cursor-pointer"
                 >
                   Submit Regularization
                 </button>

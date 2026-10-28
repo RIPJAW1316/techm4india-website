@@ -1,19 +1,5 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import {
-  AlertCircle,
-  ArrowRight,
-  Briefcase,
-  Building2,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-  Layers,
-  Sparkles,
-  UserCheck,
-  X,
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { CrmAccountsView } from './components/CrmAccountsView';
 import { CrmActivitiesView } from './components/CrmActivitiesView';
 import { CrmCampaignsView } from './components/CrmCampaignsView';
@@ -27,17 +13,6 @@ import { CrmQuotesView } from './components/CrmQuotesView';
 import { CrmRailAndSidebar } from './components/CrmRailAndSidebar';
 import { CrmReportsView } from './components/CrmReportsView';
 import { crmApi } from './lib/crm-api';
-import {
-  initialAccounts,
-  initialCallLogs,
-  initialCampaigns,
-  initialContacts,
-  initialDeals,
-  initialLeads,
-  initialMeetings,
-  initialQuotes,
-  initialTasks,
-} from './mock/crm-data';
 import {
   AccountItem,
   CallLogItem,
@@ -55,19 +30,19 @@ import {
 export default function App() {
   const [activeTab, setActiveTab] = useState<CrmViewTab>('home');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [currentView, setCurrentView] = useState("Aryan Reddy's Home");
+  const [currentView, setCurrentView] = useState("Corporate CRM Workspace");
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Domain Collections
-  const [leads, setLeads] = useState<LeadItem[]>(initialLeads);
-  const [accounts, setAccounts] = useState<AccountItem[]>(initialAccounts);
-  const [contacts, setContacts] = useState<ContactItem[]>(initialContacts);
-  const [deals, setDeals] = useState<DealItem[]>(initialDeals);
-  const [tasks, setTasks] = useState<TaskItem[]>(initialTasks);
-  const [meetings, setMeetings] = useState<MeetingItem[]>(initialMeetings);
-  const [callLogs, setCallLogs] = useState<CallLogItem[]>(initialCallLogs);
-  const [quotes, setQuotes] = useState<QuoteItem[]>(initialQuotes);
-  const [campaigns, setCampaigns] = useState<CampaignItem[]>(initialCampaigns);
+  // Domain Collections (Zero baseline - populated exclusively from API)
+  const [leads, setLeads] = useState<LeadItem[]>([]);
+  const [accounts, setAccounts] = useState<AccountItem[]>([]);
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [deals, setDeals] = useState<DealItem[]>([]);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [meetings, setMeetings] = useState<MeetingItem[]>([]);
+  const [callLogs, setCallLogs] = useState<CallLogItem[]>([]);
+  const [quotes, setQuotes] = useState<QuoteItem[]>([]);
+  const [campaigns, setCampaigns] = useState<CampaignItem[]>([]);
 
   // Conversion Modal State
   const [leadToConvert, setLeadToConvert] = useState<LeadItem | null>(null);
@@ -95,29 +70,73 @@ export default function App() {
         try {
           sessionStorage.setItem('tm4i_erp_access_token', ssoToken);
           addToast('Central SSO Session authenticated successfully.', 'success');
-          // Clean URL without page reload
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
         } catch {
           // ignore
         }
-      } else {
-        // Fallback demo token if none present
-        if (!sessionStorage.getItem('tm4i_erp_access_token')) {
-          sessionStorage.setItem(
-            'tm4i_erp_access_token',
-            'mock-techm4-jwt-token-aryan-reddy-founder-ceo'
-          );
-        }
       }
     }
   }, []);
 
+  // Parallel live API sync on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function syncCrmData() {
+      try {
+        const [
+          leadsRes,
+          accountsRes,
+          contactsRes,
+          dealsRes,
+          tasksRes,
+          meetingsRes,
+          callLogsRes,
+          quotesRes,
+          campaignsRes,
+        ] = await Promise.allSettled([
+          crmApi.getLeads(),
+          crmApi.getAccounts(),
+          crmApi.getContacts(),
+          crmApi.getDeals(),
+          crmApi.getTasks(),
+          crmApi.getMeetings(),
+          crmApi.getCallLogs(),
+          crmApi.getQuotes(),
+          crmApi.getCampaigns(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (leadsRes.status === 'fulfilled') setLeads(leadsRes.value);
+        if (accountsRes.status === 'fulfilled') setAccounts(accountsRes.value);
+        if (contactsRes.status === 'fulfilled') setContacts(contactsRes.value);
+        if (dealsRes.status === 'fulfilled') setDeals(dealsRes.value);
+        if (tasksRes.status === 'fulfilled') setTasks(tasksRes.value);
+        if (meetingsRes.status === 'fulfilled') setMeetings(meetingsRes.value);
+        if (callLogsRes.status === 'fulfilled') setCallLogs(callLogsRes.value);
+        if (quotesRes.status === 'fulfilled') setQuotes(quotesRes.value);
+        if (campaignsRes.status === 'fulfilled') setCampaigns(campaignsRes.value);
+      } catch (err) {
+        console.warn('Failed to sync CRM data from backend:', err);
+      }
+    }
+
+    syncCrmData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Handlers
   const handleCreateLead = async (leadData: Partial<LeadItem>) => {
-    const newLead = await crmApi.createLead(leadData);
-    setLeads((prev) => [newLead, ...prev]);
-    addToast(`New Lead created: ${newLead.organization}`);
+    try {
+      const newLead = await crmApi.createLead(leadData);
+      setLeads((prev) => [newLead, ...prev]);
+      addToast(`New Lead created: ${newLead.organization}`);
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Failed to create lead', 'error');
+    }
   };
 
   const handleConfirmConvert = async (
@@ -126,27 +145,31 @@ export default function App() {
     contactData: Partial<ContactItem>,
     dealData: Partial<DealItem>
   ) => {
-    const res = await crmApi.convertLead(leadId, dealData.amount, dealData.closingDate);
+    try {
+      const res = await crmApi.convertLead(leadId, dealData.amount, dealData.closingDate);
 
-    // Merge with user overrides
-    const newAcc: AccountItem = { ...res.account, ...accountData };
-    const newCon: ContactItem = { ...res.contact, ...contactData };
-    const newDeal: DealItem = { ...res.deal, ...dealData };
+      // Merge with user overrides
+      const newAcc: AccountItem = { ...res.newAccount, ...accountData };
+      const newCon: ContactItem = { ...res.newContact, ...contactData };
+      const newDeal: DealItem = { ...res.newDeal, ...dealData };
 
-    // Update state
-    setAccounts((prev) => [newAcc, ...prev]);
-    setContacts((prev) => [newCon, ...prev]);
-    if (dealData.title) {
-      setDeals((prev) => [newDeal, ...prev]);
+      // Update state
+      setAccounts((prev) => [newAcc, ...prev]);
+      setContacts((prev) => [newCon, ...prev]);
+      if (dealData.title) {
+        setDeals((prev) => [newDeal, ...prev]);
+      }
+
+      // Mark lead as converted
+      setLeads((prev) =>
+        prev.map((l) => (l.id === leadId ? { ...l, isConverted: true, status: 'WON' } : l))
+      );
+
+      setLeadToConvert(null);
+      addToast(`Lead converted! Created Account, Contact & Deal for ${newAcc.name}`);
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Lead conversion failed', 'error');
     }
-
-    // Mark lead as converted
-    setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, isConverted: true, status: 'WON' } : l))
-    );
-
-    setLeadToConvert(null);
-    addToast(`Lead converted! Created Account, Contact & Deal for ${newAcc.name}`);
   };
 
   const handleCreateAccount = (accData: Partial<AccountItem>) => {
@@ -164,10 +187,10 @@ export default function App() {
       aisheCode: accData.aisheCode,
       studentStrength: accData.studentStrength || 3000,
       relationshipScore: 80,
-      annualRevenue: accData.annualRevenue || 1500000,
+      annualRevenue: accData.annualRevenue || 0,
       activeMoU: accData.activeMoU ?? true,
       division: accData.division || 'TECHM4_ENGINEERING',
-      ownerName: 'Aryan Reddy',
+      ownerName: 'Corporate Account Rep',
       createdAt: new Date().toISOString(),
     };
     setAccounts((prev) => [newAcc, ...prev]);
@@ -178,7 +201,7 @@ export default function App() {
     const newCon: ContactItem = {
       id: `con-${Date.now()}`,
       accountId: conData.accountId || accounts[0]?.id || 'acc-01',
-      accountName: conData.accountName || accounts[0]?.name || 'Anurag University',
+      accountName: conData.accountName || accounts[0]?.name || 'Partner Account',
       firstName: conData.firstName || 'New',
       lastName: conData.lastName || 'Contact',
       title: conData.title || 'Dean / Principal',
@@ -193,9 +216,13 @@ export default function App() {
   };
 
   const handleCreateDeal = async (dealData: Partial<DealItem>) => {
-    const newDeal = await crmApi.createDeal(dealData);
-    setDeals((prev) => [newDeal, ...prev]);
-    addToast(`New Deal added to pipeline: ${newDeal.title}`);
+    try {
+      const newDeal = await crmApi.createDeal(dealData);
+      setDeals((prev) => [newDeal, ...prev]);
+      addToast(`New Deal added to pipeline: ${newDeal.title}`);
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Failed to create deal', 'error');
+    }
   };
 
   const handleUpdateDealStage = (dealId: string, stage: DealStage) => {
@@ -227,7 +254,7 @@ export default function App() {
       priority: taskData.priority || 'NORMAL',
       relatedTo: taskData.relatedTo || 'Institution',
       relatedType: taskData.relatedType || 'ACCOUNT',
-      assignedTo: taskData.assignedTo || 'Aryan Reddy',
+      assignedTo: taskData.assignedTo || 'Corporate Rep',
     };
     setTasks((prev) => [newTask, ...prev]);
     addToast(`Task scheduled: ${newTask.subject}`);
@@ -243,7 +270,7 @@ export default function App() {
       relatedType: meetData.relatedType || 'ACCOUNT',
       location: meetData.location || 'Google Meet',
       meetLink: meetData.meetLink || 'https://meet.google.com/new',
-      host: meetData.host || 'Aryan Reddy',
+      host: meetData.host || 'Corporate Rep',
     };
     setMeetings((prev) => [newMeet, ...prev]);
     addToast(`Meeting scheduled: ${newMeet.title}`);
@@ -285,11 +312,15 @@ export default function App() {
   };
 
   const handlePushQuoteToFinance = async (quoteId: string) => {
-    await crmApi.pushQuoteToFinance(quoteId);
-    setQuotes((prev) =>
-      prev.map((q) => (q.id === quoteId ? { ...q, status: 'CONVERTED_TO_INVOICE' } : q))
-    );
-    addToast(`Quotation pushed to TechM4 Finance ERP as Invoice!`);
+    try {
+      await crmApi.pushQuoteToFinance(quoteId);
+      setQuotes((prev) =>
+        prev.map((q) => (q.id === quoteId ? { ...q, status: 'CONVERTED_TO_INVOICE' } : q))
+      );
+      addToast(`Quotation pushed to TechM4 Finance ERP as Invoice!`);
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Failed to push quote to finance', 'error');
+    }
   };
 
   const handleCreateCampaign = (campData: Partial<CampaignItem>) => {
@@ -300,9 +331,9 @@ export default function App() {
       targetAudience: campData.targetAudience || 'Colleges',
       status: 'ACTIVE',
       sentCount: campData.sentCount || 100,
-      openedCount: campData.openedCount || 75,
-      repliedCount: campData.repliedCount || 30,
-      leadsGenerated: campData.leadsGenerated || 12,
+      openedCount: campData.openedCount || 0,
+      repliedCount: campData.repliedCount || 0,
+      leadsGenerated: campData.leadsGenerated || 0,
       startDate: new Date().toISOString().slice(0, 10),
     };
     setCampaigns((prev) => [newCamp, ...prev]);
@@ -351,7 +382,7 @@ export default function App() {
               setActiveTab={setActiveTab}
               onToggleTask={handleToggleTask}
               onOpenConvertModal={(lead) => setLeadToConvert(lead)}
-              onRefresh={() => addToast('Aryan Reddy Home updated.')}
+              onRefresh={() => addToast('CRM Workspace updated.')}
             />
           )}
 

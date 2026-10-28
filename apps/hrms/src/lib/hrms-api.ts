@@ -1,14 +1,4 @@
 import {
-  initialAnnouncements,
-  initialAttendance,
-  initialClaims,
-  initialEmployees,
-  initialHolidays,
-  initialLeaveApplications,
-  initialLeaveBalances,
-  initialPayrollRecords,
-} from '../mock/hrms-data';
-import {
   AttendanceRecord,
   EmployeeItem,
   ExpenseClaimItem,
@@ -52,30 +42,30 @@ export const hrmsApi = {
         const body = await res.json();
         return body?.data || body;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch HRMS dashboard summary:', err);
     }
 
     return {
       overview: {
-        totalEmployees: initialEmployees.length,
-        presentToday: initialEmployees.length - 1,
-        onLeaveToday: 1,
-        attendanceRate: '96.2%',
+        totalEmployees: 0,
+        presentToday: 0,
+        onLeaveToday: 0,
+        attendanceRate: '0%',
         pendingApprovals: {
-          leaves: initialLeaveApplications.filter((l) => l.status === 'PENDING').length,
-          claims: initialClaims.filter((c) => c.status === 'SUBMITTED').length,
+          leaves: 0,
+          claims: 0,
         },
       },
-      todayAttendance: initialAttendance,
-      holidays: initialHolidays,
-      announcements: initialAnnouncements,
-      leaveBalances: initialLeaveBalances,
+      todayAttendance: null,
+      holidays: [],
+      announcements: [],
+      leaveBalances: [],
     };
   },
 
   // 2. Attendance & Biometric Clock
-  getTodayAttendance: async (): Promise<AttendanceRecord> => {
+  getTodayAttendance: async (): Promise<AttendanceRecord | null> => {
     try {
       const res = await fetch(`${API_BASE}/attendance/today`, {
         headers: getAuthHeaders(),
@@ -84,43 +74,26 @@ export const hrmsApi = {
         const body = await res.json();
         return body?.data || body;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch today attendance:', err);
     }
-    return initialAttendance;
+    return null;
   },
 
-  toggleClock: async (currentClockedIn: boolean): Promise<AttendanceRecord> => {
+  toggleClock: async (currentClockedIn: boolean): Promise<AttendanceRecord | null> => {
     const endpoint = currentClockedIn ? '/attendance/clock-out' : '/attendance/clock-in';
-    try {
-      const res = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          notes: currentClockedIn ? 'Web portal clock-out' : 'Web portal clock-in',
-        }),
-      });
-      if (res.ok) {
-        const body = await res.json();
-        return body?.data || body;
-      }
-    } catch {
-      // Fallback
-    }
-
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        notes: currentClockedIn ? 'Web portal clock-out' : 'Web portal clock-in',
+      }),
     });
-
-    return {
-      ...initialAttendance,
-      clockInTime: currentClockedIn ? initialAttendance.clockInTime : timeStr,
-      clockOutTime: currentClockedIn ? timeStr : null,
-      status: 'PRESENT',
-    };
+    if (!res.ok) {
+      throw new Error(`Clock action failed with status ${res.status}`);
+    }
+    const body = await res.json();
+    return body?.data || body;
   },
 
   // 3. Employees Directory
@@ -131,51 +104,26 @@ export const hrmsApi = {
       });
       if (res.ok) {
         const body = await res.json();
-        const items = body?.data?.items || body?.items || body;
-        if (Array.isArray(items) && items.length > 0) return items;
+        const items = body?.data?.items || body?.items || body?.data || body;
+        if (Array.isArray(items)) return items;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch employees list:', err);
     }
-    return initialEmployees;
+    return [];
   },
 
   createEmployee: async (data: Partial<EmployeeItem>): Promise<EmployeeItem> => {
-    try {
-      const res = await fetch(`${API_BASE}/employees`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        const body = await res.json();
-        return body?.data || body;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/employees`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Create employee failed with status ${res.status}`);
     }
-
-    const newEmp: EmployeeItem = {
-      id: `emp-${Date.now()}`,
-      employeeNumber: data.employeeNumber || `TM-00${initialEmployees.length + 1}`,
-      firstName: data.firstName || 'Employee',
-      lastName: data.lastName || '',
-      email: data.email || 'employee@techm4india.com',
-      phone: data.phone || '+91 98000 00000',
-      employmentStatus: 'ACTIVE',
-      employmentType: data.employmentType || 'FULL_TIME',
-      dateOfJoining: data.dateOfJoining || new Date().toISOString().split('T')[0],
-      department: data.department || { id: 'd-1', name: 'Engineering', code: 'ENG' },
-      designation: data.designation || { id: 'des-1', title: 'Software Engineer', level: 3 },
-      branch: data.branch || { id: 'b-1', name: 'Hyderabad Headquarters', city: 'Hyderabad' },
-      panNumber: data.panNumber || 'ABCDE1234F',
-      pfUan: data.pfUan || '100987654320',
-      bankAccount: data.bankAccount || '50100123456789',
-      bankIfsc: data.bankIfsc || 'HDFC0001234',
-      bankName: data.bankName || 'HDFC Bank',
-      ctcAnnual: data.ctcAnnual || 1200000,
-    };
-    return newEmp;
+    const body = await res.json();
+    return body?.data || body;
   },
 
   // 4. Leave Management
@@ -187,12 +135,12 @@ export const hrmsApi = {
       if (res.ok) {
         const body = await res.json();
         const items = body?.data || body;
-        if (Array.isArray(items) && items.length > 0) return items;
+        if (Array.isArray(items)) return items;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch leave balances:', err);
     }
-    return initialLeaveBalances;
+    return [];
   },
 
   getLeaveApplications: async (): Promise<LeaveApplicationItem[]> => {
@@ -203,53 +151,35 @@ export const hrmsApi = {
       if (res.ok) {
         const body = await res.json();
         const items = body?.data?.items || body?.data || body;
-        if (Array.isArray(items) && items.length > 0) return items;
+        if (Array.isArray(items)) return items;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch leave applications:', err);
     }
-    return initialLeaveApplications;
+    return [];
   },
 
   applyLeave: async (data: any): Promise<LeaveApplicationItem> => {
-    try {
-      const res = await fetch(`${API_BASE}/leave/applications`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        const body = await res.json();
-        return body?.data || body;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/leave/applications`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Apply leave failed with status ${res.status}`);
     }
-
-    const created: LeaveApplicationItem = {
-      id: `la-${Date.now()}`,
-      employeeName: 'Aarav Patel',
-      employeeCode: 'TM-001',
-      leaveType: data.leaveType || 'Annual Leave',
-      startDate: data.startDate || new Date().toISOString().split('T')[0],
-      endDate: data.endDate || new Date().toISOString().split('T')[0],
-      totalDays: Number(data.totalDays) || 1,
-      reason: data.reason || 'Personal leave request',
-      status: 'PENDING',
-      appliedAt: new Date().toISOString().split('T')[0],
-    };
-    return created;
+    const body = await res.json();
+    return body?.data || body;
   },
 
   reviewLeave: async (id: string, status: 'APPROVED' | 'REJECTED'): Promise<void> => {
-    try {
-      await fetch(`${API_BASE}/leave/applications/${id}/review`, {
-        method: 'PATCH',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ status }),
-      });
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/leave/applications/${id}/review`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) {
+      throw new Error(`Review leave failed with status ${res.status}`);
     }
   },
 
@@ -262,12 +192,12 @@ export const hrmsApi = {
       if (res.ok) {
         const body = await res.json();
         const items = body?.data?.items || body?.data || body;
-        if (Array.isArray(items) && items.length > 0) return items;
+        if (Array.isArray(items)) return items;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch payroll records:', err);
     }
-    return initialPayrollRecords;
+    return [];
   },
 
   // 6. Expense Claims
@@ -279,40 +209,24 @@ export const hrmsApi = {
       if (res.ok) {
         const body = await res.json();
         const items = body?.data?.items || body?.data || body;
-        if (Array.isArray(items) && items.length > 0) return items;
+        if (Array.isArray(items)) return items;
       }
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.warn('Failed to fetch expense claims:', err);
     }
-    return initialClaims;
+    return [];
   },
 
   submitClaim: async (data: any): Promise<ExpenseClaimItem> => {
-    try {
-      const res = await fetch(`${API_BASE}/claims`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data),
-      });
-      if (res.ok) {
-        const body = await res.json();
-        return body?.data || body;
-      }
-    } catch {
-      // Fallback
+    const res = await fetch(`${API_BASE}/claims`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Submit claim failed with status ${res.status}`);
     }
-
-    const created: ExpenseClaimItem = {
-      id: `clm-${Date.now()}`,
-      claimNumber: `EXP-2026-0${Math.floor(Math.random() * 90) + 10}`,
-      employeeName: 'Aarav Patel',
-      category: data.category || 'General Operations',
-      amount: Number(data.amount) || 1500,
-      expenseDate: data.expenseDate || new Date().toISOString().split('T')[0],
-      merchant: data.merchant || 'Vendor Receipt',
-      description: data.description || 'Corporate operational expenditure',
-      status: 'SUBMITTED',
-    };
-    return created;
+    const body = await res.json();
+    return body?.data || body;
   },
 };

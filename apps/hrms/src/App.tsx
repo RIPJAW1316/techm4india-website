@@ -21,16 +21,6 @@ import {
   LeaveBalanceItem,
   PayrollRecordItem,
 } from './types';
-import {
-  initialAnnouncements,
-  initialAttendance,
-  initialClaims,
-  initialEmployees,
-  initialHolidays,
-  initialLeaveApplications,
-  initialLeaveBalances,
-  initialPayrollRecords,
-} from './mock/hrms-data';
 
 export default function App() {
   const pathname = usePathname();
@@ -39,19 +29,15 @@ export default function App() {
   // Active navigation tab
   const [activeTab, setActiveTab] = useState<HrmsTab>('overview');
 
-  // Application Data States
-  const [employees, setEmployees] = useState<EmployeeItem[]>(initialEmployees);
-  const [attendance, setAttendance] = useState<AttendanceRecord>(initialAttendance);
-  const [leaveBalances, setLeaveBalances] =
-    useState<LeaveBalanceItem[]>(initialLeaveBalances);
-  const [leaveApplications, setLeaveApplications] =
-    useState<LeaveApplicationItem[]>(initialLeaveApplications);
-  const [payrollRecords, setPayrollRecords] =
-    useState<PayrollRecordItem[]>(initialPayrollRecords);
-  const [claims, setClaims] = useState<ExpenseClaimItem[]>(initialClaims);
-  const [holidays, setHolidays] = useState<HolidayItem[]>(initialHolidays);
-  const [announcements, setAnnouncements] =
-    useState<AnnouncementItem[]>(initialAnnouncements);
+  // Application Data States (Zero baseline - populated exclusively via API)
+  const [employees, setEmployees] = useState<EmployeeItem[]>([]);
+  const [attendance, setAttendance] = useState<AttendanceRecord | null>(null);
+  const [leaveBalances, setLeaveBalances] = useState<LeaveBalanceItem[]>([]);
+  const [leaveApplications, setLeaveApplications] = useState<LeaveApplicationItem[]>([]);
+  const [payrollRecords, setPayrollRecords] = useState<PayrollRecordItem[]>([]);
+  const [claims, setClaims] = useState<ExpenseClaimItem[]>([]);
+  const [holidays, setHolidays] = useState<HolidayItem[]>([]);
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
 
   // Global Modals State
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -61,13 +47,12 @@ export default function App() {
   const [hasToken, setHasToken] = useState<boolean>(() => !!getAccessToken());
   const [isProcessingSso, setIsProcessingSso] = useState<boolean>(false);
 
-  // Synchronous and resilient SSO token extraction & baseline session hydration
+  // Synchronous and resilient SSO token extraction
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const params = new URLSearchParams(window.location.search);
     const ssoToken = params.get('sso_token');
-    const code = params.get('code');
 
     if (ssoToken) {
       setIsProcessingSso(true);
@@ -88,47 +73,13 @@ export default function App() {
           router.push('/');
         }
       }, 150);
-      return;
-    }
-
-    if (code) {
-      setIsProcessingSso(true);
-      const demoToken = `demo-access-token-hrms.lead@techm4india.com-${Date.now()}`;
-      setSession({ accessToken: demoToken });
-      setHasToken(true);
-      if (window.history?.replaceState) {
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname.startsWith('/auth/callback')
-            ? '/'
-            : window.location.pathname,
-        );
-      }
-      setTimeout(() => {
-        setIsProcessingSso(false);
-        if (window.location.pathname.startsWith('/auth/callback')) {
-          router.push('/');
-        }
-      }, 150);
-      return;
-    }
-
-    // Auto-initialize demo session if unauthenticated on direct entry
-    if (!getAccessToken()) {
-      const initialToken = `demo-access-token-hrms.lead@techm4india.com-${Date.now()}`;
-      setSession({
-        accessToken: initialToken,
-        refreshToken: `demo-refresh-token-hrms.lead@techm4india.com-${Date.now()}`,
-        expiresIn: 86400,
-        tokenType: 'Bearer',
-      });
-      setHasToken(true);
     }
   }, [router]);
 
-  // Resilient parallel API sync on mount (identical to Finance ERP)
+  // Parallel live API sync on mount
   useEffect(() => {
+    if (!hasToken) return;
+
     let isMounted = true;
     async function syncWithApi() {
       try {
@@ -149,7 +100,7 @@ export default function App() {
           if (dash.value.announcements) setAnnouncements(dash.value.announcements);
         }
         if (att.status === 'fulfilled' && att.value) setAttendance(att.value);
-        if (emps.status === 'fulfilled' && Array.isArray(emps.value) && emps.value.length > 0) {
+        if (emps.status === 'fulfilled' && Array.isArray(emps.value)) {
           setEmployees(emps.value);
         }
         if (leaves.status === 'fulfilled' && Array.isArray(leaves.value)) {
@@ -164,8 +115,8 @@ export default function App() {
         if (clms.status === 'fulfilled' && Array.isArray(clms.value)) {
           setClaims(clms.value);
         }
-      } catch {
-        // Fallback to in-memory verified baseline
+      } catch (err) {
+        console.warn('API synchronization encountered an error:', err);
       }
     }
 
@@ -173,7 +124,7 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [hasToken]);
 
   // Normalize path & synchronize tab with deep link routes
   let normalizedPath = pathname;
@@ -214,36 +165,56 @@ export default function App() {
 
   // Handlers
   const handleToggleClock = async () => {
-    const isClockedIn = Boolean(attendance?.clockInTime && !attendance?.clockOutTime);
-    const updated = await hrmsApi.toggleClock(isClockedIn);
-    setAttendance(updated);
-    showToast(isClockedIn ? 'Successfully clocked out of duty.' : 'Successfully clocked in for today!');
+    try {
+      const isClockedIn = Boolean(attendance?.clockInTime && !attendance?.clockOutTime);
+      const updated = await hrmsApi.toggleClock(isClockedIn);
+      setAttendance(updated);
+      showToast(isClockedIn ? 'Successfully clocked out of duty.' : 'Successfully clocked in for today!');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to update time punch.');
+    }
   };
 
   const handleReviewLeave = async (id: string, status: 'APPROVED' | 'REJECTED') => {
-    await hrmsApi.reviewLeave(id, status);
-    setLeaveApplications((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status } : l)),
-    );
-    showToast(`Leave application ${status.toLowerCase()} successfully.`);
+    try {
+      await hrmsApi.reviewLeave(id, status);
+      setLeaveApplications((prev) =>
+        prev.map((l) => (l.id === id ? { ...l, status } : l)),
+      );
+      showToast(`Leave application ${status.toLowerCase()} successfully.`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to review leave application.');
+    }
   };
 
   const handleApplyLeave = async (data: any) => {
-    const created = await hrmsApi.applyLeave(data);
-    setLeaveApplications([created, ...leaveApplications]);
-    showToast('Leave request submitted to reporting manager.');
+    try {
+      const created = await hrmsApi.applyLeave(data);
+      setLeaveApplications([created, ...leaveApplications]);
+      showToast('Leave request submitted to reporting manager.');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to submit leave request.');
+    }
   };
 
   const handleSubmitClaim = async (data: any) => {
-    const created = await hrmsApi.submitClaim(data);
-    setClaims([created, ...claims]);
-    showToast('Expense claim registered and queued for finance audit.');
+    try {
+      const created = await hrmsApi.submitClaim(data);
+      setClaims([created, ...claims]);
+      showToast('Expense claim registered and queued for finance audit.');
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to submit expense claim.');
+    }
   };
 
   const handleAddEmployee = async (data: Partial<EmployeeItem>) => {
-    const created = await hrmsApi.createEmployee(data);
-    setEmployees([created, ...employees]);
-    showToast(`Employee ${created.firstName} ${created.lastName} registered successfully.`);
+    try {
+      const created = await hrmsApi.createEmployee(data);
+      setEmployees([created, ...employees]);
+      showToast(`Employee ${created.firstName} ${created.lastName} registered successfully.`);
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : 'Failed to register employee.');
+    }
   };
 
   const handleSignOut = () => {
@@ -267,8 +238,8 @@ export default function App() {
     );
   }
 
-  // If explicit /login route requested, present dedicated login view
-  if (normalizedPath === '/login') {
+  // If unauthenticated or explicit /login route requested, present dedicated login view
+  if (!hasToken || normalizedPath === '/login') {
     return (
       <DirectLoginPage
         onLoginSuccess={() => {
@@ -305,8 +276,6 @@ export default function App() {
         onOpenSubmitClaim={() => setIsClaimModalOpen(true)}
         onOpenAddEmployee={() => setActiveTab('employees')}
         onSignOut={handleSignOut}
-        userEmail="hrms.lead@techm4india.com"
-        userName="Aarav Patel"
       />
 
       {/* Toast Notification Banner */}
@@ -331,7 +300,6 @@ export default function App() {
             holidays={holidays}
             announcements={announcements}
             onNavigateTab={handleTabChange}
-            userName="Aarav Patel"
           />
         )}
 
@@ -351,48 +319,36 @@ export default function App() {
 
         {activeTab === 'leave' && (
           <HrmsLeave
-            balances={leaveBalances}
+            leaveBalances={leaveBalances}
             applications={leaveApplications}
             onApplyLeave={handleApplyLeave}
             onReviewLeave={handleReviewLeave}
-            isApplyModalOpen={isApplyModalOpen}
-            setIsApplyModalOpen={setIsApplyModalOpen}
+            isOpenApplyModal={isApplyModalOpen}
+            onCloseApplyModal={() => setIsApplyModalOpen(false)}
           />
         )}
 
         {activeTab === 'payroll' && (
-          <HrmsPayroll payrollRecords={payrollRecords} />
+          <HrmsPayroll
+            payrollRecords={payrollRecords}
+          />
         )}
 
         {activeTab === 'claims' && (
           <HrmsClaims
             claims={claims}
             onSubmitClaim={handleSubmitClaim}
-            isSubmitModalOpen={isClaimModalOpen}
-            setIsSubmitModalOpen={setIsClaimModalOpen}
+            isOpenSubmitModal={isClaimModalOpen}
+            onCloseSubmitModal={() => setIsClaimModalOpen(false)}
           />
         )}
       </main>
 
-      {/* Enterprise Editorial Footer */}
-      <footer className="border-t border-[#e3ded5] bg-white py-4 px-4 sm:px-6 lg:px-8 text-center text-xs text-[#5a6376] relative z-10 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <span>
-            &copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd. · Human Capital ERP
-          </span>
-          <div className="flex items-center gap-3">
-            <a href="http://localhost:5173" className="hover:text-[#1f2946] underline">
-              Corporate Website
-            </a>
-            <span>•</span>
-            <a href="http://localhost:5173/dashboard" className="hover:text-[#1f2946] underline">
-              Central Dashboard
-            </a>
-            <span>•</span>
-            <span className="font-mono text-[11px] text-[#047857] font-semibold">
-              ● Indian Statutory Engine Verified
-            </span>
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-[#e3ded5] bg-white/70 py-4 text-center text-xs text-[#5a6376] relative z-10">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>&copy; {new Date().getFullYear()} TechM4India Innovations Pvt. Ltd. · HRMS Human Capital Engine</span>
+          <span className="font-mono text-[11px] text-[#5a6376]">Standalone Application · Port 3002</span>
         </div>
       </footer>
     </div>

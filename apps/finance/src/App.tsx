@@ -24,40 +24,7 @@ import {
 // CHART OF ACCOUNTS MASTER (Zero Baseline - Ready for live operations)
 // ==============================================================================
 
-const initialAccounts: AccountItem[] = [
-  // Assets
-  { id: 'acc-1010', code: '1010', name: 'HDFC Bank Operating Current A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1020', code: '1020', name: 'ICICI Bank Secondary Operating A/C', type: 'ASSET', category: 'BANK_ACCOUNTS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1030', code: '1030', name: 'Petty Cash Hyderabad HQ', type: 'ASSET', category: 'CASH', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1100', code: '1100', name: 'Accounts Receivable (Trade Debtors)', type: 'ASSET', category: 'CURRENT_ASSETS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1200', code: '1200', name: 'Input Tax Credit - IGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1210', code: '1210', name: 'Input Tax Credit - CGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1220', code: '1220', name: 'Input Tax Credit - SGST Receivable', type: 'ASSET', category: 'TAX_RECEIVABLE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-1500', code: '1500', name: 'STEM Labs & Hardware Equipment', type: 'ASSET', category: 'FIXED_ASSETS', currency: 'INR', balance: 0, isActive: true },
-
-  // Liabilities
-  { id: 'acc-2010', code: '2010', name: 'Accounts Payable (Trade Creditors)', type: 'LIABILITY', category: 'CURRENT_LIABILITIES', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-2100', code: '2100', name: 'Output GST Payable (Net Central & State)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-2150', code: '2150', name: 'TDS Payable (Section 194C & 194J)', type: 'LIABILITY', category: 'TAX_PAYABLE', currency: 'INR', balance: 0, isActive: true },
-
-  // Equity
-  { id: 'acc-3010', code: '3010', name: 'Paid-up Equity Share Capital', type: 'EQUITY', category: 'SHARE_CAPITAL', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-3020', code: '3020', name: 'Retained Earnings & Reserves', type: 'EQUITY', category: 'RESERVES', currency: 'INR', balance: 0, isActive: true },
-
-  // Income / Revenue (Division-wise)
-  { id: 'acc-4010', code: '4010', name: 'Revenue: TechM4Solutions Software', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-4020', code: '4020', name: 'Revenue: TechM4Engineering COE Labs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-4030', code: '4030', name: 'Revenue: TechM4Schools STEM Programs', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-4040', code: '4040', name: 'Revenue: TechM4Space CanSat Aerospace', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-4050', code: '4050', name: 'Revenue: Horizon Startup School', type: 'INCOME', category: 'OPERATING_REVENUE', currency: 'INR', balance: 0, isActive: true },
-
-  // Expenses
-  { id: 'acc-5010', code: '5010', name: 'Cloud Infrastructure & GPU Compute', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-5020', code: '5020', name: 'Lab Hardware & Components Procurement', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-5030', code: '5030', name: 'Technical Honorarium & SME Payouts', type: 'EXPENSE', category: 'DIRECT_COSTS', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-5100', code: '5100', name: 'Employee Salaries & Allowances', type: 'EXPENSE', category: 'OPERATING_EXPENSES', currency: 'INR', balance: 0, isActive: true },
-  { id: 'acc-5200', code: '5200', name: 'Corporate Office Rent & Facility', type: 'EXPENSE', category: 'ADMIN_OVERHEADS', currency: 'INR', balance: 0, isActive: true },
-];
+const initialAccounts: AccountItem[] = [];
 
 const initialJournalEntries: JournalEntryItem[] = [];
 const initialInvoices: InvoiceItem[] = [];

@@ -107,15 +107,7 @@ export default function FinanceAuthCallbackPage() {
         })
         .catch((err) => {
           // Fallback if running offline dev environment
-          if (currentSession?.accessToken || code.startsWith('auth_code_') || code.startsWith('demo_')) {
-            setSession({ accessToken: `demo-access-token-finance.lead@techm4india.com-${Date.now()}` });
-            setStatus('success');
-            setTimeout(() => {
-              const dest = window.location.pathname.startsWith('/erp/finance') ? '/erp/finance' : '/';
-              router.push(dest);
-            }, 400);
-            return;
-          }
+          // No mock fallback
           setStatus('error');
           setErrorMessage(err.message || 'Failed to exchange authorization code for session token.');
         });

@@ -13,35 +13,7 @@ interface ForumPost {
   preview: string;
 }
 
-const mockForumPosts: ForumPost[] = [
-  {
-    id: '1',
-    title: 'Best practices for Docker container security in local microservices',
-    author: 'Vikram Sharma',
-    department: 'Engineering',
-    date: 'Yesterday at 4:15 PM',
-    replies: 7,
-    preview: 'Sharing our findings on multi-stage builds and non-root users when running local NestJS and Postgres instances...',
-  },
-  {
-    id: '2',
-    title: 'TechM4India Hackathon 2026 — Team formation and project ideas',
-    author: 'Priya Patel',
-    department: 'Product & Design',
-    date: '23 Oct 2026',
-    replies: 14,
-    preview: 'Looking for 2 backend engineers interested in building an autonomous satellite telemetry visualization tool...',
-  },
-  {
-    id: '3',
-    title: 'Health & Wellness: Corporate Badminton League sign-ups open',
-    author: 'Aditya Verma',
-    department: 'Human Resources',
-    date: '21 Oct 2026',
-    replies: 9,
-    preview: 'Matches will take place every Saturday at the Gachibowli Stadium complex. All skill levels welcome!',
-  },
-];
+const mockForumPosts: ForumPost[] = [];
 
 export default function AnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);

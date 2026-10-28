@@ -11,13 +11,7 @@ interface DocItem {
   url: string;
 }
 
-const mockCompanyDocs: DocItem[] = [
-  { id: '1', title: 'TechM4India Code of Conduct & Ethics 2026', category: 'POLICY', uploadedAt: '2026-01-10', size: '2.4 MB', url: '#' },
-  { id: '2', title: 'Employee Handbook & Leave Guidelines', category: 'POLICY', uploadedAt: '2026-01-15', size: '1.8 MB', url: '#' },
-  { id: '3', title: 'Form 12BB — Investment Declaration Template (FY 2026-27)', category: 'TAX', uploadedAt: '2026-04-01', size: '420 KB', url: '#' },
-  { id: '4', title: 'Group Health Insurance Policy Coverage Schedule', category: 'POLICY', uploadedAt: '2026-02-01', size: '3.1 MB', url: '#' },
-  { id: '5', title: 'Information Security & Data Protection Standard', category: 'LEGAL', uploadedAt: '2026-01-20', size: '1.1 MB', url: '#' },
-];
+const mockCompanyDocs: DocItem[] = [];
 
 export default function DocumentsPage() {
   const [activeTab, setActiveTab] = useState<'company' | 'credentials'>('company');
