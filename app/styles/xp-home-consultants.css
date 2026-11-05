@@ -251,9 +251,18 @@
 }
 .xh-cons-org {
   display: block;
-  margin-top: 5px;
+  margin-top: 6px;
+  color: var(--xp-text);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-wrap: balance;
+}
+.xh-cons-role {
+  display: block;
+  margin-top: 2px;
   color: var(--xp-muted);
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.4;
   text-wrap: balance;
 }

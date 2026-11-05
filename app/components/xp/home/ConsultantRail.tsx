@@ -50,6 +50,7 @@ function Card({ person, index, active }: { person: Consultant; index: number; ac
       <span className="xh-cons-name">
         <span className="xh-cons-title">{person.name}</span>
         {person.company && <span className="xh-cons-org">{person.company}</span>}
+        {person.role && <span className="xh-cons-role">{person.role}</span>}
       </span>
     </li>
   );
