@@ -362,7 +362,7 @@ a:hover > .xp-plate > img,
   background: linear-gradient(180deg, transparent, rgba(8, 12, 24, 0.82));
   color: #fff;
   font-family: var(--xp-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   line-height: 1.4;
   text-transform: uppercase;
@@ -398,7 +398,7 @@ a:hover > .xp-plate > img,
   border: 1px solid var(--xp-rule-strong);
   color: var(--xp-fg);
   font-family: var(--xp-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   line-height: 1;
   text-transform: uppercase;

@@ -319,7 +319,7 @@ button {
   align-items: center;
   gap: 30px;
   background: var(--tm-red);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
@@ -554,7 +554,7 @@ button {
   gap: 13px;
   transform: rotate(90deg);
   transform-origin: right bottom;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -610,7 +610,7 @@ button {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 9px;
+    font-size: 12px;
   }
   .floating-header {
     top: 54px;
@@ -654,7 +654,7 @@ button {
     letter-spacing: -0.05em;
   }
   .eyebrow {
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.13em;
   }
   .hero-bottom {
@@ -1834,7 +1834,7 @@ button {
   --tm-blue-paper: #edf4fa;
   --tm-blue-card: #e6eff7;
   --tm-ink: #20283b;
-  --tm-muted: #687285;
+  --tm-muted: #626b7d;
   --tm-line: rgba(37, 46, 74, 0.18);
   --tm-serif: var(--font-serif), Newsreader, Georgia, serif;
   --tm-sans: var(--font-sans), Manrope, Arial, sans-serif;
@@ -1883,7 +1883,7 @@ em {
   background: var(--tm-red);
   color: #fff;
   font-family: var(--tm-sans);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -1988,7 +1988,7 @@ em {
   background: var(--tm-red);
   color: #fff;
   font-family: var(--tm-sans);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2093,7 +2093,7 @@ em {
 .menu-label {
   margin: 0 0 20px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.19em;
   text-transform: uppercase;
   font-weight: 800;
@@ -2281,7 +2281,7 @@ em {
   background: rgba(255, 255, 255, 0.12);
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.19em;
 }
 .eyebrow span {
@@ -2290,7 +2290,7 @@ em {
 .section-kicker {
   margin: 0 0 24px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 800;
@@ -2345,7 +2345,7 @@ em {
   align-items: center;
   gap: 23px;
   color: var(--tm-red);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -2396,7 +2396,7 @@ em {
   left: 18px;
   bottom: 16px;
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
@@ -2634,7 +2634,7 @@ em {
   border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 .mission-links .arrow-link {
-  font-size: 10px;
+  font-size: 12px;
 }
 .products-section {
   background: #fff;
@@ -2663,13 +2663,13 @@ em {
   display: block;
   margin-bottom: 30px;
   color: #a9b1bd;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 .product-editorial > p:first-of-type {
   margin: 0 0 10px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -2689,7 +2689,7 @@ em {
   line-height: 1.6;
 }
 .product-editorial .arrow-link {
-  font-size: 9px;
+  font-size: 12px;
 }
 .matters-section {
   background: var(--tm-blue-paper);
@@ -2757,7 +2757,7 @@ em {
 }
 .matters-list span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .matters-list h3 {
   margin: 20px 0 10px;
@@ -2804,14 +2804,14 @@ em {
   top: 14px;
   color: #fff;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
 }
 .person-card > p {
   min-height: 32px;
   margin: 17px 0 7px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.45;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -2863,7 +2863,7 @@ em {
 }
 .trust-item span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .trust-item strong {
   max-width: 140px;
@@ -2905,12 +2905,12 @@ em {
   left: 16px;
   top: 14px;
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
 }
 .news-card > p:first-of-type {
   margin: 18px 0 9px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.13em;
 }
@@ -2931,7 +2931,7 @@ em {
   line-height: 1.6;
 }
 .news-card .arrow-link {
-  font-size: 9px;
+  font-size: 12px;
 }
 .partnership-cta {
   display: grid;
@@ -3078,7 +3078,7 @@ em {
   bottom: 20px;
   z-index: 2;
   color: rgba(255, 255, 255, 0.65);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -3160,7 +3160,7 @@ em {
 .timeline-list article > div p:first-child {
   margin: 6px 0 0;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -3240,7 +3240,7 @@ em {
 }
 .editorial-list article > span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .editorial-list h3 {
   margin: 0;
@@ -3278,7 +3278,7 @@ em {
 .about-quote > .shell > p:last-child {
   margin: 28px 0 0;
   color: #f18b68;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
@@ -3325,7 +3325,7 @@ em {
 }
 .pathway-row > span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .pathway-row h3 {
   margin: 0;
@@ -3348,7 +3348,7 @@ em {
   line-height: 1.6;
 }
 .pathway-row .arrow-link {
-  font-size: 9px;
+  font-size: 12px;
 }
 .engineering-feature {
   display: grid;
@@ -3473,7 +3473,7 @@ em {
 }
 .program-grid article > span {
   color: #f18b68;
-  font-size: 10px;
+  font-size: 11px;
 }
 .program-grid h3 {
   margin: 45px 0 12px;
@@ -3549,7 +3549,7 @@ em {
   margin-bottom: 8px;
   color: var(--tm-red);
   font-family: var(--tm-sans);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.1em;
 }
 .product-showcase {
@@ -3584,7 +3584,7 @@ em {
 .showcase-card > p:first-of-type {
   margin: 18px 0 8px;
   color: var(--tm-red);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -3602,7 +3602,7 @@ em {
   line-height: 1.55;
 }
 .showcase-card .arrow-link {
-  font-size: 9px;
+  font-size: 12px;
 }
 .case-study-grid {
   display: grid;
@@ -3626,7 +3626,7 @@ em {
 }
 .case-study-grid span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .case-study-grid p:first-of-type {
   margin: auto 0 8px;
@@ -3674,7 +3674,7 @@ em {
 .labs-list span,
 .labs-list i {
   color: #f18b68;
-  font-size: 10px;
+  font-size: 11px;
 }
 .labs-list h3 {
   margin: 0;
@@ -3710,7 +3710,7 @@ em {
 }
 .delivery-map span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .delivery-map h3 {
   margin: 52px 0 10px;
@@ -3817,14 +3817,14 @@ em {
 .erp-module-card > span,
 .erp-module-card > small {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 .erp-module-card > small {
   float: right;
   color: var(--tm-muted);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.08em;
 }
 .erp-module-card h3 {
@@ -3890,7 +3890,7 @@ em {
 }
 .erp-role-grid b {
   color: #f18b68;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 400;
 }
 .erp-integration {
@@ -3910,7 +3910,7 @@ em {
 }
 .erp-integration-grid span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .erp-integration-grid h3 {
   margin: 42px 0 10px;
@@ -3956,7 +3956,7 @@ em {
 }
 .erp-security-list span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .erp-security-list p {
   margin: 0;
@@ -3987,7 +3987,7 @@ em {
 .pillar-grid span,
 .labs-editorial-list span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .pillar-grid h3 {
   margin: 55px 0 14px;
@@ -4087,7 +4087,7 @@ em {
 }
 .programs-list span {
   color: #ffd1b6;
-  font-size: 10px;
+  font-size: 11px;
 }
 .programs-list strong {
   font-family: var(--tm-serif);
@@ -4147,7 +4147,7 @@ em {
 }
 .school-products span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .school-products h3 {
   margin: auto 0 0;
@@ -4251,7 +4251,7 @@ em {
 }
 .space-lab-grid span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .space-lab-grid h3 {
   margin: auto 0 12px;
@@ -4298,7 +4298,7 @@ em {
 }
 .space-layers span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .space-layers strong {
   font-family: var(--tm-serif);
@@ -4334,7 +4334,7 @@ em {
 .outcomes-grid span,
 .benefit-grid span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
 }
 .outcomes-grid h3 {
   max-width: 210px;
@@ -4464,7 +4464,7 @@ em {
 }
 .contact-form label > span {
   color: #ffe4d9;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -4520,7 +4520,7 @@ em {
 .form-privacy {
   margin: 0 !important;
   color: #ffe4d9;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
 }
 .form-privacy a {
@@ -4555,7 +4555,7 @@ em {
 }
 .detail-block > span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
@@ -4571,7 +4571,7 @@ em {
 }
 .detail-block small {
   color: var(--tm-muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .contact-side-note {
   align-self: end;
@@ -4605,7 +4605,7 @@ em {
 .side-caption {
   margin: 18px 0 0;
   color: var(--tm-muted);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
 }
 .opportunities-section {
@@ -4634,7 +4634,7 @@ em {
 }
 .opportunities-grid article > span {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 12px;
 }
 .opportunities-grid h3 {
   margin: auto 0 10px;
@@ -4651,7 +4651,7 @@ em {
 }
 .opportunities-grid a {
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -4688,7 +4688,7 @@ em {
 .social-list span {
   color: var(--tm-red);
   font-family: var(--tm-sans);
-  font-size: 10px;
+  font-size: 12px;
 }
 .social-list i {
   color: var(--tm-red);
@@ -4715,7 +4715,7 @@ em {
 .footer-kicker {
   margin: 0 0 22px;
   color: #f18b68;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -4773,7 +4773,7 @@ em {
 .footer-grid h3 {
   margin: 6px 0 19px;
   color: #f18b68;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -4805,7 +4805,7 @@ em {
   display: flex;
   justify-content: space-between;
   color: #8e9ab0;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -4888,7 +4888,7 @@ em {
     animation-duration: 38s;
   }
   .announcement-marquee span {
-    font-size: 9px;
+    font-size: 12px;
   }
   .floating-header {
     top: 52px;
@@ -4927,7 +4927,7 @@ em {
   .header-login {
     min-height: 46px;
     padding-inline: 12px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .menu-trigger span {
     display: none;
@@ -5018,7 +5018,7 @@ em {
     min-height: 49px;
     padding-inline: 16px;
     gap: 10px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .scroll-cue {
     display: none;
@@ -5110,7 +5110,7 @@ em {
   }
   .stat-item span {
     max-width: 130px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .mission-section {
     display: block;
@@ -5202,7 +5202,7 @@ em {
   .person-card > p {
     min-height: 38px;
     margin-top: 12px;
-    font-size: 8px;
+    font-size: 12px;
   }
   .person-card h3 {
     font-size: 21px;
@@ -5289,7 +5289,7 @@ em {
   .image-credit {
     right: 12px;
     bottom: 13px;
-    font-size: 8px;
+    font-size: 11px;
   }
   .question-section,
   .engineering-manifesto,
@@ -5389,7 +5389,7 @@ em {
   }
   .pathway-tools {
     grid-column: 2;
-    font-size: 10px;
+    font-size: 11px;
   }
   .pathway-row .arrow-link {
     grid-column: 3;
@@ -5511,7 +5511,7 @@ em {
   .erp-role-grid span {
     min-height: 56px;
     padding-block: 15px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .erp-security-list {
     margin-top: 40px;
@@ -6093,7 +6093,7 @@ body:has(.login-route) {
 .erp-kicker {
   margin: 0 0 13px;
   color: var(--tm-red);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -6663,7 +6663,7 @@ body:has(.login-route) {
 .erp-login-footer {
   margin: 0;
   color: #8f98ad;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -6748,8 +6748,8 @@ body:has(.login-route) {
 }
 .erp-security-note {
   margin: 0;
-  color: #8b929d;
-  font-size: 10px;
+  color: #666b73;
+  font-size: 11px;
   text-align: center;
 }
 
@@ -7003,7 +7003,7 @@ body:has(.login-route) {
     font-size: 12px;
   }
   .erp-login-footer {
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 0.07em;
   }
   .erp-login-panel {

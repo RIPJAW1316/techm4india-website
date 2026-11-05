@@ -3718,7 +3718,7 @@ html:has(.en-sheet[open], .en-lightbox[open]) {
   --en-cream-50: #f6f1e9;
   --en-ink: #172528;
   --en-text: #485457;
-  --en-muted: #667074;
+  --en-muted: #5f686c;
   --en-line: #d7d8d2;
   --en-focus: #bd633c;
   --en-radius: 3px;
@@ -3839,7 +3839,7 @@ html:has(.en-sheet[open], .en-lightbox[open]) {
   background: #1d3032;
   color: #f9f4ea;
 }
-.en-explorer-number { color: #a65c3d; font-size: 12px; font-weight: 700; letter-spacing: .12em; }
+.en-explorer-number { color: #935136; font-size: 12px; font-weight: 700; letter-spacing: .12em; }
 .en-explorer-item[data-active="true"] .en-explorer-number { color: #efb982; }
 .en-explorer-name { font-size: clamp(22px,2.2vw,34px); font-weight: 600; letter-spacing: -.04em; line-height: 1.08; }
 .en-explorer-count { font-size: 11px; font-weight: 700; white-space: nowrap; text-transform: uppercase; letter-spacing: .08em; opacity: .7; }
@@ -3848,7 +3848,7 @@ html:has(.en-sheet[open], .en-lightbox[open]) {
 .en-explorer-stage { position: sticky; top: 106px; overflow: hidden; background: #1d3032; color: #eff1ed; }
 .en-explorer-image { position: relative; height: clamp(320px,34vw,530px); overflow: hidden; animation: en-explorer-enter .65s var(--en-ease) both; }
 .en-explorer-image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.82) contrast(1.05); }
-.en-explorer-image-note { position: absolute; right: 14px; bottom: 14px; padding: 5px 8px; background: rgba(17,31,33,.72); color: #f3f4f0; font-size: 10px; letter-spacing: .04em; }
+.en-explorer-image-note { position: absolute; right: 14px; bottom: 14px; padding: 5px 8px; background: rgba(17,31,33,.72); color: #f3f4f0; font-size: 11px; letter-spacing: .04em; }
 .en-explorer-caption { display: flex; gap: 24px; align-items: end; justify-content: space-between; padding: clamp(22px,3vw,42px); animation: en-explorer-caption .55s var(--en-ease) both; }
 .en-explorer-caption-index { color: #e8b382; font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
 .en-explorer-caption h3 { margin: 14px 0 10px; color: #fff; font-size: clamp(30px,3vw,48px); font-weight: 600; line-height: 1; letter-spacing: -.055em; }

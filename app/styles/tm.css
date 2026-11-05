@@ -1213,7 +1213,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   margin-top: 5px;
   color: var(--ds-muted);
   font-family: var(--ds-sans);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2510,7 +2510,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   padding-bottom: 24px;
   border-bottom: 1px solid rgba(200, 215, 255, .15);
   color: #a9b8ea;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -2588,7 +2588,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   gap: 12px;
   margin-top: 23px;
   color: #9eafe2;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -2684,7 +2684,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   border-radius: 4px;
   background: rgba(7, 20, 71, .72);
   color: #a9c0ff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -2722,7 +2722,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   padding-inline: 22px;
   border-bottom: 1px solid rgba(172, 198, 255, .17);
   color: #a7b9ea;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -2752,7 +2752,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-system-intro > span {
   color: #8caaff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -2815,7 +2815,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   border-radius: 6px;
   background: #1b39a5;
   color: #fff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .06em;
   box-shadow: 0 0 18px rgba(75, 116, 255, .35);
@@ -2832,7 +2832,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-system-layer-copy small {
   color: #a9b9e1;
-  font-size: 10.5px;
+  font-size: 11px;
   line-height: 1.3;
 }
 .tm-system-pulse {
@@ -2888,7 +2888,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-orbit-badge small {
   margin-top: 3px;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -2900,7 +2900,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-world--solutions .tm-trust > span {
   color: #7f96dc;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -3297,7 +3297,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-world--solutions .tm-featured-modules .tm-small {
   color: #a7baff;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -3311,7 +3311,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   border-radius: 4px;
   background: rgba(106, 132, 255, .13);
   color: #d4dfff;
-  font-size: 10.5px;
+  font-size: 11px;
 }
 .tm-world--solutions .tm-work-card {
   overflow: hidden;
@@ -3534,7 +3534,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 @media (max-width: 640px) {
   .tm-world--solutions .tm-header-inner { min-height: 68px; }
-  .tm-hero-overline { padding-bottom: 16px; font-size: 9px; }
+  .tm-hero-overline { padding-bottom: 16px; font-size: 11px; }
   .tm-hero-overline span:last-child { display: none; }
   .tm-world--solutions .tm-hero-grid { padding-top: 54px; }
   .tm-world--solutions .tm-hero-copy { gap: 20px; }
@@ -3551,22 +3551,22 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   }
   .tm-system-card { width: 93%; border-radius: 9px; transform: none; }
   .tm-system-body { padding: 18px; }
-  .tm-system-bar { min-height: 37px; gap: 7px; padding-inline: 12px; font-size: 7px; }
+  .tm-system-bar { min-height: 37px; gap: 7px; padding-inline: 12px; font-size: 11px; }
   .tm-system-live { display: none; }
   .tm-system-intro h2 { font-size: 24px; }
-  .tm-system-intro p { font-size: 10px; }
+  .tm-system-intro p { font-size: 11px; }
   .tm-system-layers { gap: 7px; margin-top: 17px !important; }
   .tm-system-layers li { min-height: 54px; padding: 7px 9px; gap: 10px; }
   .tm-system-code { width: 34px; height: 34px; }
   .tm-system-layer-copy strong { font-size: 11px; }
-  .tm-system-layer-copy small { font-size: 9px; }
-  .tm-system-link { margin-top: 17px; font-size: 9px; }
+  .tm-system-layer-copy small { font-size: 11px; }
+  .tm-system-link { margin-top: 17px; font-size: 11px; }
   .tm-orbit-label--side,
   .tm-orbit-badge { display: none; }
   .tm-orbit-label--top { top: 0; right: 6%; }
   .tm-world--solutions .tm-trust { gap: 7px 20px; }
   .tm-world--solutions .tm-trust ul { gap: 5px 16px; }
-  .tm-world--solutions .tm-trust li { font-size: 10px; }
+  .tm-world--solutions .tm-trust li { font-size: 11px; }
   .tm-world--solutions .tm-about-section { padding-block: 80px; }
   .tm-world--solutions .tm-about-copy .tm-h2 { max-width: none; }
   .tm-world--solutions .tm-stats--5 { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px 0; }
@@ -3584,7 +3584,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   .tm-service-content .tm-small { display: none; }
   .tm-service-arrow { width: 30px; height: 30px; }
   .tm-world--solutions .tm-wall-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
-  .tm-world--solutions .tm-wall-grid li { min-height: 47px; font-size: 10px; }
+  .tm-world--solutions .tm-wall-grid li { min-height: 47px; font-size: 11px; }
   .tm-world--solutions .tm-featured { padding: 24px; }
   .tm-world--solutions .tm-featured-modules { transform: none; }
   .tm-world--solutions .tm-work-grid,

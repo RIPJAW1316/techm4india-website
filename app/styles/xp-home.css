@@ -35,7 +35,7 @@
   border-top: 1px solid var(--xp-line-strong);
   color: var(--xp-muted);
   font-family: var(--xp-mono);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
   letter-spacing: .07em;
   text-transform: uppercase;
@@ -633,7 +633,7 @@
     grid-template-columns: 36px minmax(0, 1fr);
   }
   .xh-idea-visual img { aspect-ratio: 4 / 3; }
-  .xh-idea-visual figcaption { font-size: 9px; }
+  .xh-idea-visual figcaption { font-size: 11px; }
   .xh-principles li > div {
     grid-template-columns: minmax(0, 1fr);
   }

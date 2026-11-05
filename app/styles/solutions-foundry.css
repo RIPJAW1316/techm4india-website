@@ -821,7 +821,7 @@
   pointer-events: none;
 }
 .sf-panel-visual .sf-diagram { position: relative; z-index: 1; height: 100%; padding: 20px; }
-.sf-visual-note { position: absolute; z-index: 1; right: 12px; bottom: 9px; color: rgba(255,255,255,.78); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+.sf-visual-note { position: absolute; z-index: 1; right: 12px; bottom: 9px; color: rgba(255,255,255,.78); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
 .sf-diagram > p,
 .sf-case-modules > p:first-child,
 .sf-concept-cat {
@@ -1325,7 +1325,7 @@
   margin-top: auto;
   padding-top: 26px;
   color: var(--sf-dim);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
 }
 .sf-ind-field figure {
@@ -1362,7 +1362,7 @@
 }
 .sf-ind-field figcaption span {
   color: #ffb088;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -1377,7 +1377,7 @@
   .sf-ind-field { gap: 8px; }
   .sf-ind-field figure { height: 210px; }
   .sf-ind-field figcaption { display: block; padding: 30px 10px 9px; font-size: 11px; }
-  .sf-ind-field figcaption span { display: block; margin-bottom: 3px; font-size: 9px; }
+  .sf-ind-field figcaption span { display: block; margin-bottom: 3px; font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sf-ind-field img { transition: none; }
@@ -1875,7 +1875,7 @@
 .sf-concept-visual { position: relative; height: clamp(220px, 19vw, 285px); margin-bottom: 10px; overflow: hidden; isolation: isolate; perspective: 900px; background: radial-gradient(circle at 48% 52%, #2e5454, #102325 62%, #0b181b); color: #d8ebe3; }
 .sf-concept-visual::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,.09) 1px, transparent 1px) 0 0 / 34px 34px, linear-gradient(90deg,rgba(255,255,255,.09) 1px, transparent 1px) 0 0 / 34px 34px; mask-image: radial-gradient(circle at 50% 55%, #000, transparent 74%); opacity: .55; }
 .sf-concept-visual-label,
-.sf-concept-visual-foot { position: absolute; z-index: 3; right: 18px; left: 18px; font: 700 10px/1.3 var(--sf-mono, monospace); letter-spacing: .13em; text-transform: uppercase; }
+.sf-concept-visual-foot { position: absolute; z-index: 3; right: 18px; left: 18px; font: 700 11px/1.3 var(--sf-mono, monospace); letter-spacing: .13em; text-transform: uppercase; }
 .sf-concept-visual-label { top: 18px; }
 .sf-concept-visual-foot { bottom: 16px; display: flex; justify-content: space-between; gap: 8px; color: #d6d9cf; }
 .sf-concept-visual-foot b { color: #f2af83; font-weight: 700; }
@@ -1886,7 +1886,7 @@
 .sf-concept-device i:nth-child(3) { height: 75px; }
 .sf-concept-device i:nth-child(4) { height: 45px; }
 .sf-concept-device i:nth-child(5) { height: 27px; }
-.sf-concept-readout { position: absolute; top: 48%; right: 8%; color: rgba(255,255,255,.55); font: 700 10px var(--sf-mono, monospace); writing-mode: vertical-rl; letter-spacing: .18em; }
+.sf-concept-readout { position: absolute; top: 48%; right: 8%; color: rgba(255,255,255,.55); font: 700 11px var(--sf-mono, monospace); writing-mode: vertical-rl; letter-spacing: .18em; }
 .sf-concepts li:hover .sf-concept-device,
 .sf-concepts li:focus-within .sf-concept-device { transform: rotateX(17deg) rotateY(-12deg) rotateZ(-4deg) translateY(-9px); }
 .sf-concept-visual--acousticast { background: radial-gradient(circle at 48% 48%, #704d3b, #2e2828 62%, #171719); }
@@ -1921,7 +1921,7 @@
 .sf-contact-photo img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.78); transition: transform .7s var(--sf-ease); }
 .sf-contact-photo:hover img { transform: scale(1.04); }
 .sf-contact-photo figcaption { position: absolute; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-between; gap: 16px; padding: 34px 18px 14px; background: linear-gradient(transparent, rgba(7,18,20,.86)); color: #fff; font-family: var(--sf-display); font-size: 19px; font-weight: 600; }
-.sf-contact-photo figcaption span { align-self: end; font: 600 10px var(--sf-display); letter-spacing: .08em; text-transform: uppercase; }
+.sf-contact-photo figcaption span { align-self: end; font: 600 11px var(--sf-display); letter-spacing: .08em; text-transform: uppercase; }
 .sf-form { box-shadow: 16px 16px 0 #e5dfd2; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1953,7 +1953,7 @@
 }
 @media (max-width: 450px) {
   .sf-edge-layout .sf-photo-duo figure { height: 205px; }
-  .sf-concept-visual-foot { font-size: 8px; }
+  .sf-concept-visual-foot { font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sf-concept-orbit, .sf-concept-device i, .sf-platforms li, .sf-concepts li, .sf-lab-detail-photo, .sf-edge-layout .sf-photo-duo, .sf-contact-photo { animation: none !important; transition: none !important; }

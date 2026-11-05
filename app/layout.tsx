@@ -17,6 +17,8 @@ import "./styles/tm.css";
 import "./styles/solutions-foundry.css";
 import "./styles/sc.css";
 import "./styles/en.css";
+// Last on purpose: shared accessibility and small-screen fixes (contrast, touch targets).
+import "./styles/site-polish.css";
 
 const manrope = Manrope({
   variable: "--font-sans",

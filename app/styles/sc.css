@@ -22,7 +22,7 @@
   --sc-yellow: #ffcb2f;
   --sc-ink: #1b2030;
   --sc-text: #4b5266;
-  --sc-muted: #6d7387;
+  --sc-muted: #656b7e;
   --sc-soft: #f5f8fc;
   --sc-line: #e5e9f1;
   --sc-font: var(--font-school), "Poppins", "Segoe UI", system-ui, sans-serif;
@@ -388,7 +388,7 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .sc-brand small {
   display: block;
   color: var(--sc-muted);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1815,7 +1815,7 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   border-radius: 4px;
   background: rgba(5, 20, 40, 0.7);
   color: #fff;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.04em;
 }
 @keyframes sc-map-photo { from { opacity: 0.5; transform: scale(1.015); } }
@@ -1923,7 +1923,7 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   color: #fff;
 }
 .sc-footer .sc-brand small {
-  color: #cfeedd;
+  color: #e8f7ef;
 }
 .sc-footer .sc-brand img {
   border-radius: 50%;
@@ -2172,7 +2172,7 @@ body:has(.sc-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
     gap: 8px;
   }
   .sc-dots button {
-    width: 12px;
+    width: 28px;
   }
   .sc-band {
     clip-path: polygon(0 0, 100% 0, 100% calc(100% - 32px), 50% 100%, 0 calc(100% - 32px));

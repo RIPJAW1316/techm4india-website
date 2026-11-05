@@ -234,7 +234,7 @@
 .xp-institutes .xi-tracks small {
   color: var(--xp-on-ink-muted);
   font-family: var(--xp-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -451,7 +451,7 @@
   border: 1px solid var(--xp-rule-strong);
   color: var(--xp-fg);
   font-family: var(--xp-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }

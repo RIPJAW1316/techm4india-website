@@ -1,0 +1,105 @@
+/* ==========================================================================
+   Site polish: small-screen and accessibility fixes shared by every public page.
+   Imported last from layout.tsx so it wins over the per-page stylesheets at
+   equal specificity. Each block says what it replaces and why.
+   ========================================================================== */
+
+/* Contrast ------------------------------------------------------------------
+   Accent text that measured below 4.5:1 on its background. Brand wordmarks and
+   photo overlays are deliberately left alone. */
+.sf-concept-cat,
+.sf-step-no {
+  color: #bb5327; /* was #ef6a32 on white, 3.1:1 */
+}
+.sc-stats strong sup,
+.sc-field > span b {
+  color: #ce4135; /* was #e9493c on white, 3.8:1 */
+}
+.sc-footer h3 {
+  color: #fff0b8; /* was #ffcb2f on the footer green, 3.4:1 */
+}
+.sc-socials a {
+  /* White text on the lighter green chip was 4.0:1. A fainter fill passes, and
+     an inset ring keeps the chip visible. */
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+.sc-socials a:hover {
+  box-shadow: none;
+}
+
+/* Touch targets --------------------------------------------------------------
+   Links and fields that were 15 to 33px tall on phones. Footer lists get 40px
+   rows (and lose their row gap so the lists do not grow much); stand-alone
+   links, buttons and form fields get the full 44px. */
+@media (max-width: 760px), (pointer: coarse) {
+  footer li > a,
+  footer li > button,
+  footer address a,
+  footer p > a,
+  .footer-brand a,
+  .tm-footer-contact a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  footer ul,
+  .tm-footer ul,
+  .sc-footer ul,
+  .en-footer ul,
+  .footer-grid ul {
+    gap: 0;
+  }
+  .footer-grid li + li {
+    margin-top: 0;
+  }
+
+  .xh-directory-link,
+  .xh-featured-link,
+  .sf-textlink,
+  .sc-paths-back,
+  .en-topbar a,
+  .en-faq-help a,
+  .detail-block a,
+  .opportunities-grid a,
+  dd > a,
+  figcaption > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .sc-socials a,
+  .en-socials a,
+  .tm-socials a {
+    min-height: 44px;
+  }
+  .en-finder-field :is(select, input) {
+    min-height: 44px;
+  }
+  .en-prog-open {
+    min-height: 44px;
+  }
+}
+
+/* Schools hero on phones -------------------------------------------------------
+   The photo card is pinned to the bottom of the hero and the copy was given a
+   fixed 720px stage, which assumes the headline and buttons are short. At 375px
+   they wrap to more lines and the button row ran under the photo. Letting every
+   slide share one grid cell makes the stage as tall as the tallest slide, so the
+   reserved space under the copy always holds. */
+@media (max-width: 640px) {
+  .sc-slides {
+    display: grid;
+    min-height: 0;
+  }
+  .sc-slide-wrap {
+    position: relative;
+    inset: auto;
+    grid-area: 1 / 1;
+  }
+  /* The photo card rises 266px from the bottom of the hero (56px offset plus
+     210px height); the copy only reserved 250px under itself. */
+  .sc-slide--portrait .sc-slide-copy {
+    padding-bottom: 290px;
+  }
+}
