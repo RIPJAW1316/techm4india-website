@@ -50,6 +50,15 @@
   white-space: nowrap;
   animation: xh-cons-name-in 0.45s both var(--xp-ease);
 }
+.xh-cons-now-org {
+  flex: none;
+  color: var(--xp-muted);
+  font: 500 11px / 1.4 var(--xp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: xh-cons-name-in 0.45s 0.05s both var(--xp-ease);
+}
 .xh-cons-nav {
   display: flex;
   flex: none;
@@ -231,10 +240,21 @@
 .xh-cons-name {
   position: relative;
   display: block;
-  padding: 14px 0 9px;
+  padding: 14px 0 11px;
+}
+.xh-cons-title {
+  display: block;
   color: var(--xp-navy);
   font: 400 clamp(19px, 1.65vw, 24px) / 1.15 var(--xp-serif);
   letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.xh-cons-org {
+  display: block;
+  margin-top: 5px;
+  color: var(--xp-muted);
+  font-size: 13.5px;
+  line-height: 1.4;
   text-wrap: balance;
 }
 .xh-cons-name::after {
@@ -348,6 +368,9 @@
   .xh-cons-bar {
     min-height: 56px;
   }
+  .xh-cons-now-org {
+    display: none;
+  }
   .xh-cons-nav button {
     width: 44px;
     height: 44px;
@@ -355,7 +378,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .xh-cons-now strong {
+  .xh-cons-now strong,
+  .xh-cons-now-org {
     animation: none;
   }
   .xh-cons-photo,

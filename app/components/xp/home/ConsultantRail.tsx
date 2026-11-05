@@ -47,7 +47,10 @@ function Card({ person, index, active }: { person: Consultant; index: number; ac
         )}
         <span className="xp-meta">{pad(index + 1)}</span>
       </span>
-      <span className="xh-cons-name">{person.name}</span>
+      <span className="xh-cons-name">
+        <span className="xh-cons-title">{person.name}</span>
+        {person.company && <span className="xh-cons-org">{person.company}</span>}
+      </span>
     </li>
   );
 }
@@ -57,16 +60,16 @@ function Card({ person, index, active }: { person: Consultant; index: number; ac
  *
  * Native scrolling does the work (touch, trackpad, wheel). On top of it:
  * arrow buttons (the keyboard route), drag-to-scroll with a mouse, a progress
- * rule, and a "now showing" readout that follows the scroll position. The
- * active card is also what carries the colour on touch screens, where there
- * is no hover.
+ * rule, and a "now showing" readout. The readout follows the card under the
+ * mouse, or else the scroll position. The scroll-active card also carries the
+ * colour on touch screens, where there is no hover.
  */
 export function ConsultantRail({ people }: { people: Consultant[] }) {
   const rail = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLSpanElement>(null);
   const [active, setActive] = useState(0);
+  const [hovered, setHovered] = useState<number | null>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
-  const last = people.length - 1;
 
   const update = useCallback(() => {
     const node = rail.current;
@@ -74,14 +77,30 @@ export function ConsultantRail({ people }: { people: Consultant[] }) {
     const max = Math.max(node.scrollWidth - node.clientWidth, 0);
     const progress = max ? Math.min(Math.max(node.scrollLeft / max, 0), 1) : 0;
     bar.current?.style.setProperty("--p", progress.toFixed(4));
-    // Maps the first card to the start and the last to the end, so every
-    // person is reachable by scrolling and the highlight stays inside view.
-    setActive(Math.round(progress * last));
+
+    // A focus point sweeps across the visible strip as you scroll: the left
+    // edge at the start, the middle halfway, the right edge at the end. The
+    // card nearest it is the active one, so every person is reachable and the
+    // highlight always sits where the focus point is.
+    const focus = node.scrollLeft + progress * node.clientWidth;
+    const origin = node.getBoundingClientRect().left - node.scrollLeft;
+    let nearest = 0;
+    let nearestDistance = Infinity;
+    node.querySelectorAll<HTMLElement>(".xh-cons-card").forEach((card, index) => {
+      const bounds = card.getBoundingClientRect();
+      const distance = Math.abs(bounds.left + bounds.width / 2 - origin - focus);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = index;
+      }
+    });
+    setActive(nearest);
+
     setEdge((prev) => {
       const next = { start: node.scrollLeft <= 2, end: node.scrollLeft >= max - 2 };
       return prev.start === next.start && prev.end === next.end ? prev : next;
     });
-  }, [last]);
+  }, []);
 
   useEffect(() => {
     const node = rail.current;
@@ -115,6 +134,7 @@ export function ConsultantRail({ people }: { people: Consultant[] }) {
     const onDown = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
       dragging = true;
+      setHovered(null);
       startX = event.clientX;
       startLeft = node.scrollLeft;
       node.setPointerCapture(event.pointerId);
@@ -143,6 +163,27 @@ export function ConsultantRail({ people }: { people: Consultant[] }) {
     };
   }, []);
 
+  // Pointing at a card brings that person into the readout above the rail.
+  useEffect(() => {
+    const node = rail.current;
+    if (!node) return;
+    const onOver = (event: PointerEvent) => {
+      if (event.pointerType !== "mouse" || !(event.target instanceof Element)) return;
+      const card = event.target.closest<HTMLElement>(".xh-cons-card");
+      if (card) setHovered(Number(card.dataset.index));
+    };
+    const onLeave = () => setHovered(null);
+    node.addEventListener("pointerover", onOver);
+    node.addEventListener("pointerleave", onLeave);
+    return () => {
+      node.removeEventListener("pointerover", onOver);
+      node.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
+
+  const shown = hovered ?? active;
+  const current = people[shown];
+
   const scrollBy = (direction: 1 | -1) => {
     const node = rail.current;
     if (!node) return;
@@ -158,9 +199,14 @@ export function ConsultantRail({ people }: { people: Consultant[] }) {
       <div className="xp-shell xh-cons-bar">
         <p className="xh-cons-now" aria-hidden="true">
           <span className="xp-meta">
-            <b>{pad(active + 1)}</b> / {pad(people.length)}
+            <b>{pad(shown + 1)}</b> / {pad(people.length)}
           </span>
-          <strong key={active}>{people[active]?.name}</strong>
+          <strong key={shown}>{current?.name}</strong>
+          {current?.company && (
+            <span className="xh-cons-now-org" key={shown + "-company"}>
+              {current.company}
+            </span>
+          )}
         </p>
         <div className="xh-cons-nav">
           <button
