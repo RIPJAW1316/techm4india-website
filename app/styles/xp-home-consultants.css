@@ -1,0 +1,376 @@
+/* ==========================================================================
+   Landing page: 07 Consultants. Prefix: xh-cons-. Tokens come from
+   xp-foundation.css; the look follows the editorial pass in
+   xp-home-editorial.css (rounded plates, mono counters, red hairlines).
+   ========================================================================== */
+
+.xp-home .xh-cons-section {
+  --xp-bg: #f8f7f3;
+  padding-top: clamp(64px, 8vw, 112px);
+}
+.xp-home .xh-cons-section .xp-head {
+  margin-bottom: clamp(28px, 4vw, 52px);
+}
+
+.xh-cons {
+  --xh-cons-gap: clamp(14px, 1.6vw, 22px);
+  /* Lines the first card up with the page shell, then bleeds off the right. */
+  --xh-cons-pad: max(var(--xp-gutter), calc((100% - var(--xp-max)) / 2));
+}
+
+/* Readout and arrows ------------------------------------------------------ */
+.xh-cons-bar {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+}
+.xh-cons-now {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 18px;
+}
+.xh-cons-now .xp-meta {
+  flex: none;
+}
+.xh-cons-now .xp-meta b {
+  color: var(--xp-red);
+  font-weight: 600;
+}
+.xh-cons-now strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--xp-navy);
+  font: 400 clamp(22px, 2.5vw, 36px) / 1.1 var(--xp-serif);
+  letter-spacing: -0.03em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: xh-cons-name-in 0.45s both var(--xp-ease);
+}
+.xh-cons-nav {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+.xh-cons-nav button {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--xp-line-strong);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--xp-navy);
+  font: 400 20px / 1 var(--xp-sans);
+  cursor: pointer;
+  transition:
+    background 0.25s var(--xp-ease),
+    color 0.25s var(--xp-ease),
+    border-color 0.25s var(--xp-ease),
+    opacity 0.25s var(--xp-ease);
+}
+.xh-cons-nav button span {
+  display: block;
+  transition: transform 0.25s var(--xp-ease);
+}
+.xh-cons-nav button:hover:not(:disabled) {
+  border-color: var(--xp-navy);
+  background: var(--xp-navy);
+  color: #fff;
+}
+.xh-cons-nav button:first-child:hover:not(:disabled) span {
+  transform: translateX(-3px);
+}
+.xh-cons-nav button:last-child:hover:not(:disabled) span {
+  transform: translateX(3px);
+}
+.xh-cons-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* The rail ---------------------------------------------------------------- */
+.xh-cons-rail {
+  --xh-cons-fade-l: 0px;
+  --xh-cons-fade-r: 0px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--xh-cons-pad);
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--xh-cons-fade-l),
+    #000 calc(100% - var(--xh-cons-fade-r)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    #000 var(--xh-cons-fade-l),
+    #000 calc(100% - var(--xh-cons-fade-r)),
+    transparent 100%
+  );
+}
+.xh-cons-rail::-webkit-scrollbar {
+  display: none;
+}
+.xh-cons-rail:focus-visible {
+  outline-offset: -3px;
+}
+/* Fade the edge that still has more to show. */
+.xh-cons[data-start="false"] .xh-cons-rail {
+  --xh-cons-fade-l: clamp(32px, 5vw, 72px);
+}
+.xh-cons[data-end="false"] .xh-cons-rail {
+  --xh-cons-fade-r: clamp(48px, 8vw, 120px);
+}
+.xh-cons-rail.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+/* Two classes so this beats the foundation's `.xp ul { padding: 0 }` reset. */
+.xh-cons .xh-cons-track {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  align-items: flex-start;
+  gap: var(--xh-cons-gap);
+  padding: 14px var(--xh-cons-pad) 30px;
+}
+.xh-cons-card {
+  flex: 0 0 clamp(188px, 17.4vw, 250px);
+  scroll-snap-align: start;
+}
+.xh-cons-card:nth-child(even) {
+  margin-top: clamp(0px, 3.4vw, 48px);
+}
+
+/* Portrait plate ---------------------------------------------------------- */
+.xh-cons-photo {
+  --xh-cons-bg: #e3ded2;
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(135deg, rgb(37 46 74 / 5%) 0 1px, transparent 1px 11px),
+    var(--xh-cons-bg);
+  transition:
+    transform 0.5s var(--xp-ease),
+    box-shadow 0.5s var(--xp-ease);
+}
+.xh-cons-card[data-tint="1"] .xh-cons-photo {
+  --xh-cons-bg: #dde2ee;
+}
+.xh-cons-card[data-tint="2"] .xh-cons-photo {
+  --xh-cons-bg: #efd9d0;
+}
+.xh-cons-card[data-tint="3"] .xh-cons-photo {
+  --xh-cons-bg: #e9e2c8;
+}
+
+/* Initials sit behind the photograph and show whenever it is absent. */
+.xh-cons-mono {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--xp-navy);
+  font: italic 400 clamp(54px, 6.4vw, 88px) / 1 var(--xp-serif);
+  letter-spacing: -0.05em;
+  opacity: 0.5;
+}
+.xh-cons-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  filter: grayscale(1) contrast(1.04);
+  transition:
+    filter 0.55s var(--xp-ease),
+    transform 0.8s var(--xp-ease);
+}
+.xh-cons-photo .xp-meta {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  bottom: 10px;
+  padding: 3px 7px;
+  background: var(--xp-ink);
+  color: #fff;
+  transition: background 0.3s var(--xp-ease);
+}
+.xh-cons-photo::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgb(255 255 255 / 42%);
+  border-radius: 7px;
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 0.35s var(--xp-ease),
+    transform 0.35s var(--xp-ease);
+  pointer-events: none;
+}
+
+.xh-cons-name {
+  position: relative;
+  display: block;
+  padding: 14px 0 9px;
+  color: var(--xp-navy);
+  font: 400 clamp(19px, 1.65vw, 24px) / 1.15 var(--xp-serif);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.xh-cons-name::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--xp-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--xp-ease);
+}
+
+/* The active card follows the scroll position, so touch screens get the
+   same colour and lift that a mouse gets from hover. */
+.xh-cons-card.is-active .xh-cons-photo img {
+  filter: grayscale(0) saturate(0.95);
+  transform: scale(1.04);
+}
+.xh-cons-card.is-active .xh-cons-photo {
+  transform: translateY(-6px);
+  box-shadow: 0 26px 38px -28px rgb(19 35 67 / 55%);
+}
+.xh-cons-card.is-active .xh-cons-photo::after {
+  opacity: 1;
+  transform: scale(1);
+}
+.xh-cons-card.is-active .xh-cons-photo .xp-meta {
+  background: var(--xp-red);
+}
+.xh-cons-card.is-active .xh-cons-name::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .xh-cons-card:hover .xh-cons-photo img {
+    filter: grayscale(0) saturate(0.95);
+    transform: scale(1.04);
+  }
+  .xh-cons-card:hover .xh-cons-photo {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 38px -28px rgb(19 35 67 / 55%);
+  }
+  .xh-cons-card:hover .xh-cons-photo::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .xh-cons-card:hover .xh-cons-photo .xp-meta {
+    background: var(--xp-red);
+  }
+  .xh-cons-card:hover .xh-cons-name::after {
+    transform: scaleX(1);
+  }
+
+  /* While the pointer is on a card, the scroll-driven highlight steps back. */
+  .xh-cons-track:has(.xh-cons-card:hover) .xh-cons-card.is-active:not(:hover) .xh-cons-photo img {
+    filter: grayscale(1) contrast(1.04);
+    transform: none;
+  }
+  .xh-cons-track:has(.xh-cons-card:hover) .xh-cons-card.is-active:not(:hover) .xh-cons-photo {
+    transform: none;
+    box-shadow: none;
+  }
+  .xh-cons-track:has(.xh-cons-card:hover) .xh-cons-card.is-active:not(:hover) .xh-cons-photo::after {
+    opacity: 0;
+  }
+  .xh-cons-track:has(.xh-cons-card:hover) .xh-cons-card.is-active:not(:hover) .xh-cons-photo .xp-meta {
+    background: var(--xp-ink);
+  }
+  .xh-cons-track:has(.xh-cons-card:hover) .xh-cons-card.is-active:not(:hover) .xh-cons-name::after {
+    transform: scaleX(0);
+  }
+}
+
+/* Footer: progress rule and count ------------------------------------------ */
+.xh-cons-progress {
+  position: relative;
+  height: 2px;
+  margin-top: 6px;
+  background: var(--xp-line);
+}
+.xh-cons-progress span {
+  position: absolute;
+  inset: 0;
+  background: var(--xp-red);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+  transition: transform 0.15s linear;
+}
+.xh-cons .xh-cons-hint {
+  margin-top: 14px;
+}
+
+@keyframes xh-cons-name-in {
+  from {
+    opacity: 0;
+    translate: 0 0.3em;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .xh-cons-card {
+    flex-basis: clamp(168px, 56vw, 236px);
+  }
+  .xh-cons-bar {
+    min-height: 56px;
+  }
+  .xh-cons-nav button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xh-cons-now strong {
+    animation: none;
+  }
+  .xh-cons-photo,
+  .xh-cons-photo img,
+  .xh-cons-photo::after,
+  .xh-cons-name::after,
+  .xh-cons-progress span,
+  .xh-cons-nav button,
+  .xh-cons-nav button span {
+    transition: none;
+  }
+  .xh-cons-card.is-active .xh-cons-photo,
+  .xh-cons-card:hover .xh-cons-photo,
+  .xh-cons-card.is-active .xh-cons-photo img,
+  .xh-cons-card:hover .xh-cons-photo img {
+    transform: none;
+  }
+}

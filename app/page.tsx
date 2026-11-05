@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import { ActivityBoard } from "./components/xp/home/ActivityBoard";
+import { ConsultantRail } from "./components/xp/home/ConsultantRail";
 import { DivisionExplorer } from "./components/xp/home/DivisionExplorer";
 import { HeroEcosystem } from "./components/xp/home/HeroEcosystem";
 import { FeaturedWork } from "./components/xp/home/FeaturedWork";
@@ -8,10 +9,12 @@ import { UpdatesFeed } from "./components/xp/home/UpdatesFeed";
 import { Btn, ClosingPaths, Kicker, SectionHead, TextLink } from "./components/xp/Primitives";
 import { ProfileDialog } from "./components/xp/ProfileDialog";
 import { StructuredData } from "./components/StructuredData";
+import { consultants } from "@/lib/content/consultants";
 import { activities, ecosystem, leads, updates, updatesReviewedOn } from "@/lib/content/home";
 import { contact } from "@/lib/site-data";
 import { pageMetadata } from "@/lib/seo";
 import "./styles/xp-home-editorial.css";
+import "./styles/xp-home-consultants.css";
 
 export const metadata = pageMetadata({
   title: "TechM4India | Schools, Engineering, Solutions, Space & Institutes",
@@ -235,6 +238,25 @@ export default function Home() {
           <div className="xh-leads-foot">
             <TextLink href="/about">Meet the founders and the wider team</TextLink>
           </div>
+        </div>
+      </section>
+
+      <section className="xp-section xh-cons-section" id="consultants" aria-labelledby="cons-title">
+        <div className="xp-shell">
+          <SectionHead
+            index="07"
+            label="The consultants"
+            id="cons-title"
+            title={
+              <>
+                Professionals from industry, <em>working alongside us.</em>
+              </>
+            }
+            lede="Working professionals from across industry who have joined TechM4India's consultant network. Scroll, drag or use the arrows to meet them."
+          />
+        </div>
+        <div data-home-reveal="">
+          <ConsultantRail people={consultants} />
         </div>
       </section>
 
