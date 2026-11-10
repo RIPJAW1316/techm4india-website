@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 import { ActivityBoard } from "./components/xp/home/ActivityBoard";
 import { ConsultantRail } from "./components/xp/home/ConsultantRail";
+import { CredibilityBand } from "./components/xp/home/CredibilityBand";
 import { DivisionExplorer } from "./components/xp/home/DivisionExplorer";
 import { HeroEcosystem } from "./components/xp/home/HeroEcosystem";
 import { FeaturedWork } from "./components/xp/home/FeaturedWork";
@@ -15,6 +16,7 @@ import { contact } from "@/lib/site-data";
 import { pageMetadata } from "@/lib/seo";
 import "./styles/xp-home-editorial.css";
 import "./styles/xp-home-consultants.css";
+import "./styles/xp-home-credibility.css";
 
 export const metadata = pageMetadata({
   title: "TechM4India | Schools, Engineering, Solutions, Space & Institutes",
@@ -45,6 +47,7 @@ export default function Home() {
     <main className="xp xp-home">
       <HomeMotion />
       <HeroEcosystem divisions={ecosystem} />
+      <CredibilityBand divisionCount={ecosystem.length} />
 
       <section className="xp-section xh-idea" aria-labelledby="idea-title">
         <div className="xp-shell xh-idea-grid">

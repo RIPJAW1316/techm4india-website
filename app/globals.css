@@ -1900,34 +1900,6 @@ em {
   margin-left: 8px;
   font-size: 15px;
 }
-.announcement-marquee {
-  min-width: 0;
-  overflow: hidden;
-}
-.announcement-marquee > div {
-  width: max-content;
-  display: flex;
-  align-items: center;
-  gap: 31px;
-  white-space: nowrap;
-  animation: announcement-scroll 46s linear infinite;
-}
-.announcement-marquee span {
-  opacity: 0.94;
-}
-.announcement-marquee i {
-  color: #ffd2b1;
-  font-style: normal;
-  font-size: 13px;
-}
-@keyframes announcement-scroll {
-  to {
-    transform: translateX(-50%);
-  }
-}
-.announcement:hover .announcement-marquee > div {
-  animation-play-state: paused;
-}
 
 .floating-header {
   top: 64px;
@@ -1979,7 +1951,7 @@ em {
   gap: 2px;
   padding-right: 9px;
 }
-.header-login {
+.header-cta {
   min-height: 46px;
   padding: 0 16px;
   display: inline-flex;
@@ -1994,11 +1966,11 @@ em {
   text-transform: uppercase;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-.header-login:hover {
+.header-cta:hover {
   background: var(--tm-navy);
   transform: translateY(-1px);
 }
-.header-login i {
+.header-cta i {
   font-style: normal;
   font-size: 15px;
   line-height: 1;
@@ -4883,13 +4855,6 @@ em {
   .announcement > a {
     display: none;
   }
-  .announcement-marquee > div {
-    gap: 19px;
-    animation-duration: 38s;
-  }
-  .announcement-marquee span {
-    font-size: 12px;
-  }
   .floating-header {
     top: 52px;
     width: calc(100% - 24px);
@@ -4924,7 +4889,7 @@ em {
     gap: 0;
     padding-right: 5px;
   }
-  .header-login {
+  .header-cta {
     min-height: 46px;
     padding-inline: 12px;
     font-size: 12px;

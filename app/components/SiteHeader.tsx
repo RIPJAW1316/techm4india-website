@@ -3,15 +3,75 @@
 /* eslint-disable @next/next/no-img-element -- Direct image URLs support the static Vinext deployment. */
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { contact, divisions, navigation, socialLinks } from "@/lib/site-data";
 
+/** The header's inline links. Home is the logo and Contact is the button beside them. */
+const primaryLinks = navigation.filter((item) => item.href !== "/" && item.href !== "/contact");
+
+/**
+ * Where the header sits. "rest" is its place at the top of the page. Once that
+ * has scrolled away it becomes fixed: "parked" and "hidden" keep it off screen,
+ * "shown" brings it back while the reader scrolls up.
+ */
+type Pin = "rest" | "parked" | "hidden" | "shown";
+
+/** Matches `top` on `.floating-header[data-pin]` in site-polish.css. */
+const PINNED_TOP = 10;
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [pin, setPin] = useState<Pin>("rest");
+  const pathname = usePathname();
+  const header = useRef<HTMLElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const menuOverlay = useRef<HTMLDivElement>(null);
   const wasOpen = useRef(false);
+
+  useEffect(() => {
+    const node = header.current;
+    if (!node) return;
+    let state: Pin = "rest";
+    let restTop = node.offsetTop;
+    let last = window.scrollY;
+    let frame = 0;
+
+    const apply = (next: Pin) => {
+      if (next === state) return;
+      state = next;
+      setPin(next);
+    };
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const delta = y - last;
+      last = y;
+      if (state === "rest") {
+        restTop = node.offsetTop;
+        // Take over only after the resting header is out of view, so nothing jumps.
+        if (y > restTop + node.offsetHeight + 40) apply("parked");
+        return;
+      }
+      // At this scroll position the fixed header sits exactly where it rests in the page.
+      if (y <= restTop - PINNED_TOP) apply("rest");
+      else if (delta < -4) apply("shown");
+      else if (delta > 4 && state === "shown") apply("hidden");
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("menu-is-open", open);
@@ -64,42 +124,50 @@ export function SiteHeader() {
 
   return (
     <>
-      <aside className="announcement" aria-label="TechM4India announcements">
-        <span className="announcement-label">TechM4India update</span>
-        <div className="announcement-marquee" aria-hidden="true">
-          <div>
-            <span>Institution innovation partnerships</span>
-            <i>✦</i>
-            <span>Hands-on engineering programs</span>
-            <i>✦</i>
-            <span>Future-ready school labs</span>
-            <i>✦</i>
-            <span>Aerospace learning pathways</span>
-            <i>✦</i>
-            <span>Institution innovation partnerships</span>
-            <i>✦</i>
-            <span>Hands-on engineering programs</span>
-            <i>✦</i>
-          </div>
-        </div>
-        <Link href="/contact">
-          Partner with us <span aria-hidden="true">↗</span>
-        </Link>
+      <aside className="announcement" aria-label="About TechM4India">
+        <span className="announcement-label">TechM4India Innovations Pvt. Ltd.</span>
+        <p>Hyderabad, India · Schools · Engineering · Solutions · Space · Institutes</p>
+        <a href="/login">
+          ERP login <span aria-hidden="true">↗</span>
+        </a>
       </aside>
 
-      <header className="floating-header">
+      <header
+        ref={header}
+        className="floating-header"
+        data-pin={pin === "rest" ? undefined : pin}
+      >
         <Link className="brand" href="/" aria-label="TechM4India home">
           <img src="/images/brand/logo.png" alt="" width="48" height="48" />
           <span className="brand-type">
             TECHM4<span>INDIA</span>
           </span>
         </Link>
+        <nav className="header-nav" aria-label="Main">
+          <ul>
+            {primaryLinks.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={
+                    pathname === item.href || pathname.startsWith(item.href + "/")
+                      ? "page"
+                      : undefined
+                  }
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <p className="header-prompt">Engineering imagination into impact.</p>
         <div className="header-actions">
-          <a className="header-login" href="/login">
-            <span>ERP login</span>
+          <Link className="header-cta" href="/contact">
+            <span className="header-cta-long">Partner with us</span>
+            <span className="header-cta-short">Contact</span>
             <i aria-hidden="true">↗</i>
-          </a>
+          </Link>
           <button
             ref={menuButton}
             className="menu-trigger"

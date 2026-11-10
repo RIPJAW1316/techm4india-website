@@ -34,9 +34,14 @@ export function HeroEcosystem({ divisions }: { divisions: EcosystemDivision[] })
 
         <div className="xh-cover-bottom">
           <p>From a first working robot to software in production, we give ideas somewhere to go.</p>
-          <Link className="xh-cover-cta" href="#ecosystem">
-            Explore the ecosystem <span aria-hidden="true">↘</span>
-          </Link>
+          <div className="xh-cover-actions">
+            <Link className="xh-cover-cta" href="#ecosystem">
+              Explore the ecosystem <span aria-hidden="true">↘</span>
+            </Link>
+            <Link className="xh-cover-cta xh-cover-cta--line" href="/contact">
+              Partner with us <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
         </div>
       </div>
       <div className="xh-cover-foot xp-shell">

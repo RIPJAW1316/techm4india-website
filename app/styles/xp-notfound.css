@@ -1,0 +1,87 @@
+/* ==========================================================================
+   404 page. Prefix: xn-. Tokens and type come from xp-foundation.css.
+   ========================================================================== */
+
+.xp-notfound .xn {
+  /* Clears the floating header, which sits over the top of every page. */
+  padding-top: clamp(190px, 17vw, 250px);
+}
+.xn-head {
+  display: grid;
+  max-width: 760px;
+  gap: clamp(18px, 2vw, 26px);
+  justify-items: start;
+}
+.xn-head .xp-actions {
+  margin-top: 6px;
+}
+
+/* Two classes so this beats the foundation's `.xp ul { margin: 0 }` reset. */
+.xp-notfound .xn-list {
+  margin-top: clamp(48px, 6vw, 84px);
+  border-top: 1px solid var(--xp-line-strong);
+}
+.xn-list a {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 3fr) minmax(0, 5fr) 28px;
+  gap: clamp(14px, 2vw, 32px);
+  align-items: center;
+  min-height: 84px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--xp-line);
+  color: inherit;
+  transition:
+    background 0.3s var(--xp-ease),
+    padding 0.3s var(--xp-ease);
+}
+.xn-list a:hover,
+.xn-list a:focus-visible {
+  padding-inline: 14px;
+  background: rgb(255 255 255 / 55%);
+}
+.xn-list .xp-meta {
+  color: var(--xp-red);
+}
+.xn-list strong {
+  color: var(--xp-navy);
+  font: 400 clamp(22px, 2.2vw, 30px) / 1.1 var(--xp-serif);
+  letter-spacing: -0.03em;
+}
+.xn-text {
+  color: var(--xp-muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.xn-list i {
+  color: var(--xp-red);
+  font-style: normal;
+  font-variant-emoji: text;
+  transition: transform 0.25s var(--xp-ease);
+}
+.xn-list a:hover i,
+.xn-list a:focus-visible i {
+  transform: translate(3px, -3px);
+}
+
+@media (max-width: 760px) {
+  .xp-notfound .xn {
+    padding-top: 164px;
+  }
+  .xn-list a {
+    grid-template-columns: 34px minmax(0, 1fr) 22px;
+    gap: 4px 12px;
+  }
+  .xn-text {
+    grid-column: 2 / 3;
+  }
+  .xn-list i {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xn-list a,
+  .xn-list i {
+    transition: none;
+  }
+}

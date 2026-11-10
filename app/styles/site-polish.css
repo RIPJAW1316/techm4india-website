@@ -103,3 +103,179 @@
     padding-bottom: 290px;
   }
 }
+
+/* Top bar: calm and static -------------------------------------------------------
+   Replaces the red scrolling marquee, which read as a promotion. A still, dark
+   bar with the legal name and a single call to action reads as a company. */
+.announcement {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  background: #10172b;
+  box-shadow: inset 0 -2px 0 var(--tm-red);
+}
+.announcement p {
+  overflow: hidden;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  opacity: 0.78;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .announcement {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* On a phone the legal name is more useful than a truncated list. */
+  .announcement .announcement-label {
+    display: block;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
+  .announcement p,
+  .announcement > a {
+    display: none;
+  }
+}
+
+/* Header: navigation people can see ---------------------------------------------
+   On wide screens the header carries the main links inline, where the tagline
+   used to be, and its one button asks for a conversation. The ERP sign-in is a
+   staff tool, so it moves up to the quiet top bar (and stays in the menu). */
+.header-nav {
+  display: none;
+}
+.header-cta-short {
+  display: none;
+}
+.announcement > a {
+  opacity: 0.86;
+  transition: opacity 0.2s ease;
+}
+.announcement > a:hover,
+.announcement > a:focus-visible {
+  opacity: 1;
+}
+
+@media (min-width: 1200px) {
+  .floating-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  /* A plain bar with the brand's angled corners; the centre notch framed the tagline. */
+  .floating-header::before {
+    clip-path: polygon(0 0, 100% 0, 100% 74%, 97.3% 100%, 2.7% 100%, 0 74%);
+  }
+  .header-prompt {
+    display: none;
+  }
+  .header-nav {
+    display: block;
+    justify-self: center;
+    padding-bottom: 7px;
+  }
+  .header-nav ul {
+    display: flex;
+    gap: clamp(16px, 2vw, 30px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .header-nav a {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--tm-navy-deep);
+    font-family: var(--tm-sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    transition: color 0.2s ease;
+  }
+  .header-nav a::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    left: 0;
+    height: 2px;
+    background: var(--tm-red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .header-nav a:hover,
+  .header-nav a[aria-current="page"] {
+    color: var(--tm-red);
+  }
+  .header-nav a:hover::after,
+  .header-nav a:focus-visible::after,
+  .header-nav a[aria-current="page"]::after {
+    transform: scaleX(1);
+  }
+}
+@media (max-width: 760px) {
+  .header-cta-long {
+    display: none;
+  }
+  .header-cta-short {
+    display: inline;
+  }
+}
+
+/* Header: comes back when you scroll up -----------------------------------------
+   Pages run to several screens. Once the header has scrolled away it is held
+   just above the viewport, and slides back in the moment the reader scrolls up.
+   "parked" has no transition so taking over from the resting header is invisible. */
+.floating-header[data-pin] {
+  position: fixed;
+  top: 10px;
+}
+.floating-header[data-pin="parked"] {
+  transform: translate(-50%, -230%);
+  transition: none;
+}
+.floating-header[data-pin="hidden"] {
+  transform: translate(-50%, -230%);
+  transition: transform 0.3s ease;
+}
+.floating-header[data-pin="shown"],
+.floating-header[data-pin]:focus-within {
+  transform: translate(-50%, 0);
+  transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-header[data-pin] {
+    transition: none;
+  }
+  .header-nav a,
+  .header-nav a::after {
+    transition: none;
+  }
+}
+
+/* Reveals: content first ---------------------------------------------------------
+   Sections used to start invisible and wait for JavaScript. Now they are visible
+   until MotionController adds `reveal-ready`, so the first paint has the content
+   and a failed script cannot blank a page. */
+html:not(.reveal-ready) [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Small phones: the brand, the button and the menu have to share about 300px.
+   The button drops its arrow first, and on the narrowest screens it steps aside
+   (Contact is the last item in the menu). */
+@media (max-width: 400px) {
+  .header-cta {
+    padding-inline: 10px;
+  }
+  .header-cta i {
+    display: none;
+  }
+}
+@media (max-width: 340px) {
+  .header-cta {
+    display: none;
+  }
+}
