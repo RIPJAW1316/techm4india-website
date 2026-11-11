@@ -181,10 +181,10 @@
     box-shadow 0.5s var(--xp-ease);
 }
 .xh-cons-card[data-tint="1"] .xh-cons-photo {
-  --xh-cons-bg: #dde2ee;
+  --xh-cons-bg: #e6e2d6;
 }
 .xh-cons-card[data-tint="2"] .xh-cons-photo {
-  --xh-cons-bg: #efd9d0;
+  --xh-cons-bg: #eee0d1;
 }
 .xh-cons-card[data-tint="3"] .xh-cons-photo {
   --xh-cons-bg: #e9e2c8;

@@ -63,7 +63,7 @@ function Brand({ onDark = false }: { onDark?: boolean }) {
         <strong>
           TechM4<span>Schools</span>
         </strong>
-        <small style={onDark ? { color: "#e8f7ef" } : undefined}>Learn · Build · Lead</small>
+        <small style={onDark ? { color: "#f2efe6" } : undefined}>Learn · Build · Lead</small>
       </span>
     </a>
   );

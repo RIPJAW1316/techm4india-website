@@ -9,14 +9,14 @@
    photo overlays are deliberately left alone. */
 .sf-concept-cat,
 .sf-step-no {
-  color: #bb5327; /* was #ef6a32 on white, 3.1:1 */
+  color: #a8222e; /* was #ef6a32 on white, 3.1:1 */
 }
 .sc-stats strong sup,
 .sc-field > span b {
-  color: #ce4135; /* was #e9493c on white, 3.8:1 */
+  color: #c62d37; /* was #e9493c on white, 3.8:1 */
 }
 .sc-footer h3 {
-  color: #fff0b8; /* was #ffcb2f on the footer green, 3.4:1 */
+  color: #f4ddc3; /* was #ffcb2f on the footer green, 3.4:1 */
 }
 .sc-socials a {
   /* White text on the lighter green chip was 4.0:1. A fainter fill passes, and
@@ -279,3 +279,6 @@ html:not(.reveal-ready) [data-reveal] {
     display: none;
   }
 }
+
+/* Contact: the kicker sat red-on-red inside the red form panel. */
+.contact-form-panel .section-kicker { color: #fff; }

@@ -78,11 +78,11 @@ export const metadata = pageMetadata({
 const delay = (ms: number) => ({ "--delay": ms + "ms" }) as CSSProperties;
 
 const LAB_LOOK: { icon: LucideIcon; a: string; b: string }[] = [
-  { icon: Code, a: "#1f4f9f", b: "#0f2c63" },
-  { icon: Bot, a: "#0b7d3e", b: "#075a2d" },
-  { icon: Plane, a: "#1a8fc7", b: "#0f5f8c" },
-  { icon: Brain, a: "#6a3fb5", b: "#43237f" },
-  { icon: Lightbulb, a: "#e9493c", b: "#a8261d" },
+  { icon: Code, a: "#c62d37", b: "#8f1e27" },
+  { icon: Bot, a: "#253663", b: "#161f3a" },
+  { icon: Plane, a: "#a8222e", b: "#6e1620" },
+  { icon: Brain, a: "#2e3f73", b: "#1b2547" },
+  { icon: Lightbulb, a: "#c9792e", b: "#8a4c17" },
 ];
 const KIT_ICONS: LucideIcon[] = [Bot, CircuitBoard, Plane, Puzzle];
 const OUTCOME_ICONS: LucideIcon[] = [Puzzle, Zap, Brain, Lightbulb, Users, Compass];

@@ -9,29 +9,29 @@
 :root {
   /* Navy and electric blue, after the reference; red kept for the brand wordmark. */
   --ds-ink: #050b2e;
-  --ds-brand-red: #df2a33;
+  --ds-brand-red: #c62d37;
   --ds-indigo-950: #060d38;
   --ds-indigo-900: #0a165e;
   --ds-indigo-800: #0f2178;
   --ds-indigo-700: #172e9c;
   --ds-indigo-600: #2f5bff;
-  --ds-indigo-100: #e6ecff;
-  --ds-indigo-50: #f0f4ff;
+  --ds-indigo-100: #efece4;
+  --ds-indigo-50: #f7f6f2;
   --ds-accent: #2f5bff;
   --ds-accent-600: #1c45e6;
-  --ds-accent-100: #e8eeff;
+  --ds-accent-100: #efece4;
 
   /* Neutrals */
   --ds-heading: #0a165e;
   --ds-text: #555a70;
   --ds-muted: #6b7088;
-  --ds-line: #e5e7f0;
+  --ds-line: #efece4;
   --ds-line-strong: #d4d7e5;
-  --ds-soft: #f4f6fa;
+  --ds-soft: #f7f6f2;
   --ds-white: #fff;
 
   /* On dark */
-  --ds-on-dark: #f3f2fb;
+  --ds-on-dark: #f7f6f2;
   --ds-on-dark-muted: #b8b6d6;
   --ds-dark-line: rgba(255, 255, 255, 0.12);
   --ds-dark-card: rgba(255, 255, 255, 0.05);
@@ -225,7 +225,7 @@
 .tm-bg-dark .tm-h1 .tm-accent,
 .tm-bg-dark .tm-h2 .tm-accent,
 .tm-hero .tm-h1 .tm-accent {
-  background: linear-gradient(90deg, #8ea8ff, #c8d6ff);
+  background: linear-gradient(90deg, #8ea8ff, #e6e2d6);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -490,7 +490,7 @@ a.tm-card:hover .tm-icon {
   color: #137a43;
 }
 .tm-badge--grey {
-  background: #eef0f5;
+  background: #efece4;
   color: #555b72;
 }
 .tm-badge--dot::before {
@@ -2368,14 +2368,14 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   --ds-indigo-600: #315bff;
   --ds-accent: #315bff;
   --ds-accent-600: #1e46e7;
-  --ds-accent-100: #e9eeff;
+  --ds-accent-100: #efece4;
   --ds-heading: #0b1954;
   --ds-text: #4d5775;
   --ds-muted: #6c7796;
-  --ds-line: #e3e8f4;
+  --ds-line: #efece4;
   --ds-line-strong: #cdd6eb;
-  --ds-soft: #f5f7fd;
-  --ds-on-dark: #fbfcff;
+  --ds-soft: #f7f6f2;
+  --ds-on-dark: #f7f6f2;
   --ds-on-dark-muted: #b6c4ed;
   --ds-radius: 16px;
   --ds-radius-sm: 9px;
@@ -2388,13 +2388,13 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-world--solutions .tm-topbar {
   background: #0b1e7c;
-  color: #dce5ff;
+  color: #efece4;
 }
 .tm-world--solutions .tm-topbar svg {
   color: #a9c2ff;
 }
 .tm-world--solutions .tm-header {
-  border-bottom-color: #edf0f8;
+  border-bottom-color: #efece4;
   background: rgba(255, 255, 255, .93);
   backdrop-filter: saturate(180%) blur(20px);
 }
@@ -2508,7 +2508,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   justify-content: space-between;
   gap: 18px;
   padding-bottom: 24px;
-  border-bottom: 1px solid rgba(200, 215, 255, .15);
+  border-bottom: 1px solid rgba(230, 226, 214, .15);
   color: #a9b8ea;
   font-size: 11px;
   font-weight: 800;
@@ -2575,7 +2575,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   min-height: 53px;
 }
 .tm-world--solutions .tm-hero .tm-btn--ghost {
-  border-color: rgba(199, 215, 255, .38);
+  border-color: rgba(230, 226, 214, .38);
   background: rgba(255, 255, 255, .025);
 }
 .tm-world--solutions .tm-hero .tm-btn--ghost:hover {
@@ -2826,7 +2826,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   gap: 1px;
 }
 .tm-system-layer-copy strong {
-  color: #f5f7ff;
+  color: #f7f6f2;
   font-family: var(--ds-display);
   font-size: 13px;
 }
@@ -2850,7 +2850,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   align-items: center;
   gap: 8px;
   margin-top: 26px;
-  color: #c2d2ff !important;
+  color: #e6e2d6 !important;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .1em;
@@ -2896,7 +2896,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-trust {
   margin-top: 0;
   padding-block: 18px 21px;
-  border-top-color: rgba(195, 209, 255, .2);
+  border-top-color: rgba(230, 226, 214, .2);
 }
 .tm-world--solutions .tm-trust > span {
   color: #7f96dc;
@@ -2967,7 +2967,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   box-shadow: 0 23px 49px -25px rgba(6, 22, 91, .34);
 }
 .tm-world--solutions .tm-collage-float {
-  border: 1px solid #dce4fa;
+  border: 1px solid #efece4;
   border-radius: 8px;
   box-shadow: 0 30px 58px -36px rgba(20, 52, 143, .39);
 }
@@ -3002,7 +3002,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   background:
     radial-gradient(900px 420px at 95% 0%, rgba(112, 146, 255, .31), transparent 75%),
     linear-gradient(110deg, #0d2080, #112fb3 60%, #2149da);
-  color: #e7edff;
+  color: #efece4;
 }
 .tm-world--solutions .tm-record-section::before {
   position: absolute;
@@ -3028,7 +3028,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   gap: 16px;
   padding: 19px 24px 10px;
   border: 0;
-  border-left: 1px solid rgba(219, 230, 255, .34);
+  border-left: 1px solid rgba(239, 236, 228, .34);
   border-radius: 0;
   background: transparent;
 }
@@ -3041,7 +3041,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-stat strong sup { color: #a9c8ff; }
 .tm-world--solutions .tm-stat span {
   max-width: 20ch;
-  color: #c8d6ff;
+  color: #e6e2d6;
   font-size: 12px;
   font-weight: 600;
 }
@@ -3091,7 +3091,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(110deg, #edf2ff, #f8faff 70%);
+  background: linear-gradient(110deg, #efece4, #f7f6f2 70%);
   content: "";
   transform: scaleX(0);
   transform-origin: left center;
@@ -3115,7 +3115,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   width: 44px;
   height: 44px;
   border-radius: 8px;
-  background: #ecf1ff;
+  background: #efece4;
   color: #315bff;
   transition: transform .45s var(--ds-ease), background .4s ease, color .4s ease;
 }
@@ -3151,7 +3151,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   width: 35px;
   height: 35px;
   place-items: center;
-  border: 1px solid #d6dff6;
+  border: 1px solid #e6e2d6;
   border-radius: 50%;
   color: #315bff;
   transition: transform .4s var(--ds-ease), border-color .4s ease, background .4s ease, color .4s ease;
@@ -3203,7 +3203,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-drivers-list .tm-h3 { font-size: 21px; }
 .tm-world--solutions .tm-drivers-list .tm-body { color: #a8b7e1; font-size: 13px; }
 .tm-world--solutions .tm-wall {
-  border-color: #dce5fa;
+  border-color: #efece4;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 42px 110px -60px rgba(10, 31, 109, .35);
@@ -3215,9 +3215,9 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-wall-grid { gap: 8px; }
 .tm-world--solutions .tm-wall-grid li {
   min-height: 56px;
-  border-color: #e6ebf8;
+  border-color: #efece4;
   border-radius: 5px;
-  background: #f8faff;
+  background: #f7f6f2;
   color: #233576;
   font-size: 11.5px;
   font-weight: 700;
@@ -3225,7 +3225,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-world--solutions .tm-wall-grid li:hover {
   border-color: #a9bfff;
-  background: #eef3ff;
+  background: #f7f6f2;
   color: #315bff;
   transform: translateY(-3px);
 }
@@ -3233,7 +3233,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 /* A product-like feature panel anchors the portfolio before the filter grid. */
 .tm-world--solutions .tm-work-section {
   padding-top: clamp(85px, 9vw, 128px);
-  background: #f5f7fd;
+  background: #f7f6f2;
 }
 .tm-world--solutions .tm-featured {
   position: relative;
@@ -3310,12 +3310,12 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   border-color: rgba(146, 170, 255, .2);
   border-radius: 4px;
   background: rgba(106, 132, 255, .13);
-  color: #d4dfff;
+  color: #efece4;
   font-size: 11px;
 }
 .tm-world--solutions .tm-work-card {
   overflow: hidden;
-  border: 1px solid #dfe6f5;
+  border: 1px solid #efece4;
   border-radius: 8px;
   box-shadow: 0 17px 35px -30px rgba(12, 32, 103, .25);
   transition: transform .45s var(--ds-ease), box-shadow .45s var(--ds-ease), border-color .45s ease;
@@ -3333,7 +3333,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-work-card .tm-work-problem { font-size: 13.5px; }
 .tm-world--solutions .tm-work-card .tm-chip {
   border-radius: 3px;
-  background: #f0f4ff;
+  background: #f7f6f2;
   color: #31498f;
   font-size: 11px;
 }
@@ -3374,7 +3374,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-process .tm-card {
   min-height: 350px;
   padding: 24px 18px;
-  border: 1px solid #e0e7f6;
+  border: 1px solid #efece4;
   border-radius: 0;
   background: #fff;
   box-shadow: none;
@@ -3382,7 +3382,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 }
 .tm-world--solutions .tm-process .tm-card:hover {
   z-index: 1;
-  background: #f4f7ff;
+  background: #f7f6f2;
   box-shadow: 0 26px 50px -35px rgba(14, 43, 156, .36);
   transform: translateY(-8px);
 }
@@ -3400,7 +3400,7 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
 .tm-world--solutions .tm-process .tm-card .tm-process-receive { font-size: 11px; }
 
 /* Labs retain real local photography; the frame and parallax supply movement. */
-.tm-world--solutions .tm-labs-section { background: #f4f7ff; }
+.tm-world--solutions .tm-labs-section { background: #f7f6f2; }
 .tm-world--solutions .tm-labs-media .tm-media {
   overflow: hidden;
   border-radius: 8px;
@@ -3412,14 +3412,14 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
   object-fit: cover;
 }
 .tm-world--solutions .tm-labs-float {
-  border: 1px solid #d9e3ff;
+  border: 1px solid #efece4;
   border-radius: 8px;
 }
-.tm-world--solutions .tm-labs-offers li { padding-top: 15px; border-top: 1px solid #dce5fb; }
+.tm-world--solutions .tm-labs-offers li { padding-top: 15px; border-top: 1px solid #efece4; }
 .tm-world--solutions .tm-lab-steps li,
 .tm-world--solutions .tm-labs-section .tm-card,
 .tm-world--solutions .tm-labs-who {
-  border: 1px solid #e0e8fa;
+  border: 1px solid #efece4;
   border-radius: 8px;
   box-shadow: 0 22px 48px -37px rgba(15, 47, 157, .25);
 }
@@ -3435,9 +3435,9 @@ body:has(.tm-world) :is(.announcement, .floating-header, .menu-overlay, .site-fo
     radial-gradient(650px 360px at 100% 0%, rgba(255,255,255,.21), transparent 70%),
     linear-gradient(115deg, #2146d8, #315bff 65%, #4b70ff);
 }
-.tm-world--solutions .tm-contact { background: #f8faff; }
+.tm-world--solutions .tm-contact { background: #f7f6f2; }
 .tm-world--solutions .tm-contact-card {
-  border-color: #dce5fb;
+  border-color: #efece4;
   border-radius: 10px;
   box-shadow: 0 35px 75px -46px rgba(19, 54, 163, .34);
 }
